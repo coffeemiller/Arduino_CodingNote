@@ -50,10 +50,10 @@ void loop()
 {
   // put your main code here, to run repeatedly:
 
-  digitalWrite(RED_PIN,HIGH);    //빨간색 LED를 끈다.
-  digitalWrite(GREEN_PIN,HIGH);  //녹색 LED를 끈다.
-  digitalWrite(BLUE_PIN,HIGH);   //파란색 LED를 끈다.
-  val= analogRead(cds);
+  digitalWrite(RED_PIN,HIGH);     //빨간색 LED를 끈다.
+  digitalWrite(GREEN_PIN,HIGH);   //녹색 LED를 끈다.
+  digitalWrite(BLUE_PIN,HIGH);    //파란색 LED를 끈다.
+  val = analogRead(cds);
 
   //Serial.print("CDS = ");
   //Serial.print(val);
@@ -70,7 +70,6 @@ void loop()
     //Serial.print("\n");
   }
 
-
   if(val > 1 && val < 100)          //cds 값이 10-100 사이.  
   {               
     digitalWrite(RED_PIN,LOW);      //빨간색 LED를 켠다.
@@ -78,10 +77,10 @@ void loop()
     digitalWrite(BLUE_PIN,HIGH);    //파란색 LED를 끈다.
     R_co = R_co + 1;
 
-
     Serial.print("R_CDS = ");
     Serial.print(val);
     Serial.print("\n");
+    
     delay(2000);                    //2초간 대기.
   }
 
