@@ -68,26 +68,27 @@ Java는 JVM같은 중간단계를 꼭 거쳐 느리긴 하지만, 어떤 OS에�
   - Map
 
 ##### 사용자 정의 자료형
-'''
+``` java
 class Animal {
 
 }
 
 Animal cat;
-'''
-cat이라는 현수는 Animal 자료형 변수이다. cat이라는 변수에는 Animal 자료형에 해당되는 값만 담을 수 있다.'''
+```
+cat이라는 현수는 Animal 자료형 변수이다.  cat이라는 변수에는 Animal 자료형에 해당되는 값만 담을 수 있다.
 
 
 #### 주석
 ##### 블록 주석
-'''/*
+``` JAVA
+/*
 프로그램의 저작권
 이 프로그램의 저작권은 홍길동에게 있습니다.
 Copyright 2018.
-*/'''
+*/
 public class MyProgram {
 }
-
+```
 
 
 
