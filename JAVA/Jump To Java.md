@@ -75,19 +75,18 @@ class Animal {
 
 Animal cat;
 '''
-cat이라는 현수는 Animal 자료형 변수이다. cat이라는 변수에는 Animal 자료형에 해당되는 값만 담을 수 있다.
+cat이라는 현수는 Animal 자료형 변수이다. cat이라는 변수에는 Animal 자료형에 해당되는 값만 담을 수 있다.'''
 
 
 #### 주석
 ##### 블록 주석
-  /*
-  프로그램의 저작권
-  이 프로그램의 저작권은 홍길동에게 있습니다.
-  Copyright 2018.
-  */
-  public class MyProgram {
-
-  }
+'''/*
+프로그램의 저작권
+이 프로그램의 저작권은 홍길동에게 있습니다.
+Copyright 2018.
+*/'''
+public class MyProgram {
+}
 
 
 
