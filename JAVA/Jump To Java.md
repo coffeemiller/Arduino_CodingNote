@@ -63,15 +63,24 @@ Java는 JVM같은 중간단계를 꼭 거쳐 느리긴 하지만, 어떤 OS에�
 + 변수명은 숫자로 시작할 수 없다.
 + _ (underscore)와 $ 문자 이외의 특수문자는 사용할 수 없다.
 + 자바의 키워드는 변수명으로 사용할 수 없다.(예:int, class, return 등)
+``` JAVA
+    int a;
+		a = 1;
+		System.out.println(a+1);    //2
+
+		a = 2;
+		System.out.println(a+1);    //3
+```
+
 
 ##### 자료형(Type)
 + int a; ... "변수 a는 int자료형 변수이다. 즉 a라는 변수에 정수값만 담을 수 있다."
 + string b; ... "변수 b는 String 자료형 변수이다. 즉 b라는 변수에 문자열값만 담을 수 있다."
 
 ##### 자주 쓰이는 자료형
-  - int
+  - int              // 정수... 0을 기준으로 한 양수와 음수를 의미.
   - long
-  - double
+  - double           // 정수와 정수 사이의 존재하는 무한대의 많은 수. ex) 1.1, 1.11
   - boolean
   - char
   - String
@@ -146,6 +155,60 @@ float와 double의 차이 역시 표현할 수 있는 숫자의 범위이다.
 
 
 ##### [ 숫자연산 ]
+``` java
+System.out.println(1+2);
+결과 : 3
+
+System.out.println(1.2+1.3);
+결과 : 2.5
+
+곱하기를 할 때는 *(에스터리스크, Asterisk, 키보드 자판상으로 숫자 8 위)를 사용한다.
+System.out.println(2*5);
+결과 : 10
+
+나누기를 할 때는 /(슬래쉬, slash, 키보드 자판상으로 오른쪽 shift 키 왼쪽)를 사용한다.
+System.out.println(6/2);
+```
+
+
+##### [문자와 문자열]
+
+자바는 문자(Character)와 문자열(String)을 구분한다.  
+문자는 한 글자를 의미하고, 문자열은 여러 개의 문자가 결합한 것을 의미한다.  
+자바에서 문자는 '(작은따옴표)로 감싸야 한다.
+``` java
+System.out.println('생');
+```
+
+문자열은 "(큰따옴표)로 감싸야 한다.
+``` java
+System.out.println("생활코딩");
+
+만약 문자열을 작은 따옴표로 감싸면 에러가 발생한다.  
+System.out.println('생활코딩');
+
+하나의 문자를 큰따옴표로 감싼다고 에러가 발생하지는 않는다.
+한 글자도 문자열이 될 수 있기 때문이다.
+System.out.println("생");
+```
+문자 또는 문자열을 합칠때는 '+' 연산자를 이용한다.
+
+
+###### 만약 문자열 안에 큰 따옴표를 넣고 싶다면 어떻게 해야 할까?
+``` java
+System.out.println("egoing said "Welcome programming world"");
+```
+오류가 발생한다.
+이럴때는 아래와 같이 처리하면 된다.
+``` JAVA
+System.out.println("egoing said \"Welcome programming world\"");   
+```  
+
+###### 여러 줄의 표시
+여러 줄을 표시하고 싶을 때는 아래와 같이 하면 된다.
+``` JAVA
+System.out.println("HTML\nCSS\nJavaScript\n");
+```
 
 
 ### 4장.제어문
