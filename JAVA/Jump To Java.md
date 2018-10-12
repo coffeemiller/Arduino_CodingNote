@@ -111,6 +111,29 @@ public class MyProgram {
 }
 ```
 
+##### JavaDoc 주석
+``` JAVA
+/**
+ * Prints an integer and then terminate the line.  This method behaves as
+ * though it invokes <code>{@link #print(int)}</code> and then
+ * <code>{@link #println()}</code>.
+ *
+ * @param x  The <code>int</code> to be printed.
+ */
+public void println(int x) {
+    synchronized (this) {
+        print(x);
+        newLine();
+    }
+}
+```
+
+##### 세미콜론
+세미콜론을 이용하면 여러개의 문장을 한줄에 표현할 수 있다.
+``` JAVA
+int a = 100; double b = 10.1;
+```
+
 
 #### main 메소드
 main 메소드는 프로그램의 시작을 의미한다. 만약 main 메소드가 없다면 프로그램을 단독으로 수행시킬 수 없다.  
@@ -209,6 +232,25 @@ System.out.println("egoing said \"Welcome programming world\"");
 ``` JAVA
 System.out.println("HTML\nCSS\nJavaScript\n");
 ```
+
+
+##### 데이터 타입
+###### 데이터 크기
+|8 bit (비트)	               |1 byte      |
+|1024 byte (바이트)	        |1 kilobyte  |
+|1024 kilobyte (킬로바이트)	|1 megabyte  |
+|1024 megabyte (메가바이트)	|1 gigabyte  |
+|1024 gigabyte  (기가바이트)	|1 terabyte  |
+|1024 terabyte (테라바이트)	|1 petabyte  |
+|1024 petabyte (페타바이트)	|1 exabyte   |
+|1024 exabyte (엑사바이트)	  |1 zettabyte |
+
+###### 정수형
+|데이터 타입 |메모리의 크기| 표현 가능 범위                                          |
+|byte	      |1 byte      |	-128 ~ 127                                            |
+|short	    |2 byte	     |-32,768 ~ 32,767                                        |
+|int	      |4 byte	     |-2,147,483,648~2,147,483,647                            |
+|long	      |8 byte	     |-9,223,372,036,854,775,808 ~ 9,223,372,036,854,775,807  |
 
 
 ### 4장.제어문
