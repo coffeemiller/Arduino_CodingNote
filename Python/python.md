@@ -11,7 +11,7 @@
 범용 프로그래밍 언어이기 때문에 데이터 분석, 게임 개발, 보안 등 다방면에 사용이 가능합니다.
 아래는 자바라는 언어로 Life is Short!를 분리하고 출력하는 코드입니다.
 
-``` python
+``` java
 public static void main(String[] args) {
     String msg = "Life is Short!";
         for(String m : msg.split(" "))
@@ -21,7 +21,7 @@ public static void main(String[] args) {
 
 아래는 파이썬으로 Life is Short!를 분리하고 출력하는 코드입니다.
 
-``` Python
+``` py
 msg = 'Life is Short!'
 print(msg.split())
 ```
@@ -29,7 +29,7 @@ print(msg.split())
 같은 기능인데도 파이썬이 자바보다 간결한 것을 볼 수 있습니다.
 
 
-###많습니다
+### 많습니다
 파이썬을 사용하는 사람이 아주 많기 때문에 참고할 자료도 많습니다.
 스택오버플로우 (https://stackoverflow.com/) : 코딩계의 네이버 지식인이라 할 수 있습니다.
 질문도 엄청 많지만 답변은 이보다 훨씬 많습니다. 훑어보는 것만으로도 공부가 됩니다.
