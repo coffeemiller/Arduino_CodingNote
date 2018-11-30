@@ -191,15 +191,46 @@ from pandas import Series
 + 인덱스를 바꾸기
 ```python
 Series(rnp.random(5),index=['1회','2회','3회','4회','5회'])
+info_list={'kim':26,'yoon':30,'min':33}
 ```
+딕셔너리의 key값이 index가 된다.
+
 
 ### DataFrame
-
++ 엑셀문서처럼 여러 타입의 데이터를 저장할 수 잇는 자료구조
+```python
+mydata={'irum':['홍길동','장길산','임꺽정'],'addr':['서울','인천','서울'],
+       'age':[23,30,29]}
+df=DataFrame(mydata)
+```
 --------------------------------------------------------------------
+## 13강. Series, DataFrame 접근방법설명
++ 2차원 구조의 접근
+```python
+df2['irum']
+df2.irum
 
+df2.irum['no.2']
+df2['irum']['no.2']
+```
 
++ 2차원 구조의 값 변경
+```python
+df2['gender']=['male','female','male']  # gender를 추가하고 각각 값추가.
+df2.irum['no.2']='장길연'   # no.2에 해당하는 이름을 바꿈.
+```
 
++ 2차원 구조의 정렬
+```python
+df2.sort_index                # 인덱스 정렬하기
+df2.sort_index(ascending=0)   # 인덱스를 오름차순(0)으로 정렬(내림차순=1)
+df2.sort_values(by='age')     # 값을 'age'에 맞춰서 정렬(오름차순)
+```
 --------------------------------------------------------------------
+## 14. pandas에서 제공하는 산술연산 메소드 학습
+### 산술연산 작업
++ 객체내의 워소들에 대한 산술연산작업은 물론, 서로 다른 객체간의 산술연산작업도 지원됨.
+
 
 
 
