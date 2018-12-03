@@ -302,9 +302,26 @@ df.fillna('unknown')
 |read_table   |일반 텍스트파일을 읽어옴(기본 구분자는 tab(\t))             |
 |read_excel   |엑셀파일을 읽어옴                                         |
 
-
+```python
+# csv파일로 저장하는 방법 ( endcoding='ms949'를 해야 한글 안깨짐)
+df.to_csv('sample1.csv',encoding='ms949')
+# csv파일을 로딩하는 방법
+df1=pd.read_csv('sample1.csv', encoding='cp949')
+#컬럼명을 지정
+df1=pd.read_csv('sample1.csv', names=['no','시도','구분','인구','면적'],encoding='cp949')
+# 컬럼명으 인덱스로 지정
+df1=pd.read_csv('sample1.csv', index_col='no',names=['no','시도','구분','인구','면적'], encoding='cp949')
+# 불필요한 행 제외하고 로딩시키기
+df1=pd.read_csv('sample1.csv', index_col='no',names=['no','시도','구분','인구','면적'], encoding='cp949',skiprows=[0,3,5])
+df1=pd.read_csv('sample1.csv', index_col='no',names=['no','시도','구분','인구','면적'], encoding='cp949',nrows=3)
+```
 --------------------------------------------------------------------
 ## 17.데이터필터
+### JSON 형식 파일 읽어오기
++ JSON(JavaScript Object Notation)은 자바스크립트로부터 파생된 데이터포맷으로, 웹브라우저와 서버간 데이터전송을 위한 표준포맷
+
+### 데이터처리를 위한 조작작업
++ 분석에 필요한 데이터만 - 데이터 필터링 작업
 
 
 --------------------------------------------------------------------
