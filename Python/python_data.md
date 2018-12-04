@@ -597,18 +597,45 @@ plt.show()
 ```
 --------------------------------------------------------------------
 ## 24강.그래프요소 설정방법학습
-
+```python
+fig=plt.figure()
+a2=fig.add_subplot(111)
+a2.plot(nrp.randn(50),'r-+')
+a2.set_xticks([10,20,30,40,50])
+a2.set_xticklabels(['서울','경기','강원','충북','세종'])
+```
 
 + 한글 깨짐
+  - matplotlib에 한글폰트를 등록시켜야 한다.
+```python
+%matplotlib notebook
+import matplotlib.pyplot as plt
+import numpy.random as nrp
+from matplotlib import font_manager,rc
 
+#한글깨지는 문제 보완
+font_location="c:/windows/fonts/malgun.ttf"
+font_name=font_manager.FontProperties(fname=font_location).get_name()
+rc('font',family=font_name)
+```
 
+### pandas + matplotlib
++ pandas에서 처리된 행, 열, 그룹 정보등을 이용하여 시각화 도표 작성이 가능
 
 --------------------------------------------------------------------
-
-
+## 25강.pandas모듈에서 차트 작성방법학습
+|:--------------|:--------------------------------------------------|
+|인자           |설명                                                |
+|label          |범례이름                                            |
+|style          |matplotlib의 color, linestyle에 전달할 값            |
+|alpha          |그래프 투명도 설정                                    |
+|kind           |그래프 종류(line-선, bar-막대, barh-수평막대, pie-원형)|
+|Xticks / yticks|X,y 축으로 사용할 값                                 |
+|Xlim / ylim    |X,y 축한계값                                        |
+|grid           |그리드 표시여부                                      |
 
 --------------------------------------------------------------------
-
+## 26강.
 
 
 --------------------------------------------------------------------
