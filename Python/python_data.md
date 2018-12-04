@@ -523,14 +523,83 @@ a.get(1) # a의 1번째 자료를 가져옴.
 ​
 --------------------------------------------------------------------
 ## 22강.데이터 시각화 작업
+### matplotlib
++ 파이썬 프로그램에서 일반적으로 많이 사용하는 시각화 모듈
+
++ matplotlib로 초간단 그래프 작성하기 - plot()
+```python
+import matplotlib.pyplot as plt
+
+plt.plot([10,20,30,40,50])
+plt.show()
 
 
+plt.plot([2015,2016,2017],[3.2,2.8,3.6])  # [x축], [y축]
+plt.show()
+```
+
++ plot() 함수의 기본 옵션 - 색상, 선, 스타일, 강조문자 표시
+  - linestyle = '' 선스타일 지정
+  - color = '' 색상지정
+  - marker = '' 강조를 위한 마커 스타일 설정
+  ```python
+  plt.plot([12,15.3,10.9,14,16],'ro--')
+
+  plt.plot([12,15.3,10.9,14,16],color='b',linestyle='dashed',marker='+')
+  ```
+
++ 하나의 화면에 여러 개의 그래프 그려보기 - figure & subplot
+  - 그래프는 figure 객체내에 존재함
 
 --------------------------------------------------------------------
+## 23강. matplotlib의 plot메소드
+
+```python
+%matplotlib notebook   # 그래프 오류가 있을경우 추가하는 구문
+import matplotlib.pyplot as plt  # matplotlib의 pyplot을 plt로 선언
+import numpy.random as nrp  # numpy의 random메소드 nrp로 선언
+
+fig=plt.figure()  # fig라는 변수에 plt를 figure메소드로 그린다.
+
+ax1=fig.add_subplot(2,1,1) # fig라는 형식으로 2열 1행 1번째에 그래프를 넣음.
+ax2=fig.add_subplot(2,1,2) # fig라는 형식으로 2열 1행 2번째에 그래프를 넣음.
+
+ax1.plot(nrp.randn(100)) # nrp로 랜덤 100개의 정수로 뽑아냄
+ax2.plot(nrp.randn(200).cumsum())  # nrp로 랜덤 200개의 정수로 뽑아 누적값 뽑아냄
+fig.show()   # fig를 show하라
+```
+
+### x,y축 값 범위 지정하는 set_xlim(), set_ylim()함수
++ set_xticks()함수는 눈금의 간격을 정함.
+```python
+%matplotlib notebook
+import matplotlib.pyplot as plt
+import numpy.random as nrp
+
+fig=plt.figure()
+
+a1=fig.add_subplot(111)
+a1.plot(nrp.randn(50),'b*--')
+a1.set_xlim([1,50])   # x축 1부터 50까지
+a1.set_ylim([-1,3])   # y축 -1부터 3까지
+a1.set_title('basic graph')
+a1.set_xlabel('data_x')
+a1.set_ylabel('data_y')
 
 
-
+plt.plot(nrp.randn(10))
+plt.xlabel('data_x')
+plt.ylabel('value_y')
+plt.title('just sample')
+plt.text(0.5,0.5,'random value')  # 0.5, 0.5에 'random value'기입
+plt.grid(True)
+plt.show()
+```
 --------------------------------------------------------------------
+## 24강.그래프요소 설정방법학습
+
+
++ 한글 깨짐
 
 
 
