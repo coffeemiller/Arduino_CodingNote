@@ -634,23 +634,120 @@ rc('font',family=font_name)
 |Xlim / ylim    |X,y 축한계값                                        |
 |grid           |그리드 표시여부                                      |
 
+```python
+%matplotlib notebook
+from pandas import Series,DataFrame
+
+s=Series([1.5,2.4,3.7],index=['no1','no2','no3'])
+s.plot(kind='bar')
+
+from matplotlib import pyplot as plt
+
+s.plot.bar()
+plt.xlabel("item")
+plt.ylabel("value")
+plt.title('sample series')
+```
+
+### 데이터 프레임 객체에서 그래프 작성 - DataFrame-plot
+|:-----------|:-----------------------------------------|
+|인자         |설명                                      |
+|subplots     |데이터프레임 걸럼을 독립된 서브플롯에 그림   |
+|figsize      |생성될 그래프의 크기를 튜플로 지정          |
+|title        |그래프 제목을 문자열로 지정                 |
+|legend       |서브플롯의 범례를 추가                      |
+|Sort_columns |컬럼을 알파벳 순서로 작성                   |
+
+```python
+#데이터 프레임에서 시각화 작업
+import numpy.random as nrp
+import numpy as np
+df=DataFrame(nrp.randn(10,4),columns=['foo','pitch','mimi','tomo'],
+          index=np.arange(0,100,10))
+d1=df.plot(kind='barh',title='dataframe chart',legend=True)
+d1.set_xlabel('value sequence',fontsize=14)
+```
 --------------------------------------------------------------------
-## 26강.
+## 26강.2012-2014년도 교통사건 사고파일을 읽어들여 아래와 같은 분석 실습
+### 우리가 사용할 데이터에 대해
++ accidentdata.csv - 2012-2014년도 교통사건 사고파일 제(공공데이터 포털사이트)
++ 분석포커스
+  - 요일별 중대교통사고 사상자 합계 (사상자 3명이상인 데이터에 대해)
+  - 경기도에서 교통사망사고가 많은 5지역을 분석하여 도식화
+  - 요일별/발생지시도별 교통사고 빈도분석
 
+### 1.요일별 중대교통사고 사상자 합계분석
++ 제일 먼저 해야할 작업은 '필터링'작업.
+```python
+%matplotlib notebook
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib import font_manager,rc
+
+#한글깨짐방지작업
+font_info='c:/windows/fonts/malgun.ttf'
+font_name=font_manager.FontProperties(fname=font_info).get_name()
+rc('font',family=font_name)
+
+data=pd.read_csv('accidentdata.csv')
+data.head(5)
+########################## 여기까지가 공통작업 ###########
+
+d2=data[(data.사상자수>=3)]  #사상자수가 '3'이상인 것들만 필터링=d2
+d3=d2.groupby('요일')   # 필터링한 d2를 '요일'별로 그룹화=d3
+d3['사상자수'].sum().plot(kind='bar',title='2012-2014요일별 중대교통사고 사상자분석')
+#d3를 가지고 막대그래프 그리기
+```
 
 --------------------------------------------------------------------
+## 27강.경기도-시군별 교통사망사고 빈발지역 분석
++ x축 글자수정
+```python
+result=d3['사상자수'].sum().plot(kind='bar',title='2012-2014요일별 중대교통사고 사상자분석')
+result.set_xticklabels(['금요일','목요일','수요일','월요일','일요일','토요일','화요일'], fontsize=10, rotation=0)
+```
 
+### 2.경기도내 교통사망사고가 높은 5지역 분석하여 도식화
++ 1. 경기지역을 대상으로 분석하기 위해 필터링하여 d1 객체생성.
++ 2. 경기지역의 시,군별 그룹화 작업 실행하는 sa1 객체생성.
++ 3. 사망자 수 합계를 요약하여 da2 객체생성.
 
-
+```python
+df1=data[data.발생지시도=='경기']  #'경기'로 필터링=df1
+df2=df1.groupby(['발생지시군구'])  #'발생지시군구'로 그룹화=df2
+df3=df2['사망자수'].sum()  #'사망자수'의 합계구하기=df3
+result1=df3.sort_values(ascending=False).head(5) #df3를 내림차순하여 앞의 5개만 출력=result1
+result2=df3.sort_values(ascending=True).tail(5) #df3를 오름차순하여 뒤의 5개만 출력=result2
+```
 --------------------------------------------------------------------
+## 28강.요일별-지역별 교통사고빈도 분석
 
+```python
+result1.plot(kind='pie',title='2012-2014 경기도내 교통사망사고 빈번지역')
 
---------------------------------------------------------------------
+#이렇게도 작성할 수 있어요. matplotlib.pyplot 이용하여 파이차트 작성
+c=['red','brown','green','purple','yellow']
+plt.pie(result1,colors=c,autopct='%.2f')
+plt.title('2012-2014 경기도내 교통사망사고 빈발지역')
+```
 
+### 3.요일별/발생지시도별 교통사고 분석
++ 1.교차분석 실행하여 요일별 발생지시도별 데이터 건수를 계산
++ 2.각 행의 합이 1이 되도록 비율로 설정한 후 그 내용을 누적막대형 차트로 시각화
 
+```python
+d_pv=pd.crosstab(data['요일'],data['발생지시도'])
+#'요일','발생지시도' 크로스탭으로 만들기=d_pv
+result=d_pv.div(d_pv.sum(1).astype(float),axis=0)
+#한행을 전체 1로 놓고 소수점으로 표현하여 나누어 백분율로 표현=result
+result.plot(kind='bar',stacked=True)
+#'result'값을 막대그래프 형태로 표현(누적=True)
 
---------------------------------------------------------------------
-
-
-
---------------------------------------------------------------------
+#발생지시도별 교통사고 요일분석
+d_pv1=pd.crosstab(data['발생지시도'],data['요일'])
+#'요일','발생지시도' 크로스탭으로 만들기=d_pv1
+result1=d_pv1.div(d_pv1.sum(1).astype(float),axis=0)
+#한행을 전체 1로 놓고 소수점으로 표현하여 나누어 백분율로 표현=result1
+result1.plot(kind='bar',stacked=True)
+#'result1'값을 막대그래프 형태로 표현(누적=True)
+```
