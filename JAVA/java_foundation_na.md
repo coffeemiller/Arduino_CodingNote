@@ -181,6 +181,342 @@ for(int i = N; i > 0; i--)
   - int형을 입력받을 수 있다. 입력 받은 자료는 내부적으로 어떠한 처리를 한 뒤에 다시 사용자에게 그 값을 반환할 수 있다.
 + 프로그램이 입출력을 잘 지원한다는 것은 사용자 인터페이스가 뛰어나다는 의미와 같다.
 
+```java
+import java.util.Scanner;
+public class Main {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("정수를 입력하세요 : ");
+		int i = sc.nextInt();
+		System.out.println("입력된 정수는 " + i +"입니다.");
+		sc.close();
+	}
+}
+```
++ txt파일을 불러와서 정해진 계산작업하기
+```java
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		File file = new File("input.txt");
+		try {
+			Scanner sc = new Scanner(file);
+			while(sc.hasNextInt())
+			{
+				System.out.println(sc.nextInt() * 100);
+			}
+			sc.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("파일을 읽어오는 도중에 오류가 발생했습니다.");
+		}
+	}
+}
+```
+
+---------------------------------------------------------
+## 제8강.배운 내용 정리하기
++ 1. 개발환경 설치
+	- 이클립스는 JDK로서 대표적인 개발 환경이다. 이클립스를 이용하면 JSP, Java Swing부터 시작해 다양한 자바 개발을 시작할 수 있다.
+
++ 2. 변수
+	- 변수는 그 내부에 잇는 값을 프로그램이 실행되는 도중에 언제든지 교체할 수 있다. 하지만 상수는 한 번 설정되면 프로그램이 종료될 때까지 변경죄지 않는 데이터라고 할 수 있다.
+
++ 3. 자료형
+	- 일반적인 프로그래밍 언어에는 정수 자료형 int, 실수 자료형 float과 double, 문자 자료형 char, 문자열 자료형 String이 사용된다. 자바에선 특히 String을 많이 활용하게 된다.
+
++ 4. 연산자
+	- 연산자는 >,<,++,** 등의 다양한 형태로 다수의 데이터를 비교하거나 데이터를 변경할 수 있게 한다. 특히 &&와 ||는 AND, OR 연산으로서 조건문과 반복문에서도 많이 사용된다.
+
++ 5. 조건문 & 반복문
+	- 조건문과 반복문은 프로그래밍의 논리적 흐름에 있어 가장 중요한 부분이다. 여러 개의 데이터를 서로 비교하거나 1부터 100까지 반보하는 등 다양한 논리적 흐름에 따라 프로그램을 전개할 수 있도록 해준다.
+
++ 6. 기본 입출력
+	- 자바에서는 입력을 받을 대 기본적으로 Scanner클래스를 가장 많이 활용한다. Scanner클래스는 정수를 입력 받는 nextInt(), 문자열을 입력받는 next() 등 다양한 함수를 지원한다.
+
+```java
+// 1번 문제.
+public class Main {
+	public static void main(String[] args) {
+		System.out.print("염상민");
+	}
+}
+// 2번 문제.
+public class Main2 {
+	public static void main(String[] args) {
+		System.out.println(10 + 10);
+		System.out.println(30 * 30);
+		System.out.println(20 - 5);
+		System.out.println(40 / 3);
+		System.out.println(395 % 18);
+	}
+}
+// 3번 문제.
+public class Main3 {
+	public static void main(String[] args) {
+		for(int i = 0; i < 10; i++)
+		{
+			for(int j = 0; j < 10; j++)
+				{
+					System.out.print("*");
+				}
+			System.out.println();
+		}
+	}
+}
+```
+---------------------------------------------------------
+## 제9강.사용자 정의 함수-1
+### 자바 객체지향 프로그래밍
++ 객체지향 : 객체는 일반적으로 말하는 물건을 의마하며 여기서 물건은 단순한 데이터 아니고 그 데이터의 조작 방법에 대한 정보 또한 포함하고 있어 그것을 대상으로 다루는 수법을 객체지향이라고 한다.
+
+### 사용자 정의 함수
++ 사용자 정의 함수는 정해진 특정한 기능을 수행하는 모듈을 의마하며 함수를 적절히 활용하면 하나의 문제를 잘게 분해 수 있다.
++ 예를 들어 이 탐색 트리는 삽입, 삭제, 순회 등 다양한 함수의 집합으로 구성된다. 만약 사용자 정의 함수가 없다면 오직 메인 함수에서 모든 알고리즘을 처리해야 하는데, 이는 작업의 효율성을 저하시킬 수 있다. 또한 함수는 각각의 모듈로서 쉽게 수정되고 보완될 수 있다는 장점이 있다.
+
+```java
+public class Main {
+
+	// public static 반환형, 함수명, 매개변수
+	public static int function(int a, int b, int c) {
+		int min;
+		if(a>b)
+		{
+			if(b>c)
+			{
+				min = c;
+			}
+			else
+			{
+				min = b;
+			}
+		}
+		else
+		{
+			if(a>c)
+			{
+				min = c;
+			}
+			else
+			{
+				min = a;
+			}
+		}
+		for(int i=min; i>0; i++)
+		{
+			if(a % i ==0 && b % i == 0 && c % i == 0)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	public static void main(String[] args) {
+		System.out.println("(400, 300, 750)의 최대 공약수 : " + function(400, 300, 750));
+	}
+}
+```
+
+---------------------------------------------------------
+## 제10강.사용자 정의 함수-2
++ "어떤"수의 "몇"번째 약수찾기.
+```java
+public class Main {
+
+	public static int function(int number, int k) {
+		for(int i=1; i<=number; i++)
+		{
+			if(number%i==0)
+			{
+				k--;
+				if(k==0)
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
+	public static void main(String[] args) {
+		int result = function(3050, 10);
+		if(result==-1)
+		{
+			System.out.println("3050의 10번째 약수는 없습니다.");
+		}
+		else
+		{
+			System.out.println("3050의 10번째 약수는 "+result+"입니다.");
+		}
+	}
+}
+```
+
++ 마지막 글자 알아내기.
+```java
+public class Main {
+	public static char function(String input) {
+		return input.charAt(input.length() -1 );
+		// charAt는 input.length의 공백포함 11개를 가져온다. 여기서 공백 1을 빼준다.
+	}
+	public static void main(String[] args) {
+		System.out.println("Hello World의 마지막 단어는 "+function("Hello World"));
+	}
+}
+```
+
++ 세 숫자중에 가장 큰 값 찾기
+```java
+public class Main {
+	public static int max(int a, int b) {
+		return (a>b) ? a : b;
+		// a가 b보다 크다면 a를 반환하고, 그렇지 않으면 b를 반환하라.
+	}
+
+	public static int function(int a, int b, int c) {
+		int result = max(a,b);
+		result = max(result, c);
+		return result;
+	}
+
+	public static void main(String[] args) {
+		System.out.println("(345, 567, 789)중에서 가장 큰 값은 "+function(345,567,789));
+	}
+}
+```
+---------------------------------------------------------
+## 제11강.반복 함수와 재귀 함수-1
+### 반복함수
++ 반복함수는 단순히 while 혹은 for 문법을 이용하여 특정한 처리를 반복하는 방식을 ㅗ문제를 해결하는 함수이다.
++ 반면에 '재귀 함수'는 자신의 함수 내부에서 자기 자신을 스스로 호출함으로써 재귀적으로 문제를 해결하는 함수이다.
++ 재귀 함수는 경우에 따라서는 아주 간결하고 직관적인 코드로 문제를 해결할 수 있게 해주지만 때에 따라서는 심각한 비효율성을 낳을 수 있기 때문에 알고리즘을 작성할 때 유의할 필요가 있다.
+
++ 10팩토리얼 구하기
+```java
+public class Main {
+	// 5! = 5 * 4 * 3 * 2 * 1 = 120
+	// 6! = 720
+	public static int factorial(int number) {
+		int sum = 1;
+		for(int i = 2; i <= number; i++)
+		{
+			sum *= i;
+		}
+		return sum;
+	}
+
+	public static void main(String[] args) {
+		System.out.println("10팩토리얼은 " + factorial(10));
+	}
+}
+```
+
++ 재귀함수 이용하기
+```java
+public class Main {
+	public static int factorial(int number) {
+		if(number == 1)
+			return 1;
+		else
+			return number * factorial(number - 1);
+			// 5! = 5 * 4!(3*2!)
+	}
+	public static void main(String[] args) {
+		System.out.println("10펙토리얼은 " + factorial(10));
+	}
+}
+```
+
+---------------------------------------------------------
+## 제12강.반복 함수와 재귀 함수-2
++ 피보나치 수열 만들기
+```java
+// 반복함수로 구하기
+public class Main {
+	public static int fibonacci(int number) {
+		int one = 1;
+		int two = 1;
+		int result = -1;
+		if(number == 1)
+		{
+			return one;
+		}
+		else if(number == 2)
+		{
+			return two;
+		}
+		else
+		{
+			for(int i = 2; i < number; i++)
+			{
+				result = one + two;
+				one = two;
+				two = result;
+			}
+		}
+		return result;
+	}
+	public static void main(String[] args) {
+		System.out.println("피보나치 수열의 10번째 원소는 " + fibonacci(10) + "입니다.");
+	}
+}
+```
+
++ 재귀함수로 피보나치수열 구하기
+```java
+public class Main {
+	public static int fibonacci(int number) {
+		if(number==1)
+		{
+			return 1;
+		}
+		else if(number==2)
+		{
+			return 1;
+		}
+		else
+		{
+			return fibonacci(number - 1) + fibonacci(number - 2);
+		}
+	}
+	public static void main(String[] args) {
+		System.out.println("피보나치 수열의 10번째 원소는 " + fibonacci(10) + "입니다.");
+	}
+}
+```
+---------------------------------------------------------
+## 제13강. 배열
+
+
+---------------------------------------------------------
+## 제14강.다차원 배열
+
+
+---------------------------------------------------------
+## 제15강.클래스
+
+
+---------------------------------------------------------
+## 제16강.상속-1
+
+
+---------------------------------------------------------
+## 제17강.상속-2
+
+
+---------------------------------------------------------
+## 제18강.추상
+
+
+---------------------------------------------------------
+
+
+---------------------------------------------------------
+
+
+---------------------------------------------------------
 
 
 
@@ -196,17 +532,6 @@ for(int i = N; i > 0; i--)
 
 ---------------------------------------------------------
 
-
-
-
-
----------------------------------------------------------
-
-
-
-
-
----------------------------------------------------------
 
 
 
