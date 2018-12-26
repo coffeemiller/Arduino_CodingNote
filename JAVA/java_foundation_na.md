@@ -492,16 +492,82 @@ public class Main {
 + 간단한 프로그램 예제에서는 단순히 한 두개의 변수만으로 프로그램을 작동시킬수 있었지만 현실에서의 다양한 프로그램에는 아주 만은 양의 데이터가 사용되는 것이 일반적이다.
 + 따라서 데이터가 많을 때 주로 배열을 이용할 수 있다. 이때 배열은 한없이 많을 수 있으면서도 그 데이터 개수가 변경될 수 있는 데이터들의 집합을 지정해줄 수 있기에 효과적으로 대부분의 프로그램에 사용된다.
 ```java
+import java.util.Scanner;
+public class Main {
+	public static int max(int a, int b) {
+		return ( a > b ) ? a : b;
+	}
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		System.out.print("생성할 배열의 크기를 입력하세요 : ");
+		int number = scanner.nextInt();
+		int[] array = new int[number];
+		for(int i = 0; i < number; i++)
+		{
+			System.out.print("배열에 입력할 정수를 하나씩 입력하세요 : ");
+			array[i] = scanner.nextInt();
+		}
+		int result = -1;
+		for(int i = 0; i < number; i++)
+		{
+			result = max(result, array[i]);
+		}
+		System.out.println("입력한 모든 정수 중에서 가장 큰 값은 : " + result + " 입니다." );
+	}
+}
 
-
+```
++ 100까지 랜덤구해서 평균값 구하기
+```java
+public class Main {
+	public static void main(String[] args) {
+		int[] array = new int[100];
+		for(int i =0 ; i<100 ; i++) {
+			array[i] = (int) (Math.random() * 100 + 1);
+		}
+		int sum = 0;
+		for(int i = 0; i<100 ; i++) {
+			sum += array[i];
+		}
+		System.out.println("100개의 랜덤 정수의 평균값은 " + sum / 100 + "입니다.");
+	}
+}
 ```
 ---------------------------------------------------------
 ## 제14강.다차원 배열
++ 배열이 배열의 원소로 들어가는 구조를 말한다. 흔히 이차원 배월은 M X N 형태의 지도를 나타내고자 할 때 많이 사용된다. 이러한 다차원 배열을 적절하게 활용하게 되면 현실 세계의 다양한 문제에 보다 쉽게 접근할 수 있다.
 
-
++ 0-9까지 2차원배열 만들어 출력하기
+```java
+public class Main {
+	public static void main(String[] args) {
+		int N = 50;
+		int[][] array = new int[N][N];
+		for(int i=0; i<N; i++) {
+			for(int j=0; j<N; j++) {
+				array[i][j] = (int)(Math.random() * 10);
+			}
+		}
+		for(int i=0; i<N; i++) {
+			for(int j=0; j<N; j++) {
+				System.out.print(array[i][j]+" ");
+				//한칸씩 뛰어서 인쇄되도록
+			}
+			System.out.println();
+			//50개가 되면, 열을 바꿔서 출력되도록
+		}
+	}
+}
+```
 ---------------------------------------------------------
 ## 제15강.클래스
++ 클래스는 객체 지향 프로그래밍에 잇어서 가장 기본이 되는 것이다. 클래스를 이용하여 현실 세계의 특정한 물건을 지정할 수 있다. 가장 대표적으로 많이 사용되는 것이 Node 클래스이다. 이는 하나의 장소나 위치를 의미할 수도 있으며 자료구조에서 말하는 이전 탐색 트리의 하나의 서브 트리가 될 수 도 있다. 또한 개발 프로젝트에서는 종종 Student 클래스와 같이 하나의 처리할 데이터 단위를 명시하는 데 사용이 된다.
 
++ 객체라는 것은... 실세계의 사물이라고 할 수 있다.
+
+```JAVA
+
+```
 
 ---------------------------------------------------------
 ## 제16강.상속-1
