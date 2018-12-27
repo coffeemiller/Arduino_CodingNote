@@ -561,22 +561,203 @@ public class Main {
 ```
 ---------------------------------------------------------
 ## 제15강.클래스
-+ 클래스는 객체 지향 프로그래밍에 잇어서 가장 기본이 되는 것이다. 클래스를 이용하여 현실 세계의 특정한 물건을 지정할 수 있다. 가장 대표적으로 많이 사용되는 것이 Node 클래스이다. 이는 하나의 장소나 위치를 의미할 수도 있으며 자료구조에서 말하는 이전 탐색 트리의 하나의 서브 트리가 될 수 도 있다. 또한 개발 프로젝트에서는 종종 Student 클래스와 같이 하나의 처리할 데이터 단위를 명시하는 데 사용이 된다.
++ 클래스는 객체 지향 프로그래밍에 있어서 가장 기본이 되는 것이다. 클래스를 이용하여 현실 세계의 특정한 물건을 지정할 수 있다. 가장 대표적으로 많이 사용되는 것이 Node 클래스이다. 이는 하나의 장소나 위치를 의미할 수도 있으며 자료구조에서 말하는 이전 탐색 트리의 하나의 서브 트리가 될 수 도 있다. 또한 개발 프로젝트에서는 종종 Student 클래스와 같이 하나의 처리할 데이터 단위를 명시하는 데 사용이 된다.
 
 + 객체라는 것은... 실세계의 사물이라고 할 수 있다.
 
++ Main.java
 ```JAVA
-
+public class Main {
+	public static void main(String[] args) {
+		Node one = new Node(10, 20);
+		Node two = new Node(30, 40);
+		Node result = one.getCenter(two);
+		System.out.println("X : " + result.getX() + ", Y : " + result.getY() );
+	}
+}
 ```
 
++ Node.java
+```JAVA
+public class Node {
+	private int x;
+	private int y;
+
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public Node(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	public Node getCenter(Node other) {
+		return new Node((this.x + other.getX()) / 2, (this.y + other.getY()) / 2);
+	}
+}
+```
+#### 결과... X : 20, Y : 30
 ---------------------------------------------------------
 ## 제16강.상속-1
++ 상속이란 쉽게 말해, 다른 클래스가 가지고 있는 정보를 자신이 포함하겠다는 의미이다. 즉 다른 클래스에 대한 정보를 상속받아 자신이 그대로 사용할 수 있도록 한다. 상속을 적절히 활용할 때 불필요한 코드의 수를 줄일 수 있어서 상당히 효율적인 개발이 이루어질 수 있다.
 
 
++ Person 클래스 만들기
+```java
+public class Person {
+	private String name;
+	private int age;
+	private int height;
+	private int weight;
+
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	public int getHeight() {
+		return height;
+	}
+	public void setHeight(int height) {
+		this.height = height;
+	}
+	public int getWeight() {
+		return weight;
+	}
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
+	//초기화 하기.
+	public Person(String name, int age, int height, int weight) {
+		super(); //부모에로부터의 상속들 선언
+		this.name = name;
+		this.age = age;
+		this.height = height;
+		this.weight = weight;
+	}
+}
+```
+
++ Student 클래스 만들기
+```java
+public class Student extends Person {
+	private String studentID;
+	private int grade;
+	private double GPA;
+
+	public String getStudentID() {
+		return studentID;
+	}
+	public void setStudentID(String studentID) {
+		this.studentID = studentID;
+	}
+	public int getGrade() {
+		return grade;
+	}
+	public void setGrade(int grade) {
+		this.grade = grade;
+	}
+	public double getGPA() {
+		return GPA;
+	}
+	public void setGPA(double gPA) {
+		GPA = gPA;
+	}
+
+	public Student(String name, int age, int height, int weight, String studentID, int grade, double gPA) {
+		super(name, age, height, weight);
+		this.studentID = studentID;
+		this.grade = grade;
+		GPA = gPA;
+	}
+
+	public void show() {
+		System.out.println("-----------------------------");
+		System.out.println("학생 이름 : " + getName());
+		System.out.println("학생 나이 : " + getAge());
+		System.out.println("학생 키 : " + getHeight());
+		System.out.println("학생 몸무게 : " + getWeight());
+		System.out.println("학번 : " + getStudentID());
+		System.out.println("학년 : " + getGrade());
+		System.out.println("학점 : " + getGPA());
+	}
+}
+```
+
++ Main 클래스 만들기
+```java
+public class Main {
+	public static void main(String[] args) {
+		// Student라는 클래스 형태로 'student1'변수 선언
+		// stuent1에 Student클래스 형식의 인자('홍길도')를 넣어 대입.
+		Student student1 = new Student("홍길동", 20, 175, 70, "20170101", 1, 4.5);
+		Student student2 = new Student("이순신", 20, 175, 70, "20090105", 4, 3.5);
+		// Student 클래스 형식으로 만든 변수들을 show하라
+		student1.show();
+		student2.show();
+	}
+}
+```
 ---------------------------------------------------------
 ## 제17강.상속-2
-
-
++ 배열을 활용한 여러명의 학생정보 등록하기.
+```java
+import java.util.Scanner;
+public class Main {
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		System.out.print("총 몇 명의 학생이 존재합니까? ");
+		int number = scan.nextInt();
+		Student[] students = new Student[number];
+		for(int i=0;i<number;i++) {
+			String name;
+			int age;
+			int height;
+			int weight;
+			String studentID;
+			int grade;
+			double gPA;
+			System.out.print("학생의 이름을 입력하세요 : ");
+			name = scan.next();  //name 변수가 String이기 때문에 'next()'
+			System.out.print("학생의 나이를 입력하세요 : ");
+			age = scan.nextInt();
+			System.out.print("학생의 키를 입력하세요 : ");
+			height = scan.nextInt();
+			System.out.print("학생의 몸무게를 입력하세요 : ");
+			weight = scan.nextInt();
+			System.out.print("학생의 학번을 입력하세요 : ");
+			studentID = scan.next(); //studentID 변수가 String이기 때문에 'next()'
+			System.out.print("학생의 학년을 입력하세요 : ");
+			grade = scan.nextInt();
+			System.out.print("학생의 학점을 입력하세요 : ");
+			gPA = scan.nextDouble();
+			students[i] = new Student(name, age, height, weight, studentID, grade, gPA);
+		}
+		for(int i=0;i<number;i++) {
+			students[i].show();
+		}
+	}
+}
+```
 ---------------------------------------------------------
 ## 제18강.추상
 
