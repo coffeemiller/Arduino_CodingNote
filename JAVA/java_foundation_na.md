@@ -566,7 +566,7 @@ public class Main {
 + 객체라는 것은... 실세계의 사물이라고 할 수 있다.
 
 + Main.java
-```JAVA
+```java
 public class Main {
 	public static void main(String[] args) {
 		Node one = new Node(10, 20);
@@ -578,7 +578,7 @@ public class Main {
 ```
 
 + Node.java
-```JAVA
+```java
 public class Node {
 	private int x;
 	private int y;
@@ -760,8 +760,91 @@ public class Main {
 ```
 ---------------------------------------------------------
 ## 제18강.추상
+### 자바 객체지향의 활용
++ 자바에서의 객체지향을 본격적으로 활용하기 위해서는 자바의 객체지향 개념을 더욱 더 길게 이해하고 적용할 필요가 있다. 자바에서는 C언어나 여타 원시적인 프로그래밍 언어에서는 제공하지 않았던 특수한 기능들을 제공한다. 대표적으로 추상(Abstract)의 개념이 있으며 그와 비슷하지만 조금 다른 개념인 인터페이스(Interface)의 개념이 존재한다. 자바에서는 이러한 다양한 설계 기법들을 제공하기 때문에 개발 자체에서의 안정성 및 확장 가능성을 보장받을 수 있게 된다.
 
 
+### 추상(Abstruct)
++ 자바에서는 일종의 미완성 클래스라고 할 수 있는 추상 클래스를 제공한다. 추상클래스는 직접적으로 객체 인스턴스를 생성할 수 없다. 하지만 새로운 클래스를 작성하는데 밑바탕이 되는 역할을 해준다는 것에서 의미가 있다. 어느 정도 미리 설계로서 틀을 갖추고 클래스를 작성할 수 있게 한다는 기능적인 측면에서 의미가 있다.
+
++ 추 클래스를 사용하려면 꼭 상속을 받아야 하며 상속받은 모든 추상 메소드는 반드시 구현을 해주어야 한다.
+
+
++ Player를 활용한 추상.
++ Player 클래스 만들기
+```java
+abstract class Player {
+	abstract void play(String songName);
+	abstract void pause();
+	abstract void stop();
+}
+```
++ Main 클래스 만들기
+```java
+public class Main extends Player {
+	public static void main(String[] args) {
+		Main main = new Main();
+		main.play("Joakis Karud - Mighty Love");
+		main.pause();
+		main.stop();
+	}
+
+	@Override
+	void play(String songName) {
+		System.out.println(songName + " 곡을 재생합니다.");
+	}
+
+	@Override
+	void pause() {
+		System.out.println("곡을 일시정시합니다.");
+	}
+
+	@Override
+	void stop() {
+		System.out.println("곡을 정지합니다.");
+	}
+}
+```
+
++ Animal 추상클래스를 만들어 울음소리를 나타내기
++ Animal 클래스
+```java
+abstract class Animal {
+	abstract void crying();
+}
+```
++ Dog 클래스
+```java
+public class Dog extends Animal {
+	@Override
+	void crying() {
+		System.out.println("월! 월!");
+	}
+}
+```
+
++ Cat 클래스
+```java
+public class Cat extends Animal {
+	@Override
+	void crying() {
+		System.out.println("야옹~~");
+	}
+}
+```
+
++ Main 클래스
+
+```java
+public class Main {
+	public static void main(String[] args) {
+		Dog dog = new Dog();
+		Cat cat = new Cat();
+		dog.crying();
+		cat.crying();
+ }
+}
+```
 ---------------------------------------------------------
 ## 제19강.Final 키워드
 
