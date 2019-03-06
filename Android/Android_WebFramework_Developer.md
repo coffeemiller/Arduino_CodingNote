@@ -148,22 +148,223 @@
     2. 필요에 따라 1라인씩 디버깅하며 실행 : Run\Debug메뉴 사용
       ... 이때 처음 시작할 위치를 break pointㄹ 지정해야 한다.
 
+  1. 변수와 자료형
+    1. 리터럴(literal) : 프로그램 소스값 직접 값이 표현되었을때 리터럴 값이라고 한다
+      + "JICA" 문자열 리터럴
+      + 'A' 문자 리터럴
+      + 100 정수(int) 리터럴
+      + 3.14159 실수(double) 리터럴
+      + true / false 논리(boolean) 리터럴
+    2. 변수(variable) : 프로그램에서 값을 저장하고 사용(읽거나 변경)하는 기억장소
+      + 상수(constant) : 값이 저장되어있고, 변경할 수 없는 기억장소
+      + 변수명의 역할 : 값이 저장된 위치를 식별하기 위하여 사용자가 지정하는 명칭(의미화주소)
+      + 변수명을 지정할때의 관례적 규칙
+        - 저장되는 값의 역할에 맞는 의미있는 명칭을 사용하자.
+        - 소문자로 작성하는 것을 원칙으로 하되 두 단어 이상을 사용할 때는 두 번째 단어의 첫글자는 대문자로 사용하자.
+        - 한글 풀어쓰기 금지.
+        - 지나친 약어 사용은 자제하자.
+      + 변수의 선언과 정의
+        - 변수선언 형식 : 자료형 변수명 [=초기값];
+        - 선언 : 시스템 내부에 어떤 종류의 값을 어떤 명칭으로 사용할 것이라고 알려주는 것. 단, 기억장소는 확보되지 않는다. [String name;]
+        - 정의 : 기억장소가 확보되고 유효한 값이 최초로 저장되는 것. [name="홍길동"]
+          - 변수를 정의하는 3가지 방법
+            1. 선언시 초기값 지정
+            2. 대입연산자 즉, 치환연산자(=) 사용
+            3. 키보드로 입력(READ)
+        - 변수 선언시 초기값을 지정하면 변수의 선언과 정의가 동시에 이루어진 것이다. [String name="장길산"]
+    3. 변수의 사용시 L-Value, R-Value로 표현
+      1. R-Value : 변수에 저장된 값을 읽어오는 표현
+      ```java
+      int a, b=10, c;
+      System.out.println(b); //b = R-Value
+      a = b + 5; //a = L-Value
+      if( a > 20 ) {
+        실행문장
+      }
+      a = a + b; // a = 25... R+L-Value 동시에 사용
+      c = 100; // 실행문
+      ```
+      2. L-Value : 표현식에서 대입연산자 왼쪽에 변수가 나타나는 표현으로 값이 변경된다.
+      ```java
+      c = 100;
+      c = a + b;
+      c = 입력받는 표현식
+      ```
+    + 선언만 된 변수는 R-Value로 사용할 수 없다.
+    + 반드시 R-Value는 정의된 변수만 사용할 수 있다.
+    + 선언된 변수는 언제든지 L-Value로 사용될 수 있다.
+
+
+  2. 표준입력과 표준출력
+    1. 표준 출력 : System.out 객체의 메서드를 사용한다.
+    ```java
+    System.out.println(리터럴값이나 변수);
+    ```
+    2. 표준 입력 : System.in 객체의 메서드를 사용하면 한글자밖에 입력받지 못하므로 다양한 값을 입력받기 위해 다음의 방법을  사용한다.
+    ```java
+    import java.util.Scanner;
+
+    public static void main(String[] args) {
+    		String title;
+    		int score;
+    		double height;
+    		char grade;
+    		boolean pass;
+    		String pass_y;
+
+    		//입력 전용 객체선언 및 생성
+    		Scanner scanner = new Scanner(System.in);
+
+        try {
+    		System.out.print("성명입력: ");
+    		title = scanner.nextLine(); //문자열을 입력받을때 사용
+
+    		System.out.print("점수입력: ");
+    		score = scanner.nextInt(); //정수값을 입력받을때 사용
+
+    		System.out.print("몸무게입력: ");
+    		height = scanner.nextDouble(); //실수값을 입력받을때 사용
+
+    		scanner.nextLine(); // scanner라인을 지우기
+    		System.out.print("학점입력: ");  //true,false등 논리값을 입력받을때 사용
+    		grade = scanner.nextLine().charAt(0); //단수문자를 입력받을 때 사용
+
+    		System.out.print("합격여부입력: ");
+    		pass = scanner.nextBoolean();
+    		if (pass==true) {  //합격여부 true일때, "합격"으로 변환저장.
+    			pass_y="합격";
+    		}
+    		else {
+    			pass_y="불합격";
+    		}
+
+    		System.out.println(title + "," + score + "," + height + "," + grade + "," + pass_y);
+      }
+      finally {
+        scanner.close();
+      }
+    	}
+    }
+    ```
 
 #### 3. 세가지 제어구조(순차, 선택, 반복)
+  1. 순차구조
+    + 위에서 아래로/좌에서 우로 차례대로 명령어를 실행한다.
+  2. 선택구조
+    1. 단순선택구조
+    2. 양자택일(2中1)선택구조
+    3. 다중선택구조
+  3. 반복구조
+    + 특정문장을 주어진 조건이 참인 동안 반복 실행
+    + for / while
 
 #### 4. 연산자
+  1. 산술연산자 : `+, -, *, /, %(나머지연산자)`
+  2. 관계연산자 : >, >=, <, <=, ==, !=
+  3. 논리연산자 : &&, ||, !|
 
 #### 5. 문제풀이과정
-  + 두 변수만 사용하여 내용값을 교환하라.
++ 문제제시) 두 정수가 주어졌을때, 큰 수를 출력하고, 두 수의 합계가 100보다 크면 합계를 출력하시오.
 ```java
-    int a = 5;
-		int b = 7;
+int a=5, b=7;
+if ( a > b ) {
+  System.out.println("큰수 :" + a);
+}
+else {
+  System.out.println("큰수 :" + b);
+}
 
-		a = a ^ b;
-		b = a ^ b;
-		a = a ^ b;
-
-		System.out.println(a+","+b);
+if ( a+b > 100 ) {
+  System.out.println("합계 :" + a+b);
+}
 ```
+  1. 문제이해
+    + 최종결과와 결과를 만들기위한 조건을 검토해 본다.
+  2. 처리과정
+    1. 큰수결정
+    2. 합께계산
+    3. 합계출력여부결정
+    4. 큰수출력
+    5. 합계출력 or 패스
+    4. 끝
+  3. 순서도(플로우차트)
+    + 기억장소, 세가지 제어구조, 연산자만을 사용하여 수행할 기능을 약속된 기호로 나열한다.
+  4. 자바언어로 코딩
+    + 순서도를 보고 자바코딩을 수행한다.
+
+
+문제제시) 1~5까지 출력하시오.
+  1. 문제이해
+    + 숫자 값을 가진 변수를 계속 변화시켜 5를 출력
+  2. 처리과정
+    1. 숫자가 5보다 작을 동안 반복
+      1. 숫자출력
+      2. 숫자증가
+    2. 끝
+  3. 순서도
+  4. 코딩
+  ```java
+  int number = 1;
+  while ( number <= 5 ) {
+    System.out.print(a + " ");
+    number = number + 1;  // or number += 1
+  }
+  ```
+
+
 
 #### 6. Summary / Close
+  1. 변수선언의 위치가 꼭 상단이어야 하는가?
+  2. Scanner 선언 후에...Close함수를 써야하는가? (1.5까지는 필요, 1.7부터는 필요X)
+
+#### [과제]
+1. 두 변수만 사용하여 내용값을 교환하라.
+```java
+  int a = 5;
+  int b = 7;
+
+  a = a ^ b;
+  b = a ^ b;
+  a = a ^ b;
+
+  System.out.println(a+","+b);   // 7,5
+```
+
+2. 세 숫자가 주어졌을 때,
+  1. 가장 큰수 구하기
+  ```java
+    int a=10, b=2, c=5;
+    if ( a > b && a > c) {
+      System.out.println("가장 큰수 : " + a);
+    } else if ( b > a && b > c) {
+      System.out.println("가장 큰수 : " + b);
+    } else {
+      System.out.println("가장 큰수 : " + c);
+    }
+  ```
+
+  2. 중간수 구하기
+  ```java
+    int a=10, b=2, c=5;
+    if ( a > b && a < c) {
+      System.out.println("중간수 : " + a);
+    } else if ( b > a && b < c) {
+      System.out.println("중간수 : " + b);
+    } else {
+      System.out.println("중간수 : " + c);
+    }
+  ```
+
+3. 1~100숫자에서 홀수 합계 구하면 출력
+```java
+int number = 1;
+int sum = 0;
+
+while ( number <= 100 ) {
+	if ( number % 2 == 1 ) {
+		sum += number;
+	}
+	number += 1;
+}
+System.out.print(sum);
+```
