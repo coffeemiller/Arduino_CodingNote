@@ -412,19 +412,19 @@ System.out.print(sum);
 
     2. 참조형(Reference Data type)
       - 문자열 String
-      ```java
-      int a = 10;    // a라는 장소에 10이 저장
-      String name = "홍길동";   // name이라는  이름의 참조값(실제로 저장된 곳)에 저장된다.
-      ```
+```java
+  int a = 10;    // a라는 장소에 10이 저장
+  String name = "홍길동";   // name이라는  이름의 참조값(실제로 저장된 곳)에 저장된다.
+```
       - 배열
-      ```java
-      int arr[] = {10, 20, 30, 40, 50};  // arr 참조값---> |10 |20 |30 |40 |50 |
-      ```
+```java
+  int arr[] = {10, 20, 30, 40, 50};  // arr 참조값---> |10 |20 |30 |40 |50 |
+```
       - 클래스와 객체
-      ```java
-      Scanner scanner = new Scanner(System.in);
-      //scanner 참조값---> 키보드입력에 필요한 여러 값들이 저장되어 있음.
-      ```
+```java
+  Scanner scanner = new Scanner(System.in);
+  //scanner 참조값---> 키보드입력에 필요한 여러 값들이 저장되어 있음.
+```
 
 
 #### 3. 선택구조
