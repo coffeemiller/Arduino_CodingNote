@@ -422,7 +422,7 @@ System.out.print(sum);
       - 클래스와 객체
       ```java
       Scanner scanner = new Scanner(System.in);
-      //scanner 참조값---> 키보드입력에 필요한 여러 값들이 저장디어 있음.
+      //scanner 참조값---> 키보드입력에 필요한 여러 값들이 저장되어 있음.
       ```
 
 
