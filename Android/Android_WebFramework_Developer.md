@@ -410,6 +410,7 @@ System.out.print(sum);
 |논리형 boolean|1byte |true, false                      |0:false, 1:true                         |
 |문자 char     |2byte |0~65535의 값을 표현(Unicode값)   |                                        |
 
+![부동소수점](/부동소수점.png "부동소수점")
 
     2. 참조형(Reference Data type)
       - 문자열 String
@@ -426,6 +427,28 @@ System.out.print(sum);
   Scanner scanner = new Scanner(System.in);
   //scanner 참조값---> 키보드입력에 필요한 여러 값들이 저장되어 있음.
 ```
+
+  + 클래스(class)는 데이터(값)과 메서드(Mathod)로 구성되어 있다.
+  + 클래스는 벰버변수(Field)와 Method로 구성되어 있다.
+```java
+public class Test {
+	public static void main(String[] args) {
+    swap1();  // 메서드 swap1호출
+    swap2();  // 메서드 swap2호출
+	}
+  public static void swap1() {
+    // swap1 내용
+  }
+  public static void swap2() {
+    // swap2 내용
+  }
+}
+```
+  + 메서드는 특정기능을 수행하는 명령어들의 모음
+  + "static"이라는 구문이 있어야 '객체'없이 동작한다. 없으면, 객체생성해야 함.
+
+
+#### [실습]
 
 
 #### 3. 선택구조
