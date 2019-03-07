@@ -543,6 +543,7 @@ if(조건1) {
       - middle > max이면, 내용교환
     * min, middle, max 출력
   - 3.순서도
+  - ![큰수 구하기_while](while.png "while 순서도")
 
 ##### [while 반복구문]
 ```java
