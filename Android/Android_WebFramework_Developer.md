@@ -451,10 +451,36 @@ public class Test {
   + "static"이라는 구문이 있어야 '객체'없이 동작한다. 없으면, 객체생성해야 함.
 
 
+#### 3. 선택구조
+- 문제) 세 숫자가 주어졌을 때, 가장 큰 수 구하기
+  + 1. 문제이해
+  + 2. 처리과정
+    - 먼저 두 수를 비교하여, 큰수를 찾는다.
+    - 나머지 수와 비교하여 큰수 결정. (가장 큰수 결정)
+    - 결과를 출력.
+  + 3. 순서도 - 구체적인 방법
+```flow
+st=>start: Start
+op=>operation: large, a=7, b=28, c=9
+cond1=>condition: a>b, Yes or No?
+cond2=>condition: c>large, Yes or No?
+para1=>parallel: large=a
+para2=>parallel: large=b
+para3=>parallel: large=c
+para4=>parallel: Print large
+e=>end: Stop
+
+st->op->cond1
+cond1(yes)->para1->cond2
+cond1(no)->para2->cond2
+cond2(yes)->para3->para4->e
+cond2(no)->para4->e
+```
+
+
 #### [실습]
 
 
-#### 3. 선택구조
 #### 4. 반복구조
 #### 5. 관계연산자와 논리연산자
 #### 6. 문제풀이
