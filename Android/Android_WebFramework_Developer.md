@@ -174,7 +174,7 @@
         - 변수 선언시 초기값을 지정하면 변수의 선언과 정의가 동시에 이루어진 것이다. [String name="장길산"]
     3. 변수의 사용시 L-Value, R-Value로 표현
       1. R-Value : 변수에 저장된 값을 읽어오는 표현
-      ```java
+```java
       int a, b=10, c;
       System.out.println(b); //b = R-Value
       a = b + 5; //a = L-Value
@@ -183,13 +183,13 @@
       }
       a = a + b; // a = 25... R+L-Value 동시에 사용
       c = 100; // 실행문
-      ```
+```
       2. L-Value : 표현식에서 대입연산자 왼쪽에 변수가 나타나는 표현으로 값이 변경된다.
-      ```java
+```java
       c = 100;
       c = a + b;
       c = 입력받는 표현식
-      ```
+```
     + 선언만 된 변수는 R-Value로 사용할 수 없다.
     + 반드시 R-Value는 정의된 변수만 사용할 수 있다.
     + 선언된 변수는 언제든지 L-Value로 사용될 수 있다.
@@ -197,11 +197,11 @@
 
   2. 표준입력과 표준출력
     1. 표준 출력 : System.out 객체의 메서드를 사용한다.
-    ```java
+```java
     System.out.println(리터럴값이나 변수);
-    ```
+```
     2. 표준 입력 : System.in 객체의 메서드를 사용하면 한글자밖에 입력받지 못하므로 다양한 값을 입력받기 위해 다음의 방법을  사용한다.
-    ```java
+```java
     import java.util.Scanner;
 
     public static void main(String[] args) {
@@ -245,7 +245,7 @@
       }
     	}
     }
-    ```
+```
 
 #### 3. 세가지 제어구조(순차, 선택, 반복)
   1. 순차구조
@@ -303,13 +303,13 @@ if ( a+b > 100 ) {
     2. 끝
   3. 순서도
   4. 코딩
-  ```java
+```java
   int number = 1;
   while ( number <= 5 ) {
     System.out.print(a + " ");
     number = number + 1;  // or number += 1
   }
-  ```
+```
 
 
 
@@ -332,7 +332,7 @@ if ( a+b > 100 ) {
 
 2. 세 숫자가 주어졌을 때,
   1. 가장 큰수 구하기
-  ```java
+```java
     int a=10, b=2, c=5;
     if ( a > b && a > c) {
       System.out.println("가장 큰수 : " + a);
@@ -341,10 +341,10 @@ if ( a+b > 100 ) {
     } else {
       System.out.println("가장 큰수 : " + c);
     }
-  ```
+```
 
   2. 중간수 구하기
-  ```java
+```java
     int a=10, b=2, c=5;
     if ( a > b && a < c) {
       System.out.println("중간수 : " + a);
@@ -353,7 +353,7 @@ if ( a+b > 100 ) {
     } else {
       System.out.println("중간수 : " + c);
     }
-  ```
+```
 
 3. 1~100숫자에서 홀수 합계 구하면 출력
 ```java
