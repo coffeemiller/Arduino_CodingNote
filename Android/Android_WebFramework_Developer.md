@@ -410,6 +410,7 @@ System.out.print(sum);
 |논리형 boolean|1byte |true, false                      |0:false, 1:true                         |
 |문자 char     |2byte |0~65535의 값을 표현(Unicode값)   |                                        |
 
+
     2. 참조형(Reference Data type)
       - 문자열 String
 ```java
