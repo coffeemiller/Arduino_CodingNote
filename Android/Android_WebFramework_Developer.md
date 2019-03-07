@@ -459,13 +459,121 @@ public class Test {
     - 나머지 수와 비교하여 큰수 결정. (가장 큰수 결정)
     - 결과를 출력.
   + 3. 순서도 - 구체적인 방법
-  + ![세 수중 큰수 구하기](셋중에_큰수구하기.png "큰 수구하기")
+  + ![세 수중 큰수 구하기](셋중에_큰수구하기.png "큰 수 구하기")
 
 
 #### [실습]
+```java
+int large; //가장큰수
+int num1 = 7, num2 = 29, num3 = 58; //주어진 수
+
+	// 1. 두수를 비교하여 큰 수 결정
+	if(num1>num2) {   //num1이 큰수
+	//2.나머지수와 비교하여 가장큰수 결정
+	 if(num1>num3) {
+		   large=num1;
+	    }else {
+		      large=num3;
+	      }
+   } else {          //num2이 큰수
+			//2.나머지수와 비교하여 가장큰수 결정
+		if(num2>num3) {
+				large=num2;
+		}else {
+			large=num3;
+		}
+	}
+		//3.결과출력
+	System.out.println(num1+","+num2+","+num3+" 중에서 가장 큰수는 "+large);
+
+
+
+//1.두수를 비교하여 큰 수를 결정
+if(num1>num2) {
+	large=num1;
+} else {
+	large=num2;
+}
+
+//2.큰수(large)와 나머지 수를 비교하여 가장 큰 수 결정
+if(large<num3) {
+	large=num3;
+}
+
+//3.결과출력
+System.out.printf("주어진 세수 %d,%d,%d 중에서 가장큰수는 %d입니다.%n",num1,num2,num3,large);
+
+
+
+//1.num1이 가장 큰 수인지 판별
+if(num1>num2 && num1>num3) {
+		large=num1;
+} else if(num2>num1 && num2>num3) { //2.num2이 가장 큰 수 인지 판별
+		large=num2;
+} else {    //나머지는 무조건 num3이 가장 큰 수
+		large=num3;
+}
+//3.결과출력
+System.out.printf("%d(은)는 %d %d %d 중에서 가장 큰수입니다.%n",large,num1,num2,num3);
+```
+```java
+//양자택일 if
+//다중선택 if (else if문)
+if(조건1) {
+  조건1을 만족할때 수행할 문장;
+}else if(조건2){
+  조건2을 만족할때 수행할 문장;
+}else if(조건3){
+  조건3을 만족할때 수행할 문장;
+}else if(조건4){
+  조건4을 만족할때 수행할 문장;
+}else{
+  위의 모든 조건이 거짓일때 수행할 문장;
+}
+```
 
 
 #### 4. 반복구조
++ 다른각도로 풀어보자
+  - 1.문제이해 : min, middle, max를 정하자.
+  - 2.처리과정
+    * 주어진 세 수를
+    * min < middle < max
+      - min > middle이면, 내용교환
+      - middle > max이면, 내용교환
+    * min, middle, max 출력
+  - 3.순서도
+
+##### [while 반복구문]
+```java
+public static void minMidMax() {
+		int min=29, mid=7, max=58;
+		int temp;
+
+		//1. min<mid 그리고 mid<max가 될때까지 반복
+		while(min>mid || mid>max) {
+			if(min>mid) {
+				temp=min;
+				min=mid;
+				mid=temp;
+			}
+
+			if(mid>max) {
+				temp=mid;
+				mid=max;
+				max=temp;				
+			}
+		}
+
+		//결과출력
+		System.out.printf("%d %d %d 순서입니다.%n", min, mid, max);
+	}
+}
+```
+
+##### [for 반복구문]
+
+
 #### 5. 관계연산자와 논리연산자
 #### 6. 문제풀이
 #### 7. Summary / Close
