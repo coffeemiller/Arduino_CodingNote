@@ -651,7 +651,6 @@ do{
 
 --------------------------------------------------------------------
 
-
 ### [2019-03-08]
 #### 1. Review
 ##### 자료형 : 값들의 종류
@@ -709,6 +708,127 @@ default : grade = 'F';break;  // break; 생략가능
 System.out.printf("총점:%4d,평균:%6.2f,학점:%2c%n",	total, average, grade);
 ```
 
++ 반복문
+  - 규칙적인 반복 ==> for문
+  - 불규칙적인 반복 ==> while문
+
 #### 4. 연산자
+```java
+remain3 != 0 && remain1 != 0;
+!(remain3 == 0) || remain3 == 0);
+//둘다 같은 표현
+```
 #### 5. 문제풀이
+```java
+//1~20까지의 숫자를 입력받아 Factorial을 구하여 출력하시오.
+long factorial = 1L;
+int inputNumber;
+//입력전용객체 선언 및 생성
+Scanner scanner = new Scanner(System.in);
+//1. 숫자입력
+System.out.println("Factorial을 계산할 값을 입력하시오(1~20)");
+inputNumber = scanner.nextInt();
+//2. factorial계산
+for(int number=1; number<=inputNumber; number++) {
+	factorial *= number; //factorial = factorial * number;
+}
+//3. 결과출력
+System.out.printf("%d! = %d%n", inputNumber, factorial);
+
+
+
+//성명과 세 점수를 입력받아 총점, 평균, 학점을 구하여 출력하시오.
+int total;
+double average;
+char grade;
+String name;
+int score1, score2, score3;
+//입력전용객체 선언 및 생성
+Scanner scanner = new Scanner(System.in);
+//1.성명과 세점수 입력
+System.out.print("성명입력 : ");
+name = scanner.nextLine();
+System.out.print("점수1입력 : ");
+score1 = scanner.nextInt();
+System.out.print("점수2입력 : ");
+score2 = scanner.nextInt();
+System.out.print("점수3입력 : ");
+score3 = scanner.nextInt();
+//2.총점과 평균계산
+total = score1 + score2 + score3;
+average = total / 3.0;
+//3.학점결정(계산)
+int temp = (int)average / 10;
+switch (temp) {
+case 10: grade = 'A';break;   // grade = 'A';break; 생략가능
+case 9:	grade = 'A';break;
+case 8:	grade = 'B';break;
+case 7:	grade = 'C';break;
+case 6:	grade = 'D';break;
+default : grade = 'F';break;  // break; 생략가능
+}
+//4.결과출력
+System.out.printf("총점:%4d,평균:%6.2f,학점:%2c%n",	total, average, grade);
+
+
+
+
+//1부터 100까지 숫자 중, 3의 배수와 5의 배수를 제외한 홀수의 합계를 계산하여 출력하시오.
+int sum=0, number, remain3, remain5;
+for(number=1; number<=100; number+=2) {
+	remain3 = number % 3;
+	remain5 = number % 5;
+	if(remain3 != 0 && remain5 != 0) {
+		sum += number;
+		System.out.print(number+" ");
+	}
+}
+System.out.println(sum);
+
+
+
+
+//1+(1+2)+(1+2+3)+(1+2+3+4)+...+(1+2+3+...+9+10)의 합을 계산하여 출력하시오.
+// 1.while문으로 코딩하기
+int sum=0; //최종합
+int number=1; //항
+int subSum = 0; //항의 값
+int subNumber; //항의 값을 계산하기 위한 값
+
+while(number<=10) {
+//항의 값을 계산
+	subNumber = 1;
+	subSum = 0;
+	while(subNumber<=number) {
+		subSum += subNumber;
+		subNumber++;
+	}
+	//총합 누적
+	sum += subSum;
+	//중간결과 출력
+	//System.out.println(number+","+subSum+","+sum);
+	number++;
+}
+System.out.printf("총 합은 %d입니다.%n", sum);
+
+
+// 2.for문 코딩하기
+int i=1, j, sum=0, total=0;
+for(i=1; i<=10; i++) {
+	for(j=1; j<=i; j++) {
+		sum += j;
+	}
+	total += sum;
+	//System.out.println(i+","+j);
+}
+System.out.printf("총합은 : %d입니다.%n", sum);
+```
 #### 6. Summary / Close
+#### [과제]
++ 교제 1~4장 읽어오기
++ 오늘까지 실습한 문제를 복습해보기
+
+-------------------------------------------------------------------
+
+### [2019-03-08]
+#### 1. Review
