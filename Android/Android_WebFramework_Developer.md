@@ -679,9 +679,36 @@ String name = "홍길동";  //참조형 변수
 
 #### 2. 자료형
 + 문자 char - 2byte_유니코드값(0~65535)
-
++ 정수 int로 표현되는 21억까지의 숫자가 넘는다면, 'long' 변수를 사용해야 한다.
++ 등가비교는 '정수형', '문자'끼리하는 것을 권장.
 
 #### 3. 제어문
-#### 4. 연산자를
+##### [실습]
++ 키보드로 입력받는 과정
+  - name = scanner.nextLine();
+  - 성명입력 : ABC엔터  ---------  |65|66|67|13|10|||||||||||...|||||| (키보드 버퍼)
+  - name이라는 버퍼에 "ABC"가 들어감. 이후 키보드 버퍼 클린......||||||||||
+
+  - score = scanner.nextInt();
+  - 입력 : 70엔터  ---------  |7|0|13|10|||||||||||...|||||| (키보드 버퍼)
+  - score라는 변수에 숫자70을 만들어 들어감. 이후 키보드 버퍼 클린...|||||
+
++ 다중선택구조는 Java언어에서
+  - 1) else if문 - 어떠한 다중선택구조로 모두 표현할 수 있다.
+  - 2) switch case문 - 조건이 문자나 정수의 등가비교(==)일때만 사용한다.
+```java
+int temp = (int)average / 10;
+switch (temp) {
+case 10: grade = 'A';break;   // grade = 'A';break; 생략가능
+case 9:	grade = 'A';break;
+case 8:	grade = 'B';break;
+case 7:	grade = 'C';break;
+case 6:	grade = 'D';break;
+default : grade = 'F';break;  // break; 생략가능
+}
+System.out.printf("총점:%4d,평균:%6.2f,학점:%2c%n",	total, average, grade);
+```
+
+#### 4. 연산자
 #### 5. 문제풀이
 #### 6. Summary / Close
