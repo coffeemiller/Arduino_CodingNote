@@ -900,9 +900,109 @@ long value2 = 100_000_000_000L; // ok
 float phi = 3.1415f;    // ok
 double phi2 = 3.1415;   //double phi2 = 3.1415d; ok
 ```
++ 자료형이 다른 값을 저장할때는
+  - 1. 같은자료인가(문자, 정수, 실수)
+  - 2. l-value 기억장소크기 >= r-value 기억장소크기 ok
+```java
+int i = 'A';    //ok
+long l = 123;   //ok
+double d = 3.14f;  // ok
 
+int j = 0x123456789;  // 16진수 정수 => int의 표현범위를 벗어난값이므로 long형 정수써야함
+// 0001 0010 0011 0100 0101 0110 0111 1000 | 1001
+
+byte b = 127; //ok l-value는 byte형이고 r-value는 int 리터럴이지만 값이 범위가 byte형으로 저장할 수 있다.
+byte b = 128; //error 범위를 벗어나서...
+short s = 0x1234;
+
+char ch3 = 'J'; //ok
+String name2 = "Java"; //ok
+// 주의할점
+String str = ""; //ok 빈 문자열
+char ch4 = '';  //error 빈 문자표현은 없다.
+char ch5 = ' '; //ok 공백문자 즉, 코드값 32
+```
++ String 즉, 문자열은 기본자료형이 아니라 참조형이라고 했다.
+  - 참조형 변수는 new 표현으로 생성할 수도 있다.
+```java
+String name3 = "안드로이드";   //ok
+String name4 = new String("안드로이드");  //ok
+```
+
++ 문자열과 기본자료형을 +연산자로 연결시키면 최종적으로 문자열이 된다.
+```java
+String title = "Java" + 5.0;  // "Java5.0"
+```
++ 논리값 true, false
+```java
+System.out.println(true);    // true 값이 출력
+System.out.println(true+""); // "true" 문자열 출력
+```
++ null도 예약어 이다.
+  - null 참조형 변수에 아직 유효한 값이 저장되지 않았다는 의미로 사용된다.
+  - 그러나 null은 자료형은 아니다.
+```java
+String title2;
+System.out.println(title2);  //error
+
+String title2 = null;
+System.out.println(title2);  //ok
+
+System.out.println(null); //error
+System.out.println("null"); //ok
+```
+
++ System.out.println() 사용법
++ System.out.printf() 사용법
+  - System.out.printf("%d %s %f %c %n등의 형식지정자와 출력할문자열", 형식지정자);
+|출력할 값          | 형식지정자      |
+|:------------------|:---------------:|
+|문자열(String)     |%s               |
+|단순문자(char)     |%c               |
+|정수(10/8/16/2진수)|%d, %o, %x, %b   |
+|실수               |%f               |
+```java
+System.out.printf("%s %c %d %f", "Java", 'A', 78, 3.14);
+
+System.out.println('\'');		     //  '''처럼 할 수 없다.
+System.out.println("abc\t123\b456"); // \b에 의해 3이 지워진다.
+// \t tap키....\b BackSpace
+System.out.println('\n');		     //  개행(new line)문자 출력하고 개행
+System.out.println("\"Hello\"");	 //  큰따옴표를 출력하려면 이렇게 한다.
+System.out.println("c:\\");
+```
++ 문자값 중에서 특수제어기능을 수행하는 몇몇개의 특수문자를 표현하는 방법
+|          |    |
+|:---------|----|
+|tab       |\t  |
+|backspace |\b  |
+|endter    |\n\r|
+|\         |\\  |
+|'         |\'  |
+|"         |\"  |
+
++ 정수형 기억장소의 overflow
+  - 각 정수형의 기억장소의 크기에 따라 표현할 수 있는 값의 범위가 정해져있다.
+  - 그 범위를 벗어나면 에러가 발생하지는 않지만, 잘못된 값이 저장되어 이용됨. (=overflow)
+
++ 형변환?
+  - Java언어는 변수가 한번 선언될대 자료형이 결정디면해당변수는 프로그램이 끝날때까지 자료형을 변경시킬수 없는 언어이다.
+  - 필요에 따라 일시적으로 자료형이 변경된 효과를 얻는것을 형변환(캐스트:cast 연산)이라고 한다.
+  - 컴파일러 내부에서 자동으로 변환되는 것을 자동형변환이라고 한다.
+  - 이때 문자형--->정수--->실수로 자동형변환 될 수 있다.
+  - 또, 기억장소의 크기 작은 자료형이 큰 자료형으로 자동형변환 된다.
+  - byte -> short -> int -> long -> folat -> double
+
+#### [오늘의 문제]
++ 피보나치수열 구하기
 #### 4. 3장 연산자
 #### 5. 4장 조건문과 제어문
 #### 6. 배열 사용법
 #### 7. 배열을 이용한 문제풀이
 #### 8. Summary / Close
+
+
+-------------------------------------------------------------------
+
+### [2019-03-12]
+#### 1. Review
