@@ -1239,7 +1239,128 @@ for(i=1; i<=5; i++){
   }
 ```
 
+------------------------------------------------------------------
+
+### [2019-03-14]
+#### 1. Review
+#### 2. 문제풀이
 #### 3. 배열 도입
++ 배열(Array)
+  - 배열은 동일한 성격을 가진 기억장소의 모임(집합)이다.
+  - 하나의 명칭으로 여러개의 기억장소를 접근할 수 있다.
+    - 1) 배열선언 --- 배열명의 성격만 지정했을뿐 생성되지는 않았다.
+      - `자료형 배열명 [];`
+    - 2) 배열생성 --- 실제 자료형값을 저장할 공간이크기만큼 확보되고 자료형에 따라 초기값이 자동으로 저장된다.
+      |                 |         |
+      |:----------------|:-------:|
+      |정수(byte, short, int, long) | 0 |
+      |실수(float, double)       | 0.0 |
+      |논리(boolean)             | false |
+      |문자(char)                | 공백 |
+      |문자열(String)             | null |
+
+      - `배열명 = new 자료형[크기] / scores = new int[5];`
+      - 생성된 메모리 공간의 시작위치정보가 배열명에 저장된다.(참조값)
+    - 3) 이후 배열요소표현을 사용하여 값을 사용한다.
+      - 배열요소 ==> 배열명[첨자]
+      - '첨자'는 반드시 정수, 0~크기-1, literal, 변수, 계산식
+      - 배열요소는 단일기억장소 즉, 일반변수가 수행하는 기능을 모두 수행할 수 있다.
+    - 4) 배열명 즉, 참조변수에 null을 저장할 수 있다.(더이상 배열요소값을 사용하지 않는다는 뜻)
+    - 5) 배열선언과 동시에 생성하고 초기값을 지정하는 방법
+      - 방법1)
+      - 방법2)
+```java
+System.out.println(scores[0])
+scores[1] = 70;
+scores[2] = scores[3] + scores[4];
+if( scores[3] > 50 ){
+   ...
+}
+scores[4] = scanner.nextInt();
+```
+
+
+```java
+int score[]; //배열선언
+score = new int[5] //배열의 생성
+// 배열초기화
+score[0] = 70;
+score[1] = 80;
+score[2] = 90;
+score[3] = 85;
+score[4] = 50;
+
+// 배열을 선언과 동시에 초기화
+int score[] = {70, 80, 90, 85, 50}
+```
++ 배열의 길이? => `배열명.length`
+```java
+public static void main(String[] args) {
+		// 점수 5개를 저장하기위한 배열 선언
+		int scores[];   // 또는 int []scores;    또는 int[] scores;   모두 ok
+
+		// 배열생성은 new 키워드를 반드시 사용해야 한다.
+		scores = new int[5];
+		/*
+		 * 1) int값을 저장할 공간 5개 즉, 4byte짜리 5개를 연속적으로 확보하고 확보된 공간에 0을 저장한다.
+		 * 2) scores라는 참조변수에 확보된 공간의 시작주소를 저장한다.
+		 */
+
+		//배열명을 직접 출력시키면 이상한 값이 나온다. 이 값을 참조값이라고 기억하자.
+		System.out.println("배열명 scores : "+scores);
+
+		/*
+		 * 확보된 배열에 저장된 값을 개별적으로 접근할때 배열요소를 사용한다.
+		 * 배열요소는 배열에 저장된 실제값 하나, 하나를 의미한다.
+		 * 배열요소는 다음의 규칙으로 표현한다.
+		 *
+		 * 배열명[첨자]
+		 * 		----> 0~배열크기 -1까지의 정수값
+		 * 			1) 정수 literal
+		 * 			2) 정수 변수
+		 * 			3) 정수 결과값을 나타내는 계산식
+		 */
+		System.out.println(scores[0]);
+		System.out.println(scores[1]);
+		int i = 2;
+		System.out.println(scores[i]);   //2번째 요소값
+		System.out.println(scores[i+2]); //3번째 요소값
+		System.out.println(scores[i*2]); //4번째 요소값
+
+		//배열요소에 개별적으로 접근하여 값을 저장하자.
+		scores[0] = 70;
+		scores[1] = 80;
+		scores[2] = 90;
+		scores[3] = 85;
+		scores[4] = 60;
+		//scores[5] = 88;  // 컴파일시 error가 발생하지 않지만, 실행시 run time error발생한다.
+
+		int total = 0;   //총점
+		//for 반복문을 차례대로 접근하자.
+		for(int j=0; j<5; j++) {
+			total += scores[j];
+			System.out.print(scores[j]+" ");
+		}
+		System.out.println();
+
+		double average = total /5.0;
+		System.out.println("총점 : "+total+", 평균 : "+average);
+
+		//확보된 배열의 크기(요소의 갯수)를 알고 싶다면 배열명.length를 사용한다.
+		System.out.println("score배열의 크기 : "+scores.length);
+	}
+
+}
+```
+#### [오늘의 문제]
++ 1) 교제 5장 182~192page까지 정독하고 실습해보시오.
++ 2) char배열에 'A', 'B', 'C', 'D', 'E'를 저장한 후, 이 배열을 이용하여 다음모양을 출력하시오.
+  - A B C D E
+  - E A B C D
+  - D E A B C
+  - C D E A B
+  - B C D E A
+
 #### 4. 배열요소와 첨자(index)
 #### 5. 1차원배열
 #### 6. 배열을 이용한 문제풀이
