@@ -1362,6 +1362,151 @@ public static void main(String[] args) {
   - B C D E A
 
 #### 4. 배열요소와 첨자(index)
-#### 5. 1차원배열
-#### 6. 배열을 이용한 문제풀이
+#### 5. 배열을 이용한 문제풀이
+#### 6. Summary / Close
+
+------------------------------------------------------------------
+
+### [2019-03-14]
+#### 1. Review
+#### 2. 1차원배열
++ 첨자(index) 사용 실습
+```java
+int a[] = new int[10];
+		//a 0x100 ------>  [0,0,0,0,0,0,0,0,0,0]
+
+		//배열명 자체는 참조변수 이므로 위치벙보 즉, 주소를 저장하고 있다.
+		//해당 주소에 가면 실제값 즉, 배열요소들이 있다.
+		System.out.println("배열명 : "+a); //위치정보 즉, 주소가 이상한 형태로 출력.
+
+		//배열의 크기는 생성할때 즉, 메모리를 할당받을때 결정된다.
+		//배열의 크기 ==> 배열명.length
+		System.out.println("a배열의크기 즉, 요소의 갯수 : " + a.length);
+
+		//1) 10, 20, 30, ...., 100까지 차례대로 저장하자.
+		for(int i=0; i<10; i++) {
+			a[i]=(i+1)*10;
+		}
+
+		//2) 순서대로 출력
+		for (int i = 0; i < a.length; i++) {
+			System.out.print(a[i]+" ");
+		}
+		System.out.println();
+
+		//3) 저장된 역순으로 출력하시오.
+		for (int j = 9; j >=0; j--) {
+			System.out.print(a[j]+" ");
+		}
+		System.out.println();
+
+		//4) 60,70,80,90,100,10,20,30,40,50순으로 출력하시오.
+		//      0   1  2   3  4  5  6  7  8  9   
+		//a 0x100 ------------>[10,20,30,40,50,60,70,80,90,100]
+		//                      60,70,80,90,100,10,20,30,40,10
+		int temp ; //교환용 임시변수
+		for(int i=0; i<5; i++) {
+			temp = a[i];
+			a[i] = a[i+5];
+			a[i+5] = temp;
+		}
+
+		for(int i=0; i<a.length; i++) {
+			System.out.print(a[i] +" ");
+		}
+		System.out.println();
+
+		//5) 배열요소값을 다음상태로 만들어서 출력하시오.
+		for (int i = 0; i < a.length; i++) {
+			a[i]=(i+1)*10;
+		}
+		for (int i = 0; i < a.length/2; i++) {
+			temp=a[i];
+			a[i]=a[9-i];
+			a[9-i]=temp;
+		}
+		for(int i=0; i<a.length; i++) {
+			System.out.print(a[i] +" ");
+		}
+		System.out.println();
+	}
+```
+#### 3. 문자열배열
++ 메서드(method) : 특정기능을 수행하는 명령어의 모음
++ 클래스는 멤버변수(field)와 메서드로 구성되어 있다.
+```java
+public static void main(String[] args) {
+	int num[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+	// 1. 전체요소 출력
+	printTitle(); // 메서드 호출
+  // 문제 테이블 만들기
+  char ch[] = { 'A', 'B', 'C', 'D', 'E' };
+	printCharArray(ch, null);
+	// 0 1 2 3 4
+	// ch 0x200 ------------>[A, A, B, C, D]
+	// 2. 나머지줄을 만들어서 출력
+	for (int count = 1; count <= ch.length - 1; count++) {
+		// 1) 마지막 요소 임시 기억
+		char temp = ch[ch.length - 1];
+		// 2) 나머지 요소를 뒤로 이동
+		for (int j = ch.length - 1; j >= 1; j--) {
+			ch[j] = ch[j - 1];
+		}
+		// 3) 첫요소 기억
+		ch[0] = temp;
+
+		// 배열전체요소 출력
+		printCharArray(ch, null);
+	}
+	char arr[] = { 'J', 'e', 'o', 'n', 'j', 'u', ' ', 'J', 'I', 'C', 'A' };
+	printCharArray(arr, null);
+	printTitle();
+	printCharArray(null, num);
+}
+// 1차원 문자배열의 모든 요소값을 출력시키는 메서드
+private static void printCharArray(char data[], int data2[]) {
+	if (data != null) {
+		// 전체요소 출력
+		for (int i = 0; i < data.length; i++) {
+			System.out.print(data[i] + " ");
+		}
+		System.out.println();
+	} else {
+		// 전체요소 출력
+		for (int i = 0; i < data2.length; i++) {
+			System.out.print(data2[i] + " ");
+		}
+		System.out.println();
+	}
+}
+	System.out.println("JICA 전주정보문화산업진흥원");
+	System.out.println("-----------------------------");
+}
+```
+
+#### 4. 정렬(sort)
++ 순서대로 데이터를 나열하는 것. (오름차순/내림차순)
++ 다양한 정렬방법이 있으나, 제일 많이 사용되는 방법은 선택/버블정렬이다.
+##### 4.1. 선택정렬(selection sort)
++ 오름차순(asending sort)
++ 내림차순(desending sort)
+
+
+##### [오늘의 과제]
++ 오늘 학습내용 복습
++ 192~197page까지 교재를 정독해보고 실습.
+
+
+-----------------------------------------------------------
+
+### [2019-03-17]
+#### 1. Review
+
+##### 4.2. 버블정렬(bubble sort)
+##### 4.3. 쉘(shell)/삽입(insert)/퀵(quick) 정렬
+#### 5. 검색(Search)
+  + 원하는 자료를 찾는 것.
+##### 5.1. 순차검색
+##### 5.2. 이진검색
+#### 6. 다차원 배열
 #### 7. Summary / Close
