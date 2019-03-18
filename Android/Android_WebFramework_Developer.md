@@ -1367,7 +1367,7 @@ public static void main(String[] args) {
 
 ------------------------------------------------------------------
 
-### [2019-03-14]
+### [2019-03-15]
 #### 1. Review
 #### 2. 1차원배열
 + 첨자(index) 사용 실습
@@ -1490,7 +1490,8 @@ private static void printCharArray(char data[], int data2[]) {
 ##### 4.1. 선택정렬(selection sort)
 + 오름차순(asending sort)
 + 내림차순(desending sort)
-
+##### 4.2. 버블정렬(bubble sort)
+##### 4.3. 쉘(shell)/삽입(insert)/퀵(quick) 정렬
 
 ##### [오늘의 과제]
 + 오늘 학습내용 복습
@@ -1499,14 +1500,204 @@ private static void printCharArray(char data[], int data2[]) {
 
 -----------------------------------------------------------
 
-### [2019-03-17]
+### [2019-03-18]
 #### 1. Review
++ 배열(Array) - 같은 성격을 가진(자료형) 기억장소 모임
++ 배열명은 참조변수다.
+```java
+// 5명의 성명과 점수(국어, 영어, 수학)를 입력받아
+// 개인초점, 개인평균을 출력하고
+// 과목별 평균도 출력하시오.
+int total=0;
+double average;
+char grade;
+//과목총점
+//int korTotal, engTotal, mathTotal;
+int subjectTotal[] = new int [3];
+//과목평균
+double subjectAverage[] = new double[3];
+//입력받아 저장할 변수
+String name;
+// int score1, score2, score;  // 개별변수로 점수를 저장
+int scores[] = new int[3];     // 1차원배열에 점수저장
+//입력전용객체 선언 및 생성
+Scanner scanner = new Scanner(System.in);
+//과목별 총점을 누적할 배열
+for(int i=0; i<5; i++) {
+	//1.성명과 세점수 읽기
+	System.out.print("성명 입력 : ");
+	name = scanner.nextLine();
+  System.out.println("3개 점수를 입력하시오 ");
+	for(int j=0; j<3; j++) {
+		scores[j] = scanner.nextInt();
+	}
+	scanner.nextLine(); //강제로 키보드 버퍼의 내용을 읽는다.(비우는 효과)
+	System.out.println(name+","+scores[0]+","+scores[1]+","+scores[2]);
+//2.개인총점계산을 계산하면서 과목총점을 누적하자
+total = 0;
+for (int j = 0; j < scores.length; j++) {
+	total += scores[j];
+	subjectTotal[j] += scores[j];
+}
+//3.개인평균계산
+average = total / 3.0;
+system.out.println(total+","+average);
+}
+//과목별 평균계산
+System.out.println("과목별 평균 : ");
+for (int j = 0; j < scores.length; j++) {
+	subjectAverage[j] = (double)subjectTotal[j] / 5;
+	System.out.printf("%6.2f ",subjectAverage[j]);
+}
+System.out.println();
+```
 
-##### 4.2. 버블정렬(bubble sort)
-##### 4.3. 쉘(shell)/삽입(insert)/퀵(quick) 정렬
-#### 5. 검색(Search)
-  + 원하는 자료를 찾는 것.
-##### 5.1. 순차검색
-##### 5.2. 이진검색
-#### 6. 다차원 배열
-#### 7. Summary / Close
+#### 2. 버블정렬(bubble sort)
++ 인접한 두 항의 값을 계속비교해 나간다.
+```java
+int a[] = new int[5];
+// 정렬의 대상이 되는 데이터 준비 - 난수(1~100까지의 임의의 수)
+for (int i = 0; i < 5; i++) {
+	a[i] = (int) (Math.random() * 100);
+}
+// 배열요소를 전체출력하려면
+// 1) 개별요소 접근
+//for (int i = 0; i < a.length; i++) {
+//	System.out.print(a[i]+" ");
+//}
+// 2) for문을 간결하게 사용할수도 있다. (빠른 for문)
+//for (int i : a) {
+//	System.out.print(i+" ");
+//}
+// 3) 전체배열요소값을 문자열로 만들어서 출력
+System.out.println("정렬전 데이터 : "+Arrays.toString(a));
+System.out.println();
+
+//버블정렬
+for (int i = 0; i < a.length-1; i++) {
+	for (int j = 0; j < (a.length-1)-i; j++) {
+		if (a[j]>a[j+1]) {
+			int temp = a[j];
+			a[j] = a[j+1];
+			a[j+1] = temp;
+		}
+	}
+}
+System.out.println("정렬후 데이터 : "+Arrays.toString(a));
+```
+
+#### 3. 검색(Search)
+  + 대량의 데이터에서 특정데이터의 위치를 알아내는 것.
+  + 메서드(method)는 특정기능을 수행하는 명령어 모음
+    - 메서드의 구성
+```java
+리턴값 메서드명(인자정보) {
+   실행코드;
+   ....
+ }
+```
+  + 1) 메서드명 : 수행하는 기능을 대표하는 명칭
+  + 2) 인자정보 : 메서드를 호출할때 전달해 주는 값(없으면 아무것도 기술X)
+  + 3) 리턴값 : 메서드가 기능수행을 마치고 되돌아 갈때 돌려주는 값(없으면 void)
+```java
+public static void main(String[] args) {
+	// 메서드호출
+	printTitle();
+	printNumber(3);
+	int cnt = 10;
+	printNumber(cnt);
+	printNumber(cnt + 5);
+	int number1 = 78, number2 = 43;
+	int max;
+	max = maxNumber(number1, number2);
+	System.out.println("큰수 : " + max);
+}
+// 호출시 정수값 2개를 전달받고 기능수행 후 정수값을 리턴하는 메서드
+public static int maxNumber(int a, int b) {
+	int large;
+	if( a > b) {
+		large = a;
+	}else{
+		large = b;
+	}
+	return large;
+}
+// 호출시 정수값을 전달받고 리턴값은 없는 메서드
+public static void printNumber(int count) {
+	for (int i = 1; i <= count; i++) {
+		System.out.print(i + " ");
+	}
+	System.out.println();
+}
+// 인자정보도 없고 리턴값도 없는 메서드
+public static void printTitle() {
+	System.out.println("JICA 전주정보문화산업진흥원");
+}
+```
+##### 3.1. 순차검색
++ 가장 단순하게 차례로 비교
++ 앞부분부터 차례로 비교하여 원하는 위치를 찾는것.
+```java
+public static void main(String[] args) {
+	// 원본데이터
+	int data[] = { 7, 26, 45, 12, 4, 98, 67, 15, 80, 54 };
+	int key; // 검색할 값
+	int pos = -1; // 검색결과(위치)
+	// 입력전용객체 선언 및 생성
+	Scanner scanner = new Scanner(System.in);
+	// 1.검색할 값을 입력받는다.
+	System.out.print("검색할 값 입력 ==> ");
+	key = scanner.nextInt();
+	// 2.찾았거나 자료의 끝까지 반복
+	pos = foundNumber(data,key);
+	// 3.결과출력
+	if (pos!=-1) {
+		System.out.println(key + " 의 위치는 " + pos + "입니다.");
+	} else {
+		System.out.println(key + " 값은 존재하지 않습니다. " + pos);
+	}
+}
+
+public static int foundNumber(int data[], int key) {
+	int rValue = -1;
+	for (int i = 0; i < data.length; i++) {
+		if (key==data[i]) {
+			rValue = i;
+			break;
+		}
+	}
+	return rValue;
+}
+```
+##### 3.2. 이진검색(Binary Search)
++ 검색을 하기 전, 반드시 정렬되어있어야 함.
++ 정렬된 데이터에서 중앙위치값을 비교해 나가는 것.
+  - low = 하한값의 위치
+  - high = 상한값의 위치
+  - middle = 검색위치((low+high)/2)
+
+#### 4. 다차원 배열
+```java
+int a[][] = new int[2][3];  // [행] [열]
+a.length // 2
+a[0].length // 3
+a[1].length // 3
+int number=0;
+for(int i=0; i<2; i++) {  //행반복
+  for(int j=0; j<3; j++) { //열반복
+    a[i][j] = number++;
+  }
+}
+```
+#### [오늘의 과제]
+1. 교재 196~205page 예제 학습 및 실습진행
+2. 선택정렬과 버블정렬을 개선해보자.
+  1. 선택정렬개선 ( 교환횟수 개선 )
+  2. 버블정렬개선 ( 반복횟수 개선 )
+
+#### 5. Summary / Close
+
+-----------------------------------------------------------
+
+### [2019-03-19]
+#### 1. Review
