@@ -1701,3 +1701,133 @@ for(int i=0; i<2; i++) {  //행반복
 
 ### [2019-03-19]
 #### 1. Review
+##### [어제 과제풀이]
+```java
+/*선택정렬 개선
+기본형 : 선택된 i번째값과 j번째값을 차례로 비교하며 값교환
+개선형 : k번째에 현재까지 가장작은 값의 위치를 기억시키면서 j번째값과 차례로
+비교한다. 마지막에 i번째와 k번째 값교환.
+*/
+int a[] = { 7, 4, 2, 3, 8 };
+for (int i = 0; i < a.length-1; i++) {
+	int k = i;  // k는 가장작은값의 위치
+	for (int j = i+1; j < a.length; j++) {
+		if (a[k]>a[j]) {
+			k = j;
+		}
+	}
+	// 마지막에 i번째와 k번째값 교환
+	int temp = a[i];
+	a[i] = a[k];
+	a[k] = temp;
+}
+System.out.println("정렬후 : "+Arrays.toString(a));
+
+
+/*버블정렬 개선(인접한 두값 비교)
+기본형 : j번째와 j+1번째 값을 차례로 비교
+개선형 : 한번도 값을 교환하지 않으면 이미 정렬된것이므로 반복을 중간에 탈출시킨다.
+*/
+int a[] = { 7, 4, 2, 3, 8 };
+for (int i = 0; i < a.length-1; i++) {
+	boolean swaped = false;
+	for (int j = 0; j < a.length-1-i; j++) {
+		if (a[j]>a[j+1]) {
+			int temp = a[j];
+			a[j] = a[j+1];
+			a[j+1] = temp;
+			swaped = true;
+		}
+	}
+	if(!swaped) break;
+}
+System.out.println("정렬후 : "+Arrays.toString(a));
+```
+
+#### 2. 문자열과 문자배열
+```java
+int score[] = {10,20,30,40,50};
+char[] abc = { 'A', 'B', 'C', 'D'};
+char[] num = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+//char배열명을 직접출력하면 참조값을 출력하지 않고 내용값을 연속적으로 출력해 준다.
+System.out.println(score); // 참조값 출력 "I@63nb34"
+System.out.println(abc);   // 내용값을 차례로 출력  "ABCD"
+System.out.println(num);   // 내용값을 차례로 출력  "0123456789"
+
+
+//문자열 변수도 참조변수다.
+//참조변수는 4byte 부호없는 정수값을 가진다(주소값:위치정보)
+  String name = "홍길동";
+  String title = "JICA 전주정보문화산업진흥원"
+  //name  0x100 --------------->"홍길동"
+  //title 0x200 --------------->"JICA 전주정보문화산업진흥원"
+
+  String names[] = new String[3];
+  //names 0x300 --------------->[0x400,0x500,0x600]
+  names[0] = "이순신";         //  |     |      |---->"고주몽"
+  names[1] = "장길산";         //  |     |-->"장길산"
+  names[2] = "고주몽";         //  |-->"이순신"
+
+  //위의 코드는 다음과 동일하다.
+  String names[] = {"이순신","장길산","고주몽"};
+```
+
++ char배열과 String(문자열)의 관계
+  - 1) char 배열은 단순히 문자값을 차례로 모아놓은 1차원배열이다.
+  - 2) String(문자열) ==> Java언어에서 제공하는 클래스이다.
+    - 클래스는 멤버변수(field)와 메서드로 구성되어 있다.
+    - 메서드 : 저장된 값을 이용하여 특정기능을 수행하는 코드들
+    - 멤버변수 : 값을 저장
+```java
+class String{
+    char value[];
+    다양한 메서드들....
+}
+String title = "JICA";
+```
+
+```java
+String src = "ABCDE";
+//객체명.메서드()
+//src.length()    문자열내부의 문자 갯수를 알려준다.
+//src.charAt(정수) 해당번째 문자값을 알려준다.
+for(int i=0; i < src.length(); i++) {
+  char ch = src.charAt(i); // src의 i번째 문자를 ch에 저장
+  System.out.println("src.charAt("+i+"):"+ ch);
+}
+char[] chArr = src.toCharArray();  // String을 char[]로 변환
+System.out.println(chArr); // char배열(char[])을 출력
+```
+
++ 자바코드가 실행될때, main()메서드에 전달되는 인자값의 의미가 무엇인가?
+```java
+void main(String[] args)
+//JAM에 의해서 main()메서드가 호출될때 전달되는 인자값.
+//지금까지는 인자값을 전달하지 않았으므로 args는 아무값도 없었다.
+
+int a[] = new int[5];  //ok       a.length ==> 5
+int b[] = new int[1];  //ok       b.length ==> 1
+int c[] = new int[0];  //ok       c.length ==> 0
+int d[];               //선언만 했다. d.length ==> error   
+```
++ 자바프로그램을 작성한 후 실행시킬때 main()메서드로 전달해주는 값을 명령행 인자라고 부른다.(커맨드 라인 인자값)
++ 명령행 인자는 공백 즉, 사이뜨게로 구분하고 모든 값은 문자열로 전달된다.
++ 이런 값을 저장하기 위해 main()메서드의 인자정보가 String[] args이다.
+  - 이클립스에서는 Run - Arguments 에서 인자값을 미리 넣고 RUN!
+  - DOS의 커맨드라인에서는 'java 파일명 인자값'
+
+#### 3. 다차원 배열예제(교재)
+
+
+
+-----------------------------------------------------------
+
+### [2019-03-20]
+#### 1. Review
+#### 2. 객체지향 프로그램
+##### 2.1. 클래스
+##### 2.2. 객체
+##### 2.3. 메서드
+
+#### 5. 실습
+#### 6. Summary / Close
