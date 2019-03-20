@@ -1988,6 +1988,128 @@ class LargeNumber {
                         static을 사용하면 객체생성없이 호출하는 메서드이다.
 ```
 
+```java
+//Score.java
+
+//1명의 성적처리를 수행하는 클래스
+public class Score {
+	// 멤버변수(Field)는 지금까지 학습한 모든 자료형이 가능하다(배열포함).
+	String name;
+	int data[] = new int[3];
+	int total;
+	double average;
+	char grade;
+
+  //세점수를 지정하는 메서드
+  	void setData(String Name, int kor, int eng, int math) {
+  		name = Name;
+  		data[0] = kor;
+  		data[1] = eng;
+  		data[2] = math;
+  	}
+
+	// 총점 메서드
+	void calTotal() {
+		total = 0;
+		for (int i = 0; i < data.length; i++) {
+			total += data[i];
+		}
+	}
+
+	// 평균계산 메서드
+	void calAverageCal() {
+		average = total / 3.0;
+	}
+
+	// 학점계산 메서드
+	void calGrade() {
+		if (average >= 90.0) {
+			grade = 'A';
+		} else if(average >= 80.0) {
+			grade = 'B';
+		} else if(average >= 80.0) {
+			grade = 'c';
+		} else if(average >= 70.0) {
+			grade = 'D';
+		} else {
+			grade = 'F';
+		}
+	}
+	// 성적처리결과를 출력하는 메서드
+	void display() {
+//		System.out.printf("%s의 총점은 %d, 평균은 %f, 학점은 %c입니다.%n",
+//				name, total, average, grade);
+		System.out.println("성명 : "+name);
+		System.out.print("점수 : ");
+		for (int i = 0; i < data.length; i++) {
+			System.out.print(data[i]+" ");
+		}
+		System.out.println();
+		System.out.printf("총점 : %d, 평균 : %6.2f, 학점 : %c%n", total, average, grade);
+		System.out.println("--------------------------------------------------");
+	}
+}
+
+///////////////////////////////////////////
+//ScoreTest.java
+public class ScoreTest {
+	public static void main(String[] args) {
+		// 성적처리를 수행하는 객체 선언 및 생성
+		Score score = new Score();
+		//객체가 생성된 이후에는 어떠한 멤버변수의 접근이나
+		//메서드의 호출이 가능하다.
+		//단, 원하는 결과를 얻기위해 필요한 멤버를 순서있게 사용하자.
+		score.name = "홍길동";
+		score.data[0] = 70;
+		score.data[1] = 80;
+		score.data[2] = 90;
+		score.calTotal();
+		score.calAverageCal();
+		score.calGrade();
+		score.display();
+
+		Score score2 = new Score();
+		score2.setData("이순신", 100, 95, 98);
+		score2.calTotal();
+		score2.calAverageCal();
+		score2.calGrade();
+		score2.display();
+
+		//객체명.멤버변수 = 값 표현을 이용하여 외부에서 객체에 값을 직접지정할 수 있지만
+		//논리적으로 살펴보면 잘못된 접근이다.
+		//이유는 학점은 평균으로 계산되어야 하는데 아래코드는 이를
+		score2.grade = 'F';  
+		score2.display();
+	}
+}
+```
+
++ 클래스 작성 연습) TV를 클래스로 표현하고 싶다.
+  - TV가 가진 모든 상태값이 모든 기능을 다 표현하는 것이 아니라 관심있는 요소만을 추출하여 멤버변수와 메서드로 나타낸다  ===> 추상화
+```java
+class 클래스명{
+  멤버변수들;
+  ...
+  메서드들(){
+
+  }
+}
+```
+
+#### [오늘의 과제]
++ 오늘 실습한 예제코드 복습하기
++ 교재 230~240page 정독하고 실습해 보기
++ 은행계좌 클래스를 만들어서 테스트해보자.
+
+
+-----------------------------------------------------------
+
+### [2019-03-20]
+
+#### 1. Review
+
+
+
 ##### 2.2. 객체(object)
 ##### 2.3. 메서드
 #### 3. 클래스와 객체지향연습
