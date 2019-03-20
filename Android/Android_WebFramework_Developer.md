@@ -1889,13 +1889,74 @@ a[3] = new int[4];
   - 유형의 실체(사람 개개인, 모니터 하나하나, ....)
   - 무형의 실체(개념을 정의하고 값을 지정한 형태가 없는 것들 : 날짜, 시간, 속도..)
   - 현실세계는 다양한 객체(objet) 등의 상호작용에 의해서 이루어진다.
-+ 클래스(class) : 현실세계의 유,무형의 객체를 컴퓨터 내부에서 문제해결을 하기위해 상태적특성과 행위적특성으로 공통점을 추출하여 개념을 정리한것.
-+ 
++ 클래스(class) : 현실세계의 유,무형의 객체를 컴퓨터 내부에서 문제해결을 하기위해 상태적특성(값으로 표현되고 식별되는것)과 행위적특성(기능)으로 공통점을 추출하여 개념을 정리한것.
+
++ 클래스(class) : 객체를 생성하는 틀(template)
+  - 클래스의 구성요소(member) ==> 멤버변수(필드) + 메서드
++ 객체(object) : 클래스를 사용하여 메모리에 생성된 실체(instance)
+
 ```java
 class student {
 }
 public static void main(String args[]) {
     student obj = new student;
+}
+```
+
+```java
+//객체를 사용하지 않고 프로그램을 작성
+//main()메서드 내부에서만 사용하는 변수 - 지역변수(local variable)
+int large;
+int number1 = 5;
+int number2 = 7;
+
+if(number1 > number2) {
+	large = number1;
+}else {
+	large = number2;
+}
+
+System.out.printf("두수 %d,%d 중에서 큰수는 %d 입니다.%n", number1number2,large);
+
+
+
+//위 코드를 클래스로 구성해보자.
+public class ObjectTest2 {
+//두수가 주어졌을때 큰수를 구하여 출력하시오.
+	public static void main(String[] args) {
+
+//		객체를 사용하는 방법으로 문제를 해결해 보자.
+//		 1) 클래스를 만들고
+//		 2) 클래스를 이용하여 객체를 생성하고
+		LargeNumber obj = new LargeNumber();
+
+//		 3) 객체에 메세지를 전달
+		obj.number1 = 5;
+		obj.number2 = 7;
+		obj.calculate();
+		obj.print();
+	}
+}
+//두수가 주어졌을때 크수를 구하여 출력하는 기능을 가진 클래스를 만든다.
+//클래스의 멤버는 멤버변수 즉, 필드와 메서드로 구성되어 있다.
+class LargeNumber {
+	// 상태값으로 표현되는 요소 --> 멤버변수(member variable) ==> 필드(Field)
+	int number1, number2;
+	int large;
+	// 행위로 표현되는 요소:실제실행될 기능 ---> 메서드(method)
+	void calculate() { // 큰수 구하기 기능
+		//현재의 메서드에서만 사용하는 변수가 필요하다면 직접 선언해서 사용할 수 있다.
+		//int max; //지역변수
+		//메서드 내부에서는 멤버변수를 마음대로 사용할 수 있다.
+		if (number1 > number2) {
+			large = number2;
+		} else {
+			large = number1;
+		}
+	}
+	void print() { // 큰수(large)를 출력하는 기능
+		System.out.printf("%d,%d 중에서 큰수는 %d 입니다.%n", number1, number2, large);
+	}
 }
 ```
 ##### 2.1. 클래스
