@@ -1949,9 +1949,9 @@ class LargeNumber {
 		//int max; //지역변수
 		//메서드 내부에서는 멤버변수를 마음대로 사용할 수 있다.
 		if (number1 > number2) {
-			large = number2;
-		} else {
 			large = number1;
+		} else {
+			large = number2;
 		}
 	}
 	void print() { // 큰수(large)를 출력하는 기능
@@ -1959,6 +1959,12 @@ class LargeNumber {
 	}
 }
 ```
++ 객체지향방법 : 반드시 아래의 방법으로 해결
+  - 1. 클래스 만들기
+    - 문제해결에 필요한 변수들 ==> 멤버변수로 작성
+    - 실행할 코드              ==> 기능별로 분류해서 메서드로 작성
+  - 2. 객체 만들기
+    -
 ##### 2.1. 클래스
 ##### 2.2. 객체(object)
 ##### 2.3. 메서드
