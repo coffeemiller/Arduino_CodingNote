@@ -2474,9 +2474,59 @@ public class VariableTest {
 	}
 }
 ```
-#### 4. 생성자
+```java
+//Card.java
+//카드의 폭과 높이를 별도로 출력하는 메서드를 만들어보자.
+static void displaySize() {
+	System.out.println("폭 : "+Card.width+", 높이 : "+Card.height);
+}
+//VariableTest.java
+//객체생성전에 static 메서드 호출
+	Card.displaySize();
+```
+  - 3) final 멤버변수(상수)
+    - final 키워드를 가진 멤버변수로 객체생성시 멤버변수에 값이 지정되면 이후에는 읽을수만 있고 변경은 불가능한 멤버변수
+```java
+//Card.java
+final static int width = 50;
+static final int height = 100;
+//final로 가진 변수들은 변경불가
+```
 
-#### 5. 오버로딩
+#### 4. 생성자(Constructor)
++ 객체가 생성직후에 자동으로 호출되어 객체가 올바르게 사용될 수 있도록 준비하는 실행 코드이다.
++ 일반적으로 멤버변수에 초기값을 지정하는 코드를 많이 사용한다.
++ 반드시 클래스명과 동일한 명칭의 메서드로 작성한다 이때 리턴값에 대한 표현은 없다.
+```java
+//Card.java
+//인자가 없는 생성자
+Card() {
+	System.out.println("인자가 없는 생성자가 작동했습니다.");
+}
+//Card()객체가 생성될때마다 반영된다.
+//인자가 있는 생성자
+Card(String str, int num) {
+	kind = str;
+	number = num;
+}
+Card(String a, String v) {
+}
+//main()에서 Card(String, int)형식, Card(String, String)의 2가지로 바로 실행가능.
+```
+
+#### 5. 실습
+
+#### 6. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+### [2019-03-22]
+
+#### 1. Review
+#### 2. 생성자(Constructor)
+#### 3. 오버로딩(Overloading)
 
 #### 6. 실습
 
