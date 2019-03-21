@@ -2124,7 +2124,6 @@ class 클래스명{
 객체명.메서드();
 ```
 
-#### 2. 생성자
 + Java 문법에서
   - 1) 클래스의 구성원(멤버-member)은 멤버변수와 메서드이다.
   - 2) 멤버변수를 자바에서는 필드(field)라고 부른다.
@@ -2216,9 +2215,8 @@ public class AccountTest {
 }
 ```
 
-#### 3. 멤버변수
 
-#### 4. 메서드
+#### 2. 메서드
 + 메서드(method)는 특정 작업을 수행하는 일련의 문장들의 모음
 + 메서드의 작성
 ```java
@@ -2273,14 +2271,12 @@ void add(int a, int b) {
 + Method Test
 ```java
 public class MethodTest {
-
 	public static void main(String[] args) {
 		//클래스를 이용하여 객체 생성
 		MyNumber obj = new MyNumber();
 
 		//메서드 호출
 		obj.printTitle();
-
 		obj.printMessage("현재 메서드 사용법을 학습하고 있습니다.");
 		obj.printMessage("메서드 호출시 전달하는 값을 매개변수라고 부릅니다.");
 		obj.printMessage("오늘날짜는 2019/03/21 입니다.");
@@ -2303,34 +2299,183 @@ public class MethodTest {
 		} else {
 			System.out.println("합계가 홀수입니다.");
 		}
+
+		//여기까지의 코드에서 obj는 여러메서드를 가지고 있다.
+		//이 메서드들은 멤버변수를 사용하지 않고 자기 기능을 수행할수 있는 메서드들이다.
+		//지금까지의 메서드들은 객체생성없이도 호출하여 사용할수 있다.
+		//이럴때 static 키워드를 붙여서 static을 만들면 객체생성없이
+		//클래스명.메서드()형태를 호출할 수 있다.
+		//----------------------------------------------
+		obj.display();
+		int value = Integer.parseInt("23");
+		double value2 = Math.random();
+		//위 코드를 보고 유추해 보면
+		//class Integer{
+		// ...
+		// static int parseInt(String arg) {
+		//    ...
+		//     return 정수값;
+		//  }
+		//}
+		//
+		//class Math{
+		// ...
+		//  static double random(){
+		//    ...
+		//     return 실수값;
+		//   }
+		// }
+
 	}
 }
 
 class MyNumber{
+	int num1, num2;
+	int result;
 	//인자정보도 없고 리턴값도 없는 메서드
-	void printTitle() {
+	static void printTitle() {
 		System.out.println("JICA 전주정보문화 산업진흥원");
 	}
-
 	//인자정보가 1개이고 리턴값은 없는 메서드
-	void printMessage(String msg) {
+	static void printMessage(String msg) {
 		System.out.println(msg);
 	}
-
 	//인자정보가 2개인 리턴값은 없는 메서드
-	void add(int a, int b) {
+	static void add(int a, int b) {
 		int sum = a+b;
 		System.out.println("두수 합계 : "+sum);
 	}
-
 	//인자정보가 2개이고 리턴값이 있는 메서드
-	int add2(int a, int b) {
+	static int add2(int a, int b) {
 		int sum;
 		sum = a + b;
 		return sum;
 	}
+	//인자정보가 없고 리턴값도 없는 메서드
+	void add3() {
+		//멤버변수를 사용하여 기능을 수행
+		result = num1 + num2;
+	}
+	void display() {
+		System.out.printf("num1:%d, num2:%d, result:%d%n", num1, num2, result);
+	}
 }
 ```
++ static을 사용하면 멤버변수를 사용할 수 없다!!
++ static을 사용하면 다른 클래스에서 만들어진 메서드를 사용할 수 있다.
+```java
+MyNumber obj2 = new MyNumber();
+		obj2.display();
+		obj2.num1 = 43;
+		obj2.num2 = 56;
+		obj2.add3();
+		obj2.display();
+		//위의 display()와 ass3()은 일반메서드이다.
+		//그러므로 객체명.메서드() 형태로만 호출하여 사용한다.
+```
++ 메서드의 종류
+  - 1) 일반메서드
+    - 멤버변수를 사용하여 기능을 수행하는 메서드이다.
+    - 반드시 객체를 생성한 후 호출할수 있는 메서드이다.
+```java
+객체명.메서드();
+```
+  - 2) static 메서드
+    - 멤버변수를 사용하지 않고 수행되는 메서드이다. 즉, 멤버변수를 사용하면 에러발생
+    - 객체생성 없이도 호출하여 사용할 수 있다.
+```java
+클래스명.메서드();    //--- 적극권장
+```
+  - 3) final 메서드
+```java
+final void test() {
+  System.out.println("final메서드 입니다.");
+}
+```
+#### 3. 멤버변수
++ 멤버변수의 종류
+  - 1) 일반멤버변수 즉, instance 멤버변수
+    - 객체생성시 메모리에 확보되는 멤버변수
+    - 클래스로 객체를 여러개 만들었다면 인스턴스 멤버변수도 여러개 만들어진다.
+    - 즉 객체마다 별도로 가지고 있다.
+  - 2) static 멤버변수 즉, 클래스 멤버변수
+    - static 키워드를 가진 멤버변수이다.
+    - 객체가 생성되기도 전에 메모리에 1개 만들어지고 여러객체를 생성했을때 여러 객체에서 공동으로 사용한다.
+```java
+//사용법
+클래스명.멤버변수();  //-----적극권장
+객체명.멤버변수();
+```
+    - 언제 static멤버변수가 유용한가?
+      - 특정클래스로 만들어진 여러객체에서 공용으로 사용하는 멤버변수일때, 이를 static 멤버변수로 지정한다.
+```java
+//Card.java
+// 1장의 카드를 표현하는 클래스
+// 무늬 : SPADE, HEART, CLOVER, DIAMOND
+// 숫자 : 1~10, J(11), Q(12), K(13)
+// 크기 : 폭과 높이
+
+public class Card {
+	//일반멤버변수 즉, instance변수는 개별 객체마다 존재
+	String kind;
+	int number;
+
+	//static멤버변수 즉, class변수는 객체를 생성하기도 전에 1개 미리 만들어지고
+	//이후 생성하는 모든 객체에서 공용으로 사용된다.
+	static int width = 50;
+	static int height = 100;
+
+	void display() {
+		String strNumber = "";
+		if(number <= 10) {
+			strNumber = number + "";
+		} else if (number == 11){
+			strNumber = "J";
+		} else if (number == 12){
+			strNumber = "Q";
+		} else if (number == 13){
+			strNumber = "K";
+		}
+		System.out.println(kind+","+strNumber+","+width+","+height);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+//VariableTest.java
+public class VariableTest {
+
+	public static void main(String[] args) {
+		System.out.println(" 폭  : "+Card.width);
+		System.out.println("높이 : "+Card.height);
+		//아래의 코드에서 객체를 생성하기도 전에 width, height 멤버변수는
+		//이미 메모리에 만들어져 있다.
+
+		Card card1 = new Card();
+		card1.kind = "SPADE";
+		card1.number = 5;
+		card1.display();
+
+		Card card2 = new Card();
+		card2.kind = "DIAMOND";
+		card2.number = 12;
+		card2.display();
+
+		Card card3 = new Card();
+		card3.kind = "CLOVER";
+		card3.number = 9;
+		card3.display();
+    // width, height를 별도로 지정하지 않아도,
+    // Card.java의 static멤버변수를 공동으로 사용한다.
+
+    //static멤버변수는 객체명으로 접근할수 있고
+		System.out.println(card3.width+","+card3.height);  //<---비추
+		//클래스명으로 접근할수도 있지만 둘중 클래스 명으로 접근하기를 권장한다.
+		System.out.println(Card.width+","+Card.width);  //<---권장
+	}
+}
+```
+#### 4. 생성자
+
 #### 5. 오버로딩
 
 #### 6. 실습
