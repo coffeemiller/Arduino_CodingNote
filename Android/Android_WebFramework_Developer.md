@@ -2110,13 +2110,229 @@ class 클래스명{
 + 현실에서 존재하는 유,무형의 실체들이 곧 객체이다.
 + 공통적 특성(특징)을 가진것들을 '분류화'를 클래스라고 생각할 수 있다.
 + 특성은 '상태(값)', '행위(기능)'로 분류할 수 있는데, 이를 클래스명!
-+ 클래스
++ 클래스(Class)
   - 객체를 정의해 놓은 것.
   - 객체를 생성하는 틀(template)
++ 객체(Object)
+  - 현실세계를 구성하는 유무형의 실체
+  - 프로그램에서는 클래스의 인스턴스가 객체이다.
++ 메세지(Message)
+  - 객체간의 상호작용을 위한 수단
+  - 객체의 멤버(멤버변수, 메서드)를 사용하는 것
+```java
+객체명.멤버변수;
+객체명.메서드();
+```
 
 #### 2. 생성자
++ Java 문법에서
+  - 1) 클래스의 구성원(멤버-member)은 멤버변수와 메서드이다.
+  - 2) 멤버변수를 자바에서는 필드(field)라고 부른다.
+  - 3) 필드의 역할에 따라 다음으로 구분한다.
+    - 인스턴스 멤버변수
+    - static 멤버변수(클래스 멤버변수)
+    - fimal 멤버변수
+  - 4) 메서드도 다음으로 구분한다.
+    - 일반 메서드
+    - static 메서드(클래스 메서드)
+    - final 메서드
+  - 5) 객체생성시 생성되는 객체의 멤버변수에 사용자가 지정하는 초기값을 부여할수 있다. 객체가 생성될때(new) 자동적으로 호출되어 수행되는 메서드를 생성자(constructor)라고 부른다.
+    - 어쨋든 생성자도 특수한 형태의 메서드이다.
+    - 생성자는 반드시, 클래스명과 동일한 명칭을 사용해야 한다(문법).
++ 메서드를 사용할때 리턴값이 없는 메서드 즉, 리턴값이 void로 명시된 메서드는 단독으로만 사용할 수 있다.
++ 리턴값이 있는 메서드는 단독으로 사용할 수도 있고 다음의 표현에서도 사용가능하다.
+  - 1) 리턴값을 변수에 대입할수도 있고
+```java
+int respMoney = account1.withdraw(100000);
+```
+  - 2) 직접 출력시킬수도 있고
+```java
+System.out.println(account1.withdraw(100000));
+```
+  - 3) 조건식 즉, 조건문이나 반복문에 사용될 수 있다.
+```java
+if (account1.withdraw(100000) >= 0) {
+  ....
+}
+```
+
++ 은행 입/출금 시스템 코딩하기
+```java
+//Account.java
+// 은행계좌클래스
+public class Account {
+	String owner;    //소유주
+	String accountId;  //계좌번호
+	String password;   //비밀번호
+	int balance;
+	//예금하다
+	void deposit(int money) {
+		balance += money;
+	}
+	//인출하다
+	int withdraw(int money) {
+	  int withdrawal;
+		if (balance >= money) {  //정상인출
+			balance -= money;
+			withdrawal = money;  //return money;
+		} else {                //잔고가 부족하여 인출할 수 없을때
+			withdrawal = 0;  //return money;
+		}
+		return withdrawal;
+	}
+	//현재의 계좌상태정보 알려주기
+	void display() {
+		System.out.println("계좌번호 : "+accountId);
+		System.out.println("비밀번호 : "+"****");
+		System.out.println("소유주   : "+owner);
+		System.out.println("잔    액 : "+balance+"원");
+		System.out.println("--------------------------------");
+	}
+}
+///////////////////////////////////////////////////////////
+//AccountTest.java
+public class AccountTest {
+	public static void main(String[] args) {
+		// 은행계좌객체 생성
+		Account account1 = new Account();
+		// 은행계좌객체가 유효하게 사용될수 있도록 초기값을 지정한다.
+		account1.owner = "홍길동";
+		account1.accountId = "367-21-0083-921";
+		account1.password = "1234";
+		account1.display();
+		// 예금하다
+		account1.deposit(1000000);
+		account1.display();
+		// 인출하다.
+		account1.withdraw(300000);
+		System.out.println("인출금액 : " + account1.withdraw(200000));
+		account1.display();
+		if (account1.withdraw(700000) > 0) {
+			System.out.println("정상적으로 인출되었습니다.");
+		} else {
+			System.out.println("잔고가 부족하여 인출하지 못했습니다.");
+		}
+	}
+}
+```
+
 #### 3. 멤버변수
+
 #### 4. 메서드
++ 메서드(method)는 특정 작업을 수행하는 일련의 문장들의 모음
++ 메서드의 작성
+```java
+//메서드
+리턴값자료형 메서드명(인자정보) {  // 메서드 선언부
+  .....                            // 메서드 구현부(정의부)
+  메서드호출시 수행될 코드;
+  .....
+}
+//메서드명 : 기능을 대효하는 의미있는 이름으로 사용자 지정
+//인자정보 : 해당 메서드를 호출할때 전달해주는 값
+// 1.전달해주는 값이 없으면 아무것도 기술하지 않는다.
+add() {
+  ...
+}
+// 2.전달해주는 값이 있다면 다음의 형태로 작성한다.
+// 자료형 변수명, 자료형 변수명, 자료형 변수명, ...
+// 이때 전달받은 값을 저장하는 변수를 매개변수(parameter)라고 부른다
+//변수명은 자유롭게 지정할수 있다. 또 매개변수를 메서드의 수행을 마치면 메모리에서 사라진다.
+
+//메서드 내부에서 필요하다면 변수를 선언해서 사용할수도 있다. 이러한 변수를 지역변수라고 한다.
+add(int a, int b, int c, int d) {  // a,b는 매개변수
+  int result;                           // result 지역변수
+  ...
+}
+////////////////////////////////////////////////
+//리턴값 : 메서드 수행을 마치고 호울한 곳으로되돌려 주는 값
+// 1.메서드의 수행을 마치고 그 결과값을 메서드 자체에서만 사용하고 끝나면 리턴값은 없다. 이때 void를 사용한다.
+void add(int a, int b) {
+  int result;
+  result = a+b;
+  System.out.println("합계 : "+result);
+}
+
+// 2.메서드 수행의 결과값을 메서드를 호출한 곳으로 전달해줄 때는 리턴값이 있다고 한다. 리턴값이 있을 때는 전달해주는 값의 자료형을 선언부에 기술한다.
+// 리턴값은 매개변수와 다르게 단 한개의 값만 리턴할 수 있다.
+int add(int a, int b) {
+  int sum;
+  sum = a+b;
+  return sum;
+}
+
+
+//두수의 합계를 계산하는 메서드 작성
+void add(int a, int b) {
+  int result;
+  result = a+b;
+  System.out.println("합계 : "+result);
+}
+```
+
++ Method Test
+```java
+public class MethodTest {
+
+	public static void main(String[] args) {
+		//클래스를 이용하여 객체 생성
+		MyNumber obj = new MyNumber();
+
+		//메서드 호출
+		obj.printTitle();
+
+		obj.printMessage("현재 메서드 사용법을 학습하고 있습니다.");
+		obj.printMessage("메서드 호출시 전달하는 값을 매개변수라고 부릅니다.");
+		obj.printMessage("오늘날짜는 2019/03/21 입니다.");
+
+		//obj.add();            // error 호출형식 선언된 형식과 다르므로 에러이다.
+		//obj.add(10);          // error 호출할때는 인자의 갯수를 일치시켜야 한다.
+		//obj.add("ABC", 30);   // error 호출할때는 자료형을 일치시켜야 한다.
+
+		obj.add(10, 20);        // ok
+		int x = 100, y = 200;
+		obj.add(x, y);          // ok
+		int a = 76, b = 48;
+		obj.add(a, b);          // ok
+
+		obj.add2(x, y);         // ok
+		int k = obj.add2(x, y);
+		System.out.println("합계 : "+k);
+		if (obj.add2(a,b)%2 == 0) {
+			System.out.println("합계가 짝수입니다.");
+		} else {
+			System.out.println("합계가 홀수입니다.");
+		}
+	}
+}
+
+class MyNumber{
+	//인자정보도 없고 리턴값도 없는 메서드
+	void printTitle() {
+		System.out.println("JICA 전주정보문화 산업진흥원");
+	}
+
+	//인자정보가 1개이고 리턴값은 없는 메서드
+	void printMessage(String msg) {
+		System.out.println(msg);
+	}
+
+	//인자정보가 2개인 리턴값은 없는 메서드
+	void add(int a, int b) {
+		int sum = a+b;
+		System.out.println("두수 합계 : "+sum);
+	}
+
+	//인자정보가 2개이고 리턴값이 있는 메서드
+	int add2(int a, int b) {
+		int sum;
+		sum = a + b;
+		return sum;
+	}
+}
+```
 #### 5. 오버로딩
+
 #### 6. 실습
+
 #### 7. Summary / Close
