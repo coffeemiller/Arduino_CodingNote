@@ -2624,7 +2624,10 @@ public class ConstructorTest {
   public static void main(String[] args) {
 		MyDate today = new MyDate();
 		//객체가 생성되는 시점
-
+    //                1) MyDate클래스의 멤버변수값저장할 공간이 확보된다.(객체생성)
+		//                2) 인자가 없는 생성자실행
+		//                3) 위치정보를 today에 저장
+    today.display();
 		//객체생성후 유효한 값을 지정
 		today.year = 2019;
 		today.month = 3;
@@ -2637,9 +2640,25 @@ public class ConstructorTest {
 	}
 }
 ```
++ this는 키워드 즉, 예약어이다. 반드시 일반메서드 내부에서만 사용해야 한다. 이유는 this는 객체 자신을 가리키는 참조변수이기 때문이다.
+```java
+//객체명을 직접출력하면 어떻게 될까?
+System.out.println(today);    //결과 : MyDate@15db9742
+//위치정보값이 클래스명@16진수 hashcode값 형태로 출력된다.
 
+//생성자 내부에서 this를 직접출력시켜보자
+System.out.println(this);    //결과 : MyDate@15db9742
+//값이 동일하다.
+```
+```java
+public static void main(String[] args) {
+  //this 키워드는 클래스의 일반 메서드 내부에서만 사용할 수 있다.
+	System.out.println(this);  //error
+  //static 메서드에서는 사용할 수 없다.
+}
+```
 #### 3. set/get 메서드
-+ 외부에서 직접 멤버변수 등을 변경하지 (가급적)못하게 하고, 해당 클래스 내의 메서드를 통해서 변경하는 방식으로 하는 방법.
++ 외부에서 직접 멤버변수 등을 변경하지 (가급적) 못하게 하고, 해당 클래스 내의 메서드를 통해서 변경하는 방식으로 하는 방법.
 
 #### 4. 참조변수의 특성과 메서드의 인자전달
 
