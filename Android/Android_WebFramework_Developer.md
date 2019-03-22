@@ -2568,7 +2568,75 @@ Card card1 = new Card();
     - new 클래스명()을 실행하면 동작하는 생성자
   - 3) 사용자가 필요에 따라 다양한 인자값을 전달하는 생성자
 + 클래스의 메서드 내부에서 메서드의 매개변수명이나 지역변수명이 멤버변수명과 충돌할때는(같을때) 멤버변수를 지정하고 싶다면 'this.멤버변수'를 사용한다.
+```java
+//MyDate.java
+//년,월,일 정보를 표현한 날짜 클래스
+public class MyDate {
+	//멤버변수
+	int year;
+	int month;
+	int day;
+	//인자가 없는 생성자
+	MyDate() {
+		System.out.println("MyDate::MyDate()...");
+		//생성자는 객체가 생성된 직후에 호출되므로 클래스의 모든 멤버를 접근할수 있다.
+		//멤버변수 및 메서드 호출도 가능하다.
+		year = 2019;
+		month = 1;
+		day = 1;
+		display();
+	}
+	//인자가 있는 생성자
+	MyDate(int y) {
+		System.out.println("MyDate::MyDate(int)...");
+		year = y;
+		display();
+	}
+	//인자가 있는 생성자
+		MyDate(int year, int month) {
+			System.out.println("MyDate::MyDate(int,int)...");
+			//매개변수명과 멤버변수명이 동일할때는 매개변수를 사용한다.
+			//매개변수가 우선권을 가짐.
+			//year = year;
+			//month = month;
+			//이때 멤버변수를 지정하고 싶다면 this를 사용한다.
+			this.year = year;
+			this.month = month;
+			this.day = 1;
+			display();
+		}
+	//인자가 있는 생성자
+	MyDate(int y, int m, int d) {
+		System.out.println("MyDate::MyDate(int,int,int)...");
+		year = y;
+		month = m;
+		day = d;
+		display();
+	}
+	void display() {
+		System.out.println(year+"/"+month+"/"+day);
+		System.out.println("----------------------------------------");
+	}
+}
+///////////////////////////////////////////////////////////////
+//ConstructorTest.java
+public class ConstructorTest {
+  public static void main(String[] args) {
+		MyDate today = new MyDate();
+		//객체가 생성되는 시점
 
+		//객체생성후 유효한 값을 지정
+		today.year = 2019;
+		today.month = 3;
+		today.day = 22;
+		today.display();
+
+		MyDate someday = new MyDate(2010);
+		MyDate otherday = new MyDate(2018,11);
+		MyDate today2 = new MyDate(2019,4,25);
+	}
+}
+```
 
 #### 3. set/get 메서드
 + 외부에서 직접 멤버변수 등을 변경하지 (가급적)못하게 하고, 해당 클래스 내의 메서드를 통해서 변경하는 방식으로 하는 방법.
