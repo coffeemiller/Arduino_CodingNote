@@ -2916,6 +2916,52 @@ static void paramTest(MyDate someday) {
 ```
 
 #### 5. 실습
+```java
+//객체(Object)에 대한 배열 다루기
+//ObjectArrayTest.java
+import java.util.Arrays;
+public class ObjectArrayTest {
+	public static void main(String[] args) {
+		Card card = new Card("SPADE",1);
+		card.display();
+		System.out.println("------------------------------");
+		//위의 코드는 Card객체 1개만 만들어서 사용했다.
+		//만약 13개의 SPADE카드를 생성하고 싶다면.....?
+		Card cards[] = new Card[13];
+		for (int i = 0; i < cards.length; i++) {
+			cards[i] = new Card("SPADE", i+1);
+		}
+		//cards 배열의 요소값 하나, 하나 객체라고 생각하면 된다.
+		for (int i = 0; i < cards.length; i++) {
+			cards[i].display();
+		}
+	}
+}
+//13짜리 배열에, '객체(Object)'를 넣었다.
+//
+/*결과
+SPADE,1
+------------------------------
+SPADE,1
+SPADE,2
+SPADE,3
+SPADE,4
+SPADE,5
+SPADE,6
+SPADE,7
+SPADE,8
+SPADE,9
+SPADE,10
+SPADE,11
+SPADE,12
+SPADE,13
+*/
+```
+
+#### [오늘의 과제]
++ 어제와 과제와 동일 : 교재 예제를 살펴보고 질문
++ 특히 오늘 실습예제를 차례로 다시 실습해보자.
+
 #### 6. Summary / Close
 
 -----------------------------------------------------------
