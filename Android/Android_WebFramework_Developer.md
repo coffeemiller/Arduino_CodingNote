@@ -2657,8 +2657,165 @@ public static void main(String[] args) {
   //static 메서드에서는 사용할 수 없다.
 }
 ```
+```java
+//Card.java
+public class Card {
+	String kind;
+	int number;
+	Card() {
+		//아무 실행코드가 없다할지라도 타당하다.
+		kind = "SPADE";
+		number = 1;
+	}
+	Card(String kind, int number) {
+		this.kind = kind;
+		this.number = number;
+	}
+	void display() {
+		System.out.println(kind+","+number);
+	}
+}
+///////////////////////////////////////////////////////////////
+//ConstructorTest2.java
+public class ConstructorTest2 {
+	public static void main(String[] args) {
+		//사용자가 생성자를 1개도 안만들었을때 다음과 같은 형태로 코딩할 수 있다.
+		//생성자를 1개도 만들지 않으면 컴파일러 제공하는 기본생성자가 작동하지만,
+		//인자가 있는 생성자를 1개라도 작성하면 컴파일러가 제공하는 기본생성자는 작동되지 않는다.
+		//해결방법) 반드시 인자가 없는 생성자를 직접 작성해야 한다.
+		Card card = new Card();
+		card.kind = "SPADE";
+		card.number = 6;
+		card.display();
+
+		Card card2 = new Card("DIAMOND", 8);
+		card2.display();
+    System.out.println("-------------------------------");
+
+		int a = 10;
+		int b = a;
+
+		Card card3;  //Card card3 = card2;
+		card3 = card2;
+		card2.number = 4;
+		//card2와 card3이 동일한 참조값을 가지므로 내용값도 함께 변경된다.
+		//결국 card2와 card3은 같은 객체이다.
+		System.out.println(card2 == card3);   //true
+		card2.display();
+		card3.display();
+	}
+}
+```
++ 다른 객체(별도의 공간)에 내용값만 같게 할 수는 없을까?
+```java
+//Card.java
+Card(Card card) {
+	this.kind = card.kind;
+	this.number = card.number;
+}
+/////////////////////////////////////////////////////////////////
+//ConstructorTest2.java
+Card card3;  //Card card3 = card2;
+card3 = card2;
+card2.number = 4;
+//card2와 card3이 동일한 참조값을 가지므로 내용값도 함께 변경된다.
+//결국 card2와 card3은 같은 객체이다.
+System.out.println(card2 == card3);   //true
+//card2객체와 동일 내용값을 가진 별도의 객체를 card4로 만들고 싶다.
+//이때 사용하는 생성자가 복사생성자(copy)이다.
+Card card4 = new Card(card2);
+System.out.println(card2 == card4);   //false
+```
++ 이클립스에서 생성자 쉽게 만들기?
+  - 해당 클래스에서 [오른쪽 버튼]-[Source]-[Generate Constructors  from Superclass...] 클릭하면 인자없는 생성자를 손쉽게 만들 수 있음.
+  - - 해당 클래스에서 [오른쪽 버튼]-[Source]-[Generate Constructor using Fields...] 클릭하면 손쉽게 인자있는 생성자를 만들 수 있음.
+
++ 기존 객체와 동일한 값을 가지는 객체를 생성하는 생성자 ==> 복사생성자
+```java
+클래스명(클래스명 변수) {
+
+}
+```
+
 #### 3. set/get 메서드
 + 외부에서 직접 멤버변수 등을 변경하지 (가급적) 못하게 하고, 해당 클래스 내의 메서드를 통해서 변경하는 방식으로 하는 방법.
++ 객체를 생성한 후 객체를 사용하는데 있어서 유효성검증을 하면서 사용하기 위해 set/get 메서드를 사용하자.
+
++ 접근제어자 : 클래스나 클래스의 멤버를 사용할때의 규칙
+  - 클래스에서의 접근제어자
+    - 1) public : 외부 공개(현재 패키지 이외의 다른 패키지에서 자유롭게 해당 클래스를 사용할 수 있다.)
+    - 2) 아무것도 지정하지 않는 것 : 내부 숨김(현재 패키지에서만 자유롭게 사용할 수 있다.)
+  - 클래스 멤버(변수)에서의 접근제어자
+    - 1) public
+    - 2) protected
+    - 3) 아무것도 기술하지 않은 것(default, frendly)
+    - 4) private
++ private : 객체생성후 객체를 이용하여 멤버에 접근할 수 없다.
+  - 일반적으로 데이터를 보호하기 위해 멤버변수에 사용한다.
+```java
+//MyDate.java
+//멤버변수
+private int year;
+private int month;
+private int day;
+//////////////////////////////////
+//AcccessTest.java
+// 멤버접근(메세지 전달)
+System.out.println(someday.month);   // 읽기 오류
+someday.month = 7;    // 쓰기 오류
+someday.display();
+
+someday.month = 14;   // 쓰기 오류 + 문법적오류는 없으나 비정상적인 값을 가진다.
+someday.display();
+```
++ 객체는 항상 유효한 상태를 유지하고 있어야하는 책임이 있다. 이를 지원하기 위해 접근제어자를 제공한다.
++ 멤버변수에 private을 사용하면 외부에는 직접접근이 불가능하다. 이를 위해서 멤버변수의 값을 읽기만 하는 메서드(get method), 쓰기(변경)
+```java
+//MyDate.java
+//멤버변수
+private int year;
+private int month;
+private int day;
+// get 메서드(멤버변수만을 대상으로 값을 읽고 쓰는 메서드들)
+int getYear() {	return year;}
+int getMonth() {	return month;	}
+int getDay() {	return day;	}
+// set 메서드(멤버변수만을 대상으로 값을 쓰는 메서드들)
+void setYear(int year) {
+  if (month >=1 && month <= 12) {this.year = year;}
+}
+void setMonth(int month) {
+  if (month >= 1 && month <= 12) {this.month = month;	}
+}
+void setDay(int day) {
+  if (day >=1 && day <= 31) { this.day = day;}
+}
+//////////////////////////////////
+//AcccessTest.java
+// 멤버접근(메세지 전달)
+System.out.println(someday.month);   // 읽기 오류
+someday.month = 7;    // 쓰기 오류
+someday.setMonth(7);  // 쓰기 가능
+someday.display();
+
+someday.month = 14;   // 쓰기 오류 + 문법적오류는 없으나 비정상적인 값을 가진다.
+someday.setMonth(14); // 쓰기 가능하지만....범위가 벗어남.
+//MyDate에 if문을 추가할때 비로소 유효값 사용가능.
+someday.display();
+```
++ private long balance; 멤버변수가 있다면
+  - get메서드 작성규칙
+```java
+long getBalance() {
+  return balance;
+}
+```
+  - set메서드 작성규칙
+```java
+long setBalance(long balance) {
+  this.balance = balance;
+}
+```
 
 #### 4. 참조변수의 특성과 메서드의 인자전달
 
