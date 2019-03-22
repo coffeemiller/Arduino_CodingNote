@@ -2728,7 +2728,9 @@ System.out.println(card2 == card4);   //false
 ```
 + 이클립스에서 생성자 쉽게 만들기?
   - 해당 클래스에서 [오른쪽 버튼]-[Source]-[Generate Constructors  from Superclass...] 클릭하면 인자없는 생성자를 손쉽게 만들 수 있음.
-  - - 해당 클래스에서 [오른쪽 버튼]-[Source]-[Generate Constructor using Fields...] 클릭하면 손쉽게 인자있는 생성자를 만들 수 있음.
+  - 해당 클래스에서 [오른쪽 버튼]-[Source]-[Generate Constructor using Fields...] 클릭하면 손쉽게 인자있는 생성자를 만들 수 있음.
++ 이클립스에서 get/set메서드 쉽게 만들기?
+  - 해당 클래스에서 [오른쪽 버튼]-[Source]-[Generate Getter and Setter...] 클릭하면 손쉽게 인자있는 생성자를 만들 수 있음.
 
 + 기존 객체와 동일한 값을 가지는 객체를 생성하는 생성자 ==> 복사생성자
 ```java
@@ -2817,20 +2819,111 @@ long setBalance(long balance) {
 }
 ```
 
+#### page261 오류잡기
++ Data영역
+  - 1) static 영역(정적영역) : 클래스의 멤버변수중에서 static멤버변수(클래스멤버변수)
+  - 2) Heap 영역(동적영역) : new에 의해 생성된 모든 객체   
+  - 3) Stack영역(자동영역) : 메서드내부의 모든 변수
+
++ 1) 자바프로그램 main()메서드로 시작하고 이후 다양한 메서드를 호출할수 있고
+     객체의 메서드를 호출할수 있다.  이때 메서드 내부에서 선언한 변수는 stack영역에
+     만들어진다.
+```
+          |   
+sMethod() |  c 1000        (x) 사라짐
+  -----------------------
+fMethod() |  b 100         (x) 사라짐
+  -----------------------
+main()    |  a 10
+          |------------------
+```
+
++ 메서드 호출시 인자를 전달할때 기본형 전달할때와 참조형 변수 즉, 배열과 객체를 전달할때의 차이점을 이해하자.
+  - 기본형 변수 : 내용값을 복사하여 전달한다.
+  - 참조혀 변수 : 위치정보 즉, 주소를 복사하여 전달한다.
 #### 4. 참조변수의 특성과 메서드의 인자전달
++ 1) 자바프로그램 main()메서드로 시작하고 이후 다양한 메서드를 호출할수 있고 객체의메서드를 호출할 수 있다
+```java
+//ParameterTest.java
+public class ParameterTest {
+	public static void main(String[] args) {
+		int a = 10;
+		pramTest(a);   // 기본자료형 전달
+		System.out.println("a : "+a);
+	}
+	static void pramTest(int a) {
+		a = 100;
+		System.out.println("a : "+a);  // 100
+	}
+	//
+	//
+	// paramTest()    a 100 (x) 리턴되면 메모리에서 사라짐
+	// -----------------------
+	// main()         a 10
+}
+//결과
+//a : 100
+//a : 10
+//////////////////////////////////////////////////////
 
-#### 5. 초기화 블럭
-#### 6. 실습
-#### 7. Summary / Close
-#### 3. 오버로딩(Overloading)
 
+//ParameterTest2.java
+import java.util.Arrays;
+public class ParameterTest2 {
+	public static void main(String[] args) {
+		int arr[] = new int[] { 10, 20, 30 };		
+		paramTest(arr);   // 참조형 전달 즉, 배열명 전달
+		System.out.println(Arrays.toString(arr)); //10 200 30
+	}
+	static void paramTest(int arr[]) {
+		arr[1] = 200;
+		System.out.println(Arrays.toString(arr));  //10 200 30
+	}
+	//
+	//                    |-->|-->[10,200,30]                 
+	//                    |   |   0x100
+	//                    |   |  
+	// paramTest()    arr 0x100 (x) 리턴하면 사라짐
+	// -----------------------|-
+	// main()         arr 0x100
+}
+//결과
+//[10, 200, 30]
+//[10, 200, 30]
+///////////////////////////////////////////////////////
+
+//ParameterTest3.java
+public static void main(String[] args) {
+  MyDate someday = new MyDate(2019,3,22);
+  paramTest(someday);   // 참조형 전달 즉, 객체를 전달
+  someday.display();    // 2019/10/22
+}
+static void paramTest(MyDate someday) {
+  someday.month = 10;
+  someday.display();   // 2019/10/22
+}
+//
+//                                   [2019,10,22]                 
+//                          |--> |--> 0x100
+//                          |    |
+// paramTest()    someday 0x200  | (x) 리턴하면 사라짐
+// ------------------------------|----
+// main()         someday 0x200--|
+//
+//결과
+//2019/10/22
+//2019/10/22
+```
+
+#### 5. 실습
+#### 6. Summary / Close
 
 -----------------------------------------------------------
 
 ### [2019-03-23]
 
 #### 1. Review
-
-#### 5. 초기화 블럭
-#### 6. 실습
+#### 2. 오버로딩(Overloading)
+#### 3. 초기화 블럭
+#### 4. 실습
 #### 7. Summary / Close
