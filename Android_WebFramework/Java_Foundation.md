@@ -2969,7 +2969,198 @@ SPADE,13
 ### [2019-03-25]
 
 #### 1. Review
-#### 2. 오버로딩(Overloading)
-#### 3. 초기화 블럭
-#### 4. 실습
++ 단일 클래스
++ 클래스간의 관계
+
+#### 2. 객체배열
+```java
+//String name = "홍길동";
+String name = new String("홍길동"); // 문자열객체
+
+//성명을 여러개 관리하고 싶다면
+//String names[] = {"홍길동", "이순신", "장길산", "고주몽", "강감찬"};
+String names[] = new String[5];
+for(int i=0; i<5; i++) {
+  name[i] = new String("홍길동"+(i+1));
+}
+```
++ 클래스 문법 복습
+  - 멤버변수의 종류
+    - 1) 인스턴스 멤버변수
+    - 2) 클래스 멤버변수(static)
+    - 3) final 멤버변수
+  - 메서드의 종류
+    - 1) 인스턴스 메서드
+    - 2) 클래스 메서드(static)
+    - 3) final 메서드
++ 생성자(constructor) : 객체생성시(new) 메모리에 인스턴스가 확보된 직후에 호출되어 객체의 사용을 준비하는 메서드이다. 주로 멤버변수 초기화기능을 수행한다.
++ 생성자의 종류
+  - 1) 컴파일러 제공 디폴트 생성자(인자가 없는 생성자) - 사용자가 인자가 있는 생성자를 1개라도 만들면 제공되지 않는다.
+  - 2) 사용자가 만드는 인자가 없는 생성자 -- 반드시 작성하기를 권장.
+  - 3) 필요한 생성자를 마음대로 만든다.
++ 생성자에서 또다른 생성자를 호출할때 this(인자정보)를 사용한다. 단, 반드시 첫번째 문장이야 한다.
++ set/get Method : 객체의 멤버변수에 값을 저장하거나 읽어오는 전용메서드
++ 메서드 오버로딩(overloading) : 메서드명은 동일하나 인자정보가 다른 형태의 메서드를 여러개 만들어서 사용하는 기능
+```java
+//Score.java
+//3학년2반학생 1명의 성적처리를 수행하는 클래스
+public class Score {
+	//클래스 멤버변수(static)
+	public static final String title = "3학년 2반";
+	//인스턴스 멤버변수
+	private String name;
+	private int data[];  
+	private int total;
+	private double average;
+	private char grade;
+	//생성자
+	Score(){
+		System.out.println("Score::Score()...");
+		data = new int[3];
+	}
+	Score(String name) {
+		this();
+		System.out.println("Score::Score(String)...");
+		this.name = name;
+	}
+	Score(String name, int kor, int eng, int math){
+		//생성자에서 또다른 생성자를 호출할때 this(인자정보)를 사용한다.
+		//다른 생성자를 호출하는 문장을 반드시 첫문장이어야 한다.
+		this();
+		System.out.println("Score::Score(String,int,int,int)...");
+		this.name = name;
+		data[0] = kor;
+		data[1] = eng;
+		data[2] = math;
+	}
+	//set/get method ==> setter, getter
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int[] getData() {
+		return data;
+	}
+	public void setData(int[] data) {
+		//this.data = data;
+		this.data[0] = data[0];
+		this.data[1] = data[1];
+		this.data[2] = data[2];
+	}
+	public void setData(int kor, int eng, int math) {
+		this.data[0] = kor;
+		this.data[1] = eng;
+		this.data[2] = math;
+	}
+	public int getTotal() {
+		return total;
+	}
+	public double getAverage() {
+		return average;
+	}
+	public char getGrade() {
+		return grade;
+	}
+	//현재의 클래스의 가장 주된 기능 -- 총점,평균,학점계산
+	void display() {
+		System.out.println(Score.title + " " + name);
+		System.out.print("점수 : " );
+		for(int i=0; i<3; i++) {
+			System.out.print(data[i] + " ");
+		}
+		System.out.println();
+		System.out.printf("총점 :%d 평균:%6.2f 학점:%c%n", total, average, grade);
+		System.out.println("-------------------------");		
+	}
+	int calTotal() {
+		//total = data[0] + data[1] + data[2];
+		//this.total = this.data[0] + this.data[1] + this.data[2];
+		total = 0;
+		//for(int i=0; i<data.length; i++) {
+		//	total += data[i];
+		//}
+		for(int value : data) {
+			total += value;
+		}
+		return total;
+	}
+	double calAverage() {
+		//average = total / 3.0;
+		average = (double)total / data.length;
+		return average;
+	}
+	char calGrade() {
+		int temp = (int)average / 10;
+		switch(temp) {
+		case 10 :
+		case 9 : grade = 'A'; break;
+		case 8 : grade = 'B'; break;
+		case 7 : grade = 'C'; break;
+		case 6 : grade = 'D'; break;
+		default : grade = 'F';		
+		}
+		return grade;
+	}
+}
+
+//ScoreArrayTest.java
+public class ScoreArrayTest {
+	public static void main(String[] args) {
+		System.out.println(Score.title);
+		Score score = new Score();
+		//                             name  data total average grade
+		//score 0x100----------------->["이순신",0x150,0  , 0.0, ' ']
+		//                                     |-->[100,95,98]
+		//객체지향 프로그램에서 멤버변수에 외부에서 직접 접근하는 코드를 권장하지 않는다.
+		//일반적을 데이타를 보호하기 위해 인스턴스멤버변수에 private을 사용하여 접근하지 못하게 한다.
+		//그래서 아래의 코드가 error이다
+		//score.name = "이순신";
+		//score.data[0] = 100;
+		//score.data[1] = 95;
+		//score.data[2] = 98;
+		score.setName("이순신");
+		int val[]= { 100, 95, 98};
+		//score.setData(val);
+		score.setData(100,95,98);
+
+		Score score2 = new Score("홍길동", 70, 80, 90);
+		//                             name     data total average grade
+		//score2 0x200----------------->["홍길동",0x300,0  , 0.0, ' ']
+		//                                       |-->[70,80,90]
+
+		Score score3 = new Score("장길산");
+		//                             name   data total average grade
+		//score3 0x350----------------->["장길산",0x370,0  , 0.0, ' ']
+		//                                       |-->[50,70,40]
+		//                                       
+		score3.setData(50, 70, 40);
+
+		score.calTotal();
+		score.calAverage();
+		score.calGrade();
+		score.display();
+
+		score2.calTotal();		
+		score2.calAverage();
+		score2.calGrade();
+		score2.display();
+
+		score3.calTotal();		
+		score3.calAverage();
+		score3.calGrade();
+		score3.display();
+	}
+}
+```
+#### 3. 메서드 간의 호출 관계
+#### 4. 초기화블럭
++ 개체를 생성하면서 초기값을 주는 표현 중 하나.
+#### 5. 상속관계
+
+#### 6. 실습
 #### 7. Summary / Close
+
+--------------------------------------------------------------
+#### 2. 오버로딩(Overloading)
