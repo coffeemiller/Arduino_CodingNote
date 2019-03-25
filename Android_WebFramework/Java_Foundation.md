@@ -3153,6 +3153,37 @@ public class ScoreArrayTest {
 		score3.display();
 	}
 }
+
+//ScoreArrayTest2.java
+public class ScoreArrayTest2 {
+	public static void main(String[] args) {
+		// Score 객체 배열
+		//3학년2반 학생 20명(3명)의 성적처리를 하시오
+		Score scores[] = new Score[3];
+		//                                     |-->[60,80,85]
+		//                      |-->["홍길동",0x150,0,0.0,' ']
+		//                      |                   |-->[70,95,83]
+		//                      |       |-->["장길산",0x350,0,0.0,' ']
+		//                      |       |                    |-->[100,98,95]
+		//                      |       | 	   |-->["이순신",0x450,0,0.0,'']
+		//scores 0x100 ------->[0x200,0x300,0x400]
+		scores[0] = new Score();
+		scores[0].setName("홍길동");
+		scores[0].setData(60,80,85);
+
+		scores[1] = new Score("장길산");
+		scores[1].setData(70,95,83);
+
+		scores[2] = new Score("이순신",100,98,95);
+
+		for(int i=0; i<3; i++) {
+			scores[i].calTotal();
+			scores[i].calAverage();
+			scores[i].calGrade();
+			scores[i].display();
+		}
+	}
+}
 ```
 #### 3. 메서드 간의 호출 관계
 #### 4. 초기화블럭
