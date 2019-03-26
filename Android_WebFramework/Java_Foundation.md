@@ -3463,7 +3463,162 @@ Init::Init(String, int)......
 */
 
 ```
+
++ BlockTest.java
+```java
+class BlockTest {
+	static {
+		//static 초기화블럭은 무조건 1번 자동으로 실행된다.
+		System.out.println("static { }");
+	}
+
+	{
+		//초기화 블럭은 new에 의해 인스턴스가 생성된 직후, 생성자 작동전에 미리 동작.
+		System.out.println("{ }");
+	}
+
+	public BlockTest() {     
+		System.out.println("생성자");
+	}
+
+	public static void main(String args[]) {
+		System.out.println("BlockTest bt = new BlockTest(); ");
+		BlockTest bt = new BlockTest();
+
+		System.out.println("BlockTest bt2 = new BlockTest(); ");
+		BlockTest bt2 = new BlockTest();
+	}
+}
+//////////////////////결과/////////////////////////
+/*
+static { }
+BlockTest bt = new BlockTest();
+{ }
+생성자
+BlockTest bt2 = new BlockTest();
+{ }
+생성자
+*/
+```
+
++ StaticBlockTest.java
+```java
+class InitTest {
+	static int cv = 1;  // 프로그램이 시작하자마자 main()메서드 이전에 초기화된다.
+	int iv = 10;    // 객체생성할때 메모리가 할당되고 초기화된다.
+
+	static {	cv = 2;	}
+
+	{
+		iv = 20;
+	}
+
+	InitTest() {	iv = 30;	}
+}
+
+class StaticBlockTest {
+	//클래스 변수를 배열로 선언 및 생성.
+	static int[] arr = new int[10];
+	static {
+    //static 블럭에서는 static 멤버변수 접근 가능.
+		System.out.println("static 초기화블럭 작동....");
+		for(int i=0;i<arr.length;i++) {
+			// 1과 10사이의 임의의 값을 배열 arr에 저장한다.
+			arr[i] = (int)(Math.random()*10) + 1;
+		}
+	}
+
+	public static void main(String args[]) {
+		System.out.println("main() 작동....");
+		for(int i=0; i<arr.length;i++)
+			System.out.println("arr["+i+"] :" + arr[i]);
+
+    InitTest init = new InitTest();
+    System.out.println(InitTest.cv);
+    System.out.println(init.iv);
+	}
+}
+//////////////결과/////////////
+/*
+static 초기화블럭 작동....
+main() 작동....
+arr[0] :5
+arr[1] :6
+arr[2] :2
+arr[3] :1
+arr[4] :7
+arr[5] :3
+arr[6] :9
+arr[7] :8
+arr[8] :6
+arr[9] :6
+2
+30
+*/
+```
 #### 3. 상속과 접근제어자
++ 상속(inheritance) : 기존의 클래스를 재사용하여 클래스를 작성하는 것.
+  - 기존 클래스의 소스를 변경시켜서 기능을 추가한다면 update이다.
+  - 상속은 기존클래스의 소스를 변경
+
+```java
+//UpgradeScore.java
+//아래의 코딩표현은 Score클래스 상속받아서 새로운 클래스 UpgradeScore를 만든다.
+public class UpgradeScore extends Score {
+	//새로운 기능을 위한 멤버변수
+	double average;
+	char grade;
+	//평균 구하기 메서드
+	double calAverage() {
+		//메서드 내부에서 자신의 멤버뿐만아니라 상위클래스의 모든 멤버도 접근 가능하다.
+		average = total / 3.0;
+		return average;
+	}
+	//학점 계산 메서드
+	char calGrade() {
+		if( average >= 90.0) {
+			grade = 'A';
+		}else if( average >= 80.0) {
+			grade = 'B';
+		}else if( average >= 70.0) {
+			grade = 'C';
+		}else if( average >= 60.0) {
+			grade = 'D';
+		}else {
+			grade = 'F';
+		}
+		return grade;
+	}
+
+	void display() {
+		super.display();
+		System.out.printf("평균: %6.2f 학점: %c%n", average, grade);
+		System.out.println("------------------------");
+	}
+}
+
+//UpgradeScoreTest.java
+public class UpgradeScoreTest {
+	public static void main(String[] args) {
+		UpgradeScore uscore = new UpgradeScore();
+		//uscore 0x100 ------------->["홍길동",80,90,88,258,86.0,'B']
+		//                            -----Score---------==UpgradeScore
+		uscore.name = "홍길동";  //상위클래스 Score의 모든 멤버 접근가능
+		uscore.score1 = 80;    // 멤버변수 접근
+		uscore.score2 = 90;
+		uscore.score3 = 88;
+
+		uscore.calTotal();     // 메서드 접근
+		uscore.display();
+
+		uscore.calAverage();   //하위클래스 UpgradeScore의 멤버 접근
+		uscore.calGrade();  
+		//아래의 코드는 멤버변수를 직접 접근하여 출력한것
+		//System.out.printf("평균: %6.2f 학점: %c%n", uscore.average, uscore.grade);
+		uscore.display();
+	}
+}
+```
 #### 4. 포함
 #### 5. 오버라이딩(overriding)
 #### 6. 실습
