@@ -3407,8 +3407,62 @@ static {
   ....
 }
 ```
++ 초기화블럭의 단계별 사용(InitBlockTest.java)
+  - static 초기화블럭은 main()메서드가동작하기 전에 클래스 변수(static멤버변수)가 ㅁ모리에 확보되고 1번만 호출된다. 여기서 클래스변수를 초기화시키면 된다.
+  - 만일 클래스변수가 특정기능을 작동시키고 그 결과값이 저장되어야 한다면 명시적 초기화로는 불가능하다.
+  - 단, 인스턴스 멤버변수는 접근할수 없다. (마찬가지로 this도 금지)
+```java
+public class InitBlockTest {
+	public static void main(String[] args) {
+		Init init = new Init();
+		Init init2 = new Init("이순신", 30);
+		init.display();
+		init2.display();
+	}
+}
 
+class Init{
+  static String title = "JICA";
+	String name = "홍길동";
+	int age = 25;
+	{
+		//초기화블럭이다.
+		System.out.println("초기화블럭{}입니다.......");
+	}
 
+	static {
+		//static 초기화블럭이다.
+		System.out.println("Static 초기화블럭{}입니다.....");
+    name = 30; //error
+    title = "전주정보문화진흥원"; //ok ... static만 접근가능
+	}
+
+	Init(){
+		System.out.println("Init::Init()......");
+	}
+
+	Init(String name, int age) {
+		this.name = name;
+		this.age = age;
+		System.out.println("Init::Init(String, int)......");
+	}
+
+	void display() {
+		System.out.println(name+","+age);
+	}
+}
+////결과///////////////////
+/*
+Static 초기화블럭{}입니다.....
+초기화블럭{}입니다.......
+Init::Init()......
+초기화블럭{}입니다.......
+Init::Init(String, int)......
+홍길동,25
+이순신,30
+*/
+
+```
 #### 3. 상속과 접근제어자
 #### 4. 포함
 #### 5. 오버라이딩(overriding)
