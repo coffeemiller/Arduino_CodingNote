@@ -3619,10 +3619,10 @@ public class UpgradeScoreTest {
 	}
 }
 ```
-#### 4. 포함
-#### 5. 오버라이딩(overriding)
-#### 6. 실습
-#### 7. Summary / Close
+
+#### 4. 실습
+
+#### 5. Summary / Close
 
 
 
@@ -3631,3 +3631,7 @@ public class UpgradeScoreTest {
 ### [2019-03-27]
 
 #### 1. Review
+#### 2. 포함
+#### 3. 오버라이딩(overriding)
+#### 4. 실습
+#### 5. Summary / Close
