@@ -3918,6 +3918,157 @@ public class BaseballGame {
 ```
 
 #### 2. 상속과 포함
++ 상속 관련 문법(교재 315page 예제부터)
+  - 상속 : 상위클래스를 상속받아 하위클래스에서 사용
+    - 1) 하위클래스내부를 작성할때, 하위클래스의 메서드 내부에서 상위클래스의 멤버를 자유롭게 사용한다.
+      - 상위클래스 멤버를 명시적으로 지정할때 `super.상위클래스멤버`를 사용한다.
+      - 하위클래스의 생성자에서 상위클래스의 생성자를 명시적으로 호출할때 `super(인자정보)`를 사용한다.
+
+    - 2) 하위클래스로 객체를 생성하면 자동으로 상위클래스의 멤버도 인스턴스가 생성된다. 하위형객체를 사용하여 하위형멤버뿐만아니라 상위형 멤버도 자유롭게 사용한다.
+```java
+//CaptionTvTest.java
+class Tv {
+	boolean power; 	// 전원상태(on/off)
+	int channel;	// 채널
+
+	void power(){
+		power = !power;
+	}
+
+	void channelUp(){
+		++channel;     
+	}
+
+	void channelDown()  {	 
+		--channel;	    
+	}
+}
+
+//Tv클래스를 상속받은 CaptionTv클래스
+class CaptionTv extends Tv {
+	boolean caption;		// 캡션상태(on/off)
+
+	void displayCaption(String text) {
+		//필요하다면 부모클래스 즉, Tv클래스의 멤버를 사용할 수 있다.
+		if (caption) {	// 캡션 상태가 on(true)일 때만 text를 보여 준다.
+			System.out.println(text);
+		}
+	}
+}
+
+class CaptionTvTest {
+	public static void main(String args[]) {
+		//상속받은 클래스로 객체를 생성하면 상위클래스의 인스턴스도 만들어진다.
+		CaptionTv ctv = new CaptionTv();
+		//                        caption  power channel
+		// cTv  0x100 ------------>[true, false,11]
+		//                       --------- -------------
+		//                       CaptionTv     Tv
+
+		//하위클래스의 객체로 하위클래스의 멤버뿐만 아니라
+		//상위클래스의 멤버도 접근가능하다.
+		ctv.channel = 10;				// 조상 클래스로부터 상속받은 멤버
+		ctv.channelUp();				// 조상 클래스로부터 상속받은 멤버
+		System.out.println(ctv.channel);//11
+
+		ctv.displayCaption("Hello, World");	 //아무출력도 없음
+		ctv.caption = true;				    // 캡션기능을 켠다.
+		ctv.displayCaption("Hello, World");	// 캡션을 화면에 보여 준다.
+	}
+}
+```
++ 포함의 예제
+  - 상속을 표현할때처럼 2개이상의 클래스가 표현된다.
+  - 이때 전체와 부분의 개념을 접근하여 클래스를 구분한다.
+  - 예) 만약 모니터화면에 원(circle)을 표현하고 싶다면 2가지 방법으로 표현할수 있을 것이다. 이때 어느 방법이 더 자연스러운가 생각해보자.
+    - 원을 표현하기 위해 중심점(x,y)과 반지름(radius)이 필요하다.
+```
+상속으로 표현)
+class Point {
+  int x;
+  int y;
+  생성자와 메서드들...
+}
+
+class Circle extends Point {
+  Point center = new Point();  //이것을 포함관계라고 한다.
+  int radius;                  //클래스 내부에 멤버변수로 또다른 객체생성
+  생성자와 메서드들...         //반드시 생사를 같이한다.
+}
+```
+```java
+//Point.java
+class Point {
+	int x;
+	int y;
+
+	Point() {
+		x = 0;
+		y = 0;
+	}
+
+	Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	@Override
+	public String toString() {
+		return "Point [x=" + x + ", y=" + y + "]";
+	}
+}
+///////////////////////////////////////////////////////////////
+//Circle.java
+class Circle extends Point{
+	int radius;  //반지름
+
+	public Circle() {
+		super(); //부모클래스의 인자가 없는 생성자 호출
+	}
+
+	public Circle(int x, int y) {
+		super(x, y); //부모클래스의 인자가 2개인 생성자 호출
+	}
+
+	public Circle(int radius, int x, int y) {
+		super(x, y); //부모클래스의 인자가 2개인 생성자 호출
+		this.radius = radius;
+	}
+	//원을 그리다
+	void draw() {
+		System.out.println("중심점 (" + x + "," + y + ") 으로부터 반지름이 " + radius + " 인 원을 그립니다. ");
+	}
+}
+///////////////////////////////////////////////////////////////
+//Test.java
+public class Test {
+	public static void main(String[] args) {
+		Point p1 = new Point();
+		Point p2 = new Point(300,200);
+		//p1 0x100 -------->[0,  0  ]
+		//p2 0x200 -------->[300,200]
+		System.out.println(p1);
+		System.out.println(p2);
+		System.out.println("-------------------------");
+
+		Circle c1 = new Circle();
+		//             radius  x  y  
+		//c1 0x300 ------->[0, 0, 0]
+		//             ------  -----  
+    //              Circle Point
+		Circle c2 = new Circle(100,200);
+		//c2 0x400-------->[0, 100, 200]
+		Circle c3 = new Circle(80,100,200);
+		//c3 0x500-------->[80, 100, 200]
+		c1.draw();
+		c2.draw();
+		c3.draw();
+	}
+}
+```
++ 상속관계는 상위와 하위의 개념이다.(is a 관계...형광등 is a 전등)
++ 포함관계는 부분과 전체의 개념이다.(has a, part of 관계....엔진 part of 자동차)
+
 
 #### 3. 오버라이딩(overriding)
 #### 4. 접근제어자와 패키지
