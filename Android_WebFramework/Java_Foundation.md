@@ -3621,166 +3621,7 @@ public class UpgradeScoreTest {
 ```
 #### [오늘의 과제]
 + 야구게임만들기
-```java
-//Baseball.java
-import java.util.Arrays;
-import java.util.Scanner;
-//가장 재미없는 야구게임을 위한 야구클래스
-public class Baseball {
-	int count;	//게임시도 횟수
-	int src[];  //원본숫자 4개
-	int dest[]; //사용자가 시도한 숫자 4개
-	int strikeCount; // 스크라이크 갯수
-	int ballCount;   // 볼 갯수
 
-	{
-		src = new int[4];
-		dest = new int[4];		
-	}
-
-	//생성자
-	Baseball(){
-		//src에 1~9까지의 난수 4개를 준비한다.(수정필요 -- 현재는 중복숫가 허용됨)
-		for(int i=0; i<src.length; i++) {
-			src[i] = (int)(Math.random() * 9) + 1;
-		}
-	}
-
-	Baseball(String str){ //"7238"
-		//전달된 숫자문자열에서 한문자씩 추출하여 숫자로 만들어서 원본배열에 저장
-		//String클래스의 charAt()
-		//문자 '0'의 코드값이 48
-		//    '1'        49
-		//    '2'        50
-		//    ...
-		//    '8'        56
-		//    '9'        57
-		for(int i=0; i<4;i++) {
-			src[i] = str.charAt(i) - 48; // '8' - 48
-		}
-	}
-
-	//야구게임에서의 시도횟수 읽기
-	int getCount() {
-		return count;
-	}
-
-	//현재의 스트라이크갯수 읽기
-	int getStrikeCount() {
-		return strikeCount;
-	}
-
-	//현재의 볼갯수 읽기
-	int getBallCount() {
-		return ballCount;
-	}
-	//키보드로 숫자를 입력받아 배열에 저장한다.
-	//아래형태의 메서드는 사용자로부터 직접 입력기능을 수행하고 있다.
-	//이러한 형태의 코드는 문법적으로는 타당하지만 객체지향 프로그램에서의
-	//클래스의 재사용에서 많은 문제점을 발생시키므로 지양하는것이 좋다.
-	//메서드 내부에서는 직접 입력받거나 출력시키지 않는다.
-	//해결책으로 직접입력메서드 아예 작성하지 않고 출력메서드 toString()으로 대체시킨다.
-	/*
-	void inputNumber() {
-		Scanner scanner = new Scanner(System.in);
-
-		System.out.print("숫자 4개 입력(ex:4312) : ");
-		String inputNumber = scanner.nextLine();
-
-		for(int i=0; i<4;i++) {
-			dest[i] = inputNumber.charAt(i) - 48; // '8' - 48
-		}
-	}
-	*/
-
-	void userNumber(String inputNumber) {
-		for(int i=0; i<4;i++) {
-			dest[i] = inputNumber.charAt(i) - 48; // '8' - 48
-		}
-		//숫자입력횟수를 1증가
-		count++;
-	}
-
-	// 스트라이크 판정
-	int strike() {
-		strikeCount = 0;
-		for(int i=0; i<4; i++) {
-			if( src[i] == dest[i]) {
-				strikeCount++;
-			}
-		}
-		return strikeCount;
-	}
-
-	int ball() {
-		ballCount = 0;
-
-		// src  7 2 3 8
-		// dest 1 2 7 4
-		for(int i=0; i<4; i++) {
-			for(int j=0; j<4; j++) {
-				if(src[i] == dest[j] && i != j) {
-					ballCount++;
-					break;
-				}
-			}
-		}
-		return ballCount;
-	}
-
-	//현재객체의 상태값을 문자열로 만들어서 리턴해 준다.
-	@Override
-	public String toString() {
-		return "Baseball [count=" + count + ", src=" + Arrays.toString(src) + ", dest=" + Arrays.toString(dest)
-				+ ", strikeCount=" + strikeCount + ", ballCount=" + ballCount + "]";
-	}
-	/*
-	void display() {
-		System.out.println("원본숫자 : " + Arrays.toString(src));
-		System.out.println("입력숫자 : " + Arrays.toString(dest));
-	}
-	*/
-}
-
-////////////////////////////////////////////////////////
-//BaseballGame.java
-import java.util.Scanner;
-public class BaseballGame {
-	public static void main(String[] args) {		
-		//Baseball baseball = new Baseball("7238");
-		Baseball baseball = new Baseball();
-
-		System.out.println(baseball); // 원래 참조변수 즉, 배열명이나 객체를
-		                              // 출력시키면 이상한 참조값이 출력되어야 하는데
-		                              // 현재는 그렇지 않다.  이유는
-		                              // toString() 메서드를 작성하면 자동적으로
-		                              // 작동되어 그결과값이 출력되기 때문이다.
-
-		//앞으로 사용하지 않을 형태의 코딩 스타일
-		//baseball.inputNumber();
-		//baseball.display();
-		Scanner scanner = new Scanner(System.in);
-		String inputNumber = null;
-		int count = 0;
-		while(baseball.getStrikeCount() != 4) {
-			count = baseball.getCount() + 1;
-			System.out.print("4개숫자입력("+count+"회) :");
-			inputNumber = scanner.nextLine();
-
-			baseball.userNumber(inputNumber); //입력된 4개숫자 지정
-
-			baseball.strike(); // 스트라이크 판정
-			baseball.ball();   // 볼판정
-
-			System.out.println(baseball); //현재까지의 결과 출력
-			String result = null;
-			result =  baseball.getStrikeCount() +"S ";
-			result += baseball.getBallCount()+"B";			
-			System.out.println("결과 : " + result);
-		}
-	}
-}
-```
 #### 4. 실습
 
 #### 5. Summary / Close
@@ -3915,7 +3756,166 @@ public class CardTest {
     - 생성자(숫자4개) 지정된 숫자를 원본숫자로 준비 Baseball(int,int,int,int)
     - 생성자(숫자4개로 이루어진문자열) Baseball(int[])
     - 맞출숫자지정(입력) userNumber(int,int,int,int) / userNumber(int[]) / userNumber
+```java
+//Baseball.java
+import java.util.Arrays;
+import java.util.Scanner;
+//가장 재미없는 야구게임을 위한 야구클래스
+public class Baseball {
+	int count;	//게임시도 횟수
+	int src[];  //원본숫자 4개
+	int dest[]; //사용자가 시도한 숫자 4개
+	int strikeCount; // 스크라이크 갯수
+	int ballCount;   // 볼 갯수
 
+	{
+		src = new int[4];
+		dest = new int[4];		
+	}
+
+	//생성자
+	Baseball(){
+		//src에 1~9까지의 난수 4개를 준비한다.(수정필요 -- 현재는 중복숫가 허용됨)
+		for(int i=0; i<src.length; i++) {
+			src[i] = (int)(Math.random() * 9) + 1;
+		}
+	}
+
+	Baseball(String str){ //"7238"
+		//전달된 숫자문자열에서 한문자씩 추출하여 숫자로 만들어서 원본배열에 저장
+		//String클래스의 charAt()
+		//문자 '0'의 코드값이 48
+		//    '1'        49
+		//    '2'        50
+		//    ...
+		//    '8'        56
+		//    '9'        57
+		for(int i=0; i<4;i++) {
+			src[i] = str.charAt(i) - 48; // '8' - 48
+		}
+	}
+
+	//야구게임에서의 시도횟수 읽기
+	int getCount() {
+		return count;
+	}
+
+	//현재의 스트라이크갯수 읽기
+	int getStrikeCount() {
+		return strikeCount;
+	}
+
+	//현재의 볼갯수 읽기
+	int getBallCount() {
+		return ballCount;
+	}
+	//키보드로 숫자를 입력받아 배열에 저장한다.
+	//아래형태의 메서드는 사용자로부터 직접 입력기능을 수행하고 있다.
+	//이러한 형태의 코드는 문법적으로는 타당하지만 객체지향 프로그램에서의
+	//클래스의 재사용에서 많은 문제점을 발생시키므로 지양하는것이 좋다.
+	//메서드 내부에서는 직접 입력받거나 출력시키지 않는다.
+	//해결책으로 직접입력메서드 아예 작성하지 않고 출력메서드 toString()으로 대체시킨다.
+	/*
+	void inputNumber() {
+		Scanner scanner = new Scanner(System.in);
+
+		System.out.print("숫자 4개 입력(ex:4312) : ");
+		String inputNumber = scanner.nextLine();
+
+		for(int i=0; i<4;i++) {
+			dest[i] = inputNumber.charAt(i) - 48; // '8' - 48
+		}
+	}
+	*/
+
+	void userNumber(String inputNumber) {
+		for(int i=0; i<4;i++) {
+			dest[i] = inputNumber.charAt(i) - 48; // '8' - 48
+		}
+		//숫자입력횟수를 1증가
+		count++;
+	}
+
+	// 스트라이크 판정
+	int strike() {
+		strikeCount = 0;
+		for(int i=0; i<4; i++) {
+			if( src[i] == dest[i]) {
+				strikeCount++;
+			}
+		}
+		return strikeCount;
+	}
+
+	int ball() {
+		ballCount = 0;
+
+		// src  7 2 3 8
+		// dest 1 2 7 4
+		for(int i=0; i<4; i++) {
+			for(int j=0; j<4; j++) {
+				if(src[i] == dest[j] && i != j) {
+					ballCount++;
+					break;
+				}
+			}
+		}
+		return ballCount;
+	}
+
+	//현재객체의 상태값을 문자열로 만들어서 리턴해 준다.
+	@Override
+	public String toString() {
+		return "Baseball [count=" + count + ", src=" + Arrays.toString(src) + ", dest=" + Arrays.toString(dest)
+    				+ ", strikeCount=" + strikeCount + ", ballCount=" + ballCount + "]";
+	}
+	/*
+	void display() {
+		System.out.println("원본숫자 : " + Arrays.toString(src));
+		System.out.println("입력숫자 : " + Arrays.toString(dest));
+	}
+	*/
+}
+
+////////////////////////////////////////////////////////
+//BaseballGame.java
+import java.util.Scanner;
+public class BaseballGame {
+	public static void main(String[] args) {		
+		//Baseball baseball = new Baseball("7238");
+		Baseball baseball = new Baseball();
+
+		System.out.println(baseball); // 원래 참조변수 즉, 배열명이나 객체를
+		                              // 출력시키면 이상한 참조값이 출력되어야 하는데
+		                              // 현재는 그렇지 않다.  이유는
+		                              // toString() 메서드를 작성하면 자동적으로
+		                              // 작동되어 그결과값이 출력되기 때문이다.
+
+		//앞으로 사용하지 않을 형태의 코딩 스타일
+		//baseball.inputNumber();
+		//baseball.display();
+		Scanner scanner = new Scanner(System.in);
+		String inputNumber = null;
+		int count = 0;
+		while(baseball.getStrikeCount() != 4) {
+			count = baseball.getCount() + 1;
+			System.out.print("4개숫자입력("+count+"회) :");
+			inputNumber = scanner.nextLine();
+
+			baseball.userNumber(inputNumber); //입력된 4개숫자 지정
+
+			baseball.strike(); // 스트라이크 판정
+			baseball.ball();   // 볼판정
+
+			System.out.println(baseball); //현재까지의 결과 출력
+			String result = null;
+			result =  baseball.getStrikeCount() +"S ";
+			result += baseball.getBallCount()+"B";			
+			System.out.println("결과 : " + result);
+		}
+	}
+}
+```
 
 #### 2. 상속과 포함
 
