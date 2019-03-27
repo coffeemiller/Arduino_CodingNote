@@ -3990,6 +3990,7 @@ class Point {
   생성자와 메서드들...
 }
 
+//클래스의 멤버변수로 다른 클래스의 객체가 표현되는 것 ==> 포함관계
 class Circle extends Point {
   Point center = new Point();  //이것을 포함관계라고 한다.
   int radius;                  //클래스 내부에 멤버변수로 또다른 객체생성
@@ -4068,8 +4069,76 @@ public class Test {
 ```
 + 상속관계는 상위와 하위의 개념이다.(is a 관계...형광등 is a 전등)
 + 포함관계는 부분과 전체의 개념이다.(has a, part of 관계....엔진 part of 자동차)
+```java
+//위의 코딩을 다시 "포함관계"로 표현해 보자. 그것이 더 타당함.
+//Point.java
+class Point {
+	int x;
+	int y;
 
+	Point() {
+		x = 0;
+		y = 0;
+	}
 
+	Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	@Override
+	public String toString() {
+		return "Point [x=" + x + ", y=" + y + "]";
+	}
+}
+
+//Circle.java
+public class Circle {
+    Point center;  //포함관계 표현 point는 Circle의 구성원이다.
+                   //Point center = new Point();
+    int radius;  
+    //포함관계를 정확히 표현하려면
+    //명시적 초기화로 부분에 속하는 객체를 생성하거나
+	public Circle() {
+		center = new Point();
+	}
+
+	public Circle(int radius) {
+		this.radius = radius;
+		center = new Point();
+	}
+
+	public Circle(Point center, int radius) {
+		//this.center = center;  참조값을 직접대입하지 않고 내용값을 복사하여 객체를 생성한다.
+		this.center = new Point(center.x, center.y);
+		this.radius = radius;
+	}
+	void draw() {
+		System.out.println("중심점 (" + center.x + "," + center.y + ") 으로부터 반지름이 " + radius + " 인 원을 그립니다. ");		
+	}
+}
+
+//Test.java
+public class Test {
+	public static void main(String[] args) {
+		Point point = new Point(100,200);
+		//point 0x100 -------->[100,200]
+		Circle c1 = new Circle();
+		//                       |-->[0,0]
+		//                    cen|ter radius
+		//c1 0x200------------>[0x300, 0]
+		Circle c2 = new Circle(80);
+		//                        |-->[0,0]
+		//c2 0x400------------>[0x500, 80]
+		Circle c3 = new Circle(point, 120);
+		//                        |-->[100,200]
+		//c30x600 ------------>[0x700, 120]
+		c1.draw();
+		c2.draw();
+		c3.draw();
+	}
+}
+```
 #### 3. 오버라이딩(overriding)
 #### 4. 접근제어자와 패키지
 #### 5. 추상클래스
