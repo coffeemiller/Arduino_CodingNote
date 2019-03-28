@@ -4315,7 +4315,69 @@ class Card {
 } // Card클래스의 끝
 ```
 
-#### 3. 오버라이딩(overriding)
++ 교재 323page "단일상속"
++ 자바언어는 클래스 상속시 단일상속만 지원한다.(필요하면 포함관계)
+  - 상속의 종류
+    - 1) 단일상속 : 상위클래스(부모)가 1개
+```java
+class A { }
+class B extends A { }
+class C extends B { }
+```
+    - 2) 다중상속 : 상위클래스(브모)가 2개 이상 가능.(여러개일수 있다.)
+```java
+class A { }
+class B { }
+class C extends A, B { }  // 자바언어에서는 허용하지 않음
+```
+
++ 자바의 모든 클래스는 Object클래스를 최상위클래스로 사용한다. 클래스를 만들때 명시적으로 표현하지 않아도 자동적으로 Object를 상속받는다.
+```java
+class A {   // ==> 실제 컴파일 될때 class A extends Object { }
+}
+class B extends A { }
+
+public class ObjectTest {
+	public static void main(String[] args) {
+		A obj = new A();
+		System.out.println(obj.toString());  //패키지명+클래스명@16진수숫자
+		System.out.println(obj);
+	}
+}
+
+class A {  }
+```
+
+#### 3. 오버로딩(overloading)과 오버라이딩(overriding)
++ 1. 오버로딩 : 클래스의 메서드중 메서드명이 같고 인자정보가 다른 여러개의 메서드를 만드는 기능. 리턴값과는 상관이 없다.
+```java
+class Test {
+  ....
+  void print() {....}
+  int print() {....}    //에러... 오버로딩은 리턴값은 상관없다.
+  void print(int x) {....}
+  void print(String s) {....}
+  void print(int x, String s) {....}
+  ....
+}
+```
+  - 사용자가 동일기능을 쉽게 사용하기 위해
+```java
+//각기 다른 자료형을 출력하기 위해 print()메서드 다르게 만드는 방법
+//첫번째 ===> 메서드명을 다르게 작성 ( C언어와 같은 비객체지향언어에서 사용 )
+void printInt(int x)
+void printString(String s)
+void printDouble(double d)
+....
+//두번째 ===> 메서드명을 같이 작성하고 인자정보를 다르게 표현하면 컴파일러가 알아서 식별해준다.
+void print(int x)
+void print(String s)
+void print(double d)
+....
+//이러한 방법이 편리하다. 이를 '오버로딩'이라 함.
+```
+
++ 2. 오버라이딩 :
 #### 4. 접근제어자와 패키지
 #### 5. 추상클래스 : 객체생성X
 #### 6. 실습
