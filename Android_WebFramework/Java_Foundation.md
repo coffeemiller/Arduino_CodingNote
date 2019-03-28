@@ -4154,8 +4154,180 @@ public class Test {
 ### [2019-03-28]
 
 #### 1. Review
++ 상속과 포함의 차이
+```java
+//////////<상속관계>////////////////
+class Shape {
+  String color = "black";
+  void draw() {
+    System.out.printf("%s%n", color);
+  }
+}
+
+class Circle extends Shape {
+  ....
+}
+
+class Triangle extends Shape {
+  ....
+}
+//////////<포함관계>////////////////
+class Point {
+  int x;
+  int y;
+  ....
+}
+
+class Circle {
+  Point center = new Point();
+  int radius;
+  ....
+}
+
+class Triangle {
+  Point point[] = new Point[3];
+  ....
+}
+```
+
+
++ 교재 예제 DeckTest.java
+```java
+class DeckTest {
+	public static void main(String args[]) {
+		System.out.println(Card.KIND_MAX); //객체생성없이 사용할수 있다(static)
+		System.out.println(Card.DIAMOND);
+		//Card.KIND_MAX = 5;  //값을 변경할수 없다 (final)
+		//Card.DIAMOND = 7;
+		Card card = new Card();
+		//card 0x100----------->[4,1]
+		System.out.println(card.toString()); //명시적인 호출
+		System.out.println(card); //내부에서 자동으로 toString()메서드를 작동시킨다.
+
+		Card card2 = new Card(Card.DIAMOND,8); //"DIAMOND", 8
+		System.out.println(card2);
+		System.out.println("---------------------------");
+		Deck d = new Deck();	   // 카드 한 벌(Deck)을 만든다.
+		//d 0x100-----> [52,0x200]
+		//                 |--->[0x201,0x202,null, ...., ..., 0x252] 52개
+		//                        |      |         |   |         |
+		//                        V      V         V   V         V
+		//                      [4,1]  [4,2]    [4,13] [3,1]   [1,13]
+		//
+		// c 0x201 ---------------^
+		d.display();
+		System.out.println("--------------------------------");
+		Card c = d.pick(0);	   // 섞기 전에 제일 위의 카드를 뽑는다.
+		System.out.println(c); // System.out.println(c.toString());과 같다.
+		System.out.println("================================");
+		d.shuffle();		  // 카드를 섞는다.
+		d.display();
+
+		c = d.pick(0);		   // 섞은 후에 제일 위의 카드를 뽑는다.
+		System.out.println(c);
+	}
+}
+
+//Deck클래스
+class Deck {
+	final int CARD_NUM = 52;	// 카드의 개수
+	//현재클래스 Deck과 Card클래스의 관계 ==> 포함
+	Card cardArr[] = new Card[CARD_NUM];  // Card객체 배열을 포함
+
+	Deck () {	// Deck의 카드를 초기화한다.
+		int i=0;
+
+		for(int k=Card.KIND_MAX; k > 0; k--) {    // k 4        3       2      1
+			for(int n=0; n < Card.NUM_MAX ; n++) {// n 01234~12 012~12  012~12 0123~12
+				cardArr[i++] = new Card(k, n+1);
+			}
+		}
+	}
+
+	Card pick(int index) {	// 지정된 위치(index)에 있는 카드 하나를 꺼내서 반환
+		return cardArr[index];
+	}
+
+	Card pick() {			// Deck에서 카드 하나를 선택한다.
+		int index = (int)(Math.random() * CARD_NUM);
+		return pick(index);
+	}
+
+	void shuffle() { // 카드의 순서를 섞는다.
+		for(int i=0; i < cardArr.length; i++) {
+			int r = (int)(Math.random() * CARD_NUM);
+
+			Card temp = cardArr[i];
+			cardArr[i] = cardArr[r];
+			cardArr[r] = temp;
+		}
+	}
+
+	void display() {
+		for(int i=0; i<CARD_NUM; i++) {
+			System.out.println(cardArr[i]);
+		}
+	}
+} // Deck클래스의 끝
+
+//Card클래스
+//Java의 모든 클래스는 상속관계 명시되지 않으면 자동으로 Object 클래스를 상속받는다.
+class Card {
+	//static final 멤버변수는 1개만 만들어지고 그 내용값을 바꿀수 없다.
+	static final int KIND_MAX = 4;	// 카드 무늬의 수
+	static final int NUM_MAX  = 13;	// 무늬별 카드 수
+
+	static final int SPADE   = 4;
+	static final int DIAMOND = 3;
+	static final int HEART   = 2;
+	static final int CLOVER  = 1;
+
+	//인스턴스 멤버변수(객체가 생성될때 메모리에 개별적으로 만들어진다)
+	int kind;   //String kind;
+	int number;
+
+	//사용자가 만든 인자가 없는 생성자
+	Card() {
+		//생성자에서 다른 생성자를 호출 - 반드시 첫번째 실행문장이어야 한다.
+		this(SPADE, 1);
+	}
+
+	Card(int kind, int number) {
+		this.kind = kind;
+		this.number = number;
+	}
+
+	//아래의 toString()메서드는 상위클래스 Object의 메서드를 재정의(override) 한것이다.
+	//주된 용도는 현재객체의 상태값을 문자열로 만들어서 리턴해주는데 사용된다.
+	//만일 kind <= 4, number = 11  
+	//         "SPADE"        J   
+	@Override
+	public String toString() {
+		//                  0     1       2        3         4
+		//kinds 0x50 ----->["","CLOVER","HEART","DIAMOND","SPADE"]
+		String[] kinds = {"", "CLOVER", "HEART", "DIAMOND", "SPADE"};
+		//                             
+		String numbers = "0123456789XJQK"; // 숫자 10은 X로 표현
+
+		return "kind : " + kinds[this.kind]
+			+ ", number : " + numbers.charAt(this.number);
+	} // toString()의 끝
+} // Card클래스의 끝
+```
+
 #### 3. 오버라이딩(overriding)
 #### 4. 접근제어자와 패키지
-#### 5. 추상클래스
+#### 5. 추상클래스 : 객체생성X
+#### 6. 실습
+#### 7. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+### [2019-03-29]
+
+#### 1. Review
+
 #### 6. 실습
 #### 7. Summary / Close
