@@ -4448,7 +4448,125 @@ class Child2 extends Parent2 {
     - this : 메서드 내부에서 객체 자신을 나타내는 참조값
     - this(인자정보) : 현재의 생성자 내부에서 다른 생성자를 호출할때 사용
 
-#### 4. 접근제어자와 패키지
++ 생성자호출은 하위클래스의 생성자가 먼저 호출되지만 실제수행되는 생성자는 상위클래스 생성자에서 하위클래스 생성자순으로 동작한다.
+```java
+//PointTest2.java
+class PointTest2 {
+	public static void main(String argsp[]) {
+		Point3D p3 = new Point3D();
+		//p3 0x100-------------->[100,200,300]
+		//Point(int,int)
+		//Point3D(int,int,int)
+		//Point3D()
+		System.out.println("p3.x=" + p3.x);
+		System.out.println("p3.y=" + p3.y);
+		System.out.println("p3.z=" + p3.z);
+	}
+}
+
+class Point {
+	int x=10;
+	int y=20;
+	Point(){
+		System.out.println("Point::Point()....");
+	}
+
+	Point(int x, int y) {
+		System.out.println("Point::Point(int,int)....");
+		this.x = x;
+		this.y = y;
+	}
+}
+
+class Point3D extends Point {
+	int z=30;
+	Point3D() {
+		this(100, 200, 300);	// Point3D(int x, int y, int z)를 호출한다.
+		System.out.println("Point3D::Point3D()....");
+	}
+
+	Point3D(int x, int y, int z) {
+		super(x, y);			// Point(int x, int y)를 호출한다.
+		System.out.println("Point3D::Point3D(int,int,int)...");
+		this.z = z;
+	}
+}
+```
+
+#### 4. 접근제어자(access modifier)와 패키지(package)
++ 1) 패키지(package) : 관련있는 클래스들을 모아놓은 것.
+  - 패키지 내부에 작성되는 클래스는 해당 클래스가 어느패키지에 속해있다고 첫번째 실행문장으로 나타내야 한다. 이를 '패키지선언'이라고 한다.
+```java
+package 패키지명; <=== 패키지 선언
+```
+  - 다른패키지에 속해있는 클래스를 사용하려면 import구문사용하여 선언해주어야 한다.
+```java
+import 패키지명.클래스명; //혹은
+import 패키지명.*;
+```
++ 2) 접근제어자(access modifier) : 클래스나 클래스의 멤버를 접근할수 있는 범위를 지정한 명칭.
+  - 클래스의 접근제어자
+    - 1) public   --->  다른 패키지에서도 이 클래스를 사용할 수 있도록 공개.
+    - 2) 아무것도X.  --->
+  - 같은 패키지에 속한 클래스들은 서로 마음대로 사용할수 있다. 객체를 생성하든 상속, 포함관계를 규정하든 마음대로 쓸수있다는 뜻이다.
+  - 멤버(멤버변수, 생성자, 메서드)의 접근제어자
+    - 1) public : 다른 패키지에서도 멤버를 사용할 수 있다.
+    `=====================================================================`
+    - 2) protected :
+    `--------------아래의 접근제어는 같은 패키지에서 의미가 있다.---------`
+    - 3) 아무것도X.(default) : 같은 패키지에서만 자유롭게 사용가능.
+    - 4) private : 같은(다른) 패키지라도 객체생성 후 외부에서 사용불가능.
+```java
+//LargeNumber.java
+//패키지 선언 : 이후에 나타나는 클래스는 com.jica.math패키지에 속한 클래스라는 의미
+package com.jica.math;
+public class LargeNumber {
+	private int number1, number2, large;
+	public LargeNumber() {
+	}
+
+	public LargeNumber(int number1, int number2) {
+		this.number1 = number1;
+		this.number2 = number2;
+	}
+
+	public int calculate() {
+		if (number1 >= number2) {
+			large = number1;
+		} else {
+			large = number2;
+		}
+		return large;
+	}
+
+	@Override
+	public String toString() {
+		return "LargeNumber [number1=" + number1 + ", number2=" + number2 + ", large=" + large + "]";
+	}
+}
+//////////////////////////////////////////////////////////////////////
+//Test.java
+//같은 패키지 아닌 곳에서의 접근제어
+package com.jica.math;
+public class Test {
+	public static void main(String[] args) {
+    LargeNumber largeNumber = new LargeNumber(15,28);
+		largeNumber.calculate();
+		System.out.println(largeNumber);
+
+		LargeNumber largeNumber2 = new LargeNumber();
+		//largeNumber2.number1 = 5;
+		//largeNumber2.number2 = 9;
+		largeNumber2.setNumber1(5);  //get/set 이용
+		largeNumber2.setNumber2(9);
+		largeNumber2.calculate();
+		System.out.println(largeNumber2);
+		//큰수만 출력하고 싶다면
+		System.out.println(largeNumber2.getLarge());
+	}
+}
+//쓰고자 하는 클래스의 멤버들(변수, 메서드 등)에 public을 붙여가 사용가능.
+```
 #### 5. 추상클래스 : 객체생성X
 #### 6. 실습
 #### 7. Summary / Close
