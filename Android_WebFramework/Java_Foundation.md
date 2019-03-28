@@ -4377,7 +4377,77 @@ void print(double d)
 //이러한 방법이 편리하다. 이를 '오버로딩'이라 함.
 ```
 
-+ 2. 오버라이딩 :
++ 2. 오버라이딩 : 무조건 상속과 관련이 있다.
+  - 상위클래스의 메서드를 하위클래스에서 재정의 하는 것을 말한다.
+  - 반드시 오버라이딩은 '메서드명, 인자정보, 리턴값'표현이 동일해야 한다.
+  - Why?? ==> 기능을 나타내는 의미는 동일하나 구체적인 내용이 틀릴때 적성한다.
+```java
+class Point {
+  int x, y;
+  ....
+  String getLocation() {
+    return x + "," + y;
+  }
+}
+//3차원 공간에서의 위치
+class Point3D {
+  int z;
+  ....
+  @Override
+  String getLocation() {
+    return x + "," + y + "," + z;
+  }
+}
+
+Point3D p = new Point3D();
+p.getLocation();  // p객체는 getLocation메서드(오버라이딩) 두개중, 하위클래스를 작동시킨다.
+//하위 클래스 우선!!
+```
+
++ 상속에서 새롭게 등장하는 키워드(keyword) : super, super()
+  - super : 하위클래스의 메서드에서 상위클래스의 멤버를 명시적으로 표현할때 사용. 상위클래스와 하위클래스의 멤버명이 동일할때 사용한다.
+```java
+class SuperTest {
+	public static void main(String args[]) {
+		Child c = new Child();
+		c.method();
+	}
+}
+class Parent {	int x=10; }
+class Child extends Parent {
+	void method() {
+		/*메서드 내부에서 변수명을 찾아가는 순서
+		 * 1) 지역변수나 매개변수명인지 확인한다.
+		 * 2) 자신의 멤버변수명 즉, this.x
+		 * 3) 상위클래스(부모)의 멤버변수명 즉, super.x
+		 */
+		System.out.println("x=" + x);
+		System.out.println("this.x=" + this.x);
+		System.out.println("super.x="+ super.x);
+	}
+}
+
+class SuperTest2 {
+	public static void main(String args[]) {
+		Child2 c = new Child2();
+		c.method();
+	}
+}
+class Parent2 {	int x=10;}
+class Child2 extends Parent2 {
+	int x=20;
+	void method() {
+		System.out.println("x=" + x);
+		System.out.println("this.x=" + this.x);
+		System.out.println("super.x="+ super.x);
+	}
+}
+```
+
+  - super(인자정보) : 하위클래스의 생성자에서 부모클래스의 생성자를 선별해서 호출할때 사용한다. 만일 super(인자정보)의 표현이 없으면 자동으로 super() 즉 상위클래스의 인자가 없는 생성자를 호출한다.
+    - this : 메서드 내부에서 객체 자신을 나타내는 참조값
+    - this(인자정보) : 현재의 생성자 내부에서 다른 생성자를 호출할때 사용
+
 #### 4. 접근제어자와 패키지
 #### 5. 추상클래스 : 객체생성X
 #### 6. 실습
