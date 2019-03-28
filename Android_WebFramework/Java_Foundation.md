@@ -4512,10 +4512,30 @@ import 패키지명.*;
   - 멤버(멤버변수, 생성자, 메서드)의 접근제어자
     - 1) public : 다른 패키지에서도 멤버를 사용할 수 있다.
     `=====================================================================`
-    - 2) protected :
+    - 2) protected : 다른 패키지에서 상속받을 때 사용한다.
     `--------------아래의 접근제어는 같은 패키지에서 의미가 있다.---------`
     - 3) 아무것도X.(default) : 같은 패키지에서만 자유롭게 사용가능.
     - 4) private : 같은(다른) 패키지라도 객체생성 후 외부에서 사용불가능.
+
++ 같은 패키지(package)에서
+|:-------|:---------|:--------------|:-----------------|:----------------|
+| | 메서드 내부|객체생성후 외부|상속받은 클래스의 내부|하위클래스 객체생성후 외부|
+|private   |사용가능  |사용못함  |사용못함  |사용못함 |
+|(default) |사용가능  |사용가능  |사용가능  |사용못함 |
+|protected |사용가능  |사용가능  |사용가능  |사용가능 |
+|public    |사용가능  |사용가능  |사용가능  |사용가능 |
+
++ 다른 패키지(package)에서
+|:--------|:------------|:--------------------|:----------------|
+| |객체생성후 외부|상속받은 클래스의 내부|하위클래스 객체생성후 외부|
+|private   |사용못함  |사용못함  |사용못함 |
+|(default) |사용못함  |사용못함  |사용못함 |
+|protected |사용못함  |사용가능  |사용못함 |
+|public    |사용가능  |사용가능  |사용가능 |
+
++ 접근제어자의 작동범위
+  - private < (default) < proteced < public
+
 ```java
 //LargeNumber.java
 //패키지 선언 : 이후에 나타나는 클래스는 com.jica.math패키지에 속한 클래스라는 의미
@@ -4566,6 +4586,41 @@ public class Test {
 	}
 }
 //쓰고자 하는 클래스의 멤버들(변수, 메서드 등)에 public을 붙여가 사용가능.
+```
+```java
+//Point.java
+package com.jica.math;
+public class Point {
+	protected int x;
+	protected int y;
+	public Point() {	}
+	public Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+	@Override
+	public String toString() {
+		return "Point [x=" + x + ", y=" + y + "]";
+	}
+}
+//////////////////////////////////////////////////////////////////////
+//Circle.java
+import com.jica.math.Point;
+public class Circle extends Point {
+	int radius;
+	public Circle() {	super();	}
+	public Circle(int x, int y) {	super(x, y); }
+	public Circle(int x, int y, int radius) {
+		super(x,y);
+		this.radius = radius;
+	}
+	void draw() {
+		System.out.println("중심점("+x+","+y+") 반지름 "+radius+"인 원을 그렸습니다.");
+		//상위클래스의 private, 아무것도 하지 않은 멤버는 하위클래스 메서드 내부에서 사용할수 없다.
+		//상위클래스의 proteced, public은 멤버는 하위클래스 메서드 내부에서 사용할 수 있다.
+	}
+}
+//proteced부터는 다른 패키지라도 상속되면 사용가능하다.
 ```
 #### 5. 추상클래스 : 객체생성X
 #### 6. 실습
