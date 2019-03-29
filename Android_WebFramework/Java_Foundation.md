@@ -4631,8 +4631,96 @@ public class Circle extends Point {
 ### [2019-03-29]
 
 #### 1. Review
++ 오버로딩 : 같은 클래스에서 메서드명은 같고 인자정보가 다른 여러 메서드를 작성하는 기능. 리턴값은 관계없다.
++ 오버라이딩 : 상속관계의 클래스에서 하위클래스에 상위클래스의 메서드와 동일한 메서드(메서드명, 인자정보, 리턴값정보)를 재작성하는 것.
+```java
+//Point.java
+public class Point {
+	int x, y;
+
+	String getLocation() {
+		return x+","+y;
+	}
+
+	void method() {
+		System.out.println("Point::method()...");
+	}
+}
+///////////////////////////////////////////////////////////////////
+//Point3D.java
+public class Point3D extends Point {
+	int z;
+
+	@Override
+	String getLocation() {
+		return x+","+ y+ "," + z;
+	}
+
+	String getLocation(String str){
+		//...
+		return null;
+	}
+
+	void method2() {
+		System.out.println("Point3D::method2()...");
+	}
+}
+///////////////////////////////////////////////////////////////////
+//OverrideTest.java
+//다른 패키지에 속한 클래스를 사용하려면 받드시  import구문을 사용하여
+//해당 패키지의 클래스 사용한다고 명시적으로 선언해주어야 한다.
+//import 패키지명.*;
+//import 패키지명.클래스명;
+//예외로 java.lang 패키지 내부의 클래스는 자바로 코딩은 누구라도 자주 사용하는 기본적인 클래스
+//모아놓았으므로 import구문을 사용하지 않고 사용할수 있도록 허용했다.
+
+public class OverrideTest {
+	public static void main(String[] args) {
+		String title = new String("JICA");
+
+		Point point = new Point();
+		// point 0x100 ---------->[10,20]
+
+		point.x = 10;
+		point.y = 20;
+		System.out.println(point.getLocation());
+
+		Point3D point3d = new Point3D();
+		// point3d 0x200 ------------->[100,200,300]
+		point3d.x = 100;
+		point3d.y = 200;
+		point3d.z = 300;
+		System.out.println(point3d.getLocation());
+		//                 하위클래스 Point3D의 getLocation() 동작한다.
+
+		//중요) 많이 사용하는 코딩형태
+		Point p3 = new Point3D();  //p3은 Point형으로 선언하고
+		                           //객체의 생성은 Point3D형으로 했다(ok)
+		//p3 0x300 ---------->[1000,2000,0]
+		p3.x = 1000;
+		p3.y = 2000;
+		//p3.z = 3000; // error p3의 자료형이 Point형이므로 z멤버변수는 인식하지 못함
+		p3.method();   // ok
+		//p3.method2();  // error p3의 자료형이 Point형이므로  method2() 메서드는 인식하지 못함
+		System.out.println(p3.getLocation());
+		//핵심
+		//상위형으로 객체를 선언하고 실제객체를 하위형으로 생성했을때
+		//하위형클래스의 메서드에서 오버라이딩된 메서드만 호출할수 있다. 	
+	}
+}
+```
 #### 2. 다향성
 #### 3. 추상클래스 : 객체생성X
 #### 4. 인터페이스
+#### 5. 실습
+#### 6. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-04-01]
+
+#### 1. Review
+
 #### 5. 실습
 #### 6. Summary / Close
