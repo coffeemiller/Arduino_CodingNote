@@ -4788,6 +4788,7 @@ ctv.text;      //error
 
 + 상위형 참조변수에 하위형 객체저장 (무조건  ok)
 + 하위형 참조변수에 상위형 객체저장 (형변환시켜서 저장해야함.)
++ Object형 참조변수에는 모든 객체를 저장할수 있다.
 
 ```java
 상위형 참조변수 = new 하위형();   //ok
@@ -4907,6 +4908,61 @@ class CastingTest3 {
 	}
 }
 ```
+
++ 상속계층에서 형변환이 가능한지 여부를 알아보는 연산자 ==> instanceof
+```java
+Objcet
+  Car
+    FireEngine
+    Ambulance    
+
+FireEngine fe = new FireEngine();
+fe는 FireEngine의 인스턴스이다.      fe instanceof FireEngine //true
+fe는 Car의 인스턴스이다.             fe instanceof Car        //true
+fe는 Object의 인스턴스이다.          fe instanceof Object     //true
+fe는 Ambulance의 인스턴스가 아니다.  fe instanceof Ambulance  //false
+
+//////////////////////////////////////////////////////////////////////
+//InstanceofTest.java
+class InstanceofTest {
+	public static void main(String args[]) {
+		FireEngine fe = new FireEngine();
+
+		System.out.println(fe instanceof Object);  //true
+		System.out.println(fe instanceof Car);    //true
+		System.out.println(fe instanceof FireEngine);  //true
+		//System.out.println(fe instanceof Ambulance);  //error... false
+		System.out.println("-------------------------------");
+
+		//특정객체를 생성한 클래스정보를 알고싶을때 아래의 코드를 사용할수 있다.
+		System.out.println(fe.getClass().getName()); //클래스의 이름을 출력
+		Car car = new Car();
+		System.out.println(car.getClass().getName());
+		Car car2 = new FireEngine();
+		System.out.println(car2.getClass().getName());
+		////////////////////////////////////////////////////////////////
+		if(fe instanceof FireEngine) {System.out.println("This is a FireEngine instance.");	}
+
+		if(fe instanceof Car) {	System.out.println("This is a Car instance.");	}
+
+		if(fe instanceof Object) {	System.out.println("This is an Object instance.");	}
+
+		System.out.println(fe.getClass().getName()); // 클래스의 이름을 출력
+	}
+}
+```
+```
+##### [외워두자!]
++ 상위형 참조변수에 하위형 객체저장 (무조건  ok)
++ 하위형 참조변수에 상위형 객체저장 (형변환시켜서 저장해야함.)
++ Object형 참조변수에는 모든 객체를 저장할수 있다.
++ 상속계층에서 형변환이 가능한지 여부를 알아보는 연산자 ==> instanceof
+```
+
++ 다형성은 멤버변수에 적용되지 않는다.
+  - 상위클래스와 하위클래스에 동일한 멤버변수가 있으면 현재 참조변수의 자료형에 따라 멤버변수를 사용한다.
++ 다형성은 오버라이딩된 메서드에 적용된다.
+  - 상위클래스와 하위클래스에 동일한 메서드가 있으면 자료형을 참조하는 것이 아니라, 실제 메모리에 만들어진 객체가 어느형이냐에 따라 메서드를 적용시킨다.
 #### 3. 추상클래스 : 객체생성X
 #### 4. 인터페이스
 #### 5. 실습
