@@ -4784,7 +4784,129 @@ ctv.channel;    //ok
 ctv.text;      //error
 //컴파일은 통과하지만 실행시 실제값이 없으므로 실행에러 발생.
 ```
-  -
+
+
++ 상위형 참조변수에 하위형 객체저장 (무조건  ok)
++ 하위형 참조변수에 상위형 객체저장 (형변환시켜서 저장해야함.)
+
+```java
+상위형 참조변수 = new 하위형();   //ok
+하위형 참조변수 = new 상위형();   //error
+/////////////////////////////////////////////////////////////////
+//상위형 참조변수를 하위형 변수에 저장하고 싶다면,             //
+//형변환시키면 된다.                                           //
+Car car = new Car();                                           //
+FireEngine fe = (FireEngine)car; //단, 실행시 error            //
+/////////////////////////////////////////////////////////////////
+Car car = new FireEngine();                                    //
+FireEnginefe = (FireEngine)car; //실행시 정상적으로 작동.      //
+/////////////////////////////////////////////////////////////////
+```
+
++ 실습
+```java
+//Tv.java
+public class Tv {
+	boolean power;
+	int channel;
+
+	void power() {	power = !power;	}
+	void channelUp() {	channel++;	}
+	void channelDown() {	channel--;	}
+}
+/////////////////////////////////////////////////////////////////
+//CaptionTv.java
+public class CaptionTv extends Tv {
+	String text;
+	void caption() {
+		if (power) {	System.out.println(text);	}
+	}
+}
+/////////////////////////////////////////////////////////////////
+//PolymophismTest.java
+public class PolymophismTest {
+	public static void main(String[] args) {
+		//참조변수를 상위형(Tv)로 선언하고 실제 객체는 하위형(CaptionTv)으로 생성.
+		Tv tv = new CaptionTv();
+
+		tv.power = true;
+		tv.channel = 5;
+		tv.power();
+		tv.power();
+		//상위클래스의 멤버(멤버변수, 메서드)만 접근할수 있다.
+		//tv.text = "JICA"; //현재 참조변수 tv의 자료형은 Tv이므로
+		//text멤버변수는 CaptionTv형이므로 참조할 수 없다.
+		//tv.caption();  //error : 동일한 이유
+		///////////////////////////////////////////////////////////////
+
+		//참조변수를 하위형(CaptionTv)으로 선언하고 실제 객체는 상위형(Tv)으로 생성해보자
+		//문법적으로 허용하지 않는다.
+		CaptionTv ctv = new Tv();  //당장 컴파일error
+		CaptionTv ctv = (CaptionTv) new Tv();  //컴파일은 ok, 실행error
+
+		ctv.power = true;
+		ctv.channel = 5;
+		ctv.power();
+		ctv.text = "JICA";   //컴파일을 통과할수 있어도 실제 실행시킬 수 없다.
+		ctv.caption();       //CaptionTv의 인스턴스가 존재하지 않으므로 실행 error
+	}
+}
+```
+
++ 교재 361page
+```java
+//CastingTest2.java
+class CastingTest2 {
+	public static void main(String args[]) {
+		//1. 상위형 참조변수에 하위형객체를 저장할수 있다.
+		//2. 하위형 참조변수에 상위형객체를 저장하려면 반드시 형변환(cast 연산)을 해야 한다.
+		Car car = new Car();
+		Car car2 = null;
+		FireEngine fe = null;
+		//Car        car  0x100 --------->[null,0]   실제생성된 객체도 상위형이다.
+		//Car        car2 null
+		//FireEngine fe   null
+
+		car.drive();   //ok		
+		fe = (FireEngine)car;		// 8번째 줄. 컴파일은 OK. 실행 시 에러가 발생
+		               //잠깐의 눈속임이 아니라 완전히 사기친거다.
+		fe.drive();
+		fe.water();
+
+		car2 = fe;
+		car2.drive();
+	}
+}
+```
+
++ 헷갈린다면.... 다음 코딩을 기억하라!!!
+```java
+class CastingTest3 {
+	public static void main(String args[]) {
+	//1.상위형 참조변수에 하위형객체를 저장할수 있다.
+	//2.하위형 참조변수에 상위형객체를 저장하려면 반드시 형변환(cast연산)을 해야한다.
+		Car car = new FireEngine();
+		car.drive();
+		car.stop();
+		((FireEngine)car).water();
+		System.out.println("---------------------------------");
+
+		FireEngine fe = null;
+		fe = (FireEngine)car;
+		fe.drive();
+		fe.stop();
+		fe.water();
+		System.out.println("---------------------------------");
+
+		Car car2 = new Car();
+		FireEngine fe2 = null;
+		fe2 = (FireEngine)car2;  //완전 사기!!  //원래car2객체가 Car객체를 가리킨다.
+		fe2.drive();
+		fe2.stop();
+		fe2.water();
+	}
+}
+```
 #### 3. 추상클래스 : 객체생성X
 #### 4. 인터페이스
 #### 5. 실습
