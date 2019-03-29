@@ -4709,7 +4709,82 @@ public class OverrideTest {
 	}
 }
 ```
-#### 2. 다향성
++ 참고사항)
+  - 객체지향 플그래밍의 3대 구성요소
+    - 1) 클래스(class)
+    - 2) 객체(objet)
+    - 3) 메세지(Message)
+  - 객체지향 프로그래밍의 주요 용어와 개념
+    - 1) 추상화
+    - 2) 캡슐화
+    - 3) 다형성
+    - 4) 상속성
+
+#### 2. 다형성(ploymorphism)
++ 포괄적인 의미 : 여러가지 형태를 가질수 있는 능력
++ 자바언어 문법 : 한 타입의 참조변수로 여러타입의 객체를 참조할수 있도록 하는 것.
+  - 한타입의 참조변수? --> 상속관계에서의 상위클래스를 의미.
+  - 여러타입? --> 상속계층상의 하위클래스의 타입.
+```java
+class A {...}
+class B extends A {...}
+class C extends A {...}
+class D extends B {...}
+
+A obj = new A();
+A obj = new B();
+A obj = new C();
+A obj = new D();
+```
+  - 위의 경우 오버라이딩 된 메서드를 활용하라!!
+```java
+//교재 354page
+Tv tv = new Tv();
+CaptionTv ctv = new CaptionTv();
+//                      power  channel text
+//tv  0x100 ------------>[false,  0]
+//ctv 0x200 ------------>[false,  0,  null]
+
+tv.power;
+tv.channel;
+tv.power();
+tv.channelUp();
+tv.channelDown();  //모두 ok
+
+ctv.power;
+ctv.channel;
+ctv.power();
+ctv.channelUp();
+ctv.channelDown();
+ctv.text;
+ctv.caption();      //모두 ok
+/////////////////////////////////////////////////////////////////
+//이제 상위형 참조변수에 하위형 객체를 대입하자.(문법적OK)
+Tv otv = new CaptionTv();
+//otv 0x300 -------------->[false, 0, null];
+
+otv.power;
+otv.channel;
+otv.power();
+otv.channelUp();
+otv.channelDown();
+otv.text;            //error
+otv.caption();       //error
+//이때 만일 상위클래스의 메서드를 하위클래스에서
+//오버라이딩한 메서드가 있다면 이것이 가능하다.
+//이것이 장점이지만, 현재는 오버라이딩한 메서드가 없기에 장점X.
+/////////////////////////////////////////////////////////////////
+Tv t = new CaptionTv();  <<----- 중요
+//상위형 참조변수에 하위형객체를 저장하는 것은 ok
+CaptionTv ctv = new Tv();
+//하위형 참조변수에 상위형 객체를 저장하는 것은 error
+//ctv 0x100 -------------->[false, 0]
+ctv.power;      //ok
+ctv.channel;    //ok
+ctv.text;      //error
+//컴파일은 통과하지만 실행시 실제값이 없으므로 실행에러 발생.
+```
+  -
 #### 3. 추상클래스 : 객체생성X
 #### 4. 인터페이스
 #### 5. 실습
