@@ -4951,22 +4951,95 @@ class InstanceofTest {
 	}
 }
 ```
+
 ```
-##### [외워두자!]
-+ 상위형 참조변수에 하위형 객체저장 (무조건  ok)
-+ 하위형 참조변수에 상위형 객체저장 (형변환시켜서 저장해야함.)
-+ Object형 참조변수에는 모든 객체를 저장할수 있다.
-+ 상속계층에서 형변환이 가능한지 여부를 알아보는 연산자 ==> instanceof
+ [이것만은 외워두자!]
+1. 상위형 참조변수에 하위형 객체저장 (무조건  ok)
+2. 하위형 참조변수에 상위형 객체저장 (형변환시켜서 저장해야함.)
+3. Object형 참조변수에는 모든 객체를 저장할수 있다.
+4. 상속계층에서 형변환이 가능한지 여부를 알아보는 연산자 ==> instanceof
 ```
 
 + 다형성은 멤버변수에 적용되지 않는다.
   - 상위클래스와 하위클래스에 동일한 멤버변수가 있으면 현재 참조변수의 자료형에 따라 멤버변수를 사용한다.
 + 다형성은 오버라이딩된 메서드에 적용된다.
   - 상위클래스와 하위클래스에 동일한 메서드가 있으면 자료형을 참조하는 것이 아니라, 실제 메모리에 만들어진 객체가 어느형이냐에 따라 메서드를 적용시킨다.
-#### 3. 추상클래스 : 객체생성X
-#### 4. 인터페이스
-#### 5. 실습
-#### 6. Summary / Close
+
+
+##### 교재 368page... 실습해보자!!
+```java
+//PolyArgumentTest.java
+class Product {
+	int price;			// 제품의 가격
+	int bonusPoint;		// 제품구매 시 제공하는 보너스점수
+
+	Product(int price) {
+		this.price = price;
+		bonusPoint =(int)(price/10.0);	// 보너스점수는 제품가격의 10%
+	}
+}
+
+class Tv extends Product {
+	Tv() {
+		// 조상클래스의 생성자 Product(int price)를 호출한다.
+		super(100);			// Tv의 가격을 100만원으로 한다.
+	}
+
+	public String toString() {	// Object클래스의 toString()을 오버라이딩한다.
+		return "Tv";
+	}
+}
+
+class Computer extends Product {
+	Computer() {
+		super(200);
+	}
+
+	public String toString() {
+		return "Computer";
+	}
+}
+
+class Buyer {			// 고객, 물건을 사는 사람
+	int money = 1000;	// 소유금액
+	int bonusPoint = 0;	// 보너스점수
+
+	void buy(Product p) {
+		if(money < p.price) {
+			System.out.println("잔액이 부족하여 물건을 살수 없습니다.");
+			return;
+		}
+
+		money -= p.price;			// 가진 돈에서 구입한 제품의 가격을 뺀다.
+		bonusPoint += p.bonusPoint;	// 제품의 보너스 점수를 추가한다.
+		System.out.println(p + "을/를 구입하셨습니다.");
+	}
+}
+
+class PolyArgumentTest {
+	public static void main(String args[]) {
+		Buyer b = new Buyer();
+		//                           money bonusPoint
+		//b   0x100 ---------------->[700,  30      ]
+		//                           price bonusPoint
+		//tv  0x200 ---------------->[100,   10     ]
+		//com 0x300 ---------------->[200,   20     ]  
+		Tv tv = new Tv();
+		Computer computer = new Computer();
+
+		b.buy(tv);
+		System.out.println("-------------");
+		b.buy(computer);
+		System.out.println("-------------");		
+
+		System.out.println("현재 남은 돈은 " + b.money + "만원입니다.");
+		System.out.println("현재 보너스점수는 " + b.bonusPoint + "점입니다.");
+	}
+}
+```
+
+#### 3. 실습
+#### 4. Summary / Close
 
 
 -----------------------------------------------------------
@@ -4974,6 +5047,7 @@ class InstanceofTest {
 ### [2019-04-01]
 
 #### 1. Review
-
+#### 3. 추상클래스 : 객체생성X
+#### 4. 인터페이스
 #### 5. 실습
 #### 6. Summary / Close
