@@ -5047,7 +5047,140 @@ class PolyArgumentTest {
 ### [2019-04-01]
 
 #### 1. Review
-#### 3. 추상클래스 : 객체생성X
-#### 4. 인터페이스
-#### 5. 실습
-#### 6. Summary / Close
++ 객체배열 : 객체를 요소값(참조값or위치정보...주소)으로 가지는 배열
++ 문자열(String)
+  - String name = "홍길동" ;  //String name = Strinf("홍길동");
++ 문자열배열(String [])
+```java
+Strng names[] = new String[3]
+names[0] = new String("홍길동"); //"홍길동"
+names[1] = new String("이순신"); //"이순신"
+names[2] = new String("장길산"); //"장길산"
+
+//이후 배열요소를 1개의 문자열로 취급해도 된다.
+names[1].length ==> 3    
+name[0] = new String;
+```
+
++ 특정 클래스(Card)로 객체를 여러개 만들어서 관리해야 한다면 객체배열을 만들어서 사용한다.
+```java
+Card cards[] = new Card[3];
+cards[0] = new Card("SPADE",7);
+cards[1] = new Card("CLOVER",9);
+cards[2] = new Card("DIAMOND",2);
+
+//cards배열의 요소값 1개를 Card객체 처럼 사용한다.
+System.out.println(cards[1]);
+System.out.println(cards[1].kind);
+System.out.println(cards[1].number);
+```
+
++ 다형성관련 표현으로
+```java
+class Product {
+  ...
+}
+
+class Tv extends Product {
+  ...
+}
+
+class Computer extends Product {
+  ....
+}
+
+상위형 참조변수 = new 하위형객체();  //ok
+Product p = new Tv(); //ok
+Product p1 = new Computer();  //ok
+//////////////////////////////////////////////////////
+==> 오늘 이야기하고 싶은 주제
+Product ps[] = new Product[5];
+//ps 0x100---------->[null,null,null,null,null]
+ps[0] = new Tv();
+ps[1] = new Computer();
+ps[2] = new Computer();
+ps[3] = new Audio();
+ps[4] = new Tv();
+
+int i = 1; // i의 변수값은 0~4까지 변경될수 있으므로
+           // 아래의 코드에서 모든요소값이 공통으로 가지는 멤버만 사용해야 한다.
+           // 멤버변수는 Product의 멤버변수, 메서드는 Overriding된 메서드  
+ps[i].멤버  <=== 멤버변수, 메서드
+```
+
+#### 2. 추상클래스(abstract class) : 객체생성X
++ 1) 클래스(class)를 만드는 목적 ==> 객체(objet)를 생성하기 위해
++ 2) 클래스의 종류
+  - (1) 일반클래스 : 객체를 생성할 수 있는 클래스
+  - (2) 추상클래스 : 객체를 생성할 수 없는 클래스
++ 추상클래스는 왜 객체를 생성할 수 없는가? -> 뭔가 부족하기 때문이다.
+  - 일반적으로 메서드는 선언부와 본체롤 구성되어 있다.
+```java
+public void test() ==> 선언부
+{==> 본체 : 실행될 코드를 작성하는 부분
+    실행코드
+}
+```
++ 이때 선언부만 있고 본체가 없는 메서드가 있다 이러한 메서드를 추상(abstract)메서드라고 한다. 추상메서드를 작성하려면 반드시 앞부분 abstract로 선언해야 한다.
+```java
+void test(); //error
+abstract void test(); //ok
+```
++ 결론적으로 추상메서드를 1개 이상 가진 클래스를 추상클래스라고 하고, 추상클래스는 객체를 생성할 수 없다.
++ 추상클래스는 단독으로 객체를 생성하지 않고, 추상클래스를 상속받는 하위클래스에서 추상메서드를 재정의(overriding)하여 객체를 만든다.
+
++ 1. 추상클래스 작성방법
+  - 1) 무조건 class에 abstract를 사용하면 객체를 생성할 수 없다.
+  - 2) 추상메서드를 1개이상 가진 클래스
+```java
+abstract 리턴값정보 메서드명(인자정보);
+```
+
++ 추상메서드를 1개라도 가지면 객체를 생성할수 없는 추상 클래스가 되므로 클래스 앞에도 반드시 abstract를 사용하여 선언해야 한다.
+  - ==> 추상클래스로 객체를 직접생성할수 없고 추상클래스를 상속받은 하위클래스에서 추상메서드를 재정의 하면 객체를 생성할 수 있는 일반클래스가 된다.
+
++ 추상클래스에 대하여는 여기까지만 문법적으로 학습해도 무방하다.
++ 앞으ㅗㄹ 추상클래스를 사용할때는 자바클래스라이브러리 학습시 이미 만들어져 있는 클래스중
+#### 3. 인터페이스(interface)
++ 추상클래스(abstract class)는 일반멤버변수와 메서드를 가지고 있고 그중에 한두개의 메서드가 추상메서드이다.
++ 인터페이스는 멤버변수는 모두 public static fainal 특성을 가진 상수이고 메서드는 모든 메서드가 public abstract메서드이다.
+  - 그래서 이러한 특성을 가진 클래스를 별도의 명칭을 정해 interface(인터페이스)라고 부른다.
+```java
+interface Some {
+  public static final int Max = 10;
+  public static final int MIN = 0;
+
+  public abstract void attack();
+  public abstract void move();
+  public abstract void play();
+  public abstract void stop();
+}
+```
++ 인터페이스로 직접 객체로 만들수 없다(당연)
+  - 객체로 생성하고 싶다면 하위 클래스에서 상속받아 모든 메서드를 다 재정의(override)해야한다. 이것을 구현(implements)이라고 부른다.
+```java
+class Other implements Some {
+  ...
+  public void attack() {
+    ...
+  }
+  public void move() {
+    ...
+  }
+  public void play(){
+    ...
+  }
+  public void stop(){
+    ...
+  }
+}
+```
++ 결국 interface의 모든 추상메서드를 재정의한 하위클래스를 만들때는 extends 키워드를 사용하지 않고 implements(구현)하여 만든다.
++ 참고사항으로 인터페이스는 다중상속이 가능하다.
+  - 일반클래스의 상속은 '단일상속'만 되고 '다중상속'은 안된다.
++ 383~402page 내용은 생략하고 넘어가도 좋다.
+  - 너무 세밀한 문법을 표현하고 있으므로 실용적이지 않다.(즉, 당장은 몰라도 무방하단 내용이다.)
+#### 4. 내부 클래스
+#### 5. 예외처리(Ecception)
+#### 6. 보강
+#### 7. Summary / Close
