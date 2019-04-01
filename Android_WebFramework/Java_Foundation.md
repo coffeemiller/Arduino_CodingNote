@@ -5161,26 +5161,104 @@ interface Some {
 ```java
 class Other implements Some {
   ...
-  public void attack() {
-    ...
-  }
-  public void move() {
-    ...
-  }
-  public void play(){
-    ...
-  }
-  public void stop(){
-    ...
-  }
+  public void attack() {  ...  }
+  public void move() {  ...  }
+  public void play(){  ...  }
+  public void stop(){  ...  }
 }
 ```
 + 결국 interface의 모든 추상메서드를 재정의한 하위클래스를 만들때는 extends 키워드를 사용하지 않고 implements(구현)하여 만든다.
+```java
+//abstractTest.java
+public class AbstractTest {
+	public static void main(String[] args) {
+		// 일반 클래스 - Card
+		// 추상 클래스 - abstract Card
+		/*
+		Card card = new Card("SPADE", 5);
+		System.out.println(card); // card.toString();
+		System.out.println(card.kind);
+		System.out.println(card.number);
+		*/
+
+		//추상클래스는 직접 객체를 생성할 수 없고 반드시, 하위클래스에서
+		//추상메서드를 재정의(override)한 일반클래스를 만든후 생성할 수 있다.
+		//Unit unit = new Unit(); //error
+		Tank tank = new Tank();
+		System.out.println(tank);
+		tank.changeMode();
+		tank.move();
+		System.out.println(tank);
+		System.out.println("-------------------------------");
+
+		Unit unit = new Tank();
+		unit.move();
+
+		//Runnable r = new Runnable(); //error
+		MyRunnable r = new MyRunnable(); //ok
+		//Runnable는 interface이므로 재정의하고 써야 한다.
+	}
+}
+
+class MyRunnable implements Runnable {
+	@Override
+	public void run() {
+		//실행코드작성
+	}
+}
+////////////////////////////////////////////////////////////////
+//Unit.java
+//스타크래프트 게임에서 사용하는 유닛
+abstract class Unit {
+	int x,y;  // 좌표
+
+	abstract void move(); // 본체가 없는 메서드는 반드시 abstract를 사용해서 선언해야 한다.
+
+	void stop() {
+		System.out.println(x+","+y + " 위치에 정지");
+	}
+}
+////////////////////////////////////////////////////////////////
+//Tank.java
+class Tank extends Unit{
+	String name = "탱크";
+	boolean segeMode;
+
+	void changeMode() {
+		segeMode = !segeMode;
+		if (segeMode) {
+			System.out.println("공격력을 강화한 시지모드로 바꾸었습니다.");
+		} else {
+			System.out.println("이동이 용이한 일반모드로 바뀌었습니다.");
+		}
+	}
+	//상위클래스 Unit의 추상메서드를 재정의
+	@Override
+	void move() {
+		System.out.println("탱크가 움직입니다.");
+
+	}
+
+	@Override
+	public String toString() {
+		return "Tank [name=" + name + ", segeMode=" + segeMode + "]";
+	}
+}
+```
 + 참고사항으로 인터페이스는 다중상속이 가능하다.
   - 일반클래스의 상속은 '단일상속'만 되고 '다중상속'은 안된다.
 + 383~402page 내용은 생략하고 넘어가도 좋다.
   - 너무 세밀한 문법을 표현하고 있으므로 실용적이지 않다.(즉, 당장은 몰라도 무방하단 내용이다.)
-#### 4. 내부 클래스
-#### 5. 예외처리(Ecception)
-#### 6. 보강
-#### 7. Summary / Close
+
+#### 4. 보강
+#### 5. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-04-01]
+
+#### 1. Review
+#### 2. 내부 클래스
+#### 3. 예외처리(Ecception)
+#### 4. Summary / Close
