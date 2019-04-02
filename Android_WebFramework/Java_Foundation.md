@@ -5413,6 +5413,55 @@ class Outer2 {
   - 인스턴스 내부클래스는 외부클래스로 객체가 생성되어야 객체를 생성할 수 있다.
   - static 내부클래스는 외부클래스로 객체를 생성하지 않아도 단독으로 객체를 생성할 수 있다.
   - 지역내부클래스는 메서드가 호출되었을때만 객체를 생성할 수 있다.
+  - 익명의 내부클래스 사용에는 꼭 익숙해져야한다. 앞으로 많이 나타난다.
+```java
+//InnerExTest.java
+class InnerExTest {
+      public static void main(String args[]) {
+    	  // 인스턴스 내부 클래스로 객체를 생성해보자
+    	  //InnerEx1.InstanceInner ii = inner1.new InstanceInner();
+    	  //InnerEx1.InstanceInner ii = new InnerEx1.InstanceInner();  //error
+    	  //왜 error인가? 인스턴스 내부클래스를 외부클래스로 객체를 생성하고
+    	  //그 객체로부터 생성해야 한다.
+
+    	  InnerEx1 inner1 = new InnerEx1();
+    	  InnerEx1.InstanceInner ii = inner1.new InstanceInner(); //ok
+
+    	  //클래스 내부클래스(static 내부클래스)로 객체를 생성해보자.
+    	  InnerEx1.StaticInner si = new InnerEx1.StaticInner();
+
+    	  inner1.myMethod();
+      }
+}
+
+class InnerEx1 {
+	InstanceInner ii;
+
+	InnerEx1() {	ii = new InstanceInner();	}
+
+	class InstanceInner {
+        int iv = 100;
+//      static int cv = 100;            // 에러! static변수를 선언할 수 없다.
+        final static int CONST = 100;   // final static은 상수이므로 허용한다.
+  }
+
+  static class StaticInner {
+        int iv = 200;
+        static int cv = 200;       // static클래스만 static멤버를 정의할 수 있다.
+  }
+
+  void myMethod() {
+	  class LocalInner {
+      int iv = 300;
+//    static int cv = 300;          // 에러! static변수를 선언할 수 없다.
+      final static int CONST = 300; // final static은 상수이므로 허용
+    }
+
+	  LocalInner li = new LocalInner();
+	  //현재의 메서드가 끝나면 객체도 소멸된다.
+  }
+}
+```
 
 #### 3. 예외처리(Ecception)
 #### 4. 자주 사용하는 클래스(java.lang 패키지)
