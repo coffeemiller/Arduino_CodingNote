@@ -5367,7 +5367,6 @@ public class Sales {
 			Object obj = new Object() {
 				int x;   // 멤버변수
 				void test() { //메서드
-
 				}
 			};
 			//내부클래스의 메서드에서 외부클래스의 멤버를 접근할수 있다.
