@@ -5462,7 +5462,250 @@ class InnerEx1 {
 }
 ```
 
++ 익명의 내부클래스를 사용하는 이유
+  - 특정 클래스를 상속받아 객체를 만드는데 단 한번만 객체로 만들어서 사용할때 손쉽게 코딩하는 방법을 지원해주기 위해서 사용한다.
+
+```java
+//사용법)
+상위클래스형 변수명 = new 상위클래스() {
+  //필요한 멤버를 추가하는데
+  //일반적으로 상위의 특정메서드를 overriding시킨다.
+}
+
+변수명.overriding한메서드();
+//위의 형태에서 상위클래스로 사용하는 것은 대부분의 경우
+//추상(abstract)클래스이거나 인터페이스(interface)이다.
+
+///////////////////////////////////////////////////////////////////
+//AnonymousTest.java
+public class AnonymousTest {
+	public static void main(String[] args) {
+		//B클래스형 객체를 만들고 싶다.
+		B b = new B(10,20);
+		b.display();
+
+		//A클래스로 객체를 생성하되, 실제객체는 하위객체로 생성
+		//단, 해당객체를 1번만 사용할 것이다.
+		A a = new B(100,200);
+		a.display();
+
+		A obj = new B(1,2);
+		A obj2 = new B(1000,2000);
+		//B클래스를 이용하여 객체를 여러개 생성하여 사용하는 것.
+	}
+}
+
+class A {
+	int x;
+
+	A () {	}
+	A (int x) {	this.x = x;	}
+
+	void display() {
+		System.out.println("x: "+x);
+	}
+}
+
+class B extends A {
+	int y;
+
+	B () {	}
+	B (int x) {	super(x);	}
+
+	B (int x, int y) {
+		super(x);
+		this.y = y;
+	}
+
+	void display () {
+		super.display();
+		System.out.println("y: "+y);
+	}
+}
+/////////////////////////////////////////////////////////////////
+//AnonymousTest2.java
+public class AnonymousTest2 {
+	public static void main(String[] args) {
+		//A a = new A(10);
+
+		//익명(이름없는 클래스)의 클래스를 이용한
+		A a = new A(10) {
+			int y = 20;
+			void display() {
+				super.display();
+				System.out.println("y:"+y);
+			}
+		};
+		/*
+		 * [위의 코딩내용이 실행되는 절차]
+		 * 1) A클래스를 상속받은 이름없는 클래스를 만들되,
+		 * 		 멤버변수 y와 메서드 display()를 가지도록 한다.
+		 * 2) new A()의 표현은 이름없는 클래스로 객체를 생성한다.
+		 * 3) A(10)에 의해 A클래스를 작동시킨다.
+		 */
+		a.display();
+	}
+}
+//////////////////////////////////////////////////////////////////
+//AnonymousTest3.java
+public class AnonymousTest3 {
+	public static void main(String[] args) {
+		//ATest obj = new ATest();  //error
+
+    //익명의 클래스 생성
+		ATest obj = new ATest() {
+
+			@Override
+			void calculate() {
+				int result = x + y;
+				super.display();
+				System.out.println("합계는 "+result);
+			}
+		};
+		obj.calculate();
+    //---------------------------------------------------------
+
+		//Runable interface는 쓰레드를 사용할때 이용하는 인터페이스이다.
+		MyRunnable r = new MyRunnable();
+
+		//위와 동일한 기능을 익명의 클래스를 사용하면, 아래와 같이 코딩할 수 있다.
+		Runnable r2 = new Runnable() {
+			@Override
+			public void run() {
+				//여기서멀티쓰레딩에 필요한 코드를 작성한다.			
+			}
+		};    
+	}
+}
+
+class MyRunnable implements Runnable {
+	@Override
+	public void run() {
+		//여기서멀티쓰레딩에 필요한 코드를 작성한다.
+	}
+}
+
+//추상클래스
+abstract class ATest {
+	int x = 10;
+	int y = 20;
+
+	void display() {	System.out.println("x:"+x+","+"y:"+y);	}
+
+	abstract void calculate(); //추상메서드
+}
+```
+
 #### 3. 예외처리(Ecception)
+```
+교재 8장 예외처리
+
+   소스프로그램(*.java)
+   Test.java ---------------->Test.class   -----------> 메모리에 적재(load)하여                
+               javac.exe                     java.exe   JVM의 도움을 받아 실행시킨다.
+               (컴파일러)                   (자바실행기, 인터프리터) |-->실행결과                
+                                                                 1) 정상 결과     ok
+               잘못된 문법사용(문법에러, Syntax error)                        2) 잘못된 결과  ==> Logic Error
+                                                                 3) 실행중 예기치 못한 상황이 발생해서 프로그램이 중단된것
+                                                                    (실행에러, Runtime-error)
+                                   ==========================================================================                                   
+                                                                 우리가 수행해야할 조치사항을 코딩하는 방법을  예외처리(Exception Handling)라고 한다.
+                                   1) 너무 심각한 상황이어서 도저히 개입해서 복구할수 없을 때 : Error
+                                   2) 개입해서 최소한 정상적으로 프로그램이 종료하게 만들거나 복구 작업을 수행할 수 있을때 : Exception               
+```
++ 자바시스템 프로그램 작동시 발생할수 있는 모든 상황을 종류별로 미리 클래스를 만들어 놓고 해당 상황이 발생했을때 객체를 생성하여 프로그램으로 알려준다.
+
++ 예외처리 프로그램 작성방법2가지
+  - 1) 예외가 발생했을때 상위로 예외를 던져버리는것(throw)
+  - 2) 프로그램코드에서 예외트랩을 사용하여 직접 처리하는 방법
+```java
+try {
+  예외발생 가능성이 있는 코드;
+} catch (예외클래스 객체명) {
+  예외처리코드;
+}
+
+//Test2.java
+public class Test2 {
+	public static void main(String[] args) {
+		//대표적인 예외발생 상황
+		int number1 = 26;
+		int number2 = 0;
+		int value = 0;
+		try {
+			value = number1 / number2;
+			//예외가 발생하자 마자 Java시스템이 예외정보를 객체로만들어서 아래의 catch블럭으로 던져준다.
+		}catch(ArithmeticException e) {  //
+			//예외처리 코드
+			System.out.println("number2의 값이 0이므로 나눗셈을 수행할수 없습니다.");
+		}
+		//모든 컴퓨터 프로그램언어는 0으로 나눗셈을 처리할수 없다. 그런데 0으로 나누는 상황이 발생했다.
+
+		System.out.println("나눗셈의 결과 : " + value);
+
+		int data[] = {7,2,3,8,5};
+		int sum = 0;
+		for(int i=0; i<=5; i++) {
+			try {
+				sum += data[i];
+			}catch(ArrayIndexOutOfBoundsException e) { //
+				System.out.println("첨자범위를 벗어난 합계는 포함되지 않습니다.");
+			}
+		}
+		System.out.println("배열요소의 합계 : " + sum);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+//Test3.java
+public class Test3 {
+	public static void main(String[] args) {
+		//대표적인 예외발생 상황
+		int number1 = 26;
+		int number2 = 0;
+
+		int value = 0;
+		try {
+			value = number1 / number2;			
+			System.out.println("나눗셈의 결과 : " + value);
+
+			int data[] = {7,2,3,8,5};
+			int sum = 0;
+			for(int i=0; i<=5; i++) {
+				sum += data[i];
+			}
+			System.out.println("배열요소의 합계 : " + sum);
+		}catch(ArithmeticException e) {
+			System.out.println("0으로 나누는 예외가 발생했습니다.");
+		}catch(ArrayIndexOutOfBoundsException e2) {
+			System.out.println("배열 첨자범위를 예외가 발생했습니다.");
+		}
+	}
+}
+```
+
++ 예외처리에 관한 학습을 내일 이어 나감.
+
+##### [오늘의 과제]
++ 1) 어제 보강한 내용을 충분히 이해하는것(0401프로젝트의 com.jica.oop패키지 내부의 )
++ 2) 오늘 학습한 예제중 추상클래스, 인터페이스, 내부클래스 예제복습
++ 실습과제) "편의점 문제"
+  - 편의점에서 20개의 품목물품을 판매하고 있다.
+  - 제품명, 단가  ==>  20개
+  - 손님이 와서 제품을 몇개 사겠다고 하면,
+  - 1)단가와 금액을 알려준다. 단, 취급하지 않는 품목이면 없다고 알려준다.
+  - 2)판매제품의 수량을 누적한다.
+  - 업무를 정산할때 제품명, 단가, 판매수량, 판매금액을 출력해준다.
+
+
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+### [2019-04-03]
+
+#### 1. Review
 #### 4. 자주 사용하는 클래스(java.lang 패키지)
-#### 5. 실습
-#### 6. Summary / Close
