@@ -5140,7 +5140,7 @@ abstract 리턴값정보 메서드명(인자정보);
   - ==> 추상클래스로 객체를 직접생성할수 없고 추상클래스를 상속받은 하위클래스에서 추상메서드를 재정의 하면 객체를 생성할 수 있는 일반클래스가 된다.
 
 + 추상클래스에 대하여는 여기까지만 문법적으로 학습해도 무방하다.
-+ 앞으ㅗㄹ 추상클래스를 사용할때는 자바클래스라이브러리 학습시 이미 만들어져 있는 클래스중
++ 앞으로 추상클래스를 사용할때는 자바클래스라이브러리 학습시 이미 만들어져 있는 클래스중
 #### 3. 인터페이스(interface)
 + 추상클래스(abstract class)는 일반멤버변수와 메서드를 가지고 있고 그중에 한두개의 메서드가 추상메서드이다.
 + 인터페이스는 멤버변수는 모두 public static fainal 특성을 가진 상수이고 메서드는 모든 메서드가 public abstract메서드이다.
@@ -5259,6 +5259,162 @@ class Tank extends Unit{
 ### [2019-04-01]
 
 #### 1. Review
++ 1) 추상클래스 : 객체를 생성할수 없는 클래스
+```java
+abstract class A{
+  //멤버변수
+
+  //메서드들
+  //메서드중에서 본체가 없는 메서드 즉, 추상메서드가 1개라도 있으면
+  //추상 클래스가 된다.
+  abstract void test();
+}
+
+A obj = new A(); //추상클래스이므로 객체생성 못함 : error
+```
+  - 추상클래스 A로는 객체를 생성할 수 있으므로 하위클래스에 상속받아 추상메서드를 재정의(override)하면 일반클래스가 되어 객체를 생성할수 있다.
+```java
+class B extends A{
+  //멤버변수
+  //메서드를 필요한 만큼 추가
+
+  //반드시 추상클래스 A의 추상메서드를 재정의해야 한다.
+  @Override
+  void test(){
+     //실행코드
+  }
+}  
+
+B obj = new B(); //일반클래스이므로 객체생성 가능 : ok
+```
++ 2) 인터페이스(interface) : 구성원 모두가...static final 멤버변수, public abstract 추상메서드... 일때.
+  - 특정클래스를 만들려고 할때 (1) 멤버변수는 모두 public static final이고, (2) 메서드는 모두 public abstract 메서드일때, 추상클래스로 만들지 않고 interface로 만든다.
+```java
+interface Abs{
+   int MAX = 100;   //자동으로 모든 멤버변수는 public static final로 인식
+   int MIN = 0;
+
+   void method1();  //자동으로 모든 메서드를 public abstract로 인식
+   void method2();
+   void method3();
+}  
+
+interface로 객체를 만들려면 새로운 클래스에서 모든 추상메서드를
+   재정의하면 된다. 이것을 상속(extends)대신 interface를 구현(implements)했다고 한다.
+
+class Imp implements Abs{
+   //필요하다면 멤버변수와 메서드 추가
+   //반드시 Abs interface의 모든 추상메서드를 재정의한다.
+   public void method1(){
+               실행코드1;
+   }
+
+   public void method2(){
+               실행코드2;
+   }
+
+   public void method3(){
+               실행코드3;
+   }   
+}
+
+Imp obj = new Imp();   // ok
+
+//접근지정자의 범위
+public > protected > 아무것도 없음 > private
+```
++ 메서드를 overriding할때는 접근제어자가 같거나 더 넓은것을 사용할수 있다.
+
+
 #### 2. 내부 클래스
++ 1) 클래스 내부에서 선언된 클래스
+  - 왜 내부클래스를 만드는가?
+    - 두클래스가 긴밀한 관계일때 내부에 표현하느 것이 편리(내부클래스의 메서드에서 외부클래스를 접근할수 있다.)하고 다른곳에서 사용하지 않는다면 감출수 있기 때문이다.
++ 2) 내부클래스의 종류
+  - 인스턴스 내부 클래스          ==> 자주사용
+  - 클래스 내부의 클래스(static)  ==> 거의 사용하지 않음
+  - 지역 내부 클래스              ==> 거의 사용하지 않음
+  - 익명(anonymous) 내부 클래스   ==> 자주사용(문법표현이 독특한 형태이다.)
+```java
+//Sales.java
+public class Sales {
+	static int total;  //판매된 제품의 금액
+	Item items [] = new Item[5];
+
+	void sale (Item item) {
+		System.out.println(item.title+"제품을 판매했습니다.");
+		total += item.price;
+
+		//지역 내부클래스
+		class Linner {
+
+		}
+	}
+
+	//클래스 내부클래스
+	static class Linner {
+
+	}
+
+	//클래스안에 또다른 클래스를 작성했다. 이때 Item 클래스를 내부클래스라고 부른다.
+	static class Item {
+		String title;
+		int price;
+
+		void method() {
+			//객체를 생성하면서 이름없는 클래스를 선언/정의하는 것.
+			//익명의 내부클래스
+			Object obj = new Object() {
+				int x;   // 멤버변수
+				void test() { //메서드
+
+				}
+			};
+			//내부클래스의 메서드에서 외부클래스의 멤버를 접근할수 있다.
+			//가장 큰 장점이자 특징
+			System.out.println("지금까지 total은 "+total+"입니다.");
+		}
+	}
+}
+
+// Item클래스 외부에 작성해 놓았다.
+// 만일 Item클래스가 Sales클래스에서만 사용되고 다른곳에서 사용되지 안흔다면
+// Sales클래스 내부에 위치할수도 있다.  <==== 내부 클래스(inner class)
+//////////////////////////////////////////////////////////////////
+//Outer.java
+public class Outer {
+	private int iv = 0;  //인스턴스 변수
+	protected static int cv = 0; //클래스변수(static변수)
+
+	void myMethod() {
+		int lv = 0;  //지역변수
+	}
+}
+
+//내부클래스는 위의 변수선언처럼 사용된다.
+class Outer2 {
+	//인스턴스 내부클래스
+	private class InstanceInner {
+	}
+
+	//클래스 내부클래스(static 내부클래스)
+	protected static class StaticInner {
+	}
+
+	void myMethod() {
+		//지역 내부클래스
+		class LocalInner {
+		}
+	}
+}
+```
+
++ 3) 내부클래스별 특징
+  - 인스턴스 내부클래스는 외부클래스로 객체가 생성되어야 객체를 생성할 수 있다.
+  - static 내부클래스는 외부클래스로 객체를 생성하지 않아도 단독으로 객체를 생성할 수 있다.
+  - 지역내부클래스는 메서드가 호출되었을때만 객체를 생성할 수 있다.
+
 #### 3. 예외처리(Ecception)
-#### 4. Summary / Close
+#### 4. 자주 사용하는 클래스(java.lang 패키지)
+#### 5. 실습
+#### 6. Summary / Close
