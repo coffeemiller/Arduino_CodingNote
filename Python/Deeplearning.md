@@ -1,3 +1,7 @@
+우분투 셋팅 참조사이트
+https://www.pyimagesearch.com/2019/01/30/ubuntu-18-04-install-tensorflow-and-keras-for-deep-learning/
+
+
 [깊은 관계]......팀장="이동은"
 
 -------------------------------------------------------------
