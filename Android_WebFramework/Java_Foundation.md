@@ -5890,13 +5890,9 @@ try{
 + 1. 오늘 학습내용 복습
 + 2. 오전 실습(편의점)내용 보완해서 계속 작성.
 
-#### 3. 자주 사용하는 클래스(java.lang 패키지)
-##### 3.1. Object
-##### 3.2. Object
-##### 3.3. Object
-#### 4.
-#### 5. 실습
-#### 6. Summary / Close
+
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
@@ -5905,5 +5901,245 @@ try{
 ### [2019-04-04]
 
 #### 1. Review
++ 과제 실습(편의점) 과제 마무리
+```java
+//Item.java
+public class Item {
+	private String title;   //제품명
+	private int price;      //단가
+	private int quantity;   //판매 수량
+
+	//생성자 - Constructor
+	public Item() {
+		super();
+	}
+
+	public Item(String title, int price) {
+		super();
+		this.title = title;
+		this.price = price;
+	}
+
+	//set/get 메서드
+	String getTitle() {
+		return title;
+	}
+
+	void setTitle(String title) {
+		this.title = title;
+	}
+
+	int getPrice() {
+		return price;
+	}
+
+	void setPrice(int price) {
+		this.price = price;
+	}
+
+	int getQuantity() {
+		return quantity;
+	}
+
+	//단순히 값을 변경만 하는것이 아니라 값을 누적하는 기능을 수행한다.
+	void accumulateQuantity(int quantity) {
+		this.quantity += quantity;
+	}
+
+	@Override
+	public String toString() {
+		return "[제품명=" + title + ", 단가=" + price + ", 판매수량=" + quantity + "]\n";
+	}
+}
+/////////////////////////////////////////////////////
+//Sales.java
+import java.util.Arrays;
+public class Sales {
+	public static final int MAX = 20;  //취급품목의 최대갯수
+	Item items[] = new Item[MAX];      //취급품목
+	int currentCount;                  //현재 취급하는 제품의 갯수
+
+	//생성자
+	public Sales() {
+		super();
+		// 이곳에서 취급하는 제품객체를 생성하여 저장
+		items[0] = new Item("코카콜라", 800);
+		items[1] = new Item("컵라면", 850);
+		items[2] = new Item("새우깡", 500);
+		items[3] = new Item("삼각김밥", 1000);
+		items[4] = new Item("우유", 1500);
+		currentCount = 5;
+	}
+
+	public void addItem(Item item) {
+		//items[currentCount] = item; //권장하지 않음(참조값 복사)
+
+		//동일한 내용을 가진 Item객체를 생성하여 대입한다
+		//Item newItem = new Item();
+		//newItem.setTitle(item.getTitle());
+		//newItem.setPrice(item.getPrice());
+		//items[currentCount] = newItem;
+
+		//위의 4줄과 동일한 기능을 아래의 1줄이 수행한다.
+		items[currentCount] = new Item(item.getTitle(), item.getPrice());
+		currentCount++;
+	}
+
+	@Override
+	public String toString() {
+		return "Sales [items=" + Arrays.toString(items) + ", currentCount=" + currentCount + "]";
+	}
+
+	//판매하다
+	public int sale(String title, int quantity) {
+		//취급품목들에서 제품명으로 검색한다.
+		int pos = itemSearch(title);
+		if(pos == -1) { //검색실패
+			System.out.println("<<" + title + " 은 취급하는 품목이 아닙니다.>>");
+			return -1;
+		}
+
+		Item item = items[pos];
+		System.out.println(title + " 가격은 " + item.getPrice() + " 이고");
+		System.out.println("지불하실 총금액은 " + item.getPrice() * quantity + "입니다.");
+
+		//판매수량을 누적
+		item.accumulateQuantity(quantity);
+		return pos;
+	}
+
+	int itemSearch(String title) {
+		int pos = -1;
+		for(int i=0; i<currentCount; i++) {
+			Item item = items[i];
+			if(title.equals(item.getTitle())) {
+				pos = i;
+				break;
+			}
+		}
+		return pos;
+	}
+
+	//정산하다
+	public void summary() {
+		//전체목록은 판매금액순으로 정렬하여 출력시킨다.
+	}
+}
+/////////////////////////////////////////////////////
+//SalesTest.java
+public class SalesTest {
+	public static void main(String[] args) {
+		Sales sales = new Sales();
+		//1.인스턴스만 만들어졋을때
+		//                      items  currentCount
+		//sales                [0x200, 0]
+		//                       |--->[null,null,null,null,.......]
+
+		//2.인자가 없는 생성자 작동후
+		//                      items  currentCount
+		//sales 0x100 -------->[0x200, 5]
+		//                        |--->[0x300,0x400,0x500,0x600,0x700,0x60,.....]
+		//                               |     |     |     |     ...   |-->["맥주",1400,0]
+		//                               |     |     |     |-->[...]
+		//                               |     |     |-->[...]
+		//                               |     |-->["컵라면",850,0]
+		//                               |-->["코카콜라",800,0]
+
+		//item 0x50 --------->["맥주",20000,0]
+		Item item = new Item("맥주", 1400);		
+		sales.addItem(item);
+
+		System.out.println(sales); //sales.toString()
+
+		//판매시작
+		sales.sale("새우깡", 2);
+		sales.sale("새우깡", 3);
+		sales.sale("컵라면", 1);
+		sales.sale("맥주", 2);
+		sales.sale("풍선껌", 1);
+		sales.sale("새우깡", 1);
+
+		System.out.println(sales);
+
+		//문자열 비교시 등가비교(==)가 아닌 String클래스의 equals()메서드를 사용한다.
+		//String title = new String("새우깡");
+		//System.out.println(title == "새우깡");     //true(x), false
+		//System.out.println(title.equals("새우깡"));//true(o)
+	}
+}
+```
+
+#### 2. 자주 사용하는 클래스(java.lang 패키지)
++ java 8.0이후에 모듈이라는 개념이 자바언어에 도입되었다.
+  - 이전까지는 클래스라이브러리를 제공할때 패키지로 제공을 했는데, 이것보다 큰개념을 모듈을 만들어서 모듈안에 피키지가 속하도록 되었다.
+
++ 가장 기본적인 패키지인 java.lang 패키지와 범용적으로 유용한 클래스를 제공하는 java.util 패키지는 java.base모듈 내부에 있다.
+
++ 도움말문서(API Documentation)
+  - 특정 패키지를 클릭하면
+  - 1. 개요
+  - 2. 패키지에서 제공하는 interface
+  - 3. 패키지에서 제공하는 class
+
+##### 2.1. Object 클래스 사용법
++ 1) java.lang패키지
++ 2) 모든클래스의 최상위 클래스이다.
++ 3) 멤버변수는 없고 메서드만 있다.
+  - Object의 메서드들은 본래기능이 있는데 대부분 하위클래스에서 재정의(override)해서 사용한다.
++ 4) Object클래스의 메서드를 학습해보자.
+```
+public String toString() ==> 패키지명.클래스명@16진수hashcode값
+우리가 만든 클래스에서 객체의 상태값을 대표하는 문자열을 만들도록 재정의해서 사용한다.
+```
+
+```java
+//ObjectTest.java
+import java.util.Date;
+
+public class ObjectTest {
+	public static void main(String[] args) {
+		Object obj = new Object();
+		Object obj2 = new Object();
+
+		System.out.println(obj.hashCode());   //2018699554
+		System.out.println(obj2.hashCode());  //1311053135
+		System.out.println(Integer.toHexString(obj.hashCode()));
+		System.out.println(Integer.toHexString(obj2.hashCode()));
+
+		System.out.println(obj);
+		System.out.println(obj2);
+
+		Card card = new Card();
+		Card card2 = new Card();
+		System.out.println(card);
+		System.out.println(card2);
+		//위의 출력된 내용을 이전까지 학습할때 객체의 참조값을 가공해서 출력한 것이라고 설명했다.
+		//그런데 정확히 설명하면 출력된 값은 참조값이 아니다. java언어는 참조값을 철저하게 내부에서만 사용한다.
+		//자바는 특정 객체가 할당되면, 다음의 형태로 관리한다.
+		//참조변수 참조값(정수값)  실제메모리주소(숨겨져있음)
+		//  obj       17             0x342564
+		//  card      32             0x934523
+		// ...
+		//위의 코드에서 참조변수 즉, 객체명을 출력하면 나타나는 값은 무엇인가?
+		//먼저 Java언어는 메모리에 생성된 모든 객체에 내부적으로 식별하기 위해 부여해주는
+		//유일한 정수값이 있다.  이 값을 hashcode라고 부른다.
+		//이값을 출력시킬때 나타나는 값이다.
+		//내부적으로는 객체 즉, 참조변수를 출력하라고 하면
+		//1)toString()메서드가 재정의 되어 있으면 toString()을 실행시켜 그 값을 출력시킨다.
+		//2)없으면 상위클래스의 toString()실행시켜 그 값을 출력시킨다.
+		//결론적으로 Object클래스의 toString()메서드는 다음코드를 실행시킨다.
+		//getClass().getName() + '@' + Integer.toHexString(hashCode())
+		//--------------------   ---   -------------------------------
+		//패키지명.클래스         @            16진수 hashcode값
+
+		//아래의 Date클래스로 만들어진 today객체는 지금 현재의 년월일시분초밀리초까지의 정보를 자동으로 가진다.
+		Date today = new Date();
+		System.out.println(today);
+	}
+}
+```
+##### 2.2. Object
+##### 2.3. Object
+#### 2.
 #### 4. 실습
 #### 5. Summary / Close
