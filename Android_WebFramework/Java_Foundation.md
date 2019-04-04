@@ -6336,11 +6336,68 @@ public class HashCodeTest {
   - 1) Object -- 자바의 모든 클래스의 조상클래스
   - 2) Class  -- 특정객체를 생성한 클래스에 대한 정보를 표현하는 클래스
 
-##### 2.2. Object equals() 메서드
-+
+###### 문자열 관련 클래스
++ 1) java.lang 패키지의 String, StringBuffer, StringBuilder
++ 2) java.util 패키지의 StringTokenizer, StringJoiner
 
-##### 2.3. Object
++ String : 문자열, 상수성격을 가졌다.(상수성격:한번 값이 정해지면 끝까지 변경되지 않는다.)
++ StringBuffer, StringBuilder : 문자열을 수정,추가,삭제등 변경할수도 있다.
+```java
+//StringTest.java
+public class StringTest {
+	public static void main(String[] args) {
+		System.out.println("Jeonju");
+		String str = "Jeonju";
+		String str1 = "Jeonju";
+		String str2 = new String("Jeonju");
+		String str3 = new String("Jeonju");
 
-#### 3.
-#### 4. 실습
-#### 5. Summary / Close
+		System.out.println(str==str1);  //true
+		System.out.println(str==str2);  //false
+		System.out.println(str2==str3); //false
+		System.out.println("-------------------------------------");
+
+		//내용값이 같으면 같다고 판정하자.
+		System.out.println(str.equals(str1));  //true
+		System.out.println(str.equals(str2));  //true
+		System.out.println(str2.equals(str3)); //true
+
+		//모든 문자열은 상수성격을 가진다.
+		//즉, 한번 값이 결정되면 그 값이 바뀔수 없다(?).
+		str3 = "Gunsan"; //참조값만 바뀐것이다.
+
+		//"Jeonju"의 5번째 글자를 s로 변경하고 싶다거나
+		//맨뒤에 글자를 추가한다거나 중간위치에 글자를 삽입하는 기능을 전혀 할수없다.
+		//====> 상수성격을 가졌다.(String)
+
+		//이와 대조적으로 StringBuffer, StringBuilder 클래스는
+		//그 내용값을 변경시킬수 있다.
+		StringBuffer sb = new StringBuffer("Jeonju");
+		System.out.println(sb);
+
+		sb.append('J');
+		sb.append("ICA");
+		sb.insert(6, ' ');
+		System.out.println(sb);
+
+		String s = "ABC";
+		s = "XYZ";
+		s = "JAVA";
+	}
+}
+```
+##### [오늘의 과제]
++ 오늘 실습한 내용 복습
++ 편의점문제(정산하다 메서드 작성해보기)
+
+#### 3. 실습
+#### 4. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-04-05]
+
+#### 1. Review
+#### 3. 실습
+#### 4. Summary / Close
