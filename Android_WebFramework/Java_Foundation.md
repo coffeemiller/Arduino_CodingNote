@@ -6090,6 +6090,17 @@ public class SalesTest {
 ```
 public String toString() ==> 패키지명.클래스명@16진수hashcode값
 우리가 만든 클래스에서 객체의 상태값을 대표하는 문자열을 만들도록 재정의해서 사용한다.
+
+public boolean equals​(Object obj) ==> 객체의 참조값이 같으면 true, 다르면 false.... 등가비교연산자(==)와 동일한 기능을 수행한다. 우리가 만든 클래스에서 재정의하여 내용값이 값으면 true를 리턴하도록 만들어 사용한다.
+
+protected Object clone() throws CloneNotSupportedException
+==> 객체 복제본을 만드는 기능이다. 단, 사용자가 직접 사용할수는 없다. 이유) 접근제어자가 proteced이므로 그냥 사용할수 없다. 그래서 상속받는 하위클래스에서 호출하여 사용한다.
+<우리는 clone() 재정의 할때>
+1) Clonable interface를 구현한다고 선언한다.
+2) clone()메서드 override
+3) clone메서드를 사용할때는 예외처리와 함께 사용한다.(try catch, throw CloneNotSupportedException)
+
+참고사항) 다른메서드에 비해 사용빈도가 빈약하다.
 ```
 
 ```java
@@ -6138,8 +6149,100 @@ public class ObjectTest {
 	}
 }
 ```
-##### 2.2. Object
+```java
+//equals()사용
+import java.util.Date;
+
+public class EqualsTest {
+
+	public static void main(String[] args) {
+		Value v1 = new Value(100);
+		Value v2 = new Value(200);
+		Value v3 = new Value(100);
+
+		System.out.println(v1==v2);  //false
+		System.out.println(v1==v3);  //false
+		System.out.println("------------------------------------");
+
+		//우리가 원하는것은 v1이 가리키는 내용값과 v2가 가리키는 내용값이 같으면 같으것으로 취급하고 싶다면
+		//equals()메서드를 재정의하여 사용한다.
+		System.out.println(v1.equals(v1));    //true
+		System.out.println(v1.equals(null));  //false
+		Date today = new Date();
+		System.out.println(v1.equals(today)); //false
+
+		System.out.println(v1.equals(v2));  //false(가리키는 곳의 내용값이 다르다.)
+		System.out.println(v1.equals(v3));  //true(가리키는 곳의 내용값이 같다.)
+	}
+}
+
+class Value {
+	int value;
+
+	Value(int value){
+		this.value = value;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Value other = (Value) obj;
+		if (value != other.value)
+			return false;
+		return true;
+	}
+
+
+}
+////////////////////////////////////////////////////////////
+//toString()메서드 사용
+package com.jica.chap09.book;
+
+class Card {
+	String kind;
+	int number;
+
+	Card() {
+		this("SPADE", 1);  // Card(String kind, int number)를 호출
+	}
+
+	Card(String kind, int number) {
+		this.kind = kind;
+		this.number = number;
+	}
+
+	public String toString() {
+		// Card인스턴스의 kind와 number를 문자열로 반환한다.
+		//디버깅용
+		System.out.println("Card::toString()이 작동함....");
+		return "kind : " + kind + ", number : " + number;
+	}
+}
+
+class CardToString2 {
+	public static void main(String[] args) {
+		Card c1 = new Card();
+		Card c2 = new Card("HEART", 10);
+		System.out.println(c1.toString());
+		System.out.println(c2.toString());
+	}
+}
+
+////////////////////////////////////////////////////////////
+//clone() 메서드 사용
+
+
+```
+##### 2.2. Object equals() 메서드
++
+
 ##### 2.3. Object
-#### 2.
+
+#### 3.
 #### 4. 실습
 #### 5. Summary / Close
