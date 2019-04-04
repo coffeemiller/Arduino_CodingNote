@@ -6088,12 +6088,14 @@ public class SalesTest {
   - Object의 메서드들은 본래기능이 있는데 대부분 하위클래스에서 재정의(override)해서 사용한다.
 + 4) Object클래스의 메서드를 학습해보자.
 ```
-public String toString() ==> 패키지명.클래스명@16진수hashcode값
+1. (1등)★★★public String toString() ==> 패키지명.클래스명@16진수hashcode값
 우리가 만든 클래스에서 객체의 상태값을 대표하는 문자열을 만들도록 재정의해서 사용한다.
 
-public boolean equals​(Object obj) ==> 객체의 참조값이 같으면 true, 다르면 false.... 등가비교연산자(==)와 동일한 기능을 수행한다. 우리가 만든 클래스에서 재정의하여 내용값이 값으면 true를 리턴하도록 만들어 사용한다.
 
-protected Object clone() throws CloneNotSupportedException
+2. (2등)★★★public boolean equals​(Object obj) ==> 객체의 참조값이 같으면 true, 다르면 false.... 등가비교연산자(==)와 동일한 기능을 수행한다. 우리가 만든 클래스에서 재정의하여 내용값이 값으면 true를 리턴하도록 만들어 사용한다.
+
+
+3. protected Object clone() throws CloneNotSupportedException
 ==> 객체 복제본을 만드는 기능이다. 단, 사용자가 직접 사용할수는 없다. 이유) 접근제어자가 proteced이므로 그냥 사용할수 없다. 그래서 상속받는 하위클래스에서 호출하여 사용한다.
 <우리는 clone() 재정의 할때>
 1) Clonable interface를 구현한다고 선언한다.
@@ -6101,6 +6103,26 @@ protected Object clone() throws CloneNotSupportedException
 3) clone메서드를 사용할때는 예외처리와 함께 사용한다.(try catch, throw CloneNotSupportedException)
 
 참고사항) 다른메서드에 비해 사용빈도가 빈약하다.
+
+
+4. public final Class<?> getClass​() ==> 객체를 생성한 클래스정보를 저장한 객체로 리턴하는 메서드이다. 우리가 만든 클래스에서 재정의할수 없다.
+
+
+5. (3등)★★★public int hashCode​() ==> 모든 객체는 메모리에 생성되는 즉시, 내부적으로 식별하기 위해 유일한 정수값이 부여된다. 이 값을 hashCode라고 한다. 그렇기때문에 모든 객체의 hashCode값은 모두 다르다.
+==>> 우리가 만든 클래스에서는 내용값이 같으면 같은 hashCode값을 리턴하도록 재정의해서 사용한다.
+
+
+===========================================================================
+아래의 5가지 메서드는
+멀티 쓰레드 프로그램에서 동기화처리에 사용되는 메서드이다.
+(그때 사용하면 된다.)
+
+public final void notify​()
+public final void notifyAll​()
+public final void wait​()
+public final void wait​(long timeout) throws InterruptedException
+public final void wait​(long timeout, int nanos) throws InterruptedException
+===========================================================================
 ```
 
 ```java
@@ -6235,9 +6257,85 @@ class CardToString2 {
 
 ////////////////////////////////////////////////////////////
 //clone() 메서드 사용
+public class Card implements Cloneable {
+	String kind;
+	int number;
 
+	@Override
+	public String toString() {
+		return "Card [kind=" + kind + ", number=" + number + "]";
+	}
+	//clone()메서드를 재정의 할때는 반드시 현재클래스도 Cloneable 인터페이스를 구현(implements)한다고 선언해야 한다.
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+}
 
+public class CloneTest {
+	public static void main(String[] args) {
+		// object클래스의 clone()메서드는 객체를 복사하는 메서드이다.
+		//단, protected 접근제어자를 가지고 있으므로 직접사용할 수는 없다.
+		Card card = new Card();
+		card.kind = "SPADE";
+		card.number = 1;
+
+		Card card2 = null;
+		//card객체를 복제하여 card2에 저장하겠다. 원하는 결과는
+		try {
+			card2 = (Card)(card.clone());
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		System.out.println(card);
+		System.out.println(card2);
+	}
+}
+////////////////////////////////////////////////////////////
+//getClass() 메서드 사용
+public class ClassTest {
+	public static void main(String[] args) {
+		Card card = new Card();
+		card.kind = "SPADE";
+		card.number = 1;
+		//card객체를 생성한 클래스는 어떤 클래스인가?
+		//또 그 클래스는 명칭이 무엇이고 멤버변수는 무엇이있고, 메서드는 무엇이 있는가 등등
+		//클래스의 모든 정보를 저장하고 있는 객체
+		Class objInfo = card.getClass();
+		//위의 objInfo객체에는 Card클래스의 모든 정보가 저장되어 있다.
+		//클래스정보를 이용하는 특별한 분야가 있다.
+		//이런류의 프로그램을 Reflection 프로그래밍이라고 한다.
+		//실행시간에 클래스정보를 추출하여 다양한 기능에 활용될수 있는 프로그램의 한 분야이다.
+		System.out.println(objInfo);
+	}
+}
+////////////////////////////////////////////////////////////
+//hashCode() 메서드 사용
+public class HashCodeTest {
+	public static void main(String[] args) {
+		Card card = new Card("DIAMOND",5);
+		Card card2 = new Card("DIAMOND",5);
+		Card card3 = new Card("DIAMOND",5);
+
+		System.out.println(card.hashCode());
+		System.out.println(card2.hashCode());
+		System.out.println(card3.hashCode());
+
+		String str = "JICA";
+		String str2 = new String("JICA");
+		System.out.println(str==str2);  //false
+		System.out.println(str.equals(str2)); //true
+
+		System.out.println(str.hashCode());
+		System.out.println(str2.hashCode());
+	}
+}
 ```
+
++ 독특한 클래스
+  - 1) Object -- 자바의 모든 클래스의 조상클래스
+  - 2) Class  -- 특정객체를 생성한 클래스에 대한 정보를 표현하는 클래스
+
 ##### 2.2. Object equals() 메서드
 +
 
