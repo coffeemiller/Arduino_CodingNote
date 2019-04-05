@@ -6524,8 +6524,9 @@ public class StringTest2 {
 		System.out.println("전주".compareTo("군산"));
 
 		//두문자열을 합쳐서 하나의 문자열을 만드는 메서드
-		String city3 = city + city2;  //"전주군산"
-		String city4 = city.concat(city2); //"전주군산"
+    String city4 = city.concat(city2).concat("임실"); //"전주군산임실"
+		System.out.println(city3);
+		System.out.println(city4);
 	}
 }
 ```
