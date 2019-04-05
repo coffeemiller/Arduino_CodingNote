@@ -6399,10 +6399,138 @@ public class StringTest {
 ### [2019-04-05]
 
 #### 1. Review
++ 편의점 문제
+  - 정산하다 메서드 기능구현(4시이후 분석하여 이해하자)
++ 문자열관련클래스 학습
++ 1) java.lang 패키지의 String, StringBuffer, StringBuilder
++ 2) java.util 패키지의 StringTokenizer, StringJoiner
+
++ String : 문자열을 나타내는 클래스이다. 실제내부멤버변수로 char[]이 있다.
++ String 클래스로 만들어진 객체의 내부내용을 최초 생성시 결정되면 프로그램 끝까지 그 내용을 변경할 수 없다.
+  - 상수성격을 가졌다.(상수성격:한번 값이 정해지면 변경되지 않음.)
+  - 다른표현으로변경 불가능한 클래스(immutable)라고도 한다.
+
+```java
+String title  = "JICA";
+//title 0x200              "JICA"   //JICA문자열 자체의 값은 프로그램 끝까지 변경되지 않는다.
+//         |-------------->"Jeonju" //단, 참조변수 title 다른값을 가질수도 있다.
+System.out.println(title); //JICA
+
+title = "Jeonju";
+System.out.println(title); //Jeonju
+```
++ 문자열 비교시 등가비교연산자는 참조값을 비교한다.
++ equals()메서드는 참조값의 내용값을 비교한다.
++ 참고) 에디터에서 class파일 열면 '이진'으로 깨진다. 화일내요을 byte단위로 그대로 보여주는 프로그램 Binary Editor를 활용해야한다. ==>두가지 기능을 동시에 실행하는 프로그램으로 울트라 에디터 혹은 Notepad++ 등 여러가지가 있다.
+```java
+class StringEx1 {
+	public static void main(String[] args) {
+		String str1 = "abc";
+		String str2 = "abc";
+
+		System.out.println("JICA");
+		System.out.println("\"JICA\"");
+		System.out.println("---------------------------------------------");
+		System.out.println("String str1 = \"abc\";");
+		System.out.println("String str2 = \"abc\";");
+
+		System.out.println("str1 == str2 ?  " + (str1 == str2));
+		System.out.println("str1.equals(str2) ? " + str1.equals(str2));
+		System.out.println();
+
+		String str3 = new String("\"abc\"");
+		String str4 = new String("\"abc\"");
+
+		System.out.println("String str3 = new String(\"abc\");");
+		System.out.println("String str4 = new String(\"abc\");");
+
+		System.out.println("str3 == str4 ? " + (str3 == str4));
+		System.out.println("str3.equals(str4) ? " + str3.equals(str4));
+		System.out.println("---------------------------------------------");
+
+		String strA = "";
+		String strB = new String();
+		String strC = null;
+
+		System.out.println(strA.length()); //ok
+		System.out.println(strB.length()); //ok
+		System.out.println(strC.length()); //NullPointException발생
+
+		char ch = ' ';      // 빈공백
+		char ch2 = '';      // 문법에러
+		char ch3 = '\u0000';  //문자형기억장소인데 현재 값이 아무것도 없다.
+
+		int arr[] = new int[3];      //요소갰수가 3개인 정상배열
+		int arr2[] = new int[1];     //굳이 배열을 쓰지 않아도 값을 표현할수 있다.
+		int arr3[] = new int[0];     //요소갯수가 0개인 정상배열
+	}
+}
+```
+
++ 자주 사용되는 주요 메서드들
+```java
+package com.jica.string;
+public class StringTest2 {
+	public static void main(String[] args) {
+		//생성자
+		String str = new String();           //빈 문자열
+		String str2 = new String("Android");
+		String str3 = new String(str2);
+		char chs[] = {'j','e','o','n','j','u'};
+		String str4 = new String(chs);
+		String str5 = new String(chs, 4,2);
+		//이외의 byte[]을 인자로 받아들이는 생성자들은 이후에
+		//file 입출력인 네트웍으로 데이타를 전송할때 주소 사용한다.
+
+		//str  0x100 -------->""
+		//str2 0x200 -------->"Android"
+		//str3 0x300 -------->"Android"
+		//str4 0x400 -------->"jeonju"
+		//str5 0x500 -------->"ju"
+
+		//자주 사용되는 주요 메서드들
+		String title = new String("전주 JICA jeonju");
+		//                     01 234567890123
+		//str 0x700 --------->"전주 JICA jeonju"
+		System.out.println(title.length()) ; //14(문자의개수, 한글1글자도 1로취급
+		System.out.println(title.isEmpty()); //false
+		System.out.println(str.isEmpty());   //true
+		System.out.println(title.charAt(0));   //'전'
+		System.out.println(title.charAt(9));   // 'e'
+		for(int i=0; i<title.length(); i++) {
+			char ch = title.charAt(i);
+			System.out.println(ch);
+		}
+		//두문자열의 대소관계 비교
+		//public int compareTo​(String anotherString)
+		//리턴값이 0  : 두문자열이 같다.
+		//리턴값이 양수 : 앞의 문자열이 크다
+		//리턴값이 음수 : 뒤의 문자열이 크다
+		String subject  = "Java";
+		String subject2 = "Java";
+		String subject3 = "Job";
+		String subject4 = "Jaba";
+
+		System.out.println(subject.compareTo(subject2)); // 0
+		System.out.println(subject.compareTo(subject3)); // 'a'의 코드값 97 - 'o'의코드값 111 ==> -14
+		System.out.println(subject.compareTo(subject4));  // 20
+
+		String city = "전주";
+		String city2 = "군산";
+		System.out.println(city.compareTo(city2));
+
+		//특이한 형태의 코드
+		System.out.println("Android".length());
+		System.out.println("전주".compareTo("군산"));
+
+		//두문자열을 합쳐서 하나의 문자열을 만드는 메서드
+		String city3 = city + city2;  //"전주군산"
+		String city4 = city.concat(city2); //"전주군산"
+	}
+}
+```
 #### 3. 실습
 #### 4. Summary / Close
-
-
 
 
 
