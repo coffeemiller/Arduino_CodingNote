@@ -6530,6 +6530,122 @@ public class StringTest2 {
 	}
 }
 ```
+
+```java
+public class StringTest3 {
+	public static void main(String[] args) {
+		//특정 문자열을 포함하고 있는지 여부
+		//public boolean contains​(CharSequence s)
+		//위의 메서드는 CharSequence를 인자로 사용한다.
+		//CarhSequence는 interface이고 이를 String, StringBuffer, StringBuilder클래스가
+		//구현해서 만들어졌다.
+		//결과적으로 인자정보로 우리는 위의 자료형을 다 사용할수 있다는 의미다.
+
+		String str = "전주 jeonuju 안드로이드 jica Oracle";
+		//str문자열 내부에 jica가 포함되어 있는지 알고 싶다.
+		String target = "MS SQL";
+		if( str.contains(target)) {
+			System.out.println(target +" 이(가) 포함되어 있습니다.");
+		}else {
+			System.out.println(target + " 이(가) 포함되어 있지 않습니다.");
+		}
+
+		//문자열을 byte[]배열로 만들어주는 메서드
+		//생성자 String(byte[])와 대조적인 역활을 수행한다.
+
+		//public byte[] getBytes​()
+		String title = "JICA";
+		byte bTitle[] = title.getBytes();
+
+		//String클래스의 hashcode()메서드
+		//같은 문자열이면 같은 hashcode()를 리턴한다.
+		System.out.println("Jeonju".hashCode());
+		String city = new String("Jeonju");
+		System.out.println(city.hashCode());
+
+		//문자열 내부에서 단일문자나 문자열의 시작위치를 알려주는 메서드
+		/*public int lastIndexOf​(int ch, int fromIndex)
+		 * public int lastIndexOf​(String str)
+		 * public int lastIndexOf​(String str, int fromIndex)
+         * public String substring​(int beginIndex)
+		 */
+		System.out.println("검색 원본 문자열 : "+str);
+		System.out.println(str.indexOf('j'));
+		System.out.println(str.indexOf('j',4));
+		System.out.println(str.indexOf('j',9));
+		System.out.println(str.indexOf('j', 18));  //-1
+		//str내부에 'j'문자의 위치를 모두 알아보자.
+
+		System.out.println("검색 원본 문자열 : "+str);
+		System.out.println(str.indexOf("jica"));
+
+		//indexOf()는 앞부분부터 차례로 검색
+		//lastIndexOf() 뒷부분부터 역순으로 차례로 검색
+		//사용법은 indexOf()와 동일하다.
+		System.out.println(str.lastIndexOf('j'));
+
+		//문자열내부의 특정문자를 다른문자로 변경하는 메서드
+		//"mesquite in your cellar".replace('e', 'o');
+        //"mosquito in your collar"
+		//"the war of baronets".replace('r', 'y')
+        //returns "the way of bayonets"
+
+		//문자열 내부에 특정부분문자열을 다른 부분문자열로 대체시킨다.
+		//public String replace​(CharSequence target, CharSequence replacement)
+		String str2 = "seoul, busan, jeonju, jeju, kimje";
+		System.out.println("str2 : "+str2);
+		String str3 = str2.replace("ju", "JICA");
+		System.out.println(str3);
+
+		//문자열에서 지정한 위치의 부분문자열을 발췌하는 메서드
+		//public String substring​(int beginIndex)
+		//public String substring​(int beginIndex, int endIndex)
+		String phone = "010-7242-9424";
+		String phone2 = phone.substring(4);
+		String phone3 = phone.substring(4,8);;
+		System.out.println(phone);;
+		System.out.println(phone2);;
+		System.out.println(phone3);;
+
+		//문자열을 char[]로 만들어준다.
+		//public char[] toCharArray​()
+		System.out.println("title : "+title);
+		char chTitle[] = title.toCharArray();
+		System.out.println(Arrays.toString(chTitle));
+
+		//문자열 앞뒤의 공백문자를 제거하는 메서드
+		//public String trim​()
+		String sample = "  JICA abc ";
+		System.out.println("|"+sample+"|");
+		String trimSample = sample.trim();
+		System.out.println("|"+trimSample+"|");
+
+		/* 기본자료형을 문자열로 만드는 static메서드
+		 * static String	valueOf​(boolean b)
+		 * static String	valueOf​(char c)
+		 * static String	valueOf​(char[] data)
+		 * static String	valueOf​(char[] data, int offset, int count)
+		 * static String	valueOf​(double d)
+		 * static String	valueOf​(float f)
+		 * static String	valueOf​(int i)
+		 * static String	valueOf​(long l)
+		 * static String	valueOf​(Object obj)
+		 */
+		//기존방법으로 기본자료형 + 문자열 ==> 문자열
+		//String strYear = 2019 + "";
+		//새로운 방법....
+		int year = 2019;
+		String strYear = String.valueOf(year);
+	}
+}
+```
+
++ 교재) String 클래스의 join()와  유사기능을 가진 StringJoiner클래스 사용법
+
+##### 4시 이후 과제
++ ```String str = "전주 jeonuju 안드로이드 jica Oracle";``` 일때, str내부에 'j'문자의 위치를 모두 알아보는 프로그램 코드작성.
+
+
 #### 3. 실습
 #### 4. Summary / Close
 
