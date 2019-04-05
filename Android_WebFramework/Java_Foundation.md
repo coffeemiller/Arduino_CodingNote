@@ -6641,6 +6641,50 @@ public class StringTest3 {
 ```
 
 + 교재) String 클래스의 join()와  유사기능을 가진 StringJoiner클래스 사용법
+```java
+package com.jica.chap09;
+import java.util.StringJoiner;
+class StringEx5 {
+	public static void main(String[] args) throws Exception {
+		String str = "가";
+
+		//String클래스의 getBytes()메서드는 문자열을 char[]로 만들어 준다.
+		//그런데 문자열이 현재 어느 문자셋을 적용하는지에 결과가 달라질수도 있다.
+		//그래서 byte[]로 만들때 아래처럼 문자셋을 지정할수 있도록 했다.
+		//-----------------------------------------------------------------------
+		byte[] bArr  = str.getBytes("UTF-8");  //한글1글자를 3byte사용
+		byte[] bArr2 = str.getBytes("CP949");  //한글1글자를 2byte사용
+		System.out.println("UTF-8:" + joinByteArr(bArr));
+		System.out.println("CP949:" + joinByteArr(bArr2));
+		System.out.println("UTF-8:" + new String(bArr,  "UTF-8"));
+		System.out.println("CP949:" + new String(bArr2, "CP949"));
+	}
+
+	static String joinByteArr(byte[] bArr) {
+		StringJoiner sj = new StringJoiner(":", "[", "]");
+		for(byte b : bArr)
+			sj.add(String.format("%02X",b));
+		return sj.toString();
+	}
+}
+//////////////////////////////////////////////////////
+public class FormatTest {
+	public static void main(String[] args) {
+		String name = "홍길동";
+		int score = 85;
+
+		System.out.println(name+","+score);
+		System.out.printf("%s,%d%n", name, score);
+		String result = String.format("%s,%d", name, score);
+		System.out.println(result);
+
+		byte value = -22;
+		String hexValue = String.format("%02X", value);
+		System.out.println(hexValue);
+	}
+}
+
+```
 
 ##### 4시 이후 과제
 + ```String str = "전주 jeonuju 안드로이드 jica Oracle";``` 일때, str내부에 'j'문자의 위치를 모두 알아보는 프로그램 코드작성.
