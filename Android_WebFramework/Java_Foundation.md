@@ -6683,7 +6683,49 @@ public class FormatTest {
 		System.out.println(hexValue);
 	}
 }
+/////////////////////////////////////////////////////
+class StringEx6 {
+	public static void main(String[] args) {
+		int iVal = 100;
+		String strVal = String.valueOf(iVal); // int를 String으로 변환한다.
 
+		double dVal = 200.0;
+		String strVal2 = dVal + ""; // int를 String으로 변환하는 또 다른 방법
+
+		// 그동안 키보드로 문자열을 입력받아 정수나 실수로 마들때 사용했던 메서드
+		// 문자열 "200" -----> 정수 200
+		// Interger.parseInt("200") ==> 200
+		// Double.parseDouble("200.0") ==> 200.0
+		double sum = Integer.parseInt("+" + strVal) + Double.parseDouble(strVal2);
+		double sum2 = Integer.valueOf(strVal) + Double.valueOf(strVal2);
+
+		// String클래스의 valueOf()는 기본자료형을 String형으로 만든다.
+		// 문자열을 정수로 만드는 메서드 Integer.valuOf("문자숫자") ==> 정수
+		// 문자열을 실수로 만드는 메서드 Double.valuOf("문자숫자") ==> 실수
+		System.out.println(String.join("+" + strVal, "+", strVal2, "=") + sum);
+		System.out.println(strVal + "+" + strVal2 + "=" + sum2);
+
+		// 실습만 해보고
+		// Wrapper 클래스(Byte, Short, Integer, Long, Float, Double, Boolean) 를 학습할때
+		// 자세한 사용법을 정리하겠습니다.
+	}
+}
+/////////////////////////////////////////////////////
+class StringEx7 {
+	public static void main(String[] args) {
+		String fullName = "Hello.java";
+		// fullName에서 '.'의 위치를 찾는다.
+		int index = fullName.indexOf('.');
+		// fullName의 첫번째 글자부터 '.'이 있는 곳까지 문자열을 추출한다.
+		String fileName = fullName.substring(0, index);
+    // '.'의 다음 문자 부터 시작해서 문자열의 끝까지 추출한다.
+		// fullName.substring(index+1, fullName.length());의 결과와 같다.
+		String ext = fullName.substring(index+1);
+
+		System.out.println(fullName + "의 확장자를 제외한 이름은 " + fileName);
+		System.out.println(fullName + "의 확장자는 " + ext);
+	}
+}
 ```
 
 ##### 4시 이후 과제
