@@ -6809,6 +6809,101 @@ String strB = new StringBuffer("JICA");
   - 삽입(insert) : 맨앞이나 중간에 추가  
   - 삭제(delete) : 지정된 위치의 값을 삭제하거나 검색해서 삭제기능을 수행          
 
+#### 3. Math : 수학관련기능을 제공하는 클래스(관련있는 데이터와 메서드)
++ 모든 메서드가 public static이다.
++ 참고) 다른 패키지 클래스를 사용할때는 import구문을 사용하였다.
+  - 특정 클래스의 static멤버를 손쉽게 사용하는 것을 지원하기 위해 static import
+```
+import static java.lang.Math.*;
+import static java.lang.System.*;
+
+Math클래스에
+round() : 반올림
+ceil() : 무조건 올림
+floor() : 버림 기능
+.....................을 지원하는 메서드가 있다.
+기타 수학함수들 log, 지수, 삼각함수 등등의 함수들이 지원된다.
+```
+
+```java
+//java.lang패키지의 클래스는 생략해도 사용가능핟.
+//import java.lang.Math;
+import static java.lang.Math.PI;
+import static java.lang.System.out;
+
+public class MathTest {
+	public static void main(String[] args) {
+		System.out.println("Math.PI ==> "+Math.PI);
+		System.out.println("Math.PI ==> "+PI);
+		//위처럼 코딩을 해도 PI가 Math.PI로 인식되어 처리되기를 원할때
+		//static멤버변수나 메서드는 객체생성없이 클래스이름으로만으로도 접근가능,
+		//static import를 사용하여 허용해 준다.
+
+		//어떠한 값을 출력하려면
+		//System.out.println("값");
+		//위의 코드에서 out객체도 System클래스의 static멤버변수이다.
+		System.out.println("static import사용법입니다.");
+		out.println("static import사용법입니다.");
+	}
+}
+////////////////////////////////////////////////////////////////////////////
+import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
+import static java.lang.Math.rint;
+import static java.lang.Math.round;
+import static java.lang.System.out;
+
+class MathEx1 {
+	public static void main(String args[]) {
+		//Math클래스는 수학계산에 필요한 상수를 가지고 있다.
+		System.out.println("Math.PI ==> "+Math.PI);
+		System.out.println("Math.E ==> "+Math.E);
+
+		//주요 메서드 사용법
+		double val = 90.7552;
+		out.println("round("+ val +")=" + round(val));  // 반올림
+		//위의 코드는 static import 구문으로 인해 축약(Math, System)해서 사용.
+
+		val *= 100;
+		out.println("round("+ val +")=" + round(val));  // 반올림
+
+		out.println("round("+ val +")/100  =" + round(val)/100);  // 반올림
+		out.println("round("+ val +")/100.0=" + round(val)/100.0);  // 반올림
+		out.println();
+		out.printf("ceil(%3.1f)=%3.1f%n",  1.1, ceil(1.1));   // 올림
+		out.printf("floor(%3.1f)=%3.1f%n", 1.5, floor(1.5));  // 버림
+		out.printf("round(%3.1f)=%d%n",    1.1, round(1.1));  // 반올림
+		out.printf("round(%3.1f)=%d%n",    1.5, round(1.5));  // 반올림
+		out.printf("rint(%3.1f)=%f%n",     1.5, rint(1.5));   // 반올림
+		out.printf("round(%3.1f)=%d%n",   -1.5, round(-1.5)); // 반올림
+		out.printf("rint(%3.1f)=%f%n",    -1.5, rint(-1.5));  // 반올림
+		out.printf("ceil(%3.1f)=%f%n",    -1.5, ceil(-1.5));  // 올림
+		out.printf("floor(%3.1f)=%f%n",   -1.5, floor(-1.5)); // 버림
+	}
+}
+```
++ 래퍼(Wrapper) 클래스 : 기본 자료형을 객체로 표현할때 사용하는 클래스들
+```
+boolean          Boolean
+char             Character
+byte             Byte
+short            Short
+int              Integer
+long             Long
+float            Float
+double           Double                        
+
+
+1. Character를 제외한 모든 Wrapper클래스는 아래형태의 생성자를 가졌다.
+(jdk 7.0이전 사용)
++ 래퍼클래스명(기본자료형) ===> 래퍼클래스형 래퍼클래스명.valueOf(기본자료형)
++ 래퍼클래스명(문자열) ===> 래퍼클래스형 래퍼클래스명.valueOf(기본자료형)
+
+그러나 생성자 대신 static 메서드 valuOf()사용을 권장한다.
+
+
+2. Wrapper클래스 객체는 상수성격을 가진다. 값을 변경할수 없다.
+```
 
 #### 3. 실습
 #### 4. Summary / Close
