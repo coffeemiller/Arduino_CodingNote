@@ -6884,6 +6884,11 @@ class MathEx1 {
 ```
 + 래퍼(Wrapper) 클래스 : 기본 자료형을 객체로 표현할때 사용하는 클래스들
 ```
+래퍼클래스의 상속 계층구조
+               Object
+    Boolean    Character        Number
+                      Byte,Short,Integer,Long,Float,Double , BigInteger, BigDecimal
+-----------------------------------------------------------------                      
 boolean          Boolean
 char             Character
 byte             Byte
@@ -6892,7 +6897,7 @@ int              Integer
 long             Long
 float            Float
 double           Double                        
-
+-----------------------------------------------------------------
 
 1. Character를 제외한 모든 Wrapper클래스는 아래형태의 생성자를 가졌다.
 (jdk 7.0이전 사용)
@@ -6903,7 +6908,42 @@ double           Double
 
 
 2. Wrapper클래스 객체는 상수성격을 가진다. 값을 변경할수 없다.
+
+3. []문자열 -----> 숫자로 변환]
+byte Byte.parseByte("문자열숫자")
+int Integer.parseInt("문자열숫자")
+int Integer.parseInt("문자열숫자",10)  //10진수...2,8,16진수로 가능.
+short Short.parseShort("문자열숫자")
+long Long.parseFloat("문자열숫자")
+float Float.parrseFloat("문자열숫자")
+double Double.parseDouble("문자열숫자")
+---------------------------------------
+[문자열 ----> Wrapper클래스 객체]
+Byte Byte.valueOf("문자열숫자")
+Int Integer.valueOf("문자열숫자")
+Short Short.valueOf("문자열숫자")
+Long Long.valueOf("문자열숫자")
+Float Float.valueOf("문자열숫자")
+===========================================================================
+
+int Interger객체.intValue()
+byte Byte객체.byteValue()
+short Short객체.shortValue()
+float Float객체.floatValue()
+double Double객체.doubleValue()
+
+4. Wrapper객체와 기본자료형을 하나의 표현식에서 사용할때
+필요한 시점에서 자동으로 아래의 기능이 작동한다.
+  객체    ---> 기본자료형 (언박싱)
+기본자료형 ---> 객체 (오토박싱)
+
+Integer i = new Integer(100)
+Integer i = Integer.valueOf(100)
+=================================> Integer i = 100;
+int sum = i + 5; //ok
 ```
++ 여기까지가 java.lang패키지의 기본 클래스들이다.
++ 이제 java.lang 혹은 java.util 패키지에서 우리가 자주사용하는 클래스들을 살펴보자.
 
 #### 3. 실습
 #### 4. Summary / Close
