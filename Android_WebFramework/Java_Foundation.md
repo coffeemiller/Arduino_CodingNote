@@ -6700,8 +6700,8 @@ class StringEx6 {
 		double sum2 = Integer.valueOf(strVal) + Double.valueOf(strVal2);
 
 		// String클래스의 valueOf()는 기본자료형을 String형으로 만든다.
-		// 문자열을 정수로 만드는 메서드 Integer.valuOf("문자숫자") ==> 정수
-		// 문자열을 실수로 만드는 메서드 Double.valuOf("문자숫자") ==> 실수
+		// 문자열을 정수로 만드는 메서드 Integer.valueof("문자숫자") ==> 정수
+		// 문자열을 실수로 만드는 메서드 Double.valueof("문자숫자") ==> 실수
 		System.out.println(String.join("+" + strVal, "+", strVal2, "=") + sum);
 		System.out.println(strVal + "+" + strVal2 + "=" + sum2);
 
@@ -6776,7 +6776,7 @@ String idno = "8912131238235";
 
 -----------------------------------------------------------
 
-### [2019-04-06]
+### [2019-04-08]
 
 #### 1. Review
 + 문제풀이(주민번호검증문제 - com.jica.idno)
@@ -6904,7 +6904,7 @@ double           Double
 + 래퍼클래스명(기본자료형) ===> 래퍼클래스형 래퍼클래스명.valueOf(기본자료형)
 + 래퍼클래스명(문자열) ===> 래퍼클래스형 래퍼클래스명.valueOf(기본자료형)
 
-그러나 생성자 대신 static 메서드 valuOf()사용을 권장한다.
+그러나 생성자 대신 static 메서드 valueof()사용을 권장한다.
 
 
 2. Wrapper클래스 객체는 상수성격을 가진다. 값을 변경할수 없다.
@@ -6945,5 +6945,291 @@ int sum = i + 5; //ok
 + 여기까지가 java.lang패키지의 기본 클래스들이다.
 + 이제 java.lang 혹은 java.util 패키지에서 우리가 자주사용하는 클래스들을 살펴보자.
 
++ 1) java.util.Arrays
+  - Arrays클래스는 배열관련 유용한 기능을 제공해주고 있다.
+  - 배열 전체요소값을 문자열로 만들어서 출력할때 사용 ==> Arrays.toString(배열)
+
++ 2) java.util.Objects
+  - 객체관련 유용한 static메서드로 제공해 주고 있다. 기능만 예제로 확인!
+=====================================================================
+==> 위 두 클래스는 필요한 사람만 가져다 써라!!
+
++ 3) java.util.Random 클래스
+  - 자바에서는 난수를 발생시킬때
+```
+double Math.random() ==> 0.0 ~ 1.0 사이의 임의값을 발생시켜 준다.
+
+이보다 좀더 다양학 난수발생을 지원하는 클래스를 만들어 놓았다.
+단, Ramdom클래스는 객체를 생성하고 사용해야 한다.
+```
+```java
+import java.util.Arrays;
+import java.util.Random;
+
+public class RandomTest {
+	public static void main(String[] args) {
+		// 1~100사이의 난수 5개 발생하여 배열에 저장
+		int a[] = new int[5];
+
+		for (int i = 0; i < a.length; i++) {
+			a[i] = (int)(Math.random() * 100) + 1;
+		}
+		System.out.println(Arrays.toString(a));
+
+		int b[] = new int[5];
+		Random r = new Random();  //난수발생전용 객체
+		for (int i = 0; i < b.length; i++) {
+			b[i] = r.nextInt(100) + 1;
+		}
+		System.out.println(Arrays.toString(b));
+
+		//난수전용 메서드들이다양하게 준비되어있다.
+		for (int i = 0; i < b.length; i++) {
+			System.out.println(r.nextBoolean());   // nextInt()
+			                                       // nextInt(int)
+			                                       // nextBoolean()
+		}
+
+		System.out.println("--------------------------------------------");
+		Random r2 = new Random(100);  //seed값
+		for (int i = 0; i < b.length; i++) {
+			System.out.println(r2.nextInt(100));
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////////
+import java.util.Arrays;
+
+class RandomEx3 {
+	public static void main(String[] args) {
+		for(int i=0; i < 10;i++)
+			System.out.print(getRand(5, 10)+",");
+		System.out.println();
+
+		int[] result = fillRand(new int[10], new int[]{ 2, 3, 7, 5});
+
+		System.out.println(Arrays.toString(result));
+	}
+
+	//아래의 메서드는 저자가 난수와 관련딘 메서드를 만들어 놓은 것이다.
+	public static int[] fillRand(int[] arr, int from, int to) {
+		for(int i=0; i < arr.length; i++) {
+			arr[i] = getRand(from, to);
+		}
+		return arr;
+	}
+
+	//arr : 난수를 발생시켜 저장할 배열
+	//data : 발생할 난수의 값들이저장된 배열
+	public static int[] fillRand(int[] arr, int[] data) {
+		for(int i=0; i < arr.length; i++) {
+			arr[i] = data[getRand(0, data.length-1)];
+		}
+		return arr;
+	}
+
+	//from : 난수발생 시작범위 값
+	// to  : 난수발생 끝 값
+	public static int getRand(int from, int to) {
+		return (int)(Math.random() * (Math.abs(to-from)+1)) + Math.min(from, to);
+	}
+}
+```
+
++ 난수관련 교재예제를 살펴보고 필요할때 해당메서드를 가져다 사용하세요(유용).
+
++ 505page 이하 정규식 부분은 생략!! (관심있는 사람만~)
+
+#### [반드시 학습해주세요!!!]
++ 1. Object
+  - toString() ==> 패키지명.클래스명@16진수 해쉬코드값....@@@ 현재까지의 상태를 대표하는 문자열을 리턴
+  - equals() ==> 두객체의 참조값 비교.....@@@ 내용값이 같으면 같은 객체로 취급(true)
+  - hashCode() ==> 모든 객체의 hashCode값은 다르다......@@@ 내용값이 같으면 hashCode값도 같도록 리턴
+
+
++ 2. 얕은복사와 깊은복사
+  - 1) 얕은 복사는 같은 참조값을 가지게 하는것
+  - 2) 깊은 복사는 새로운 공간을 확보한 후, 같은 내용값을 복사해서 저장한것
+
+
++ 3. 문자열관련 클래스
+  - 1) String과 StringBuffer, StringBuilder의 차이점  => 내용값 변경 불가능(immutable)
+  - 2) 생성
+```java
+new String();
+new String("JICA");
+new String(new char[]{'J','I','C','A'});
+
+String str = new String("Jeonju JICA");
+str.charAt(5);  //'u'
+str.length();   //11
+str.indexOf('o');  //3
+str.indexOf("ju"); //4
+str.indexOf('x');   // -1
+
+str.compareTo("jeju");  //-32
+str.equal("문자열");
+str.getBytes();
+str.replace('j', 'X');
+str.replace("ju", "jjjj");
+
+str.substring(3);
+str.substring(3, 7);
+
+str.trim();  //앞뒤 공백제거
+
+String.valueOf(기본자료형값) ==> String객체
+```
+
+  - 3) StringBuffer
+    - append(), insert(), delete()등의 메서드를 사용하여 내용값을 변경할수 있다.
+
+
++ 4. Math클래스
+  - Math.PI, Math.E
+  - Math.round()
+  - Math.floor()
+  - Math.random()
+
+
++ 5. Wrapper클래스
+```
+기본형 -----> 객체
+int          Integer
+byte         Byte
+boolean      Boolean
+........
+
+생성자(기본형값), 생성자(문자열)  ===(대신)===> 래퍼클래스.valueOf("문자열") / 래퍼클래스.valueOf(기본형)
+
+오토박싱(기본형이 객체형으로 자동으로...), 언박싱(객체가 자동으로 기본형으로...)
+
+//문자열    ------->    숫자
+Integer.parseInt("문자열숫자");
+Double.parseDouble("문자열숫자");
+Byte.parseByte("문자열숫자");
+```
+
++ 6. Object, Arrays 참고만하자.
+
++ 7. Random 클래스
+```
+  Random r = Random();
+  Random r2 = Random(정수값)
+
+  r.nextInt();
+  r2.nextInt();
+
+  //좀더편리하게 정수, 실수, 논리값들도 난수로 발생시킬수 있다.
+  nextInt(), nextInt(정수), nextBoolean(), nextDouble()....
+
+  //교재의 예제에서 유용한 샘플은 기억해두자.
+```
+
+```java
+//Item.java
+package com.jica.review;
+public class Item {
+	String title;
+	int price;
+
+	public Item() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Item(String title, int price) {
+		super();
+		this.title = title;
+		this.price = price;
+	}
+
+	public int getPrice() {
+		return price;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	@Override
+	public String toString() {
+		return "Item [title=" + title + ", price=" + price + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Item other = (Item) obj;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+}
+///////////////////////////////////////////////////////////////////////////
+//ItemTest.java
+package com.jica.review;
+public class ItemTest {
+	public static void main(String[] args) {
+		Item item = new Item("새우깡", 800);
+		Item item2 = new Item("콜라", 950);
+		Item item3 = new Item("새우깡", 1000);
+
+		System.out.println(item);
+		System.out.println(item2.toString());
+		System.out.println(item3);
+
+		System.out.println(item==item3);
+		System.out.println(item.equals(item3));
+		System.out.println(item.hashCode());
+		System.out.println(item3.hashCode());
+		System.out.println("-----------------------------------------");
+
+		Item item4 = item; // 같은 참조값을 가졌으므로 얕은복사라고 한다.
+
+		//아래의 코드는 별도의 메모리공간에 내용값을 복사해서 가지고 있다.
+		Item item5 = new Item(item.title, item.price);
+		System.out.println(item4);
+		System.out.println(item5);
+	}
+}
+```
+
+#### [오늘 해야할 일]
++ 4/22.... 마지막 과정에서 Project를 진행합니다.
+  - 이때 만들고 싶은 app에 대해서 기획해서 발표하고 팀을 결정합니다.
+  - 프로젝트 기획서를 작성해 봅시다. 이번주는 자유롭게 생각해보는 시간, 조사하는 시간.
+
++ 오늘까지의 내용을 복습해주세요.
+
+
 #### 3. 실습
+
 #### 4. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-04-09]
+
+#### 1. Review
