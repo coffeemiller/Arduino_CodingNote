@@ -7373,6 +7373,27 @@ public class ArrayListTest2 {
 }
 ```
 
++ 실제로 사용하게 되는 클래스 사용법
++ 1. List구조
+  - 1) ArrayList
+```
+//추가/삽입
+void	add​(int index, E element)
+boolean	add​(E e)
+
+//읽기/쓰기
+E	get​(int index)
+E	set​(int index, E element)
+
+//검색
+int	indexOf​(Object o)
+
+//부가정보 얻기
+boolean	isEmpty​()
+int	size​()
+
+```
+
 #### 3. List
 
 #### 4. Set
