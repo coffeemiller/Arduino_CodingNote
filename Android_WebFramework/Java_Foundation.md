@@ -7233,8 +7233,145 @@ public class ItemTest {
 ### [2019-04-09]
 
 #### 1. Review
+#### 2. 컬렉션 프레임웍(Collections Framework)
++ 자료구조(Data structure) : 대량의 데이터를 관리하는 방법
+  - 1) 저장하는 구조와 저장하는 방법
+  - 2) 검색 / 정렬
+  - 3) 삽입(추가)
+  - 4) 수정
+  - 5) 삭제
+  - 6) 그외....
 
-#### 2. Collections Framework
++ 물리적으로 데이터를 저장하는 구조가 2가지가 있다.
+  - 첫번째 : 배열사용 => 최초생성시 최대크기가 정해져 있다(단점). 첨자가 사용하므로 검색속도가 빠르다(장점).
+```
+삽입, 삭제에 효율이 떨어진다.
+ 0 1 2 3 4 5
+|7|2|5|8| | |
+두번째(3)위치에 9를 삽입하려면 기존데이터를 이동시킨후 저장시켜야 한다.
+|7|2|9|5|8| |
+첫번째(1)위치에 2를 삭제하려면 뒤쪽의 데이터를 앞으로 이동시켜야 한다.
+|7|9|5|8| | |
+```
+  - 두번째 : Link를 사용하는 방법 ==> 데이터를 저장하기 위해 노드를 이용. 데이터 무한정(장정)/검색속도 느림(단점)
+```
+데이터 + Link  <==  노드(Node)
+
+메모리가 허용하는 한 무한정의 데이터를 관리할 수 있다.
+검색시 link를 차례로 찾아들어가야 하므로 속도가 느리다.
+배열과 대조적으로 삽입, 삭제가 용이하다.
+-------          -------        -------
+7 0x100--------->2 0x200-------->8 null
+
+세번째(2)위치에 9를 삽입하려면 새로운 노드를 확보후 링크만 조정하면 가능
+
+두번째(1)위치에 2를 삭제하려면 이전 노드의 링크만 조정하면 가능
+```
+
++ 자료구조의 구분
+  - 1) 선형구조 : 순서가 중요한 데이터 관리(처음/마지막, 이전/다음)
+    - 순수선형구조 : 데이터의 삽입과 삭제를 자유롭게 수행.  ==> List구조
+    - 제한된 선형구조 : 데이터의 삽입과 삭제위치가 제한된다.
+      - 스택(stack) ==> 삽입/삭제위치가 하나이다(LIFO:후입선출) : 막다른 골목의 자동차 주차.
+      - 큐(queue) ==> 삽입/삭제위치가 별도로 존재(FIFO:선입선출) : 택시정류장의 손님대기줄.
+
+  - 2) 비선형구조 : 순서보다는 계층적 구조가 중요
+    - 트리구조(이진트리) : 부모노드, 자식노드, 부모노드는 최대 2개의 자식노드만 가질수 있다.
+    - 그래프 구조 : 모든게 트리구조와 동일하나 부모노드가 여러개일수 있다.
+      - 네비게이션 길찾기, html문서의 링크, 댐에서의 방류량계산
+
++ 위의 기능을 가진 클래스를 Java언어에서 모두 제공하고 있다. 이것을 컬렉션 프레임워크의 클래스라 부른다.
+  - 컬렉션(Collection) ==> 대량의 데이터
+  - 프레임워크(Framework) ==> 표준화된 설계기법을 적용하여 만들어진 다양한 클래스들의 집합.
+    - 개발시 공유가 쉽고 유지보수가 편리... 사용하기 쉽다.
+    - interface 3개를 통해 구현. <<interface>> Collection / <<interface>> List / <<interface>> Set
+    - 독립적인 <<interface>> Map
+![Collection Interface](collection.png "Collection인터페이스")
+![Java Collection 구조](java_collection.jpg "Java Collection 구조")
+```
+
+```
+
+```java
+//ArrayListTest.java
+import java.util.ArrayList;
+import java.util.Date;
+public class ArrayListTest {
+	public static void main(String[] args) {
+		// ArrayList의 사용법을 학습해보자
+		// ArrayList는 순서를 중요시하고 데이터 중복을 허용하는 데이터 집합.
+		// 단, 데이터는 반드시객체여야 한다.
+		//예전부터 사용하던 방법(각기 다른 종류의 데이터를 저장)
+		ArrayList list = new ArrayList();
+		list.add(10);      // autoBoxing  ==>  Integer.valueOf(10);
+		list.add("홍길동");    //add -> 데이터 추가
+		list.add(3.14);
+		list.add(new Date());
+
+		System.out.println(list.size());  //데이터 갯수
+
+		//현재까지의 모든 데이터 보기
+		System.out.println(list);    // 내부적으로 toString()을 작동.
+
+		list.add(2,"장길산");      // 중간에 데이터를 추가하는 삽입기능
+		System.out.println(list);
+
+		//순서번째 데이터 얻기
+		System.out.println(list.get(3));  //3번째 데이터 얻기
+		//3번째 데이터를 얻어서 변수에 저장하자
+		double value = (double)list.get(3); //내부적으로 언박싱작동하여 Double객체가 double형으로~
+		System.out.println(value);
+
+		Date someday = (Date)list.get(4);
+		System.out.println(someday);
+
+		//list 4번째 데이터값을 55로변경.
+		list.set(4, 55);
+		System.out.println(list);
+
+		int value2 = (Integer)list.get(4);
+		//데이터를 관리할때 몇번째 어떤 자료형의 값이 저장되어있는지 알고 있어야
+		//위 코드처럼 사용할 수 있다.
+		//그러나 수백개, 수천개, 수만개의 데이터를 관리할때....
+		//위 처럼 사용한는 것은 현실적으로 불가능하다.
+	}
+}
+//////////////////////////////////////////////////////////////////////////////
+//ArrayListTest2.java
+import java.util.ArrayList;
+public class ArrayListTest2 {
+	public static void main(String[] args) {
+		//ArrayList nameList = new ArrayList();
+		ArrayList<String> nameList = new ArrayList<String>();
+		//위 표현은 nameList에 저장되고 관리되는 모든 데이터는 String형이라는 의미다.
+		//이후 nameList를 사용하여 String만 취급할수 있다.
+		//이때 사용하는 문법을 type parameter라고 한다.
+
+		System.out.println(nameList.size());     //0
+		System.out.println(nameList.isEmpty());  //true
+
+		nameList.add("김동민");
+		nameList.add("빈태욱");
+		nameList.add("서영곤");
+		nameList.add("이형준");
+		nameList.add(3,"염상민");
+
+		System.out.println(nameList.size());
+		System.out.println(nameList);
+
+		nameList.add(nameList.size(),"임성현");
+		System.out.println(nameList);
+
+//		for (int i = 0; i < nameList.size(); i++) {
+//			String name = nameList.get(i);
+//		}
+
+		for (String name : nameList) {
+			System.out.println(name);
+		}
+	}
+}
+```
 
 #### 3. List
 
