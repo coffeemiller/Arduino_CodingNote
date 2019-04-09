@@ -7557,9 +7557,94 @@ int	size​()
 ```
 
 ```java
-/////////////////(실제 ArrayList를 사용할때의 예제)///////////////////////////////////////////////////////
-//ArrayListTest4.java
+/////////////////(실제 ArrayList를 사용할때의 예제)////////////////////////////
+//Item.java
+public class Item {
+	String title;
+	int price;
+	public Item() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Item(String title, int price) {
+		super();
+		this.title = title;
+		this.price = price;
+	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		return result;
+	}
+  //아래처럼 equals()메서드를 재정의 해놓으면
+  //사용하기가 편리하다 -- 꼭 재정의하라!!
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Item other = (Item) obj;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Item [title=" + title + ", price=" + price + "]\n";
+	}
+}
+//////////////////////////////////////////////////////////////////////////
+//ArrayListTest4.java
+public class ArrayListTest4 {
+	public static void main(String[] args) {
+		Item item = new Item("새우깡", 800);
+		Item item2 = new Item("코카콜라", 950);
+		System.out.println(item);
+		System.out.println(item2);
+		System.out.println("--------------------------------------------");
+
+		// Item객체를 여러개 관리하고 싶다.
+		ArrayList<Item> items = new ArrayList<Item>();
+		items.add(item);
+		items.add(item2);
+		items.add(1, new Item("김밥", 1200));
+		items.add(new Item("커피", 1500));
+		items.add(new Item("맥주", 1800));
+
+		System.out.println(items.size());
+		System.out.println(items);
+
+		// 검색
+		Item sItem = items.get(2);
+		System.out.println(sItem);
+
+		// 검색할때도 인자값으로 Item객체를 넘겨주어야 한다.
+		Item sItem2 = new Item();
+		sItem2.title = "담배";
+
+		int index = items.indexOf(sItem2);
+		// 위의 메서드를 사용하면 내부적으로 요소값들을 차례대로 추출하고
+		// equals(Object )메서드를 작동시킨다.
+		System.out.println("검색결과 index : " + index);
+
+		if (index != -1) { // 검색에 성공했다면
+			Item sItem3 = items.get(index);
+			System.out.println("가격은 " + sItem3.price + " 입니다.");
+		} else {
+			System.out.println(sItem2.title+"은 없는 상품입니다.");
+		}
+	}
+}
 ```
 ```
 대부분의 경우 ArrayList에서 관리하는 내용값은 사용자가 만든 클래스의 객체이다.
@@ -7576,18 +7661,100 @@ int	size​()
 
    //ArrayList를 이용
    ArrayList<Item> items = new ArrayList<Item>();
+
+=====================================================
+
+자바의 예전 버전 즉, 1.0 ~ 1.4까지에서는 ArrayList대신에 Vector클래스를 주로 사용.
+그렇지만, 컬렉션프레임워크가 1.5 즉 5.0버전부터 활성화되고 나서는...
+거의 Vector클래스를 사용하지 않고 대신에 ArrayList, LinkedList를 사용한다.
+Vector클래스의 기능은 ArrayList와 유사하다.(생략)
 ```
-#### 3. List
 
-#### 4. Set
+```java
+//ArrayListEx1.java
+import java.util.ArrayList;
+import java.util.Collections;
+class ArrayListEx1{
+	public static void main(String[] args) {
+		//대략 10정도의 데이터를 관리할 것이다.
+		ArrayList list1 = new ArrayList(10);
+		list1.add(new Integer(5)); //Integer.valueOf(5) 형태 권장.
+		list1.add(new Integer(4));
+		list1.add(new Integer(2));
+		list1.add(new Integer(0));
+		list1.add(new Integer(1));
+		list1.add(new Integer(3));
 
-#### 5. Map
+		System.out.println("list1 : "+list1);
 
-#### 6. 실습
+		ArrayList list2 = new ArrayList(list1.subList(1,4));
+		System.out.println("list2 : "+list2);
+		System.out.println("-----------------------------------------");
+
+		//사용자가 만든 메서드 호출
+		print(list1, list2);
+
+		Collections.sort(list1);	// list1과 list2를 정렬한다.
+		Collections.sort(list2);	// Collections.sort(List l)
+		print(list1, list2);
+
+		System.out.println("list1.containsAll(list2):" + list1.containsAll(list2));
+
+		list2.add("B");
+		list2.add("C");
+		list2.add(3, "A");
+		print(list1, list2);
+
+		list2.set(3, "AA");
+		print(list1, list2);
+
+		// list1에서 list2와 겹치는 부분만 남기고 나머지는 삭제한다.
+		System.out.println("list1.retainAll(list2):" + list1.retainAll(list2));
+		print(list1, list2);
+
+		//  list2에서 list1에 포함된 객체들을 삭제한다.
+		for(int i= list2.size()-1; i >= 0; i--) {
+			if(list1.contains(list2.get(i)))
+				list2.remove(i);
+		}
+		print(list1, list2);
+	} // main의 끝
+
+	static void print(ArrayList list1, ArrayList list2) {
+		System.out.println("list1:"+list1);
+		System.out.println("list2:"+list2);
+		System.out.println();		
+	}
+} // class
+///////////////////////////////////////////////////////////////////////
+//ArrayListEx2.java
+import java.util.*;
+class ArrayListEx2 {
+	public static void main(String[] args) {
+		final int LIMIT = 10;	// 자르고자 하는 글자의 개수를 지정한다.
+		String source = "0123456789abcdefghijABCDEFGHIJ!@#$%^&*()ZZZ";
+		int length = source.length();
+
+		//상위형클래스형으로 하위형 객체를 저장할수 있다.
+		List list = new ArrayList(length/LIMIT + 10); // 크기를 약간 여유 있게 잡는다.
+
+		for(int i=0; i < length; i+=LIMIT) {
+			if(i+LIMIT < length )
+				list.add(source.substring(i, i+LIMIT));
+			else
+				list.add(source.substring(i));
+		}
+
+		for(int i=0; i < list.size(); i++) {
+			System.out.println(list.get(i));
+		}
+	} // main()
+}
+```
+
+#### 3. 실습
 
 #### 7. Summary / Close
-
-
 
 
 -----------------------------------------------------------
@@ -7595,6 +7762,18 @@ int	size​()
 ### [2019-04-10]
 
 #### 1. Review
-#### 3. 실습
+#### 2. List
+#### 3. Set
+#### 4. Map
+#### 5. 실습
 
-#### 4. Summary / Close
+#### 6. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-04-11]
+
+#### 1. Review
+#### 5. 실습
+#### 6. Summary / Close
