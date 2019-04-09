@@ -7266,6 +7266,16 @@ public class ItemTest {
 세번째(2)위치에 9를 삽입하려면 새로운 노드를 확보후 링크만 조정하면 가능
 
 두번째(1)위치에 2를 삭제하려면 이전 노드의 링크만 조정하면 가능
+
+7 0x100--->2 0x400     |-> 5 0x300-----> 8 null
+                |      |  
+                |-> 9 0x200
+
+    첫번째(1)위치의 2를 삭제하려면  이전노드의 링크만 조정하면 가능                                                        
+7 0x400                |-> 5 0x300-----> 8 null
+      |                |  
+      |-----------> 9 0x200     
+
 ```
 
 + 자료구조의 구분
@@ -7279,6 +7289,9 @@ public class ItemTest {
     - 트리구조(이진트리) : 부모노드, 자식노드, 부모노드는 최대 2개의 자식노드만 가질수 있다.
     - 그래프 구조 : 모든게 트리구조와 동일하나 부모노드가 여러개일수 있다.
       - 네비게이션 길찾기, html문서의 링크, 댐에서의 방류량계산
+```
+
+```
 
 + 위의 기능을 가진 클래스를 Java언어에서 모두 제공하고 있다. 이것을 컬렉션 프레임워크의 클래스라 부른다.
   - 컬렉션(Collection) ==> 대량의 데이터
@@ -7289,6 +7302,30 @@ public class ItemTest {
 ![Collection Interface](collection.png "Collection인터페이스")
 ![Java Collection 구조](java_collection.jpg "Java Collection 구조")
 ```
+위의 기능을 가진 클래스를  Java언어에서 모두 제공하고 있다. 이것을 컬렉션 프레임워크의 클래스라고 부른다.
+컬렉션(Collection)   ==> 대량의 데이타
+프레임워크(Framework) ==> 표준화된 설계기법을 적용하여 만들어진 다양한 클래스들의 집합
+                     ----------------> 개발시 공유가 쉽고 유지보수가 편리
+                         ||            사용하기 쉽다.                                    
+                         ||
+                         VV
+                             아래처럼 3개의 interface를 제공하여 모든 클래스를 만들었다
+                  <<interface>>
+                   Collection
+
+             <<interface>>     <<interface>>         <<interface>>   
+                 List              Set                   Map
+                  ....            ....                   .....
+       -----------------------------------------------------------------           
+       ArrayList, LinkedList     HashSet, TreeSet    HashMap, TreeMap    
+       Stack, Queue
+       Vector(예전부터 지원)                             HashTable, Propertis(예전부터지원) : 하위버전 호환성을 위해 학습                   
+       -----------------------------------------------------------------                                  
+
+                  선형구조(순수선형,스택,큐)                           key-value의 쌍(pair)으로 데이타관리    
+                           순서가 중요                   순서는 중요하지 않다.         검색의 효율성에 집중                                 
+                           데이타중복 허용             데이타중복은 불허                       순서는 중요하지 않다.          
+                                                       key-중복불러, value-중복허용
 
 ```
 
@@ -7339,6 +7376,9 @@ public class ArrayListTest {
 //////////////////////////////////////////////////////////////////////////////
 //ArrayListTest2.java
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 public class ArrayListTest2 {
 	public static void main(String[] args) {
 		//ArrayList nameList = new ArrayList();
@@ -7362,13 +7402,123 @@ public class ArrayListTest2 {
 		nameList.add(nameList.size(),"임성현");
 		System.out.println(nameList);
 
-//		for (int i = 0; i < nameList.size(); i++) {
-//			String name = nameList.get(i);
-//		}
+		for (int i = 0; i < nameList.size(); i++) {
+			String name = nameList.get(i);
+		}
 
 		for (String name : nameList) {
 			System.out.println(name);
 		}
+
+		//내용값을 변경할때
+		nameList.add(4,"홍길동");
+		System.out.println(nameList);
+		nameList.set(4, "정우람"); //set()메서드를 사용하여 값을 변경
+		System.out.println(nameList);
+
+		//기존데이터에서 위치를 검색
+		int n = nameList.indexOf("최유리"); //있으면 위치값(index), 없으면 -1
+		if (n==-1) {
+			nameList.add("최유리");
+			System.out.println(nameList);
+		}
+		System.out.println(nameList.lastIndexOf("이형준"));
+
+		//순서번째의 데이터 삭제
+		String rName = nameList.remove(3);  //0~size()-1
+		System.out.println(rName+" 데이터가 삭제되었습니다.");
+
+		//검색해서 삭제
+		rName = "정우람";
+		if (nameList.remove(rName)) {
+			System.out.println(rName+" 데이터를 삭제했습니다.");
+		} else {
+			System.out.println(rName+" 데이터가 존재하지 않습니다.");
+		}
+		System.out.println(nameList);
+
+		if (!nameList.contains("황남수")) {
+			nameList.add(1,"황남수");
+		}
+
+		nameList.add(3,"황도연");
+		nameList.add("황세연");
+		nameList.add(0,"황인우");
+		System.out.println("정렬전 : "+nameList);
+
+		//데이터를 정렬하고 싶다면?
+		//1) Collections 클래스 : collection객체에게 범용적으로 유용한 메서드를 제공.
+		Collections.sort(nameList);
+		System.out.println("정렬후 : "+nameList);
+
+		//2) ArrayList의 sort(comparator)
+		//만약에 내림차순으로 정렬하고 싶다면? 비교하는 방법을 interface로 전달해주면 된다.
+		MyComparator comparator = new MyComparator();
+		nameList.sort(comparator);
+		System.out.println("정렬후(내림차순) : "+nameList);
+		System.out.println("-----------------------------------------------");
+
+		System.out.println(nameList.size());
+		//전체요소 삭제
+		nameList.clear();
+		System.out.println(nameList.size());
+		System.out.println(nameList);
+
+		int a[] = {7,2,3,6,9};
+		for (int i = 0; i < a.length-1; i++) {
+			for (int j = i+1; j < a.length; j++) {
+				if (a[i]>a[j]) {
+					int temp = a[i];
+					a[i] = a[j];
+					a[j] = temp;
+				}
+			}
+		}
+		System.out.println("정렬후 : " + Arrays.toString(a));
+	}
+}
+//Comparator interface는 정렬시 두값을 비교할때 사용되는 메서드를 가지고 있다.
+//int Compare(Object, Object)
+class MyComparator implements Comparator {
+	@Override
+	public int compare(Object o1, Object o2) {
+		String name1 = (String)o1;
+		String name2 = (String)o2;
+		//디버깅용
+		System.out.println(name1+", "+name1+"을(를) 비교합니다.");
+		return name2.compareTo(name1);
+	}
+}
+//////////////////////////////////////////////////////////////////////////////
+//ArrayListTest3.java
+import java.util.ArrayList;
+import java.util.List;
+public class ArrayListTest3 {
+	public static void main(String[] args) {
+		// "cities에 문자열을 관리하는데 대략 30개쯤 관리할것이다."라고 정보를 제공한 것.
+		// 이는 내부적인 효율성을 위해 작성한 것이지, 사용법 자체에는 아무런 차이X.
+		ArrayList<String> cities = new ArrayList<String>(30); // 30개의 공간확보????
+		cities.add("전주");
+		cities.add("고창");
+		cities.add("남원");
+		// .....
+		ArrayList<String> mountain = new ArrayList<String>();
+		mountain.add("모악산");
+		mountain.add("내장산");
+		mountain.add("학산");
+		mountain.add("남고산");
+		ArrayList<String> cities2 = new ArrayList<String>(cities);
+		cities2.add("임실");
+		// cities2.addAll(mountain);
+		cities2.addAll(2, mountain);
+		System.out.println("cities : " + cities);
+		System.out.println("cities2: " + cities2);
+		System.out.println(cities.size());
+		System.out.println(cities2.size());
+		// 기존 ArrayList를 분리하자
+		// List<E> subList​(int fromIndex,int toIndex)
+		List<String> cities3 = cities2.subList(1, 5);
+		System.out.println("cities3 : " + cities3);
 	}
 }
 ```
@@ -7387,13 +7537,46 @@ E	set​(int index, E element)
 
 //검색
 int	indexOf​(Object o)
+int	lastIndexOf​(Object o)
+boolean contains(Object o)  ==> 포함되어 있으면 true, 없으면 false
+
+//정렬
+Collections 클래스 sort() ==> 오름차순정렬
+void	sort​(Comparator<? super E> c)
+
+//삭제
+E	remove​(int index)
+boolean	remove​(Object o)
+void clear()
 
 //부가정보 얻기
 boolean	isEmpty​()
 int	size​()
 
+=======> ArrayListTest2.java(여기까지 반드시 이해!!!)
 ```
 
+```java
+/////////////////(실제 ArrayList를 사용할때의 예제)///////////////////////////////////////////////////////
+//ArrayListTest4.java
+
+```
+```
+대부분의 경우 ArrayList에서 관리하는 내용값은 사용자가 만든 클래스의 객체이다.
+-- 편의점 문제에서 20개의 품목을 관리할때
+   class Item{
+      String title;
+      int price;
+
+      //....
+   }
+   //객체 배열을 이용
+   Item items[] = new Item[20];
+
+
+   //ArrayList를 이용
+   ArrayList<Item> items = new ArrayList<Item>();
+```
 #### 3. List
 
 #### 4. Set
