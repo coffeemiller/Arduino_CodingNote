@@ -7751,6 +7751,35 @@ class ArrayListEx2 {
 	} // main()
 }
 ```
+##### [오늘의 과제]
++ 1. 오늘 학습내용 복습/질문
++ 2. 간단한 주소관리기능을 ArrayList로 작성해보기
+```java
+//간단한 신상명세 - 명함, 주소정보
+class Profile {
+  성명;
+  나이;
+  전화번호;
+  주소;
+  ....
+  생성자();
+  toString();
+  equals();
+}
+
+ProfileTest.java
+main() 메서드 내부 {
+  ArrayList<Profile> profiles = new ArrayList<Profile>();
+
+  Profile p = new Profile("홍길동",25,"010-1235-4367","전북 전주시 완산구 중화산동 521-40")
+
+  //주소록에 정보추가
+  profiles.add(p);
+  ....
+
+  //여러 메서드는 test해본다.
+}
+```
 
 #### 3. 실습
 
