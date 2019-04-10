@@ -8093,7 +8093,11 @@ class StackQueueEx {
 + 참고)
   - Iterator(단방향), ListIterator(양방향), Enumeration(예전버전)
   - 내부저장구조와 상관없이 전체구성요소를 1회 접근하게 하는 클래스
-  - 교재 614page를 읽오보기!!
+  - 교재 614page를 읽어보기!!
+
++ Arrays클래스 사용법 ==> 교재 624page
++ Comparator, Comparable ==> 인터페이스 사용법(내일 review 설명)
+
 #### 3. Set
 #### 4. Map
 #### 5. 실습
