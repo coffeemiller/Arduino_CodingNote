@@ -7861,9 +7861,89 @@ ArrayList는 내부에 배열을 사용하여 관리한다.
     - 큐 ----> 추가(offer), 삭제(poll)
 + 스택기능을 지원하는 독자적인 클래스가 존재한다. => Stack()
 + 큐기능을 지원하는 독자적인 클래스가 존재하지X. But! interface로 Queue가 있다. 이 Queue interface를 LinkedList가 구현(implements)해서 가지고 있다.
+```java
+//LinkedListTest.java
+import java.util.ArrayList;
+import java.util.LinkedList;
+public class LinkedListTest {
+	public static void main(String[] args) {
+		ArrayList<Integer> ar = new ArrayList<Integer>();
+		//                      |-->[10,20,30,0,0,...] 내부데이타를 배열로 관리한다.
+		//ar 0x100 --------->[0x200 ,...]
+		ar.add(10);
+		ar.add(20);
+		ar.add(30);
+		System.out.println(ar);
 
+		LinkedList<Integer> ll = new LinkedList<Integer>();
+		//                     |--> null 10 0x300----> 0x200 20 0x400----> 0x300 30 null
+		//                     |    ^--------------------|   ^---------------|
+		//ll 0x100---------->[0x200 ,...]
+		ll.add(10);
+		ll.add(20);
+		ll.add(30);
+		System.out.println(ll);
+	}
+}
+```
 + 이제 구체적으로 LinkedList의 메서드를 사용해 보자
+```java
+import java.util.LinkedList;
+import java.util.ListIterator;
 
+public class LinkedListTest2 {
+
+	public static void main(String[] args) {
+		LinkedList<Item> items = new LinkedList<Item>();
+
+		items.add(new Item("새우깡", 800));
+		items.add(new Item("커피", 950));
+
+		items.addFirst(new Item("담배", 4500));
+		items.addLast(new Item("우유", 700));
+		items.add(1, new Item("라면", 900));
+
+		// items
+		// 0x100-------->[["담배",4500],["라면",900],["새우깡",800],["커피",950],["우유",700]]
+		System.out.println(items);
+
+		// 기존항목을 제거
+		// remove()
+		// remove(int index)
+		// remove(Object o)
+		// removeFirst()
+		// removeLast()
+		Item deleteItem = new Item();
+		deleteItem.title = "라면";
+
+		// 내부적으로 검색해서 제거하므로 Item클래스의 equals()메서드가 동작한다.
+//		boolean result = items.remove(deleteItem);
+//		if (result) {
+//			System.out.println(deleteItem + " 이(가) 제거되었습니다.");
+//		} else {
+//			System.out.println(deleteItem + " 이(가) 존재하지 않습니다.");
+//		}
+
+		System.out.println(items.removeLast() + " 항목이 제거되었습니다.");
+		System.out.println(items);
+
+		ListIterator<Item> lit = items.listIterator();
+		System.out.println("앞으로 접근----------------------------------");
+		while (lit.hasNext()) {
+			Item item = (Item) lit.next();
+			System.out.println(item);			
+		}
+
+		System.out.println("뒤로 접근----------------------------------");
+		while (lit.hasPrevious()) {
+			Item item = (Item) lit.previous();
+			System.out.println(item);
+		}
+	}
+}
+```
+
++ 교재 내용중 Vector관련 소스는 건너뛰어도 상관없다(page 588 ~ 595)
 #### 3. Set
 #### 4. Map
 #### 5. 실습
