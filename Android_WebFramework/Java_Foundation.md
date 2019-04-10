@@ -7791,7 +7791,75 @@ main() 메서드 내부 {
 ### [2019-04-10]
 
 #### 1. Review
-#### 2. List
++ 주소록관리 프로그램만들기
+```
+1. 과제
+    간단한 주소관리기능을 ArrayList로 작성해보기
+
+   //간단한 신상명세 - 명함,주소정보
+   class Profile{
+         성명
+         나이
+         전화번호
+         주소
+     ...
+         생성자
+     toString()
+     equals()        
+   }
+
+   class ProfileManager{
+      ArrayList<Profile> profiles = new ArrayList<Profile>();
+
+          생성자()
+         주소록추가()
+         주소록검색()
+         주소록삭제()
+         주소록변경()    
+   }
+
+   ProfileTest.java
+   main()메서드 내부{
+      ProfileManager pm = new ProfileManager();
+
+      pm.add(주소정보);
+   }
+```
++ 4시 이후 추가기능을 자유롭게 작성.
+
+
+```
+------------------------------------------------------
+               <<interface>>             |
+                Collection               |
+                                         |   
+      <<interface>>     <<interface>>    |   <<interface>>   
+          List              Set          |       Map
+           ....            ....          |      .....
+-----------------------------------------------------------------           
+ArrayList, LinkedList     HashSet, TreeSet    HashMap, TreeMap    
+Stack, Queue
+Vector(예전부터 지원)                             HashTable, Propertis(예전부터지원) : 하위버전 호환성을 위해 학습                   
+-----------------------------------------------------------------                                  
+
+           선형구조(순수선형,스택,큐)                    key-value의 쌍(pair)으로 데이타관리    
+           순서가 중요                   순서는 중요하지 않다.         검색의 효율성에 집중                                 
+           데이타중복 허용             데이타중복은 불허                       순서는 중요하지 않다.          
+                                                key-중복불러, value-중복허용
+
+ArrayList는 내부에 배열을 사용하여 관리한다.
+```
++ Iterator : ArrayList 및 향후 학습할 다양한 컬렉션 클래스에서 내부구조와 상관없이 전체 데이타를 처음부터 끝까지 1회 접근하도록 지원해주는 클래스 사용자가 생성하는것이 아니라 컬렉션클래스의 메서드를 사용하면 만들어진다.
+
+#### 2. LinkedList : 내부에 link를 사용하여 데이타를 관리한다.
++ 1) link를 이용하여 순차적으로 접근하므로 접근이 느리다.
++ 2) 추가/삭제시 기존데이터에 영향을 주지 않으므로 속도가 빠르다.
++ ArrayList에 없는 추가 메서드들을 가지고 있다.
+  - 처음과 마지막을 지정하는 기능
+  - 스택과 큐의 기능을 지원하는 메서드들
+    - 스택 --> 추가(push), 삭제(pop),
+    - 큐 ----> 추가(offer), 삭제(poll)
+
 #### 3. Set
 #### 4. Map
 #### 5. 실습
