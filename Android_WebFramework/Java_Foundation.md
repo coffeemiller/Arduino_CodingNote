@@ -8098,11 +8098,159 @@ class StackQueueEx {
 + Arrays클래스 사용법 ==> 교재 624page
 + Comparator, Comparable ==> 인터페이스 사용법(내일 review 설명)
 
-#### 3. Set
-#### 4. Map
-#### 5. 실습
+```
+=====================================================================
+ArrayList, LinkedList 사용법만을 꼭 기억합시다(철저히 학습).
+=====================================================================
+```
 
-#### 6. Summary / Close
+#### 3. Set
++ Set은 순서는 중요하지 않다. 중복된 자료는 없다(중복불허)
+
++ HashSet
+  - HashSet은 내부 자료구조로 배열을 사용하면서 배열요소에 값을 저장할때, 특정한 Hash알고리즘을 작동시켜 데이타의 저장위치를 결정한다.
+  - HashSet은 내부에 데이타를 저장할때 중복여부를 검사하는 방법으로 equals(),hashcode()메서드를 실행시켜 그값으로 판단한다.
+  - 결론) 우리가 만든 클래스의 객체의 HashSet에 저장할때는 반드시 hashCode()메서드를 재정의 하자.    
+```java
+//HashSetEx3.java
+package com.jica.chap11;
+import java.util.HashSet;
+class HashSetEx3 {
+	public static void main(String[] args) {
+		HashSet set = new HashSet();
+		set.add("abc");
+		set.add("abc");
+		set.add(new Person("David",10));
+		set.add(new Person("David",10));
+
+		System.out.println(set);
+	}
+}
+
+class Person {
+	String name;
+	int age;
+
+	Person(String name, int age) {
+		this.name = name;
+		this.age = age;
+	}
+
+	public String toString() {
+		return name +":"+ age;
+	}
+}
+//////////////////////////////////////////////////////////////////////////
+//HashSetLotto.java
+import java.util.HashSet;
+
+class HashSetEx4 {
+	public static void main(String[] args) {
+		HashSet set = new HashSet();
+
+		set.add(new String("abc"));
+		set.add(new String("abc"));
+		set.add(new Person2("David", 10));
+		set.add(new Person2("David", 10));
+
+		System.out.println(set);
+	}
+}
+
+class Person2 {
+	String name;
+	int age;
+
+	Person2(String name, int age) {
+		this.name = name;
+		this.age = age;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + age;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Person2 other = (Person2) obj;
+		if (age != other.age)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
+	public String toString() {
+		return name + ":" + age;
+	}
+}
+```
+
+
++ TreeSet
+  - 트리(tree) --> 첫번째 저장된 데이터를 root Node라고 한다. 이후 데이터가 추가될때마다 작은 데이터는 왼쪽Node에 큰 데이터는 오른쪽 Node에 저장한다.
+```
+class Node {
+  Node left;  //작은값을 가리키는 노드
+  Object data;
+  Node right; //큰값을 가리키는 노드
+}
+```
+
+```java
+//TreeSetTest.java
+import java.util.TreeSet;
+public class TreeSetTest {
+	public static void main(String[] args) {
+		TreeSet<Integer> ts = new TreeSet<Integer>();
+		ts.add(50);  // Integer.valueOf(50)
+		ts.add(40);
+		ts.add(80);
+		ts.add(45);
+		ts.add(70);
+		ts.add(80);  // 중복 추가안됨.
+
+		System.out.println(ts);
+
+		//트리구조는 자체적으로 수정, 삭제, 추가 할때의 규칙이 있다.
+		ts.remove(40);
+		System.out.println(ts);
+	}
+}
+///////////////////////////////////////////////////////////////////
+//TreeSetLotto.java
+import java.util.*;
+class TreeSetLotto {
+	public static void main(String[] args) {
+		Set<Integer> set = new TreeSet<Integer>();
+
+		for (int i = 0; set.size() < 6 ; i++) {
+			int num = (int)(Math.random()*45) + 1;
+			set.add(num);  // set.add(new Integer(num));
+		}
+		System.out.println(set);
+	}
+}
+```
+
+##### [오늘의 과제]
+
+#### 4. 실습
+#### 5. Summary / Close
 
 
 -----------------------------------------------------------
@@ -8110,5 +8258,7 @@ class StackQueueEx {
 ### [2019-04-11]
 
 #### 1. Review
+#### 2. Map
+#### 3. Windows Programing
 #### 5. 실습
 #### 6. Summary / Close
