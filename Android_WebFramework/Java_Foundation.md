@@ -7859,6 +7859,10 @@ ArrayList는 내부에 배열을 사용하여 관리한다.
   - 스택과 큐의 기능을 지원하는 메서드들
     - 스택 --> 추가(push), 삭제(pop),
     - 큐 ----> 추가(offer), 삭제(poll)
++ 스택기능을 지원하는 독자적인 클래스가 존재한다. => Stack()
++ 큐기능을 지원하는 독자적인 클래스가 존재하지X. But! interface로 Queue가 있다. 이 Queue interface를 LinkedList가 구현(implements)해서 가지고 있다.
+
++ 이제 구체적으로 LinkedList의 메서드를 사용해 보자
 
 #### 3. Set
 #### 4. Map
