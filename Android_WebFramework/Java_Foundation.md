@@ -8209,6 +8209,16 @@ class Node {
   Object data;
   Node right; //큰값을 가리키는 노드
 }
+
+50 40 70 85 47의 순서대로 데이타를 트리구조로 저장하면
+
+root Node ---------> v-- 50 --v
+                  n 40 --v  n 70 ---v  
+                         47        n 80 n
+
+
+내부구조가 트리구조를 사용한다는것만 알고 있으면 된다.
+HashSet보다 좀더 풍부한 메서드들을 가지고 있다.    
 ```
 
 ```java
@@ -8248,7 +8258,8 @@ class TreeSetLotto {
 ```
 
 ##### [오늘의 과제]
-
++ 1. 수업내용복습
++ 2. com.jica.profile의 ProfileManager클래스에 다양한 메서드를 추가해서 테스트 해보세요.
 #### 4. 실습
 #### 5. Summary / Close
 
