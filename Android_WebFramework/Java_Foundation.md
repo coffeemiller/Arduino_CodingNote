@@ -7944,6 +7944,156 @@ public class LinkedListTest2 {
 ```
 
 + 교재 내용중 Vector관련 소스는 건너뛰어도 상관없다(page 588 ~ 595)
+
++ LinkedList를 이용한 스택과 큐의 관련메서드들
+```
+스택(stack) ---> LIFO(후입선출) : 접시쌓기/사용하기
+  1) 추가하는 장소와 삭제하는 장소가 동일하다.
+  2) 추가:push, 삭제:pop, 마지막에 추가된 값/삭제될 값 읽어오기:peek
+
+큐(queue)  ---> FIFI(선입선출) : 택시정류장의 줄서기
+  1) 추가하는장소와 삭제하는 장소가 별개이다.
+  2) 추가:put,offer 삭제:get,poll
+----------------------------------------------------------------
+1) Stack클래스, LickedList메서드
+2) Queue 인터페이스, LinkedList가 Queue인터페이스를 구현했다.
+----------------------------------------------------------------
+Stack클래스
+
+Stack​()
+----------------
+boolean	empty​()
+E	peek​()
+E	pop​()
+E	push​(E item)
+int	search​(Object o)
+
+교재 607page의 예제는 사용자가 직접 Stack기능을 클래스로 만들어본 예(MyStack.java)
+교재 609page에서 스택의 실제 사용예 -- 웹브라우저에서 웹사이트방문,앞으로,뒤로가기...
+교재 610page에서는 계산힉이 올바른가를 평가할때 스택을 실제 사용하는 예
+교재 611page 큐의 실생활에서의 예제 -- CMD명령
+```
+
+```java
+//StackTest.java
+import java.util.Stack;
+public class StackTest {
+	public static void main(String[] args) {
+		Stack<String> stack = new Stack<String>();
+
+		System.out.println(stack.empty());
+
+		stack.push("첫번째");   //추가
+		stack.push("두번째");
+		stack.push("세번째");
+		System.out.println(stack);
+
+		System.out.println(stack.peek());
+		System.out.println(stack);
+
+		int pos = stack.search("두번째");
+		System.out.println(pos+" 번째에 값이 있습니다.");
+
+		String word = stack.pop();
+		System.out.println(stack);
+		System.out.println("삭제된 값은 '"+word+"' 입니다.");
+		System.out.println(stack.pop());
+		System.out.println(stack.pop());
+		System.out.println(stack);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+//StatckTest2.java
+import java.util.LinkedList;
+public class StackTest2 {
+	public static void main(String[] args) {
+		LinkedList<String> stack = new LinkedList<String>();
+
+		System.out.println(stack.isEmpty());
+
+		stack.push("첫번째");   //추가
+		stack.push("두번째");
+		stack.push("세번째");
+		System.out.println(stack);
+
+		System.out.println(stack.peek());
+		System.out.println(stack);
+
+		//int pos = stack.search("두번째");
+		//System.out.println(pos+" 번째에 값이 있습니다.");
+
+		String word = stack.pop();
+		System.out.println(stack);
+		System.out.println("삭제된 값은 '"+word+"' 입니다.");
+		System.out.println(stack.pop());
+		System.out.println(stack.pop());
+		System.out.println(stack);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+//QueueTest.java
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class QueueTest {
+	public static void main(String[] args) {
+		// Queue는 독자적인 클래스가 없고
+		//Queue interface가 있다. 이를 LinkedList가 구현(implements)했다.
+
+		//LinkedList<String> queue = new LinkedList<String>();
+		Queue<String> queue = new LinkedList<String>();
+
+		//데이터 추가:offer, 데이터 삭제:poll
+		queue.offer("첫번째");
+		queue.offer("두번째");
+		queue.offer("세번째");
+		System.out.println(queue);
+
+		System.out.println(queue.poll());
+		System.out.println(queue);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+//StackQueueEx.java
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
+
+class StackQueueEx {
+	public static void main(String[] args) {
+		//아래의 st는 Stack클래스로 객체를 생성
+		Stack<String> st = new Stack<String>();
+
+		//아래의 q는 LinkedList로 객체를 생성
+		Queue<String> q = new LinkedList<String>();	 // Queue인터페이스의 구현체인 LinkedList를 사용
+
+		//스택에 데이터 추가
+		st.push("0");
+		st.push("1");
+		st.push("2");
+
+		//큐에 데이터 추가
+		q.offer("0");
+		q.offer("1");
+		q.offer("2");
+
+		System.out.println("= Stack =");
+		while(!st.empty()) {
+			System.out.println(st.pop());
+		}
+
+		System.out.println("= Queue =");
+		while(!q.isEmpty()) {
+			System.out.println(q.poll());
+		}
+	}
+}
+```
+
++ 참고)
+  - Iterator(단방향), ListIterator(양방향), Enumeration(예전버전)
+  - 내부저장구조와 상관없이 전체구성요소를 1회 접근하게 하는 클래스
+  - 교재 614page를 읽오보기!!
 #### 3. Set
 #### 4. Map
 #### 5. 실습
