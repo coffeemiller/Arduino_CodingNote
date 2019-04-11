@@ -8269,7 +8269,112 @@ class TreeSetLotto {
 ### [2019-04-11]
 
 #### 1. Review
+#### 2. Comparable, Comparator 인터페이스 사용법
++ 두 객체의 동등(등가)비교에 필요한 메서드 ---> equals() Object
++ 두 객체의 대소비교에 필요한 기능은 Object클래스에 없다. 그래서 별도의 인터페이스로 제공해주고 있다.
+  - Comparable, Comparator
++ 두 객체를 대소비교할 필요성이 있을때 기본비교방법으로 Comparable 인터페이스를 구현(implements)하여 사용하고 상황에 따른 다른 비교방법이 필요할때는 일시적으로 Comparator 인터페이스를 구현하여 사용한다.
+```
+<특히 대소비교는 객체의 정렬(Sort)에서 많이 사용된다.
+java.lang.Comparable  <==  기본 비교방식 제공
+
+int	compareTo​(T o)
+---> 양수 : 현재객체(this)가 크다.
+       0  : 현재객체(this)와 인자로 전달된 객체가 같다.
+     음수 : 현재객체(this)가 작다.
+
+int	compareTo​(T o1, T o2)
+---> 리턴값의 의미는 동일하다.
+```
+
+```java
+//CompareTest.java
+import java.util.ArrayList;
+import java.util.Collections;
+public class CompareTest {
+	public static void main(String[] args) {
+		String str = new String("Jeonju");
+		String str2 = new String("Jeju");
+
+		System.out.println(str.compareTo(str2));
+		//위 코드를 통해 String클래스도 Comparable 인터페이스를 구현했다는것을 알수 있다.
+
+		ArrayList<String> cities = new ArrayList<String>();
+
+		cities.add("전주");
+		cities.add("군산");
+		cities.add("장수");
+		cities.add("남원");
+		cities.add("임실");
+
+		//기본정렬방법 즉, 오름차순으로 정렬하고 싶을때는
+		//Colletctions.sort() 메서드를 사용한다.
+		Collections.sort(cities);  //내부적으로 String 클래스의 compareTo() 메서드가 작동
+		System.out.println(cities);
+	}
+}
+/////////////////////////////////////////////////////////////////////////////
+//ComparableTest.java
+import java.util.ArrayList;
+import java.util.Comparator;
+public class ComparableTest {
+	public static void main(String[] args) {
+		Profile p1 = new Profile("최유리", 24, "010-1111-1111", "cyr@daum.net");
+		Profile p2 = new Profile("정우람", 27, "010-1234-1234", "jwr@naver.com");		
+
+		ArrayList<Profile> prs = new ArrayList<Profile>();
+		prs.add(p1);
+		prs.add(p2);
+		prs.add(new Profile("임성현", 26, "010-1234-5678", "ish@gmail.com"));
+		prs.add(new Profile("이형준", 23, "010-7777-7777", "lhj@naver.com"));
+		//prs의 구성요소를 정렬시키고 싶다. 그런데 성명순으로가 아닌 나이순으로 정렬하고 싶다면
+		//별도의 비교방법을 제시해주어야 한다. 이때 Comparator를 사용한다.
+		AgeComparator c = new AgeComparator();
+		//Collections.sort(prs, c);
+		prs.sort(c);
+		System.out.println(prs);
+		//email순으로 정리하고 싶다면
+		EmailComparator c2 = new EmailComparator();
+		//Collections.sort(prs, c2);
+		prs.sort(c2);
+		System.out.println(prs);
+	}
+}
+
+class EmailComparator implements Comparator {
+	//email순으로 오름차순 비교
+	@Override
+	public int compare(Object o1, Object o2) {
+		Profile p1 = (Profile)o1;
+		Profile p2 = (Profile)o2;		
+		return p1.email.compareTo(p2.email);
+	}
+}
+
+class AgeComparator implements Comparator {
+	@Override
+	public int compare(Object o1, Object o2) {
+		Profile p1 = (Profile)o1;
+		Profile p2 = (Profile)o2;		
+		return p1.age - p2.age;
+	}
+}
+```
+
+
 #### 2. Map
-#### 3. Windows Programing
+#### 3. Windows Programming(GUI Programming)
+#### 5. 실습
+#### 6. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+### [2019-04-12]
+
+#### 1. Review
+
 #### 5. 실습
 #### 6. Summary / Close
