@@ -8546,6 +8546,136 @@ class HashMapEx1 {
 + 이벤트처리와 관련해서 xxxListener 인터페이스를 제공한다.
   - Button을 클릭할때의 이벤트처리는 ActionListener 인터페이스를 구현하여 작성한다.
   - Frame 즉, Window의 여러 버튼을 클릭할때 작동하는 이벤트처리는 WindowListener 인터페이스를 구현하여 작성한다.
+```java
+//AWTTest.java
+import java.awt.Frame;
+public class AWTTest {
+	//Frame을 직접사용하는 것.
+	public static void main(String[] args) {
+		//1.윈도우 생성
+		Frame frame = new Frame("첫번째 윈도우");
+		//JFrame frame = new JFrame();
+
+		//2.크기를 설정(폭,높이)및 위치변경
+		frame.setSize(500, 400);
+		frame.setLocation(400, 200);
+		//frame.setTitle("자바의 윈도우 만들기");
+
+		//3.필요하다면 윈도우 크기를 변경하지 못하도록 설정할수 있다.
+		frame.setResizable(false);
+
+		//4.실제작업에 필요한 내부구성요소를 만들어야 한다.
+		//지금처럼 코딩을 수행하면 앞으로의 작업이 복잡하고 어려워진다.
+		//그래서 지금처럼 Frame객체를 직접생성하는 것보다 상속받아 사용한느 코드를 사용한다.
+
+		//5.윈도우 보이기
+		frame.setVisible(true);		
+	}
+}
+///////////////////////////////////////////////////////////////////////
+//AWTTest2.java
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.HeadlessException;
+import java.awt.Label;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+public class AWTTest2 {
+	//Frame을 상속받아 사용하는 방법
+	public static void main(String[] args) {
+		MyFrame frame = new MyFrame("Frame을 상속받아 윈도우 만들기");
+	}
+}
+
+class MyFrame extends Frame {
+	public MyFrame(String title) throws HeadlessException {
+		super(title);  //제목설정
+		setSize(500,400);
+		setLocation(400, 200);
+		//setResizable(false);
+		setVisible(true);
+
+		//작업영역이 어디인지 확인해보자.
+		//색상을 나타내는 클래스 --> Color
+		this.setBackground(Color.DARK_GRAY);
+
+		//Frame은 자신의 내부구성요소를 배치할때 기본으로 BorderLayout을 사용하는데
+		//여기서는 FlowLayout으로 변경시켜서 사용하자
+		//이유) FlowLayout은 구성요소를 추가한 순서대로 차례로 배치하기 때문이다.
+		setLayout(new FlowLayout());
+
+		//여기서 화면구성과 관련된 작업을 수행하는 구체적인 개별기능 Component
+		//1.Label ==> 단순히 문자열만 화면에 보여주는 기능
+		Label lTitle = new Label("단순히 글자만 보여주는 컴퍼넌트");
+		lTitle.setBackground(Color.LIGHT_GRAY);
+		//만약 보여지는 글자를 좀더 크게 나타내고 싶다면 Font를 설정해주면 된다.
+		//Font font = new Font("Serif",Font.BOLD,20);
+		//lTitle.setFont(font);
+		add(lTitle);
+
+		//2.Button ==> 확인, 취소 등 사용자가 클릭하면 특정기능을 수행하는 버튼
+		Button btnConfirm = new Button(" 확  인 ");
+		Button btnCancel = new Button(" 취  소 ");
+		add(btnConfirm);
+		add(btnCancel);
+
+		//3.TextField ==> 한줄로 입력받을 때 사용하는 컴퍼넌트
+		TextField tfName = new TextField(20);  //20글자 입력할 수있는 폭을 준비
+		add(tfName);
+
+		//Button을 사용자가 클릭했을때 사용자가 작성한 기능을 동작하게 설정하는 것을
+		//이벤트처리라고 한다.
+		MyButtonHandler handler = new MyButtonHandler();
+		btnConfirm.addActionListener(handler);
+
+		//현재의 Frame의 종료버튼 클릭시 프로그램을 종료하자.
+		MyWindowHandler wHandler = new MyWindowHandler();
+		addWindowListener(wHandler);
+	}
+
+	class MyWindowHandler implements WindowListener {
+		@Override
+		public void windowOpened(WindowEvent e) {}
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+			//윈도우(Frame)에서 종료버튼(x) 클릭시 호출된다.
+			//Frame을 보이지 않게 하고
+			setVisible(false);		
+			//프로그램을 종료
+			System.exit(0);
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {}
+
+		@Override
+		public void windowIconified(WindowEvent e) {}
+
+		@Override
+		public void windowDeiconified(WindowEvent e) {}
+
+		@Override
+		public void windowActivated(WindowEvent e) {}
+
+		@Override
+		public void windowDeactivated(WindowEvent e) {}
+	}
+
+	class MyButtonHandler implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("확인버튼이 눌리워졌습니다.");			
+		}
+	}
+}
+```
 
 ##### [오늘의 과제]
 + 1. Collection Framework에서는 ArrayList, LinkedList <== 복습
