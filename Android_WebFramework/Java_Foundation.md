@@ -8496,8 +8496,15 @@ class HashMapEx1 {
 }
 ```
 
++ Page 648의 HashMapEx3.java  <=== 자세히 분석해 볼것(나중에 활용기회가 있다.)
++ 나머지 교재의 TreeMap, Propeties는 생략
 
 #### 3. Windows Programming(GUI Programming)
++ GUI Programming
+  - java.awt 패키지  <=======  가장 기본이되는 class들(모든 OS 공통)
+  - javax.swing 패키지  
+
+  
 #### 5. 실습
 #### 6. Summary / Close
 
