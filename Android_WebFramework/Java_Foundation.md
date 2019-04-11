@@ -8362,7 +8362,141 @@ class AgeComparator implements Comparator {
 ```
 
 
-#### 2. Map
+#### 2. Map : key-value의 쌍으로 데이터를 관리
++ 검색효율의 증대에 촛점이 맞추어져 있다.
++ key : 검색의 기준값으로 중복 불허(유일-unique)
++ value : 검색의 내용이다. 중복허용.
+
++ Map인터페이스 안에 내부클래스 Entry가 있다.
+```
+public interface Map {
+  ....추상메서드
+  interface Entry {   <=== Map.Entry
+    ....추상메서드
+  }
+}
+```
+
++ HashMap : 내부에 Hash알고리즘을 적용하여 데이터를 저장하고 관리
+```
+public class HashMap extends AbstractMap implements Map,.... {
+  Entry[] tables;
+  ...
+  class Entry implements Map.Entry {
+    ...
+  }
+}
+```
+  - key는 붕복불허, value는 중복허용
+  - 데이터 추가 : put(key,value)
+  - 데이터 검색 : get(key)
+  - 데이터 삭제 : remove(key)
+  - 키값의 존재여부 : boolean containsKey(Object o)
+  - 키값 전체를 알고싶다. : Set<K> keySet()
+  - value값 전체를 알고싶다. : Collection<V> values()
+  - key와 value 전체를 알고싶을때 : Set<Map.Entry<K,V> entrySet()
+
+```java
+import java.util.HashMap;
+public class HashMapTest {
+	public static void main(String[] args) {
+		//id와 패스워드를 쌍으로 관리하고 싶다.
+		HashMap<String, String> map = new HashMap<String, String>();
+		//데이터 추가 -- put(key, value)
+		System.out.println(map.put("jica", "1234"));    //예전의 value값 리턴
+		System.out.println(map.put("jica2", "1234"));   //정상적 추가->null값 리턴
+		System.out.println(map.put("jica3", "5678"));
+		System.out.println(map.put("jica", "7777"));    //추가않고 동일 key의 value값 변경
+
+		System.out.println(map.size());
+		System.out.println(map);
+
+		String pass = map.get("jica3");
+		System.out.println("jica3의 패스워드는 "+pass+" 입니다.");
+
+		pass = map.get("jica4");
+		System.out.println(pass);  //동일 key의 값이 없으면 null을 리턴한다.
+		//기존값 제거
+		System.out.println(map.remove("jica3"));  // 해당 데이터를 삭제하고, 삭제한 데이터 value값을 리턴
+		System.out.println(map);		
+		//없는값 제거
+		System.out.println(map.remove("3"));  // 삭제할 데이터 검색후, value값으로 null 리턴
+		System.out.println(map);
+    //------------------------------------------------------
+    map.put("jeonju", "7238");
+    map.put("argus", "2222");
+    map.put("android", "3333");
+    System.out.println(map);
+    System.out.println();
+
+    //현재 key값 전체를 알고 싶다.
+    Set<String> keys = map.keySet();
+    Iterator it = keys.iterator();
+    while (it.hasNext()) {
+      System.out.println(it.next());
+    }
+    System.out.println("-------------------------------------------");
+
+    //현재 value값 전체를 알고 싶다.
+    Collection<String> values = map.values();
+    System.out.println(values);
+
+    Iterator<String> it2 = values.iterator();
+    while (it2.hasNext()) {
+      System.out.println(it2.next());
+    }
+    System.out.println("-------------------------------------");
+
+    //key와 value 전체를 알고 싶다면? Set<Map.Entry<K,V>> entrySet()
+    Set<Map.Entry<String, String>> entry = map.entrySet();
+    Iterator<Map.Entry<String, String>> it3 = entry.iterator();
+    while (it3.hasNext()) {
+      Map.Entry<String, String> en = it3.next();
+      System.out.println("key : "+en.getKey()+" , value : "+ en.getValue());			
+    }
+	}
+}
+/////////////////////////////////////////////////////////////////////////
+//HashMapEx1.java
+package com.jica.chap11;
+import java.util.HashMap;
+import java.util.Scanner;
+class HashMapEx1 {
+	public static void main(String[] args) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("myId", "1234");
+		map.put("asdf", "1111");
+		map.put("asdf", "1234");
+		System.out.println(map);
+
+		Scanner s = new Scanner(System.in);	// 화면으로부터 라인단위로 입력받는다.
+
+		while(true) {
+			System.out.println("id와 password를 입력해주세요.");
+			System.out.print("id :");
+			String id = s.nextLine().trim();
+
+			System.out.print("password :");
+			String password = s.nextLine().trim();
+			System.out.println();
+
+			if(!map.containsKey(id)) {
+				System.out.println("입력하신 id는 존재하지 않습니다. 다시 입력해주세요.");
+				continue;
+			} else {
+				if(!(map.get(id)).equals(password)) {
+					System.out.println("비밀번호가 일치하지 않습니다. 다시 입력해주세요.");
+				} else {
+					System.out.println("id와 비밀번호가 일치합니다.");						
+					break;
+				}
+			}
+		} // while
+	} // main의 끝
+}
+```
+
+
 #### 3. Windows Programming(GUI Programming)
 #### 5. 실습
 #### 6. Summary / Close
