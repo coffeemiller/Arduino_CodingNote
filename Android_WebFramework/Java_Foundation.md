@@ -8513,7 +8513,48 @@ class HashMapEx1 {
     - 1) java.awt 패키지 (OS공통기능으로 모든 클래스 구현)
     - 2) javax.swing 패키지 (Java언어 자체적으로 모든 클래스 구현) <---java.awt상속
 
++ AWT(Abstract Window Toolkit) ==> 윈도우 프로그램을 하기위한 도구
+
++ 윈도우 프로그램의 구성요소
+  - 1) 윈도우 : 작업을 진행하는 창                 ===> 컨테이너(내부구성요소를 관리)
+  - 2) 윈도우 내부에서 개별기능을 수행하는 구성요소  ===> 컴퍼넌트(내부구성요소)
+  - 화면을 구성 ===> 작업이 편리하도록 구성요소를 배치해야 한다.(3)(Layout)
+  - 사용자가 기능수행을 위해 수행하는 행동(키보드, 마우스) ==> (4)Event처리
+
++ AWT의 주요 클래스 상속계층구조(외우자)
+```
+                  Component
+           Container           개별기능을 수행은 컴퍼넌트들
+       Panel       Window    
+       Applet   Dialog  Frame(제목표시줄,테두리,메뉴,작업영역)        
+                FileDialog
+
+
+                 Component    <<아래의 클래스들이 개별기능 컴퍼넌트>>
+           Container    Button,Label, Checkbox, List, Scrollbar
+                        TextComponent, Canvas, Choice
+                            TextField
+                            TextArea
+```
+
++ 우리가 사용하는(작업하는) 윈도우는 최소한 다음의 구성요소를 가지고 있다.
+  - 1) 작업영역(폭, 높이, 테두리선)
+  - 2) 제목표시줄+시스템메뉴, 최소화버튼/최대버튼(원래크기), 종료버튼
+
++ 참고) 윈도우 프로그램에서의 크기단위는 픽셀(Pixcel)이다.
+
++ 이벤트처리와 관련해서 xxxListener 인터페이스를 제공한다.
+  - Button을 클릭할때의 이벤트처리는 ActionListener 인터페이스를 구현하여 작성한다.
+  - Frame 즉, Window의 여러 버튼을 클릭할때 작동하는 이벤트처리는 WindowListener 인터페이스를 구현하여 작성한다.
+
+##### [오늘의 과제]
++ 1. Collection Framework에서는 ArrayList, LinkedList <== 복습
+  - 4/10 마지막실습 com.jica.profile ==> ProfileManager클래스
++ 2. AWT예제 복습
++ 3. MAP ==> 교재예제(x), 수업에 실습한 예제.
+
 #### 5. 실습
+
 #### 6. Summary / Close
 
 
