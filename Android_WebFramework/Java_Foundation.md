@@ -9068,6 +9068,7 @@ class ChoiceFrame extends Frame{
 }
 //////////////////////////////////////////////////////////////////
 ```
+
 ##### [화면구성시 아래의 LayoutManager를 어떻게 사용하는지 살펴보자]
 + 중첩시켜서 사용할수 있다.
 + FlowLayout, BorderLayout기능을 정리해 보자.
