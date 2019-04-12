@@ -8695,6 +8695,7 @@ class MyFrame extends Frame {
 #### 1. Review
 + GUI Programming - Event Drive 방식처처리
 
+#### 2. Component사용법
 + 시각화되어 보여지는 클래스들의 상속계층구조(외우자)
 ```
 Component
@@ -9079,8 +9080,8 @@ class ChoiceFrame extends Frame{
 + 1) 실습내용 복습
 + 2) com.jica.awt의 LayoutTest2.java에서 주소록 상세내용을 보여주고 입력할수 있는 화면을 추가적으로 구성해 보세요.
 
-#### 5. 실습
-#### 6. Summary / Close
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
