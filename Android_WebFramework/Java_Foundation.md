@@ -8693,7 +8693,389 @@ class MyFrame extends Frame {
 ### [2019-04-12]
 
 #### 1. Review
++ GUI Programming - Event Drive 방식처처리
 
++ 시각화되어 보여지는 클래스들의 상속계층구조(외우자)
+```
+Component
+  Container <=== 내부구성요소를 관리하는 역활 담당
+      Window
+         Frame
+           |-->우리가 Frame을 상속받아서 UserFrame을 만든다.
+         Dialog
+           FileDialog
+      Panel  ==============> 단독으로 존재할수 없고 Frame, Dialog의 내부구성요소로 존재(영역구분)
+         Applet
+  Button <=== Button과 그외의 클래스를 개별기능Component라고 부른다.     
+  Canvas - 선, 도형, 이미지를 직접 그려서 보여줄때 사용
+  Checkbox
+  Choice
+  Label
+  List
+  Scrollbar
+  TextComponent
+      TextField - 한줄로 입력
+      TextArea  - 여러줄로 입력
+```
+
++ Container계열의 클래스에 내부구성요소를 배치할때 배치하는 바법을 Layoutmanager객체로 설정한다.
+  - 참고로 Frame은 기본 배치관리자가 BorderLayout이다. 추가한 구성요소 순서대로 배치할때는 FlowLayout으로 변경한다.
+  - 단, 실무에서 많이 사용하지 않지만 수업진행을 원활히 하기 위해 배치관리를 지정하지 않고 사용해보자.
+  - setLayout(null)
+  - setSize(), setLocation()으로 크기와 위치를 직접지정해야 한다.
+
+  - 이벤트처리시 우리가 구현해야 할 interface가 컴퍼넌트들마다 정해져 있다.
+```
+Button 클릭 --- ActionListener
+Window의 이벤트 --- WindowListener
+Checkbox, List, Choice의 항목선택 -- ItemListener
+Mouse의 움직임 감지 --- MouseListener
+
+그런데 해당 interface에 여러개의 추상메서드가 있을때 이를 직접 구현하려면 모든 추상메서드를 재정의 해야 한다.
+이를 해솧하기 위해 XXXAdapter클래스를 준비해놨다.
+우리는 해당 Adapter만 상속받아 필요한 메서드만 재정의해서 사용한다.
+```
+```java
+//WindowListener interface 대신에 미리 모든 추상메서드를 재정의해서 가지고 있는
+//WindowAdapter class를 상속받아 필요한 메서드만 재정의 했다.
+class WindowHandler extends WindowAdapter {
+
+  @Override
+  public void windowClosing(WindowEvent e) {
+    super.windowClosing(e);
+    setVisible(false);
+    System.exit(0);
+  }
+}
+```
+
++ 이벤트 핸들러 설정시 간편하게 코딩하기 위해 익명의 클래스를 사용할 수 있다.
+```java
+addXXXListener(new 상위클래스(){
+  @Override
+  메서드 재정의
+});
+
+//종료버튼 이벤트 핸들러 설정 - 익명의 내부클래스 사용
+addWindowListener(new WindowAdapter() {
+	@Override
+	public void windowClosing(WindowEvent e) {
+		setVisible(false);
+		System.exit(0);
+	}
+});
+
+//버튼클릭시 count를 1 증가시켜 보여주기
+button.addActionListener(new ActionListener() {
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    count++;
+    System.out.println("count : "+count);
+  }
+});
+```
+
++ List, Checkbox, Choice의 항목선택이 바뀌었을때 작동하는 이벤트 핸들러 설정은 ItemListener interface를 사용한다.
+```java
+//CheckboxTest2.java
+public class CheckboxTest2 {
+	public static void main(String[] args) {
+		CheckboxFrame2 frame = new CheckboxFrame2("Checkbox 실제 사용법");
+	}
+}
+
+class CheckboxFrame2 extends Frame {
+	//여러항목을 자유롭게 선택/해제할수 있는 개별기능 Component
+	Checkbox cbJava, cbCplus, cbPython, cbHtml, cbAndroid;
+	Button btnConfirm;
+	Label lResult;
+
+	public CheckboxFrame2(String title) throws HeadlessException {
+		super(title);
+		//위치 및 크기 결정
+		setBounds(300, 200, 500, 300);
+		setVisible(true);
+
+		setLayout(new FlowLayout());
+		//안내문구 출력
+		Label lMessage = new Label("좋아하는 프로그램 언어를 선택하세요(중복선택 가능)");
+		add(lMessage);
+
+		//Checkbox 객체 생성
+		cbJava = new Checkbox("Java");
+		cbCplus = new Checkbox("C++");
+		cbPython = new Checkbox("Python",true);
+		cbHtml = new Checkbox("HTML");
+		cbAndroid = new Checkbox("Android");
+
+		//Frame에 Component객체 추가
+		Panel panel2 = new Panel();
+		panel2.add(cbJava);
+		panel2.add(cbCplus);
+		panel2.add(cbPython);
+		panel2.add(cbHtml);
+		panel2.add(cbAndroid);
+		add(panel2);
+
+		//Panel생성 ---> 중요)Panel도 내부 구성요소를 가질 수 있다.
+		Panel panel = new Panel();
+		btnConfirm = new Button("현재 상태 확인");
+		panel.add(btnConfirm);
+		lResult = new Label("버튼을 클릭하면 여기에 객체의 상태값을 보여줍니다.                  ");
+		lResult.setBackground(Color.GRAY);
+		panel.add(lResult);
+
+		//Panel에 컴퍼넌트를 추가한 후 Panel을 Frame에 추가
+		add(panel);
+
+		btnConfirm.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String msg = "";
+				msg += (cbJava.getState()) ? "Java ":"";
+				msg += (cbCplus.getState()) ? "C++ ":"";
+				msg += (cbPython.getState()) ? "Python ":"";
+				msg += (cbHtml.getState()) ? "HTML ":"";
+				msg += (cbAndroid.getState()) ? "Android ":"";
+				msg += "항목이 선택되어 있습니다.";
+				lResult.setText(msg);
+			}
+		});
+
+		//종료버튼 이벤트 핸들러설정
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				System.exit(0);
+			}			
+		});		
+	}
+}
+//////////////////////////////////////////////////////////////////
+//CheckboxTest3.java
+public class CheckboxTest3 {
+	public static void main(String[] args) {
+		CheckboxFrame3 frame = new CheckboxFrame3("Checkbox - Radio버튼  실제 사용법");
+	}
+}
+
+class CheckboxFrame3 extends Frame{
+	//배타적 선택을 하는 Checkbox - Radio버튼
+	Checkbox cbJava, cbHtml, cbAndroid; //3가지중 1가지만 선택할수 있음
+	CheckboxGroup cbgLanguage;
+	Button btnConfirm;
+	Label lResult;
+
+	public CheckboxFrame3(String title) throws HeadlessException {
+		super(title);
+
+		//위치및 크기 설정
+		setBounds(300,200,450,300);
+		setVisible(true);
+
+		setLayout(new FlowLayout());
+
+		add(new Label("좋아하는 언어를 1가지만 선택하세요"));
+		//세가지 Checkbox를 한그룹을 묶어주기 위해 CheckboxGroup객체를 만든다.
+		cbgLanguage = new CheckboxGroup();
+		//Checkbox객체를 만들면 그룹을 동일하게 지정하자
+		cbJava = new Checkbox("Java", cbgLanguage, true);
+		cbHtml = new Checkbox("HTML", cbgLanguage, false);
+		cbAndroid = new Checkbox("Android", cbgLanguage, false);
+
+		//Frame에 추가
+		add(cbJava);
+		add(cbHtml);
+		add(cbAndroid);
+
+		//Button객체 생성후 이벤트 핸들러 설정
+		btnConfirm = new Button("현재상태");
+		btnConfirm.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//CheckboxGroup객체의 상태값을 얻는다.
+				Checkbox select = cbgLanguage.getSelectedCheckbox();
+				String msg = "";
+				if( select == cbJava) {
+					msg = "Java";
+				}else if( select == cbHtml) {
+					msg = "Html";
+				}else if( select == cbAndroid) {
+					msg = "Android";
+				}
+				msg += " 이(가) 선택되어 있습니다.";
+				lResult.setText(msg);
+			}			
+		});
+
+		add(btnConfirm);
+
+		lResult = new Label("                                                             ");
+		add(lResult);
+
+		//종료버튼 이벤트 핸들러 설정
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				System.exit(0);
+			}
+		});
+	}
+}
+//////////////////////////////////////////////////////////////////
+//ListTest.java
+public class ListTest {
+	public static void main(String[] args) {
+		ListFrame frame = new ListFrame("ListFrame Component 사용법");
+	}
+}
+
+class ListFrame extends Frame{
+	//일정 4각영역에 목록을 보여주고 선택하는 Component
+	List lName;
+	List lCities;
+	List lSports;
+
+	public ListFrame(String title) throws HeadlessException {
+		super(title);
+
+		//위치및 크기 설정
+		setBounds(300,200,450,300);
+		setVisible(true);
+
+		setLayout(new FlowLayout());
+		//List객체 생성
+		lName = new List();
+		//List에 보여줄 항목을 추가
+		lName.add("전라북도");
+		lName.add("충청남도");
+		lName.add("강원도");
+		lName.add("제주도");
+
+		//List를 Frame추가
+		add(lName);
+
+		//List의 항목을 선택하는 순간 동작하는 이벤트 핸들러 설정
+		ListHandler l = new ListHandler();
+		lName.addItemListener(l);
+
+		//두번째 도시명을 보여주는 List객체 생성
+		lCities = new List(7);  //항상 7개항목 영역확보 후 목록을 보여줌.
+		//항목이 7개 이상이면, 스크롤 기능을 동작시킨다.
+		lCities.add("전주");
+		lCities.add("군산");
+		lCities.add("익산");
+		lCities.add("장수");
+		lCities.add("남원");
+		lCities.add("임실");
+		lCities.add("부안");
+		lCities.add("고창");
+		lCities.add("장계");
+
+		lCities.select(1);
+		add(lCities);
+
+		//여러항목을 선택할 수 있는 List
+		lSports = new List(3,true);
+		lSports.add("해외축구");
+		lSports.add("야구");
+		lSports.add("배구");
+		lSports.add("농구");
+		lSports.add("컬링");
+
+		add(lSports);
+
+		//종료버튼 이벤트 핸들러 설정
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				System.exit(0);
+			}
+		});
+	}
+
+	class ListHandler implements ItemListener {
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			//현재 선택된 항목의 위치 구하기
+			int pos = lName.getSelectedIndex();
+			//현재 선택된 항목 문자열 구하기
+			String selectName = lName.getSelectedItem();
+
+			System.out.println(pos + " 번째 " + selectName + " 항목이 선택되었습니다.");
+		}
+	}
+}
+//////////////////////////////////////////////////////////////////
+//ChoiceTest.java
+public class ChoiceTest {
+	public static void main(String[] args) {
+		ChoiceFrame frame = new ChoiceFrame("Choice Component사용법");
+	}
+}
+
+class ChoiceFrame extends Frame{
+	//평상시는 1개항목만 보여주다가 클릭시 드롭-다운되어 여러항목에서 선택하게하고
+	//선택후 원래의 모양으로 돌아오는 목록선택 Componet
+	Choice cWeek;
+
+	public ChoiceFrame(String title) throws HeadlessException {
+		super(title);
+
+		//위치및 크기 설정
+		setBounds(300,200,430,300);
+		setVisible(true);
+
+		setLayout(new FlowLayout());
+
+		//Choice객체 생성
+		cWeek = new Choice();
+		cWeek.add("월요일");
+		cWeek.add("화요일");
+		cWeek.add("수요일");
+		cWeek.add("목요일");
+		cWeek.add("금요일");
+		cWeek.add("토요일");
+		cWeek.add("일요일");
+
+		//Frame에 추가
+		add(cWeek);
+
+		//Choice도 항목선택 동작하는 이벤트핸들러 사용시 ItemListener를 사용한다.
+		cWeek.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// 현재 선택된 항목
+				int pos = cWeek.getSelectedIndex();
+				String str = cWeek.getSelectedItem();
+
+				System.out.println(pos+" 번째 "+str+" 선택됨");
+			}
+		});
+
+		//종료버튼 이벤트 핸들러 설정
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				System.exit(0);
+			}
+		});
+	}
+}
+//////////////////////////////////////////////////////////////////
+```
+##### [화면구성시 아래의 LayoutManager를 어떻게 사용하는지 살펴보자]
++ 중첩시켜서 사용할수 있다.
++ FlowLayout, BorderLayout기능을 정리해 보자.
+
+
+#### 2.
+#### 3.
+#### 4.
 #### 5. 실습
 #### 6. Summary / Close
 
