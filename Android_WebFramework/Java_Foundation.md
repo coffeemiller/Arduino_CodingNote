@@ -9068,15 +9068,17 @@ class ChoiceFrame extends Frame{
 }
 //////////////////////////////////////////////////////////////////
 ```
-
 ##### [화면구성시 아래의 LayoutManager를 어떻게 사용하는지 살펴보자]
 + 중첩시켜서 사용할수 있다.
 + FlowLayout, BorderLayout기능을 정리해 보자.
++ FlowLayout은 추가(add)한 순서대로 컴퍼넌트를 왼쪽에서 오른쪽으로 위에서 아래로 차례로 배치한다.  
+  - Frame계열을 기본배치관리자가 BorderLayout이다.
+  - Panel은 기본 배치관리자가 FlowLayout이다.   
 
+##### [오늘의 과제]
++ 1) 실습내용 복습
++ 2) com.jica.awt의 LayoutTest2.java에서 주소록 상세내용을 보여주고 입력할수 있는 화면을 추가적으로 구성해 보세요.
 
-#### 2.
-#### 3.
-#### 4.
 #### 5. 실습
 #### 6. Summary / Close
 
