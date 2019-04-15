@@ -9090,6 +9090,79 @@ class ChoiceFrame extends Frame{
 ### [2019-04-15]
 
 #### 1. Review
++ 1)AWT관련클래스의 상속계층 구조
+```
+Component
+  Container
+     Window
+        Frame <== 메인화면
+        Dialog<== 보조화면
+          FileDialog
+     Panel <==화면의 일부영역
+        Applet
+  Label,Button,Checkbox,List,Choice,Scrollbar,Canvas <==개별기능Component
+  TextComponent
+     TextField
+     TextArea
+```
++ 2)화면구성
+```
+Frame <----add(개별기능Component)
+      <----add(Panel)
+      Panel <--- add(개별기능Component)
+            <--- add(Panel)   
+```
++ 3)이벤트처리
+  - 이벤트 소스.addXXXListener(이벤트핸들러객체)   
+```
+frame.addWindowListener(new WindowListener를 구현한 클래스)
+button.addActionListener(new ActionListener를 구현한 클래스)
+list.addItemListener(new ItemListener를 구현한 클래스)
+```    
+  - xxxListerner를 구현하여 추상메서드를 재정의 한다.
+```
+class xxxHandler implements xxxListener{
+    @Override
+    public 추상메서드(){
+       ....         
+    }        
+}    
+```
+
+#### 2. 아직 학습하지 않은 개별기능 Componet
++ 1) Scrollbar - 수평/수직 스크롤바를 사용할 수 있다.
+  - ```Scrollbar​(int orientation, int value, int visible, int minimum, int maximum)```
+  - 이벤트 처리 - ```AdjustmentListener```
+  - 색상을 지정하는 방법
+    - 1) 미리정해진 상수 사용
+      + Color.GREEN, Color.Blue....
+    - 2) Color객체 생성
+      + Color(int re, int green, int blue)
+      + Red, Green, Blue의 색상값은 0~255 범위로 표현
++ 2) Canvas
+  - 모든 Componet를 상속받는 UI객체는 자신의 영역에 드로잉(drawing) 할 수 있다. 이때 호출되는 메서드가 void paint(Graphics g) 이다.
+  - Frame영역에 paint()메서드를 재정의하면 직접 내용을 그릴수 있다. 이와 마찬가지로 모든 UI객체가 동일하다.
+  - 사용자가 직접드로잉할 필요가 있을때 전문적으로 상요할수 있는 개별기능 Componet를 제공해준다. 이것이 Canvas클래스이다.
+
+#### 3. 마우스 이벤트
++ 이벤트 처리시 우리는 개별Component별로 이벤트를 처리를 했다. 그런데 간혹 키를 눌렀을때 혹은 마우스를 움직였을때 이벤트처리를 하고싶을때가 있다.
++ MouseEvent 처리
+  - MouseListener, MouseMotionListener
++ KeyEvent 소개
+
+
+#### 5. 실습
+#### 6. Summary / Close
+
+
+
+
+
+-----------------------------------------------------------
+
+### [2019-04-16]
+
+#### 1. Review
 
 #### 5. 실습
 #### 6. Summary / Close
