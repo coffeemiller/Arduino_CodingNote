@@ -9147,15 +9147,32 @@ class xxxHandler implements xxxListener{
 #### 3. 마우스 이벤트
 + 이벤트 처리시 우리는 개별Component별로 이벤트를 처리를 했다. 그런데 간혹 키를 눌렀을때 혹은 마우스를 움직였을때 이벤트처리를 하고싶을때가 있다.
 + MouseEvent 처리
-  - MouseListener, MouseMotionListener
-+ KeyEvent 소개
+  - MouseListener(들어오거나.나가거나, 클릭)
+  - MouseMotionListener(이동/드래그)
+  - MouseWheilListener(휠위아래)
+  - 위 모든 걸 MouseAdapter 클래스에서 구현
 
++ KeyEvent 소개
+  - interface
+    - KeyListener(키가 눌리워지거나/떼어졌을때, 문자값이 있는키==>keyTyped
+      - KeyPressed    KeyReleased
+
++ 지금까지의 내용이 AWT의 핵심적인 기능들이다. 이를 우리가 작성하는 프로그램에 적용해 본다면 ==> 주소록 관리 프로그램에서 사용해보자
++ 코딩을 작성해 보면서 1) 메뉴, 2) 대화상자도 함께 학습
+
++ 대화상자(Dialog)
+  - Frame과 유사한 기능을 수행하지만 가장 큰 차이점은 단독으로 실행되지 못하고 반드시 부모윈도우에서 띄워야 한다.
+  - 현재예제에서는 ProfileFrame이 부모윈도우이다.
++ 대화상자의 종류
+  - 1) Modal 대화상자 --> 대화상자가 활성화되면 부모윈도우로 돌아오지 못한다.
+  - 2) Modeless 대화상자 --> 대화상자가 활성화된 후에도 부모윈도우로 자유롭게 왔다갔다 할수 있다.
+
+##### [오늘의 과제]
++ 1) ProfileAWT.java의 소스를 이해하고 복습.
++ 2) 위의 소스가 이해된 사람은 추가기능을 대화상자로 만들어보기.
 
 #### 5. 실습
 #### 6. Summary / Close
-
-
-
 
 
 -----------------------------------------------------------
