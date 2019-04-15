@@ -9170,6 +9170,7 @@ class xxxHandler implements xxxListener{
 ##### [오늘의 과제]
 + 1) ProfileAWT.java의 소스를 이해하고 복습.
 + 2) 위의 소스가 이해된 사람은 추가기능을 대화상자로 만들어보기.
++ 3) 워크샵에서 발표할 pt준비하기.
 
 #### 5. 실습
 #### 6. Summary / Close
