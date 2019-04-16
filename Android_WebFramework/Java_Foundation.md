@@ -9521,20 +9521,77 @@ MenuItem의 이벤트처리는 ActionListener를 사용한다.
     - OutputStream     ----| 추상클래스
     - 1byte 혹은 byte[]을 입출력의 대상으로 한다.
 ```
+ByteArrayInputStream          ByteArrayOutputStream     
+FileInputStream               FileOutputStream  
+---------------------------------------------------     
+BufferedInputStream           BufferedOutputStream
+DataInputStream               DataOuputStream
+ObjectInputStream             ObjectOuputStream
 ```
   - 2) 문자(character)기반 스트림 -- 한글도 문제없이 입출력 할 수 있다.
     - Reader   ----| 추상클래스
     - Writer   ----| 추상클래스
     - char, char[]을 입출력의 대상으로 삼는다.
 ```
+CharArrayReader             CharArrayWriter
+FileReader                  FileWriter
+-----------------------------------------------
+BufferedReader              BufferedWriter
+                            PrintWriter
 ```
 
 + byte 기반스트림
 ```
+InputStream                OutputStream
+....                          ...
+abstract int read()           abstract void write(int)      
+int read(byte[])              void write(byte[])
+int read(byte[],int, int)     void write(byte[], int, int)
+....                          ...
 ```
 
 + 실제로 사용하는 클래스들....
   - ByteArrayInputStream / ByteArrayOutputStream
+```java
+//IOEx.java
+package com.jica.chap15;
+import java.io.*;
+import java.util.Arrays;
+
+class IOEx1 {
+	public static void main(String[] args) {
+		//byte배열에서 byte배열로 데이타 입출력
+		byte[] inSrc = {0,1,2,3,4,5,6,7,8,9};
+		byte[] outSrc = null;
+
+		ByteArrayInputStream  input  = null;
+		ByteArrayOutputStream output = null;
+
+		input  = new ByteArrayInputStream(inSrc);
+		output = new ByteArrayOutputStream();
+
+		//insrc  0x50 --------->[0,1,2,3,4,5,6,7,8,9]
+		//                       ^
+		//                       |
+		//input  0x100--------->[0x50 ....]         //byte[]로 부터 값을 읽어들인다.
+		//output 0x200--------->[0x60 ....]
+		//                       |---->[0,1,2,3,4,5,6,7,8,9] 내부버퍼
+		//outSrc 0x300--------->[0,1,2,3,4,5,6,7,8,9]
+		int data = 0;
+
+		while((data = input.read())!=-1) { //더이상 읽을데이타가 없을때 -1
+			output.write(data);	// void write(int b)
+		}
+
+		outSrc = output.toByteArray(); // 스트림의 내용을 byte배열로 반환한다.
+
+		System.out.println("Input Source  :" + Arrays.toString(inSrc));
+		System.out.println("Output Source :" + Arrays.toString(outSrc));
+	}
+}
+```
+
+
 
 ##### [오늘의 과제]
 + 4시이후 com.jica.profile의 실습코드에 여러분들이 필요한 메뉴항목을 추가해보세요.
