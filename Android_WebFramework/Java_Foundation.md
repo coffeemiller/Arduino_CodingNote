@@ -9139,10 +9139,146 @@ class xxxHandler implements xxxListener{
     - 2) Color객체 생성
       + Color(int re, int green, int blue)
       + Red, Green, Blue의 색상값은 0~255 범위로 표현
+```java
+//ScrollbarTest.java
+public class ScrollbarTest {
+	public static void main(String[] args) {
+		ScrollFrame frame = new ScrollFrame("스크롤바 연습");
+	}
+}
+
+class ScrollFrame extends Frame{
+	int greenValue = 0;
+	public ScrollFrame(String title) throws HeadlessException {
+		super(title); //제목
+
+		//위치및 크기지정
+		setBounds(300,200,500,300);
+		//this.setBackground(Color.GREEN);
+		setBackground(new Color(0, greenValue, 0));
+		setVisible(true);
+
+		//배치관리자를 지정하지 않는다.(위치와크기를 직접 지정해야 한다)
+		setLayout(null);
+		//수평스크롤바, 수직스크롤바
+		//Scrollbar​(int orientation, int value, int visible, int minimum, int maximum)
+		Scrollbar hor = new Scrollbar(Scrollbar.HORIZONTAL,0,1,0,100);
+		hor.setSize(400,18);
+		hor.setLocation(50,50);
+
+		//프레임에 Scrollbar추가
+		add(hor);
+
+		//프레임의 thumb(썸)을 드래그(drag) 하거나 클릭할때의 이벤트 핸들러 설정
+		hor.addAdjustmentListener(new AdjustmentListener() {
+			@Override
+			public void adjustmentValueChanged(AdjustmentEvent e) {
+				greenValue = hor.getValue(); //0~100 ==> 0~255
+				greenValue = (int)(greenValue * 2.55);
+				System.out.println("현재 thumb의 값 : " + hor.getValue()+"greenValue 값 : "+greenValue);
+				setBackground(new Color(0,greenValue,0));
+			}
+		});
+
+		//x버튼(종료버튼) 이벤트 핸들러 설정
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				dispose();      //현재 Frame이 차지한 모든 자원을 반납
+				System.exit(0);
+			}			
+		});
+	}
+}
+```
 + 2) Canvas
   - 모든 Componet를 상속받는 UI객체는 자신의 영역에 드로잉(drawing) 할 수 있다. 이때 호출되는 메서드가 void paint(Graphics g) 이다.
   - Frame영역에 paint()메서드를 재정의하면 직접 내용을 그릴수 있다. 이와 마찬가지로 모든 UI객체가 동일하다.
   - 사용자가 직접드로잉할 필요가 있을때 전문적으로 상요할수 있는 개별기능 Componet를 제공해준다. 이것이 Canvas클래스이다.
+```java
+//CanvasTest.java
+public class CanvasTest {
+	public static void main(String[] args) {
+		CanvasFrame frame = new CanvasFrame("Canvas 사용법");
+	}
+}
+
+class CanvasFrame extends Frame {
+	public CanvasFrame(String title) throws HeadlessException {
+		super(title); // 제목
+
+		// 위치및 크기지정
+		setBounds(300, 200, 500, 500);
+		setVisible(true);
+
+		// 화면 구성
+		// setLayout(new BorderLayout());
+		MyCanvas myCanvas = new MyCanvas();
+		add(myCanvas, BorderLayout.CENTER);
+		add(new Label("Canvas 사용법",Label.CENTER), BorderLayout.SOUTH);
+
+		// x버튼(종료버튼) 이벤트 핸들러 설정
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				dispose(); // 현재 Frame이 차지한 모든 자원을 반납
+				System.exit(0);
+			}
+		});
+	}
+
+	// Canvas를 상속받은 클래스 --->여기에 선,도형,글자,이미지등을 직접 그리자
+	class MyCanvas extends Canvas {
+		public MyCanvas() {
+			super();
+		}
+
+		@Override
+		public void paint(Graphics g) {
+			super.paint(g);
+
+			//인자로 전달된 Graphics g 객체는 시스템이 관리하고 전달해 준것.
+			//이것을 사용하여 그리는데 필요한 모든 정보를 설정할수도 있다.
+			//다양한 그리기 메서드를 사용할수도 있다.
+
+			//글자그리기
+			g.setFont(new Font("Serif", Font.PLAIN, 15));
+			g.drawString("Graphics를 이용해서 직접 글자를 그리기", 10, 50);
+
+			//원그리기
+			g.drawOval(50, 100, 50, 50);
+			g.setColor(Color.BLUE);
+			g.fillOval(100, 100, 50, 50);
+
+			//선그리기
+			g.setColor(Color.RED);
+			g.drawLine(100, 100, 150, 150);
+
+			//사각형그리기
+			//g.drawRect(200, 100, 120, 80);
+			//g.drawRoundRect(200, 100, 120, 80, 30, 30);
+			g.fillRoundRect(200, 100, 120, 80, 30, 30);
+
+			//다각형그리기
+			g.setColor(Color.ORANGE);
+			g.drawPolygon(new int[] {50,100,150,200}, new int[] {250,200, 200,250}, 4);
+
+			//이미지 그리기
+			//먼저 이미지를 읽어서 Image객체를 만든다.
+			Toolkit tk = Toolkit.getDefaultToolkit();
+			Image img = tk.getImage("logoTop.png");
+
+			//이미지를 그린다.
+			g.drawImage(img, 300, 250, this);
+
+			//다양한 이미지 그리기메서드로 확대/축소 등을 할수있다.
+
+		}
+	}
+}
+```
 
 #### 3. 마우스 이벤트
 + 이벤트 처리시 우리는 개별Component별로 이벤트를 처리를 했다. 그런데 간혹 키를 눌렀을때 혹은 마우스를 움직였을때 이벤트처리를 하고싶을때가 있다.
@@ -9151,18 +9287,115 @@ class xxxHandler implements xxxListener{
   - MouseMotionListener(이동/드래그)
   - MouseWheilListener(휠위아래)
   - 위 모든 걸 MouseAdapter 클래스에서 구현
+```java
+//LowLevelEventTest2.java
+public class LowLevelEventTest2 {
+	public static void main(String[] args) {
+		LowLevelFrame3 frame = new LowLevelFrame3("마우스 이벤트 인지....");
+	}
+}
+
+class LowLevelFrame2 extends Frame{
+	public LowLevelFrame2(String title) throws HeadlessException {
+		super(title); //제목
+
+		//위치및 크기지정
+		setBounds(300,200,500,500);
+		setVisible(true);
+
+		//화면 구성
+		//setLayout(new BorderLayout());
+
+		//마우스가 눌리워질
+		this.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				System.out.println("mousePressed (" + e.getX()+","+e.getY() +")");
+			}			
+		});
+
+		//마우스가 움직일때
+		this.addMouseMotionListener(new MouseAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				System.out.println("mouseMoved (" + e.getX()+","+e.getY() +")");
+			}			
+		});
+
+		//x버튼(종료버튼) 이벤트 핸들러 설정
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				dispose();      //현재 Frame이 차지한 모든 자원을 반납
+				System.exit(0);
+			}			
+		});
+	}
+}
+```
 
 + KeyEvent 소개
   - interface
     - KeyListener(키가 눌리워지거나/떼어졌을때, 문자값이 있는키==>keyTyped
       - KeyPressed    KeyReleased
+```java
+//LowLevelEventTest3.java
+public class LowLevelEventTest3 {
+	public static void main(String[] args) {
+		LowLevelFrame3 frame = new LowLevelFrame3("키 이벤트 인지....");
+	}
+}
 
+class LowLevelFrame3 extends Frame{
+	public LowLevelFrame3(String title) throws HeadlessException {
+		super(title); //제목
+
+		//위치및 크기지정
+		setBounds(300,200,500,500);
+		setVisible(true);
+
+		//화면 구성
+		//setLayout(new BorderLayout());
+		//키보드에서 어떠한 키가 눌리워졌을때를 Frame이 인지하도록 설정
+		this.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				System.out.println("keyTyped ");
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				System.out.println("keyPressed " + e.getKeyCode() + ":" + e.getKeyChar());
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				System.out.println("keyReleased " + e.getKeyCode() + ":" + e.getKeyChar());
+			}
+
+		});
+
+		//x버튼(종료버튼) 이벤트 핸들러 설정
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				dispose();      //현재 Frame이 차지한 모든 자원을 반납
+				System.exit(0);
+			}			
+		});
+	}
+}
+```
 + 지금까지의 내용이 AWT의 핵심적인 기능들이다. 이를 우리가 작성하는 프로그램에 적용해 본다면 ==> 주소록 관리 프로그램에서 사용해보자
 + 코딩을 작성해 보면서 1) 메뉴, 2) 대화상자도 함께 학습
 
 + 대화상자(Dialog)
   - Frame과 유사한 기능을 수행하지만 가장 큰 차이점은 단독으로 실행되지 못하고 반드시 부모윈도우에서 띄워야 한다.
   - 현재예제에서는 ProfileFrame이 부모윈도우이다.
+
 + 대화상자의 종류
   - 1) Modal 대화상자 --> 대화상자가 활성화되면 부모윈도우로 돌아오지 못한다.
   - 2) Modeless 대화상자 --> 대화상자가 활성화된 후에도 부모윈도우로 자유롭게 왔다갔다 할수 있다.
@@ -9179,6 +9412,41 @@ class xxxHandler implements xxxListener{
 -----------------------------------------------------------
 
 ### [2019-04-16]
+
+#### 1. Review
+
+#### 5. 실습
+#### 6. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+### [2019-04-17]
+
+#### 1. Review
+
+#### 5. 실습
+#### 6. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+### [2019-04-18]
+
+#### 1. Review
+
+#### 5. 실습
+#### 6. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+### [2019-04-19]
 
 #### 1. Review
 
