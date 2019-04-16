@@ -9552,6 +9552,8 @@ int read(byte[],int, int)     void write(byte[], int, int)
 
 + 실제로 사용하는 클래스들....
   - ByteArrayInputStream / ByteArrayOutputStream
+  - FileInputStream/FileOuputStream
+
 ```java
 //IOEx.java
 package com.jica.chap15;
@@ -9591,8 +9593,198 @@ class IOEx1 {
 }
 ```
 
++ 예외처리를 학습할때 앞으로 사용하게될 생성자나 메서드의 뒤부분에 throws절이 있으면 반드시 try catch절이나 throws절을 사용하여 예외처리를 하여야 한다.
 
++ file을 open할때는 입력용은 file이 존재하지 않으면 예외가 발생한다. 그러나 출력용은 file이 존재해도 예외가 발생하지 않는다.
 
+```java
+//FileCopy.java
+package com.jica.chap15;
+import java.io.*;
+
+class FileCopy {
+	public static void main(String args[]) {
+		try {
+			//입력용은 없으면 예외발생
+			FileInputStream  fis = new FileInputStream("actor.jpg");
+			//출력용은 없어도 예외가 발생하지 않고 최초 출력시 자동으로 화일이 만들어진다.
+			//만일 화일이 있으면 기존내용은 지워버리고 새로출력한다.			
+			//기존내용의 뒷부분에 추가싶다면 2번째인자를 사용한다.
+			FileOutputStream fos = new FileOutputStream("actor2.jpg");
+
+			int data =0;
+			int cnt = 0;
+			while((data=fis.read())!=-1) {
+				//화면에 보여주거나 이런처리없이 직접화일에 출력
+				fos.write(data);	 // void write(int b)
+				System.out.println(++cnt + " 번 읽어서 출력");
+			}
+
+			fis.close();
+			fos.close();
+		} catch (IOException e) {
+			e.printStackTrace();		
+		}
+	}
+}
+///////////////////////////////////////////////////////////
+//FileCopy2.java
+package com.jica.chap15;
+import java.io.*;
+
+class FileCopy2 {
+	public static void main(String args[]) {
+		try {
+			FileInputStream  fis = new FileInputStream("actor.jpg");
+			FileOutputStream fos = new FileOutputStream("actor2.jpg");
+
+			//화일내용이 크다면 byte[]을 사용
+			byte data[] = new byte[1024*8]; //일반적인 버퍼의 크기 8kb==>8192byte
+			int cnt = 0;
+			int len = 0;
+			while((len=fis.read(data)) > 0) {
+				//화면에 보여주거나 이런처리없이 직접화일에 출력
+				fos.write(data,0,len);	 // void write(int b)
+				System.out.println(++cnt + " 번 읽어서 출력");
+			}
+
+			fis.close();
+			fos.close();
+		} catch (IOException e) {
+			e.printStackTrace();		
+		}
+	}
+}
+```
+
++ 단독으로 생성해서 사용할수 있는 InputStream과 OutputStream이다. 이것을 기반스트림이라고 한다.
++ 기반스트림과 연결시켜서 사용하는 스트림들을 보조스트림이라고 부른다. 보조스트림은 생성할때 반드시 기반스트림을 사용해야 한다.
++ (참고 : 모든 기반스트림들은 FilterInputStream, FilterOutputStream을 상속받았다.)
+
++ 1) BufferedInputStream / BufferedOutputStream
+  - 사용자가 버퍼를 직접사용하는것이 아니라 내부적으로 버퍼를 사용해서 속도를 증가시킨것이다.
+
+```java
+//BufferedOutputStreamEx1.java
+package com.jica.chap15;
+import java.io.*;
+
+class BufferedOutputStreamEx1 {
+	public static void main(String args[]) {
+		try {
+		     FileOutputStream fos = new FileOutputStream("123.txt");
+		     // BufferedOutputStream의 버퍼 크기를 5로 한다.
+		     BufferedOutputStream bos = new BufferedOutputStream(fos, 5);
+		     // 파일 123.txt에  1 부터 9까지 출력한다.
+		     for(int i='1'; i <= '9'; i++) {
+			     bos.write(i);
+		     }
+		     //내부적인 출력작업은 2번실행된다.
+		     //이유는 13라인의 출력은 buffer에 이루어지고 buffer가 가득차면
+		     //그때 물리적인 화일에 출력시킨다.
+		     //bos 0x100----->[ 0x50  ....] ============>fos --->123.txt
+		     //                  |--->[     ]       '1','2','3','4','5','6','7','8','9'
+
+		     bos.close();  //bos.flush() 내부버퍼를 자동을 비운다-->출력한다.
+		     fos.close();
+		} catch (IOException e) {
+		     e.printStackTrace();		
+		}
+	}
+}
+```
+
++ 2) DataInputStream / DataOuputStream
+  - byte배열을 읽어서 기본자료형을 만들거나, 기본자료형값을 byte배열로 만들어서 출력시킨다.
+```java
+//DataOutputStreamTest.java
+package com.jica.io;
+
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class DataOutputStreamTest {
+
+	public static void main(String[] args) {
+		String name = "홍길동";
+		int age = 25;
+		double height = 178.25;
+		char grade = 'A';
+		boolean pass = true;
+
+		//위의 내용을 화일로 출력하고 싶다.
+		FileOutputStream fos = null;
+		DataOutputStream dos = null;
+		try {
+			fos = new FileOutputStream("profile.dat");
+			//fos만으로는 byte,byte[]만 출력할수있다.
+			//위의 기본자료형 즉, String/int/double/char/boolean등의 값을 출력하려면
+			//아래의 보조스트림이 필요하다.
+			dos = new DataOutputStream(fos);
+
+			//writeUTF()문자열을 출력하면 기본으로 한글1글자는 ==>3byte
+			//문자열의끝을나타내는추가2byte붙는다.
+			dos.writeUTF(name);   //문자열출력       9+2
+			dos.writeInt(age);    //int        4
+			dos.writeDouble(height); // double 8
+			dos.writeChar(grade);  //char      2
+			dos.writeBoolean(pass);//boolean   1
+		} catch( Exception e) {
+
+		} finally {
+			try {
+				dos.close();
+				fos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+}
+////////////////////////////////////////////////////////////
+//DataInputStreamTest.java
+package com.jica.io;
+
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class DataInputStreamTest {
+
+	public static void main(String[] args) {
+		FileInputStream fis = null;
+		DataInputStream dis = null;
+
+		try {
+			fis = new FileInputStream("profile.dat");
+			dis = new DataInputStream(fis);
+
+			//읽을때는 반드시 출력한 순서대로 읽어야 한다.
+			String name = dis.readUTF();
+			int age = dis.readInt();
+			double height = dis.readDouble();
+			char grade = dis.readChar();
+			boolean pass = dis.readBoolean();
+
+			System.out.println(name + "," + age + "," + height);
+			System.out.println(grade + "," + pass);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				dis.close();
+				fis.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
+```
 ##### [오늘의 과제]
 + 4시이후 com.jica.profile의 실습코드에 여러분들이 필요한 메뉴항목을 추가해보세요.
 
