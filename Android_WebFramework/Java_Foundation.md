@@ -9786,7 +9786,9 @@ public class DataInputStreamTest {
 }
 ```
 ##### [오늘의 과제]
-+ 4시이후 com.jica.profile의 실습코드에 여러분들이 필요한 메뉴항목을 추가해보세요.
++ 1) 실습내용 복습 + 프로젝트기획서 작업
++ 2) 4시이후 com.jica.profile의 실습코드에 여러분들이 필요한 메뉴항목을 추가해보세요.
+  - DataInputStream, DataOutputStream을 복습하기 위해, "성명, 점수3개, 총점, 평균"이 있다.(5건) 화일(result.dat)에 저장해 보고 그 내용을 읽어서 화면에 출력해 보시오. [홍길동 70 80 90 240 80.0]
 
 #### 3. 실습
 #### 4. Summary / Close
