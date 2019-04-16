@@ -9388,6 +9388,59 @@ class LowLevelFrame3 extends Frame{
 		});
 	}
 }
+///////////////////////////////////////////////////////////////
+//MenuTest.java
+public class TextFieldEventTest {
+	public static void main(String[] args) {
+		TextFrame frame = new TextFrame("글자를 입력할때마다의 이벤트");
+	}
+}
+
+class TextFrame extends Frame {
+	TextField tfPhone;
+
+	public TextFrame(String title) throws HeadlessException {
+		super(title);
+
+		setBounds(300, 200, 300, 300);
+		setVisible(true);
+		// 화면구성
+		setLayout(new FlowLayout());
+		add(new Label("전화번호 입력(숫자및 -"));
+
+		tfPhone = new TextField(13);
+		add(tfPhone);
+
+		// TextField에 글자를 입력할때마다 개입해서 숫자혹은 하이픈(-)인지 검사하는
+		// 이벤트핸들러 설정
+		tfPhone.addTextListener(new TextListener() {
+			@Override
+			public void textValueChanged(TextEvent e) {
+
+				System.out.println(tfPhone.getText());
+				String str = tfPhone.getText();
+				if (str.contentEquals("")) {
+					return;
+				}
+				char ch = str.charAt(str.length() - 1);
+				if (!(ch >= '0' && ch <= '9' || ch == '-')) {
+					tfPhone.setText(str.substring(0, str.length() - 1));
+					tfPhone.setCaretPosition(str.length() - 1);
+				}
+			}
+		});
+
+		addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setVisible(false);
+				dispose();
+				System.exit(0);
+			}
+		});
+	}
+}
 ```
 + 지금까지의 내용이 AWT의 핵심적인 기능들이다. 이를 우리가 작성하는 프로그램에 적용해 본다면 ==> 주소록 관리 프로그램에서 사용해보자
 + 코딩을 작성해 보면서 1) 메뉴, 2) 대화상자도 함께 학습
@@ -9414,9 +9467,80 @@ class LowLevelFrame3 extends Frame{
 ### [2019-04-16]
 
 #### 1. Review
+```
+메뉴관련 기능
 
-#### 5. 실습
-#### 6. Summary / Close
+- 메뉴의 종류
+1) 기본메뉴(윈도우 제목 아래의 메뉴)
+2) 팝업메뉴(작업창에서 마우스 오른쪽버튼 클릭시 나타나는 메뉴)
+
+- 메뉴를 처리할수 있는 클래스의 계층구조  
+
+      MenuComponent        
+MenuBar           MenuItem
+              Menu     CheckboxMenuItem
+              PopupMenu
+
+------------------------------------------
+MenuComponent
+  MenuBar
+  MenuItem
+     Menu
+       PopupMenu
+     CheckboxMenuItem  
+
+Menu작성순서
+1) MenuBar
+2) MenuBar에 Menu추가
+3) Menu에 MenuItem을 추가     
+
+MenuItem의 이벤트처리는 ActionListener를 사용한다.
+```
+#### 2. java.io 패키지
++ 자바프로그램에서 사용되는 전체 입/출력 기능관련내용을 학습해보자 -> 교재 15장.
+
++ 자바에서 입출력(I/O) --- Input/Output  <=== 데이터를 주고 받는것.
+  - 데이터를 주고받는 통로를 지칭하는 용여  ==> 스트림(stream)
+
++ 스트림의 특성
+  - 1) 단방향성
+  - 2) 연속된 흐름(byte[], char[])
+  - 3) 스트림간의 연결을 통해 기능을 확장
+
++ 입출력 수행하는 장소
+
+  - 1) 메모리에서 메모리로(byte[], char[] -----> byte[], char[])
+  - 2) 키보드 ------> 메모리(기본자료형[변수] or 클래스[객체]) ------------> 모니터
+  - 3) file <--------> 메모리
+  - 4) [네트워크]  다른컴퓨터(통신port) <-----------> (통신포트) 내 컴퓨터
+  - 위에서 사용되는 모든 입/출력기능을 지원하는 클래스를 만들어서 제공해준다.(java.io패키지)
+
++ 스트림클래스의 종류구분  ===> 입력(Input), 출력(Output)
+  - 1) byte기반 스트림(Stream)
+    - InputStream      ----| 추상클래스
+    - OutputStream     ----| 추상클래스
+    - 1byte 혹은 byte[]을 입출력의 대상으로 한다.
+```
+```
+  - 2) 문자(character)기반 스트림 -- 한글도 문제없이 입출력 할 수 있다.
+    - Reader   ----| 추상클래스
+    - Writer   ----| 추상클래스
+    - char, char[]을 입출력의 대상으로 삼는다.
+```
+```
+
++ byte 기반스트림
+```
+```
+
++ 실제로 사용하는 클래스들....
+  - ByteArrayInputStream / ByteArrayOutputStream
+
+##### [오늘의 과제]
++ 4시이후 com.jica.profile의 실습코드에 여러분들이 필요한 메뉴항목을 추가해보세요.
+
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
