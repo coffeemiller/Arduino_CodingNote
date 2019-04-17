@@ -9985,13 +9985,26 @@ InputStreamReader, OutputStreamWriter
   System.setErr(출력스트림)
 ```
 
+
+#### 3. File
+
 + 순차파일접근 : 화일의 내용을 읽고 쓸때 지금까지는 화일의 처음부터 끝까지 차례대로 읽었고
 화일에 출력할때는 차례대로 출력했다.  이것을 순차화일접근이라고 한다.
 + 임의파일접근 : 특별한 경우에는 화일의 특정위치값만 읽거나 변경할수 있다.  
   - 이러한 기능을 제공하는 클래스가 RandomAccessFile이다.  
   - 특이하게 이 클래스만 입/출력기능을 동시에 수행할수 있다.
+```
+class RandomAccessFile extends Object implements DataOutput, DataInput {
+  ...
+  입/출력 메서드가 모두 있다.
+}
+```
++ 사용하는 방법
+  - 1) Open ==> 객체생성(이때 open모드를 지정=>Read;r, Write:w, Read/Write:rw(+) )
+  - 2) 작업을 수행할 위치로 파일 pointer를 이동시킨다. ==> seek()
+  - 3) 기능수행 : readXXX(), writeXXX()
+  - 4) close()
 
-#### 3. File
 + File 클래스를 이용한 file 및 directory정보
 
 #### 4. 객체 직렬화
