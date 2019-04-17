@@ -9953,12 +9953,6 @@ Character 기반스트림(char, char[]을 대상으로한 입출력 기능을 �
 참고) text file에서 대표적인 제어문자를 프로그램에서 표현할때
          탭키     코드값     '\t'
          앤터키              '\n\r'   
-
-  PipedReader, PipedWriter(참고만 하면 된다)
-  쓰레드별로 별도의 메모리를 사용한다.  이때 쓰레드끼리 데이타를 입출력할때 사용한다.
-
-  StringReader, StringWriter(참고만 하면 된다)
-  문자열끼리 스트림을 이용하여 입출력을 수행할수도 있다.
 ```
 + 실제로 사용하는 클래스들 ==> Character 기반 클래스
   - CharArrayReader/CharArayWriter   char[]
@@ -9968,10 +9962,41 @@ Character 기반스트림(char, char[]을 대상으로한 입출력 기능을 �
 + Character 보조 스트림 ===> 생성시 단독으로 생성할 수 없고 인자값으로 Reader/Writer 전달받아 생성하는 스트림들.
 ```
 BufferedReader, BufferedWriter
-  - 사용법상에서는 아무 차이도 없으나 내부적으로 버퍼를 사용하여 처리속도를 증대시킨다.
+   사용법상에서는 아무 차이도 없으나 내부적으로 버퍼를 사용하여 처리속도를 증대시킨다.
+  BufferedReader
+     String	readLine​()   라인단위 read가능
+
+  BufferedWriter
+     void	flush​()      내부버퍼 비우기
+
+InputStreamReader, OutputStreamWriter
+    바이트기반스트림을 문자기반스트림으로 연결시키는 역활을 수행한다.        
 ```
+
+```
+표준입출력(외우자)
+  System.in   표준입력 InputStream          키보드
+  System.out  표준출력 PrintStream          모니터
+  System.err  표준에러출력 PrintStream       모니터                                                    
+
+표준입출력의 대상을 변경하고 싶을때 아래의 메서드를 사용할 수 있다.(알고있으면 좋다)         
+  System.setOut(출력스트림)
+  System.setIn(입력스트림)
+  System.setErr(출력스트림)
+```
+
++ 순차파일접근 : 화일의 내용을 읽고 쓸때 지금까지는 화일의 처음부터 끝까지 차례대로 읽었고
+화일에 출력할때는 차례대로 출력했다.  이것을 순차화일접근이라고 한다.
++ 임의파일접근 : 특별한 경우에는 화일의 특정위치값만 읽거나 변경할수 있다.  
+  - 이러한 기능을 제공하는 클래스가 RandomAccessFile이다.  
+  - 특이하게 이 클래스만 입/출력기능을 동시에 수행할수 있다.
+
 #### 3. File
++ File 클래스를 이용한 file 및 directory정보
+
 #### 4. 객체 직렬화
++ 직렬화(serialization) 기능 : 객체를 통채로 화일에 저장하거나 화일내용을 읽자마자 객체가 생성되게 하는 기능
+
 #### 5. Thread개요
 #### 6. 실습
 #### 7. Summary / Close
