@@ -9985,9 +9985,6 @@ InputStreamReader, OutputStreamWriter
   System.setErr(출력스트림)
 ```
 
-
-#### 3. File
-
 + 순차파일접근 : 화일의 내용을 읽고 쓸때 지금까지는 화일의 처음부터 끝까지 차례대로 읽었고
 화일에 출력할때는 차례대로 출력했다.  이것을 순차화일접근이라고 한다.
 + 임의파일접근 : 특별한 경우에는 화일의 특정위치값만 읽거나 변경할수 있다.  
@@ -10002,17 +9999,33 @@ class RandomAccessFile extends Object implements DataOutput, DataInput {
 + 사용하는 방법
   - 1) Open ==> 객체생성(이때 open모드를 지정=>Read;r, Write:w, Read/Write:rw(+) )
   - 2) 작업을 수행할 위치로 파일 pointer를 이동시킨다. ==> seek()
+    - 현재의 파일pointer얻기 getFilePointer()
+    - 파일의 크기(끝) length()
   - 3) 기능수행 : readXXX(), writeXXX()
   - 4) close()
 
-+ File 클래스를 이용한 file 및 directory정보
 
-#### 4. 객체 직렬화
-+ 직렬화(serialization) 기능 : 객체를 통채로 화일에 저장하거나 화일내용을 읽자마자 객체가 생성되게 하는 기능
 
-#### 5. Thread개요
-#### 6. 실습
-#### 7. Summary / Close
+#### 3. File
++ File 클래스를 이용한 file 및 directory정보 ==> 예제를 실행해보고 이런기능이 있다고 확인해두는것
+```
+-os입장에서는 1개의 file이나 디렉토리가 같다.
+File클래스 - 화일정보관리
+ 주요메서드
+ boolean exists​()
+ boolean	isFile​()
+ boolean	isDirectory​()
+ File[] listFiles​()   디렉토리정보를 관리하는 화일객체 내부의 모든요소를 File객체배열로 만들어준다.
+```
+
+##### [오늘의 과제]
++ 1) 수업내용 복습
++ 2) 프로젝트기획서 작업
+
+
+
+#### 4. 실습
+#### 5. Summary / Close
 
 
 
@@ -10022,7 +10035,10 @@ class RandomAccessFile extends Object implements DataOutput, DataInput {
 ### [2019-04-18]
 
 #### 1. Review
+#### 4. 객체 직렬화
++ 직렬화(serialization) 기능 : 객체를 통채로 화일에 저장하거나 화일내용을 읽자마자 객체가 생성되게 하는 기능
 
+#### 5. Thread개요
 #### 5. 실습
 #### 6. Summary / Close
 
