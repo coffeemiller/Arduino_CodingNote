@@ -9706,7 +9706,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class DataOutputStreamTest {
-
 	public static void main(String[] args) {
 		String name = "홍길동";
 		int age = 25;
@@ -9800,9 +9799,182 @@ public class DataInputStreamTest {
 ### [2019-04-17]
 
 #### 1. Review
++ 스트림(stream) -> 입출력의 통로
+  - 1) 단방향성의 특징
+  - 2) 연속된 흐름(byte[], char[])
+  - 3) 연결
 
-#### 5. 실습
-#### 6. Summary / Close
++ 다양한 기능을 class로 제공.
+  - byte기반..... InputStream / OutputStream
+  - char기반..... Reader / writer
+
+```
+DataInputStream, DataOutpuStream을 복습하기위해
+  성명,점수3개,총점, 평균이 있다(5건)
+  화일(result.dat)에 저장해 보고 그내용을 읽어서 화면에 출력해 보시오
+
+  홍길동 70 80 90 240 80.0
+  이순신 100 100 100 300 100.0
+....
+  강감찬  80 80 88 248 82.33  
+
+ScoreOutputTest.java ==>화일에 출력
+ScoreInputTest.java  ==>화일에서 읽어서 모니터에 출력  
+-----------------------------------------------------
+byte기반스트림
+        InputStream                OutputStream
+        ....                          ...
+abstract int read()           abstract void write(int)      
+        int read(byte[])              void write(byte[])
+        int read(byte[],int, int)     void write(byte[], int, int)
+        ....                          ...
+```
+
++ 실제로 사용하는 클래스들
+  - ByteArrayInputStream/ByteArrayOutputStream
+  - FileInputStream/FileOuputStream
+```
+예외처리를 학습할때 앞으로 사용하게될 생성자나 메서드의 뒤부분에 throws절이 있으면
+반드시 try catch절이나 throws절을 사용하여 예외처리를 하여야 한다.
+
+file을 open할때는 입력용은 file이 존재하지 않으면 예외가 발생한다.
+그러나  출력용은 file이 존재해도 예외가 발생하지 않는다.
+
+단독으로 생성해서 사용할수 있는 InputStream과 OutputStream 이다.
+이것을 기반스트림이라고 한다.
+
+기반스트림과 연결시켜서 사용하는 스트림들을 보조스트림이라고 부른다.
+보조스트림은 생성할때 반드시 기반스트림을 사용해야 한다.
+(참고: 모든 기반스트림들은 FilterInputStream,FilterOutputStream을 상속받았다)
+
+1) BufferedInputStream/BufferedOutputStream
+    사용자가 버퍼를 직접사용하는것이 아니라 내부적으로 버퍼를 사용해서 속도를 증가시킨것이다.
+
+2) DataInputStream/DataOutputStream(***많이 사용된다)
+ byte배열을 읽어서 기본자료형을 만들거나
+    기본자료형값을 byte배열로 만들어서 출력시킨다. ==> binary file
+
+ DataInputStream               DataOutputStream
+ ---------------               -------------------
+ boolean readBoolean()         void writeBoolean(boolean)
+ int     readInt()             void writeInt(int)
+ String  readUTF()             void writeUTF(String)
+  ....                         ....
+
+
+3) SequenceInputStream
+         여러개의 입력스트림을 연결하여 사용할수 있다.(간단히 참고만 하자)
+4) PrintStream
+          보조스트림으로 다양한 출력기능을 제공해 준다.
+          대표적으로 System.out 객체를 이용한 출력이 있다.
+
+      System.out.print()
+      System.out.println()
+      System.out.printf()
+             ===
+             PrintStream
+
+      class System ....{
+          public static InputStream in;   //표준입력
+      	public static PrintStream out;  //표준출력
+      	public static PrintStream err;  //표준에러
+      }                   
+
+
+ 참고) Collection framework의 클래스들을 사용할때
+     내부구조와 상관없이 전체요소값을 1회 접근해주는 클래스 ==> Iterator, ListIterator
+     예전부터 사용해온 비슷한 기능을 수행하는 클래스           ==> Enumeration       
+```
+
+```java
+//PrintStreamEx1.java
+package com.jica.chap15;
+
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.Date;
+
+class PrintStreamEx1 {
+	public static void main(String[] args) {
+		int    i = 65;
+		float f = 1234.56789f;
+
+		Date d = new Date();
+
+		System.out.printf("문자 %c의 코드는 %d%n", i, i);
+		System.out.printf("%d는 8진수로 %o, 16진수로 %x%n", i ,i, i);
+		System.out.printf("%3d%3d%3d%n", 100, 90, 80);
+		System.out.println();
+		System.out.printf("123456789012345678901234567890%n");
+		System.out.printf("%s%-5s%5s%n", "123", "123", "123");
+		System.out.println();
+		System.out.printf("%-8.1f%8.1f %e%n",f,f,f);
+		System.out.println();
+		//아래의 코드는 이후라도 자주 사용하는 표현이다.
+		System.out.printf("오늘은 %tY년 %tm월 %td일 입니다.%n", d,d,d );
+		System.out.printf("지금은 %tH시 %tM분 %tS초 입니다.%n", d,d,d );
+		System.out.printf("지금은 %1$tH시 %1$tM분 %1$tS초 입니다.%n", d );
+		System.out.println("---- 여기까지는 표준 출력-----------------");
+		//----------------------------------------------------
+		//System.out은 PrintStream객체이지만 기본출력대상을 모니터로 설정되어 있다.
+		//아래의 코드처럼 PrintStream객체를 생성시 화일을 지정하면
+		//이후의 모든 출력결과가 화일로 출력된다.
+		try {
+			PrintStream ps = new PrintStream("test.txt");
+			ps.printf("문자 %c의 코드는 %d%n", i, i);
+			ps.printf("%d는 8진수로 %o, 16진수로 %x%n", i ,i, i);
+			ps.printf("%3d%3d%3d%n", 100, 90, 80);
+			ps.println();
+
+			ps.printf("오늘은 %tY년 %tm월 %td일 입니다.%n", d,d,d );
+			ps.printf("지금은 %tH시 %tM분 %tS초 입니다.%n", d,d,d );
+			ps.printf("지금은 %1$tH시 %1$tM분 %1$tS초 입니다.%n", d );
+			ps.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}		
+	}
+}
+
+```
+#### 2. 문자스트림
+```
+Character 기반스트림(char, char[]을 대상으로한 입출력 기능을 수행)
+
+          Reader                        Writer
+          ....                          ...
+ abstract int read()           abstract void write(int)      
+          int read(char[])              void write(char[])
+          int read(char[],int, int)     void write(char[], int, int)
+          ....                          void write(String)
+                                        void write(String,int, int)
+                                        ...
+====================================================================
+참고) text file에서 대표적인 제어문자를 프로그램에서 표현할때
+         탭키     코드값     '\t'
+         앤터키              '\n\r'   
+
+  PipedReader, PipedWriter(참고만 하면 된다)
+  쓰레드별로 별도의 메모리를 사용한다.  이때 쓰레드끼리 데이타를 입출력할때 사용한다.
+
+  StringReader, StringWriter(참고만 하면 된다)
+  문자열끼리 스트림을 이용하여 입출력을 수행할수도 있다.
+```
++ 실제로 사용하는 클래스들 ==> Character 기반 클래스
+  - CharArrayReader/CharArayWriter   char[]
+  - StringReader/StringWriter        String
+  - FileReader/FileWrite  
+
++ Character 보조 스트림 ===> 생성시 단독으로 생성할 수 없고 인자값으로 Reader/Writer 전달받아 생성하는 스트림들.
+```
+BufferedReader, BufferedWriter
+  - 사용법상에서는 아무 차이도 없으나 내부적으로 버퍼를 사용하여 처리속도를 증대시킨다.
+```
+#### 3. File
+#### 4. 객체 직렬화
+#### 5. Thread개요
+#### 6. 실습
+#### 7. Summary / Close
 
 
 
