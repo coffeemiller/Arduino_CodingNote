@@ -10432,6 +10432,7 @@ class WorkThread extends Thread {
 + 1. main()메서드로부터 시작된 코드는 main Thread의 실행코드이다.
 + 2. Thread class, Runable interface를 사용하여 Thread객체를 만들고 start()를 시키면 이때부터는 작업쓰레드가 main Thread와 동시에 실행된다. 즉, 멀티 쓰레딩이 작동하는 것이다.
 + 3. 여러개의 쓰레드에서 실행할 코드를 작동시키는 것은 전적으로 OS가 담당한다. 우리가 개입할수 없다. 이것을 쓰레드 컨텍스트 스위칭이라고 부른다.(쓰레드를 교체하는 것)
++ 4. main쓰레드는 main()메서드 끝나면 소멸된다.작업쓰레드는 run()메서드의 실행이 끝나면 소멸된다.
 
 #### 5. 실습
 #### 6. Summary / Close
