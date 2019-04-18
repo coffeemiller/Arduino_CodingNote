@@ -10513,6 +10513,50 @@ class ThreadEx1_2 implements Runnable {
 	}
 }
 ```
+
++ 쓰레드는 쓰레드마다 사용하는 별도의 기억장소 즉, Stack이 따로 존재한다.
+```java
+//TreadEx2+3.java
+package com.jica.chap13;
+
+class ThreadEx3 {
+	public static void main(String args[]) throws Exception {
+		//쓰레드 객체를 생성만 하고
+		ThreadEx3_1 t1 = new ThreadEx3_1();
+    t1.start();
+		//start()시키지 않고 run()메서드를 지접 호출했다.
+    t1.run();
+	}
+}
+//실행중일때 스택의 상태  start()
+//
+//      |        |         |        |
+//      |        |         |        |
+//      |        |   throw.|--------|
+//main()|--------|   run() |--------|
+
+
+//실행중일때 스택의 상태  run()
+//
+//      |        |    
+// throw|--------|   
+// run()|--------|   
+//main()|--------|   
+
+class ThreadEx3_1 extends Thread {
+	public void run() {
+		throwException();
+	}
+
+	public void throwException() {
+		try {
+			throw new Exception();		
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+```
 #### 5. 실습
 #### 6. Summary / Close
 
