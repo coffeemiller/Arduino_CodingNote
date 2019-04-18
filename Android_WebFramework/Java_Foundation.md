@@ -10368,7 +10368,30 @@ public class ThreadTest {
 + Java에서 Thread를 생성하는 방법 2가지
   - 1) Thread클래스를 상속(extends) 받아, public void run() 메서드 재정의한다.
     - run()메서드의 내용이 OS가 인지하는 Thread이다.
-  - 2) Runable 인터페이스를 구형(implements)
+```
+class MyThread extends Thread {
+  public void run() {
+    //실행코드
+  }
+}
+
+MyThread wRhread = new MyThread();  //쓰레드 객체생성
+wThread.start();                    //OS가 인지하는 쓰레드 시작.
+```
+  - 2) Runable 인터페이스를 구현(implements)
+```
+class MyRunnable implements Runable {
+  public void run() {
+    //실행코드
+  }
+}
+
+MyRunnable wRunnable = new MyRunnable();
+Thread wThread = new Thread(wRunnable);  //쓰레드 객체생성
+wThread.start();                         //OS가 인지하는 쓰레드 실행
+``
+
+
 ```
 cpu
 main Thread  ---           --1~98--           --99~420--             --420~500--->>x 메인쓰레드소멸         
@@ -10434,6 +10457,62 @@ class WorkThread extends Thread {
 + 3. 여러개의 쓰레드에서 실행할 코드를 작동시키는 것은 전적으로 OS가 담당한다. 우리가 개입할수 없다. 이것을 쓰레드 컨텍스트 스위칭이라고 부른다.(쓰레드를 교체하는 것)
 + 4. main쓰레드는 main()메서드 끝나면 소멸된다.작업쓰레드는 run()메서드의 실행이 끝나면 소멸된다.
 
+##### [쓰레드 객체만 생성하면 아직 OS가 인지하는 쓰레드는 작동전이다.]
++ 반드시 start()메서드를 사용해야 쓰레드 작동이 시작하는 것이다.
++ start()메서드는 쓰레드 객체에 한번만 사용할 수 있다. 더 사용하면 예외가 발생한다.
+
+```java
+//ThreadEz1.java
+package com.jica.chap13;
+
+class ThreadEx1 {
+	public static void main(String args[]) {
+		//min()메서드 자체가 main Thread이다.
+		System.out.println(Thread.activeCount());    // main Thread = 1
+		//Thread 객체를 생성
+		ThreadEx1_1 t1 = new ThreadEx1_1();
+
+		ThreadEx1_2 r  = new ThreadEx1_2();
+		//쓰레드 객체 생성
+		Thread   t2 = new Thread(r);	  // 생성자 Thread(Runnable target)
+
+		//작업쓰레드 2개를 작동시켰다.
+		t1.start();  //쓰레드 시작
+		System.out.println(Thread.activeCount());  // main + Thread1 Thread = 2
+		t2.start();
+		System.out.println(Thread.activeCount());  // main + Thread1 + Thread2 = 3
+
+		t1 = new ThreadEx1_1();
+		t1.start();  //예외가발생하지 않게하려면 객체를 새로 생성하고 start()사용.
+		//strat()는 쓰레드 객체에 1번만 사용할수 있다.
+
+		t1.run(); //코드는 실행되지만 이것은 단순히 main()메서드에서 다른 메서드를 호출한것.
+		// 즉, OS가 인지하는 쓰레드가 실행되는 것이 아니다.
+	}
+}
+
+//방법1)
+class ThreadEx1_1 extends Thread {
+	//필요하다면 이곳에 다양한 멤버변수 사용가능
+	public void run() {
+		for(int i=0; i < 5; i++) {
+			System.out.println(getName()); // 조상인 Thread의 getName()을 호출
+		}
+	}
+	//기타 생성자와 다양한 메서드들을 사용할 수 있다.
+}
+
+//방법2) Runnable 인터페이스를 구현
+class ThreadEx1_2 implements Runnable {
+	public void run() {
+		for(int i=0; i < 5; i++) {
+			// Thread.currentThread() - 현재 실행중인 Thread를 반환한다.
+		    System.out.println(Thread.currentThread().getName());
+		}
+		System.out.println("현재 실행중인 쓰레드 갯수 : "+Thread.activeCount());
+	}
+}
+```
 #### 5. 실습
 #### 6. Summary / Close
 
@@ -10443,6 +10522,7 @@ class WorkThread extends Thread {
 ### [2019-04-19]
 
 #### 1. Review
+
 
 #### 5. 실습
 #### 6. Summary / Close
