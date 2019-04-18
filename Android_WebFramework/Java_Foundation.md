@@ -10291,7 +10291,147 @@ public class SerialEx3 {
 } // class
 ```
 
-#### 4. Thread개요
+#### 4. Thread학습
+```
+Test.java -------> Test.class -------->실행
+
+1) OS 시스템 자원(resource) 즉, 메모리를 할당받는다. ==> Process가 시작된다.
+2) 할당받은 메모리공간을 cord area, data area 분리한후
+       코드영역에 Test.class를 Load한다.
+3) start-up 코드를 실행시켜서 static영역을 준비한다.
+4) main메서드를 찿아서 main Thread를 생성한후 실행시킨다.
+       이후 main Thread가 CPU를 독점하여 수행된다.
+5) 실행이 마치면 Thread가 종료하고  
+6) Process가 종료되고 자원을 반납하다.
+
+프로그램(Program) : 보조 기억매체 화일 형태로 저장되어 있는 실행코드
+프로세스(Process) : 시스템 자원(리소스:resource)를 할당받아 현재 실행중인 프로그램    
+쓰레드(Thread)    : CPU를 독점하여 실행할수 있는 실행단위   
+
+현재까지의 프로그램실행 단일쓰레드 즉, main Thread하나만 동작하였다.
+
+우리가 학습할 쓰레드를 작업 쓰레드라고 부른다.
+main Thread에서 새로운 쓰레드를 생성하여 실행시키면 이때부터는 2개의 쓰레드가
+CPU를 번갈아가면서 사용하여 프로그램을 실행시키게 된다.
+            cup
+main Thread  ---------------------------------------->>x종료
+
+main Thread  -----|   ---->>      ------>>   -------->>x
+                 |
+                 |-->     ------>       --->x
+                 신규작업쓰레드 생성후 실행                              작업쓰레드 종료
+
+                 cpu를 시간분할에 의해 병렬적으로 사용하여 프로그램을 실행시키는것을
+                                 멀티쓰레딩 프로그램이라고 한다.
+
+원래 쓰레드는 OS에서 관리한다.(시스템에서 관리 : 메모리와 쓰레드 스케쥴링을 관리)
+자바 프로그램언어에서 쓰레드를 사용하고 관리하기위해 아래의 클래스들을 제공해 주고 있다.
+*** 쓰레드는 CPU를 독점해서 사용할수 있는 프로그램 실행단위
+*** 쓰레드객체는 자바언어에서 Thread정보를 관리하고 실행하기 위해 만든 객체
+
+모든 쓰레드는 쓰레드를 식별하는 이름과 식별자(id)를 가지고 있다.
+
+쓰레드를 만들어서 사용하거나 쓰레드의 정보를 사용할때 우리는
+java.lang.Thread class, java.lang.Runnable interface를 사용한다.
+```
+
+
+```java
+//ThreadTest.java
+package com.jica.thread;
+public class ThreadTest {
+	public static void main(String[] args) {
+		//1부터 100까지 합계를 구하는 프로그램
+		int sum = 0;
+		int number = 1;
+		while(number <= 1000) {
+			sum += number;
+			number++;
+		}
+
+		//현재 실행중인 Thread의 갯수를 알아보자
+		Thread curThread = Thread.currentThread();
+		System.out.println("현재 실행중인 쓰레드의 갯수 : " + Thread.activeCount());
+		System.out.println(curThread);
+		System.out.println(curThread.getName());
+		System.out.println(curThread.getId());
+		System.out.println(curThread.getPriority());
+		System.out.println("1~1000까지의 합계 : " + sum);
+	}
+}
+```
+
+```
+1~1000까지의 합계 계산 : ThreadTest.java ==> 단일 쓰레드(main Thread)
+                    ThreadTest2.java ==> main Thread + 작업쓰레드
+```
++ Java에서 Thread를 생성하는 방법 2가지
+  - 1) Thread클래스를 상속(extends) 받아, public void run() 메서드 재정의한다.
+    - run()메서드의 내용이 OS가 인지하는 Thread이다.
+  - 2) Runable 인터페이스를 구형(implements)
+```
+cpu
+main Thread  ---           --1~98--           --99~420--             --420~500--->>x 메인쓰레드소멸         
+work Thread     --501~504--        --505~820--          --821~1000--x
+                생성후실행                                           쓰레드소멸
+```  
+```java
+//ThreadTest2.java
+package com.jica.thread;
+public class ThreadTest2 {
+	public static void main(String[] args) {
+		// main 쓰레드에서는 1~500까지 합계 계산
+		// 작업쓰레드에서 501~1000까지 합계 계산
+
+		int sum1 = 0;
+		// 작업 쓰레드 즉, 501~1000합계 계산 쓰레드를 만들자
+		WorkThread wThread = new WorkThread();
+		wThread.start(); // 작업쓰레드가 실행된다.
+
+		int number = 1;
+		while (number <= 500) {
+			sum1 += number;
+			System.out.println(Thread.currentThread().getName() + "," + number + "," + sum1);
+			number++;
+		}
+
+		System.out.println("1~500까지의 합 : " + sum1);
+		// 아래의 코드는 작업쓰레드가 종료된 이후에야 정확하게 값을 알수있다.
+
+		try {
+			wThread.join();
+			// 위의 코드는 main Thread에게 작업쓰레드가 끝날때까지 기다리도록 한다.
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("501~1000까지의 합 : " + wThread.sum2);
+		System.out.println("1~1000까지의 합계 : " + (sum1 + wThread.sum2));
+		// 현재코드에서는 어느쓰레드가 먼저 종료될지 알수 없다.
+		System.out.println("main Thread 끝!------------------------------");
+	}
+}
+
+class WorkThread extends Thread {
+	int sum2;
+
+	@Override
+	public void run() {
+		// 여기에 작성하는 코드가 OS가 인지하는 쓰레드의 실제 실행코드이다.
+		System.out.println("작업쓰레드 시작!-------------------------------");
+		for (int number = 501; number <= 1000; number++) {
+			sum2 += number;
+			System.out.println(Thread.currentThread().getName() + "," + number + "," + sum2);
+		}
+		System.out.println("작업쓰레드 끝!--------------------------------");
+		// run()메서드의 실행코드가 끝나면 OS가 인지하는 쓰레드도 소멸되는 것이다.
+	}
+}
+```
+##### [반드시 기억하세요]
++ 1. main()메서드로부터 시작된 코드는 main Thread의 실행코드이다.
++ 2. Thread class, Runable interface를 사용하여 Thread객체를 만들고 start()를 시키면 이때부터는 작업쓰레드가 main Thread와 동시에 실행된다. 즉, 멀티 쓰레딩이 작동하는 것이다.
++ 3. 여러개의 쓰레드에서 실행할 코드를 작동시키는 것은 전적으로 OS가 담당한다. 우리가 개입할수 없다. 이것을 쓰레드 컨텍스트 스위칭이라고 부른다.(쓰레드를 교체하는 것)
 
 #### 5. 실습
 #### 6. Summary / Close
