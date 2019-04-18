@@ -10022,11 +10022,8 @@ File클래스 - 화일정보관리
 + 1) 수업내용 복습
 + 2) 프로젝트기획서 작업
 
-
-
 #### 4. 실습
 #### 5. Summary / Close
-
 
 
 
@@ -10035,14 +10032,269 @@ File클래스 - 화일정보관리
 ### [2019-04-18]
 
 #### 1. Review
-#### 4. 객체 직렬화
-+ 직렬화(serialization) 기능 : 객체를 통채로 화일에 저장하거나 화일내용을 읽자마자 객체가 생성되게 하는 기능
+#### 2. File클래스 사용법 및 활용예제(참고만)
+  - 1) File클래스의 메서드 사용법
+    + delete() 파일삭제
+    + renameTo(File) 화일명변경
+    + File.createTempFile(String, String) 임시파일 작성
 
-#### 5. Thread개요
+  - 2) 활용가능
+    + 파일명 변경, 파일분리, 파일병합
+
+#### 3. 객체 직렬화(serialization)
++ 직렬화(serialization) 기능 : 객체를 통채로 화일에 저장하거나 화일내용을 읽자마자 객체가 생성되게 하는 기능
++ 직렬화는 객체를ㄹ byte[]로 만들어서 ----(응용)----> 파일에 저장할 수 있는 기능. [or 네트워크전송]
++ 기존의 class중에서 직렬화기능을 지원하는 클래스들은 serialization 인터페이스를 구현했다.
+  - 우리가 사용했던 많은 클래스들이 이미 직렬화기능을 가지고 있다.
+```
+직렬화                        저장(쓰기:write)
+객체 ------------->byte[]-------->화일
+<-------------      <--------   
+역직렬화                      읽기:read
+```
+
++ 직렬화를 담당하는 I/O클래스가 있다.
+```
+  - ObjectInputStream / ObjectOuputStream
+                       -------------------
+                       defaultWriteObject()  내부적으로 자동직렬화를 수행해준다.
+                       write(int)
+                       write(byte[])
+                       write(byte[],int,int)
+                       writeXXX(기본자료형)
+                       ...
+                       writeObject(Object)
+```
+
++ 1) 직렬화방법
+  - 자동직렬화 : 클래스를 만들때 Serializable 인터페이스를 구현한다고 선언만 하면 된다.
+```java
+//SerialEx1.java
+package com.jica.ser;
+
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+
+public class SerialEx1 {
+	public static void main(String[] args) {
+		try {
+			String fileName = "UserInfo.ser";
+
+			FileOutputStream     fos = new FileOutputStream(fileName);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+			//직렬화기능을 전담하는 클래스
+			ObjectOutputStream out = new ObjectOutputStream(bos);
+
+			UserInfo u1 = new UserInfo("JavaMan","1234",30);
+			UserInfo u2 = new UserInfo("JavaWoman","4321",26);
+
+			//객체를 직렬화시켜 화일에 저장
+			out.writeObject(u1);
+			out.writeObject(u2);
+
+			//직렬화내용을 저장한 화일에는
+			//클래스정보와 객체의 멤버변수값이 저장된다.
+
+			ArrayList<UserInfo> list = new ArrayList<>();
+			list.add(new UserInfo("홍길동","jica",12));
+			list.add(new UserInfo("장길산","jeonju",650));
+
+			//ArrayList를 직렬화시켜 화일에 저장
+			out.writeObject(list);
+
+			out.close();
+			System.out.println("직렬화가 잘 끝났습니다.");
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	} // main
+} // class
+///////////////////////////////////////////////////////////////////
+//SerialEx2.java
+package com.jica.ser;
+
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+
+public class SerialEx2 {
+	public static void main(String[] args) {
+		try {
+			String fileName = "UserInfo.ser";
+			FileInputStream     fis = new FileInputStream(fileName);
+			BufferedInputStream bis = new BufferedInputStream(fis);
+
+			ObjectInputStream in = new ObjectInputStream(bis);
+
+			// 객체를 읽을 때는 출력한 순서와 일치해야한다.
+			UserInfo u1 = (UserInfo)in.readObject();
+			UserInfo u2 = (UserInfo)in.readObject();
+
+			System.out.println(u1);
+			System.out.println(u2);
+
+			//ArrayList을 화일로 부터 읽어와서 객체를 만들자
+			ArrayList list = (ArrayList)in.readObject();
+			System.out.println(list);
+
+			in.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	} // main
+} // class
+```
+
+```java
+//UserInfo2.java
+package com.jica.ser;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+class SuperUserInfo {
+	String name;
+	String password;
+
+	SuperUserInfo() {
+		this("Unknown","1111");
+	}
+
+	SuperUserInfo(String name, String password) {
+		this.name = name;
+		this.password = password;
+	}
+} // class SuperUserInfo
+
+//이미 SuperUserInfo클래스가 존재한다. 그런데 이클래스에는
+//직렬화기능이 지원되지 않고 있다.
+//이클래스를 상속받아 새로운 클래스를 만들때 직렬화기능을 지원하고 싶다면
+//Serializable 인터페이스를 구현한다고 선언하면
+//새로운클래스에 추가된 멤버만 직렬화가 이루어지고
+//SuperUserInfo의 멤버는 여전히 직렬화 지원되지 않는다.
+//이때 readObject(),writeObject()메서드를 재정의 하여
+//SuperUserInfo의 멤버를 수동으로 직렬화 시켜야 한다.
+
+public class UserInfo2 extends SuperUserInfo implements Serializable {
+	private static final long serialVersionUID = 1L;
+	int age;
+
+	public UserInfo2() {
+		this("Unknown", "1111", 0);
+	}
+
+	public UserInfo2(String name, String password, int age) {
+		super(name, password);
+		this.age = age;
+	}
+
+	public String toString() {
+		return "("+ name + "," + password + "," + age + ")";		
+	}
+
+	//특이한 문법
+	//직렬화기능을 수동으로 처리하고 싶을때 아래의 두메서드를 재정의 한다.
+	private void writeObject(ObjectOutputStream out)
+			throws IOException {
+			//디버깅용
+			System.out.println("UserInfo2::writeObject()...");
+
+			//상위클래스의 멤버를 수동으로 직렬화 시킨다.
+			out.writeUTF(name);
+			out.writeUTF(password);
+
+			//현재클래스의 멤버를 직렬화시킨다.
+			out.defaultWriteObject();
+		}
+
+		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+			//디버깅용
+			System.out.println("UserInfo2::readObject()...");
+
+			//상위클래스의 멤버를 수동으로 역직렬화 시킨다.			
+			name = in.readUTF();
+			password = in.readUTF();
+
+			//현재클래스의 멤버를 역직렬화시킨다.
+			in.defaultReadObject();
+		}
+} // class UserInfo2
+
+/////////////////////////////////////////////////////////////
+//SerialEx3.java
+package com.jica.ser;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+public class SerialEx3 {
+	public static void main(String[] args) {
+		try {
+			String fileName = "UserInfo2.ser";
+
+			FileOutputStream     fos = new FileOutputStream(fileName);
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+			//직렬화기능을 전담하는 클래스
+			ObjectOutputStream out = new ObjectOutputStream(bos);
+
+			UserInfo2 u1 = new UserInfo2("김동민","1111",27);
+			UserInfo2 u2 = new UserInfo2("빈태욱","2222",27);
+			UserInfo2 u3 = new UserInfo2("서영곤","3333",28);
+
+			System.out.println("직렬화시켜 화일에 저장시킨 객체 내용--------");
+			System.out.println(u1);
+			System.out.println(u2);
+			System.out.println(u3);		
+
+			//객체를 직렬화시켜 화일에 저장
+			out.writeObject(u1);
+			out.writeObject(u2);
+			out.writeObject(u3);
+
+			out.close();
+			System.out.println("직렬화가 잘 끝났습니다.------------");
+
+			FileInputStream     fis = new FileInputStream(fileName);
+			BufferedInputStream bis = new BufferedInputStream(fis);
+
+			ObjectInputStream in = new ObjectInputStream(bis);
+
+			// 객체를 읽을 때는 출력한 순서와 일치해야한다.
+			UserInfo2 u4 = (UserInfo2)in.readObject();
+			UserInfo2 u5 = (UserInfo2)in.readObject();
+			UserInfo2 u6 = (UserInfo2)in.readObject();
+
+			System.out.println("역직렬화시켜 화일에서 읽어서 생성한 객체 내용--------");
+			System.out.println(u4);
+			System.out.println(u5);
+			System.out.println(u6);			
+
+		} catch(IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	} // main
+} // class
+```
+
+#### 4. Thread개요
+
 #### 5. 실습
 #### 6. Summary / Close
-
-
 
 
 -----------------------------------------------------------
