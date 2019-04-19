@@ -6551,7 +6551,7 @@ public class StringTest3 {
 		}
 
 		//문자열을 byte[]배열로 만들어주는 메서드
-		//생성자 String(byte[])와 대조적인 역활을 수행한다.
+		//생성자 String(byte[])와 대조적인 역할을 수행한다.
 
 		//public byte[] getBytes​()
 		String title = "JICA";
@@ -6787,7 +6787,7 @@ String idno = "8912131238235";
 + StringBuffer, StringBuilder ==>수정 가능한(mutable) 문자열
 --추가,삽입,삭제,변경------
 ```
-==> StringBuffer와 StringBuilder는 동일한 역활을 수행하므로
+==> StringBuffer와 StringBuilder는 동일한 역할을 수행하므로
           생성자나 메서드의 형태가 거의 동일하다.  유일한 차이점 멀티쓰레딩기능을 지원하느냐 마느냐다.
     StringBuilder에는 멀티쓰레딩일때 정상 동작하도록 동기화처리가 되어있다.
 
@@ -8699,7 +8699,7 @@ class MyFrame extends Frame {
 + 시각화되어 보여지는 클래스들의 상속계층구조(외우자)
 ```
 Component
-  Container <=== 내부구성요소를 관리하는 역활 담당
+  Container <=== 내부구성요소를 관리하는 역할 담당
       Window
          Frame
            |-->우리가 Frame을 상속받아서 UserFrame을 만든다.
@@ -9970,7 +9970,7 @@ BufferedReader, BufferedWriter
      void	flush​()      내부버퍼 비우기
 
 InputStreamReader, OutputStreamWriter
-    바이트기반스트림을 문자기반스트림으로 연결시키는 역활을 수행한다.        
+    바이트기반스트림을 문자기반스트림으로 연결시키는 역할을 수행한다.        
 ```
 
 ```
@@ -10642,8 +10642,82 @@ void   sleep(int)
 + 1. Thread 정보 얻기
   - 현재쓰레드 객체를 얻어 get메서드들을 사용해 본다.
 ```
+getName()   : 쓰레드명
+getId()     : 시스템이 부여하는 고유 id
+getState()  : 쓰레드의 상태(NEW, RUNNABLE/BLOCKD-WAITTING-TIMED_WAITTING, TERMINATED)
+getPriority()) : 쓰레드의 우선순위(1~10)
+getThreadGroup().getName() : 현재쓰레드를 생성한 부모쓰레드
+isAlive()   : 쓰레드의 소멸여부
+isDemon()   : 현재쓰레드를 생성한 쓰레드가 종료되면 자동으로 종료되는 쓰레드여부(보조적인 역할)
+```
++ 2. Thread의 우선순위
+  - 다른쓰레드와 함께 사용될때 cpu를 얼마나 많이 점유하느냐의 정도를 지정한 값.
+  - 우선순위값은 1~10까지이다.
+  - 우선순위값이 클수록 다른 쓰레드에 비해 cpu를 많이 차지한다. 결국 빠르게 수행된다는 의미이다.
+  - 자주사용되는 우선순위값을 필드로 가지고 있다.
+```
+static int	MAX_PRIORITY = 10;
+static int	MIN_PRIORITY = 1;
+static int	NORM_PRIORITY = 5;
+
+void setPriority(int)
+int getPriority()
 ```
 
++ 3. 일반쓰레드와 데몬쓰레드
+  - 데몬쓰레드 : 보조기능을 수행하는 쓰레드로 부모쓰레드가 종료되면 자동으로 소멸되는 쓰레드다.
+```
+boolean isDemon()
+void setDemon(boolean)
+```
+
++ 4. 쓰레드 스케쥴링 관련메서드들
+```
+쓰레드생성 -------->실행 ----------->소멸
+                  | ^
+                  v |
+                                   대기상태    
+
+1.쓰레드 객체 생성 -------- NEW
+2.쓰레드 실행(start())--- RUNNABLE
+
+          RUNNABLE                   TIMED_WAITING,WAITTING,BLOCKED
+------------------------  <<resume>> -----------------------                                            
+   실행대기큐      main m2 m1 m3  <---------    일시정지큐  
+------------------------          -----------------------     
+              ^                    ^ sleep(시간)  
+              |                    | wait()
+              V                    | block 메서드실행(키보드입력)
+          활성화( ) ----------------| yield()
+                                     join()
+                                     <<suspend()) 강제로 일시정지
+                                     <<stop()>> ---------------> TERMINATED(소멸)
+```
+
++ 관련메서드 사용법
+```
+-- 주어진 시간동안 정지상태
+static void	sleep​(long millis)
+static void	sleep​(long millis, int nanos)
+
+-- 쓰레드에게 멈추기를 요청하는것(내부코드에서 요청을 인지하고 실제 종료하도록 코드를 작성하는것은 사용자 몫)
+        쓰레드 내부에는 interrupt상태를 저장하는 boolean변수가 있다.
+   intrerrupt()가 호출되면 해당변수를 false에서 true로 변경만 시킨다.  변수의 내용값을
+        참조하는 인스턴스메서드가 isInterrupted()이고 static메서드가 interrupted()이다.                               
+
+   void interrupt​()
+   boolean isInterrupted()
+   static boolean interrupted​()     
+
+-- 프로그램에서 강제로 일시정시/다시실행/종료등의 기능을 메서드로 사용할 수 있지만
+      권장하지 않는 메서드들이다.(쓰지 마시오)
+
+      일시정지   public final void suspend​()
+      다시실행   public final void resume​()
+      강제종료   public final void stop​()    
+
+      교재예제에서 비슷한 효과가 나타나도록 해당메서드를 재정의해서 사용했다.
+```
 
 #### 4. 동기화
 #### 5. 실습
