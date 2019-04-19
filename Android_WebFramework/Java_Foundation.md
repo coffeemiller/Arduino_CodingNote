@@ -10575,7 +10575,83 @@ cpu자체의 기술도 많이 발전하여 마치 여러개의 cpu가 있는 것
 ### [2019-04-19]
 
 #### 1. Review
++ 자바강의 마무리
+  - Network는 데이터베이스(Oracle)학습후 Java에서 Database를 사용하는 방법(JDBC)을 학습할때, Network관련학습을 함께 마무리하자.
+  - 오늘까지 Tread, Tread동기화까지 학습해서 자바를 마무리하자.
+
++ Thread(복습-정리)
+  1. Program - file형태로 존재하는 실행코드
+  2. Process - 시스템자원(resource)을 할당받아 현재 실행중인 프로그램
+  3. Thread
+    - 1) cpu를 독점적으로 상요하여 특정코드를 실행시키는 단위
+    - 2) 독자적인 메모리영역을 사용
+    - 3) 시간분할에 의한 병렬처리(멀티 쓰레드 프로그램)
+```
+Test.java ---> Test.class ---실행-----> Process생성/실행
+                           java.exe        |--> main method실행<== main Thread
 
 
+   원래 쓰레드는 OS의 고유영역이다.
+Java에서 쓰레드를 생성하는 방법을 제공해준다( Thread class, Runnable interface )
+
+                                           <<interface>>
+Thread                                        Runnable
+------------------                         ----------------
+Thread()                            <<abstract>> void run()
+Thread(Runnable)
+
+void run(){}
+static int activeCount()
+static Thread currentThread()
+String getName()
+int    getId()
+int    getPriority()
+void   sleep(int)
+   ....
+
+   1) Thread 클래스 상속
+      class UserThread extends Thread{
+          ...
+          public void run(){
+                        실행코드
+             (상위클래스 즉, Thread클래스의 모든 메서드 사용 가능)           
+          }
+          ...
+      }
+
+      UserThread ut = new UserThread();   //쓰레드 객체   
+      ut.start();                         //os가 인지하는 쓰레드가 생성되고 실행된다.
+
+
+   2) Runnable 인테페이스 구현        
+      class UserRunnable implements Runnable{
+          ...
+          public void run(){
+                           실행코드
+              (Thread의 메서드를 사용할수 없다)             
+          }
+      }
+
+      UserRunnable ur = new UserRunnable();
+      Thread th = new Thread(ur);         //쓰레드 객체         
+      th.start();                         //os가 인지하는 쓰레드가 생성되고 실행된다.
+```
+
+
+#### 2. Thread
++ 1. Thread 정보 얻기
+  - 현재쓰레드 객체를 얻어 get메서드들을 사용해 본다.
+```
+```
+
+
+#### 4. 동기화
 #### 5. 실습
 #### 6. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-04-24]
+
+#### 1. Oracle
