@@ -101,7 +101,7 @@
 ```
 
 #### 3. SELECT문
-![SELECT FROM](select00.png "SELECT FROM")
+![SELECT FROM](select.png "SELECT FROM")
 ```
 1.특정 종업원에 대한 모든 데이터를 나타내는 단일 row(오라클) 또는 tuple 입니다.
   기본 키(primary key)에 의해 식별되어져야 합니다.
