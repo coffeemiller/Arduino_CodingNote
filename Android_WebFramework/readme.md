@@ -45,6 +45,6 @@
 
 #### 2. 간단 TEST
 
-## [JAVA 기초](\Java_Foundation\Java_Foundation.md) - 2019/003/05
+## [JAVA 기초](#Java_Foundation#Java_Foundation.md) - 2019/003/05
 
-## [Oracle 기초](\Oracle_Foundation\Oracle_Foundation.md) - 2019/04/24
+## [Oracle 기초](#Oracle_Foundation#Oracle_Foundation.md) - 2019/04/24
