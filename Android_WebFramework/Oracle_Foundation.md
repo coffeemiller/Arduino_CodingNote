@@ -371,7 +371,7 @@ SQL> SELECT empno,ename,job,CONCAT(empno,ename) e_name,
 긴 문장일때는 파일(*.sql)을 만들어서 실행(@경로\파일.sql)
 이때... 실행과정을 보려면, ( SQL> SET ECHO ON )으로 설정
 
-
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 [숫자와 문자를 합치도록 CONCAT()을 사용하면 내부적으로 자동현변환]
 SQL> SELECT empno, ename, CONCAT(empno,ename), CONCAT(ename,empno) FROM emp;
 ---------------------------------------> 가독성이 없어서 수정이 필요함.
@@ -395,8 +395,100 @@ CHAR(10) ==> 고정길이 문자열
 VARCHAR2(10) ==> 가변길이 문자열
 NUMBER(5) ==> 고정길이 정수
 NUMBER ==> 가변길이 정수
+============================================================
+[SUBSTR() : 부분문자열 발췌함]
+SQL> SELECT 'ORACLE JICA', SUBSTR('ORACLE JICA', 8, 4) FROM DUAL;
 
-SUBSTR()
+'ORACLEJICA'           SUBSTR('
+---------------------- --------
+ORACLE JICA            JICA
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+SQL> SELECT * FROM emp WHERE SUBSTR(ename, 1,1) > 'K' AND SUBSTR(ename,1,1) < 'Y' ORDER BY ename;
+
+EMPNO ENAME         JOB                MGR HIREDATE        SAL       COMM     DEPTNO
+----- -------  ---------------- ---------- -------- ---------- ---------- ----------
+7654 MARTIN        SALESMAN          7698 81-09-28       1250       1400         30
+7934 MILLER        CLERK             7782 82-01-23       1300                    10
+7788 SCOTT         ANALYST           7566 87-04-19       3000                    20
+7369 SMITH         CLERK             7902 80-12-17        800                    20
+7844 TURNER        SALESMAN          7698 81-09-08       1500          0         30
+7521 WARD          SALESMAN          7698 81-02-22       1250        500         30
+
+6 rows selected.
+=============================================================
+
+[LENGTH() 문자열의 길이 구하기]
+SQL> SELECT LENGTH('전주'), LENGTH('jeonju') FROM DUAL;
+
+LENGTH('전주') LENGTH('JEONJU')
+-------------- ----------------
+             2                6
+LENGTH(문자열), LENGTH(숫자)-내부적으로 자동형변환(NUMBER->CHAR)
+문자함수는 문자형을 매개변수로 사용하고 결과값을 문자값 혹은 숫자값을 리턴한다.
+
+
+[INSTR() 문자열에서 지정한 문자열의 위치를 검색]
+SQL> SELECT INSTR('DataBase', 'B') FROM DUAL;
+
+INSTR('DATABASE','B')
+---------------------
+                    5
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+SQL> SELECT INSTR('DataBase', 'a', 1, 3) FROM DUAL;
+
+INSTR('DATABASE','A',1,3)
+-------------------------
+                        6
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+SQL> SELECT ename, INSTR(ename,'L') e_null,
+  2                          INSTR(ename,'L',1,1) e_11,
+  3                          INSTR(ename,'L',1,2) e_12,
+  4                          INSTR(ename,'L',4,1) e_41,
+  5                          INSTR(ename,'L',4,2) e_42
+  6  FROM emp
+  7  ORDER BY ename;
+
+ENAME                    E_NULL       E_11       E_12       E_41       E_42
+-------------------- ---------- ---------- ---------- ---------- ----------
+ADAMS                         0          0          0          0          0
+ALLEN                         2          2          3          0          0
+BLAKE                         2          2          0          0          0
+CLARK                         2          2          0          0          0
+FORD                          0          0          0          0          0
+JAMES                         0          0          0          0          0
+JONES                         0          0          0          0          0
+KING                          0          0          0          0          0
+MARTIN                        0          0          0          0          0
+MILLER                        3          3          4          4          0
+SCOTT                         0          0          0          0          0
+SMITH                         0          0          0          0          0
+TURNER                        0          0          0          0          0
+WARD                          0          0          0          0          0
+
+===============================================================
+
+[LPAD(), RPAD() : 지정한 문자열의 왼/오른쪽에 특정문자로 채움]
+SQL> SELECT 'MILLER', LPAD('MILLER',10,'*'), RPAD('MILLER',10,'X') FROM DUAL;
+
+'MILLER'     LPAD('MILLER',10,'*' RPAD('MILLER',10,'X'
+------------ -------------------- --------------------
+MILLER       ****MILLER           MILLERXXXX
+
+================================================================
+
+[LTRIM() : 왼쪽에서 지정문자제거]
+SQL> SELECT 'MILLER', LTRIM('MILLER','M'), RTRIM('MILLER','R') FROM DUAL;
+
+'MILLER'     LTRIM('MIL RTRIM('MIL
+------------ ---------- ----------
+MILLER       ILLER      MILLE
+
+SQL> SELECT ename, job, LTRIM(job,'A'), sal, LTRIM(sal,'1') FROM emp;
+
+==============================================================
+
+[TRANSLATE, REPLACE ==> 다른 문자열로 대체]
+
 ```
     + (2) 숫자형 함수 : 숫자를 입력 받고 숫자를 RETURN한다.
     + (3) 날짜형 함수 : 날짜형에 대해 수행하고 숫자를 RETURN하는 MONTHS_BETWEEN 함수를 제외하고 모두 날짜 데이터형의 값을 RETURN한다.
