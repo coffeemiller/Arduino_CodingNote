@@ -488,7 +488,32 @@ SQL> SELECT ename, job, LTRIM(job,'A'), sal, LTRIM(sal,'1') FROM emp;
 ==============================================================
 
 [TRANSLATE, REPLACE ==> 다른 문자열로 대체]
+SQL> SELECT TRANSLATE('MILLER','L','*') FROM DUAL;
 
+TRANSLATE('M
+------------
+MI**ER
+///////////////////////////////////////////////////////
+SQL> SELECT TRANSLATE('MILLER','MLE','X*@') FROM DUAL;
+
+TRANSLATE('M
+------------
+XI**@R
+///////////////////////////////////////////////////////
+
+TRANSLATE()는 지정한 글자를 새로운 문자로 변환
+
+==================================================================
+
+[REPLACE() : 원래 문자열(여러문자)을 새로운 문자열로 대체시킨다.]
+SQL> SELECT REPLACE('JACK AND JUE', 'J', 'BL') FROM DUAL;
+
+REPLACE('JACKANDJUE','J','BL
+----------------------------
+BLACK AND BLUE
+
+
+오라클 내부에서는 한글한글자를 저장하기 위해 실제 사용하는 BYTE는 3byte
 ```
     + (2) 숫자형 함수 : 숫자를 입력 받고 숫자를 RETURN한다.
     + (3) 날짜형 함수 : 날짜형에 대해 수행하고 숫자를 RETURN하는 MONTHS_BETWEEN 함수를 제외하고 모두 날짜 데이터형의 값을 RETURN한다.
@@ -509,6 +534,7 @@ SQL> SELECT 2*5 FROM dept;
         10
         10
 ```
+
 + 오라클 내부에 1개의 row를 가진 임시테이블이 있다. 이 테이블을 DUAL테이블이다.
 ```
 SQL> SELECT 2*5 FROM DUAL;
@@ -525,12 +551,14 @@ SQL> SELECT 2*5 FROM DUAL;
   - 함수명도 대문자로 작성하자  <=======관례적 규칙
 
   - 문자열 합치기 연산자 ==> ||
-#### 3. 연산자
-#### 4. 실습
-#### 5. Summary / Close
+
+##### [오늘의 과제]
++ 3.doc 연습문제 풀기
+
+#### 3. 실습
+#### 4. Summary / Close
 
 -----------------------------------------------------------
-
 
 
 ### [2019-04-26]
