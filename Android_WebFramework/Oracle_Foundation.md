@@ -326,7 +326,113 @@ HAVING
 ```
 + 먼저 함수를 학습해야 GROUP BY와 HAVING을 적용할때 용이하다.
 
-#### 3. 자료형
+#### 3. 단일행 함수
++ 함수 : 특정 기능을 수행하는 명령어들의 모임(JAVA언어에서 메서드와 비슷)
+
++ 함수의 종류
+  - 1) 단일행 함수 : 각 행(row)별로 함수를 적용시켜 결과를 만든다.
+    + 각 함수마다 리턴값이 정해져 있다.
+    + (1) 문자형 함수 : 문자를 입력 받고 문자와 숫자 값 모두를 RETURN할 수 있다.
+      - 해당 컬럼을 소문자로...```SELECT empno, ename, LOWER(ename), sal FROM emp;```
+      - ```SELECT empno, ename FROM emp WHERE LOWER(ename)='smith';```
+      - 해당 문자의 숫자계산...```SELECT LENGTH('Oracle') FROM DUAL;```
+```
+[대소문자변환]
+SQL> SELECT empno, ename, LOWER(job), deptno FROM emp WHERE LOWER(ename)='scott';
+
+     EMPNO ENAME                LOWER(JOB)             DEPTNO
+---------- -------------------- ------------------ ----------
+      7788 SCOTT                analyst                    20
+
+SQL> SELECT empno, ename, job FROM emp WHERE ename=UPPER('scott');
+
+     EMPNO ENAME                JOB
+---------- -------------------- ------------------
+      7788 SCOTT                ANALYST
+
+[문자열의 첫글자만 대문자로 변환 : INITCAP]
+SQL> SELECT 'ORACLE DATABASE', INITCAP('ORACLE DATABASE') FROM DUAL;
+
+'ORACLEDATABASE'               INITCAP('ORACLEDATABASE')
+------------------------------ ------------------------------
+ORACLE DATABASE                Oracle Database
+
+
+[두 문자열을 합치는 함수 ==> CONCAT()]
+SQL> COL e_name FORMAT A15
+SQL> COL e_empno FORMAT A15
+SQL> COL e_job FORMAT A15
+SQL> SELECT empno,ename,job,CONCAT(empno,ename) e_name,
+  2  CONCAT(ename,empno) e_empno,
+  3  CONCAT(ename,job) e_job
+  4  FROM emp
+  5  WHERE deptno = 10;
+
+긴 문장일때는 파일(*.sql)을 만들어서 실행(@경로\파일.sql)
+이때... 실행과정을 보려면, ( SQL> SET ECHO ON )으로 설정
+
+
+[숫자와 문자를 합치도록 CONCAT()을 사용하면 내부적으로 자동현변환]
+SQL> SELECT empno, ename, CONCAT(empno,ename), CONCAT(ename,empno) FROM emp;
+---------------------------------------> 가독성이 없어서 수정이 필요함.
+SQL> COL e_name FORMAT A15  -> 결과값으로 문자 15자리를 출력할수 있는 공간확보.
+
+
+[SQL 자료형]
+SQL> DESC emp
+ Name                               Null?    Type
+ --------------------------------- -------- --------------------------------------------
+ EMPNO                             NOT NULL  NUMBER(4)
+ ENAME                                       VARCHAR2(10)
+ JOB                                         VARCHAR2(9)
+ MGR                                         NUMBER(4)
+ HIREDATE                                    DATE
+ SAL                                         NUMBER(7,2)
+ COMM                                        NUMBER(7,2)
+ DEPTNO
+
+CHAR(10) ==> 고정길이 문자열
+VARCHAR2(10) ==> 가변길이 문자열
+NUMBER(5) ==> 고정길이 정수
+NUMBER ==> 가변길이 정수
+
+SUBSTR()
+```
+    + (2) 숫자형 함수 : 숫자를 입력 받고 숫자를 RETURN한다.
+    + (3) 날짜형 함수 : 날짜형에 대해 수행하고 숫자를 RETURN하는 MONTHS_BETWEEN 함수를 제외하고 모두 날짜 데이터형의 값을 RETURN한다.
+    + (4) 형변환함수 : 어떤 데이터형의 값을 다른 데이터형으로 변환한다.
+    + (5) 기타함수
+
+  - 2) 그룹 함수 : 여러행(전체행, GROUP지정행들)을 대상으로 하나의 결과를 만든다.
+    + 그룹함수는 7개 밖에 없다.
+    + ```SELECT deptno, COUNT(deptno) FROM emp GROUP BY deptno;```
+
+```
+SQL> SELECT 2*5 FROM dept;
+
+       2*5
+----------
+        10
+        10
+        10
+        10
+```
++ 오라클 내부에 1개의 row를 가진 임시테이블이 있다. 이 테이블을 DUAL테이블이다.
+```
+SQL> SELECT 2*5 FROM DUAL;
+
+       2*5
+----------
+        10
+```
+  - DUAL : 임의의 테이블, 가상테이블(dummy 테이블) ==> DUAL
+
++ 오라클 학습시 참고 사이트(http://www.gurubee.net/)
+  - 키워드는 대문자로 하자
+  - 사용자 정의어 즉, 테이블명, 컬럼명은 소문자로 기술하자
+  - 함수명도 대문자로 작성하자  <=======관례적 규칙
+
+  - 문자열 합치기 연산자 ==> ||
 #### 3. 연산자
 #### 4. 실습
 #### 5. Summary / Close
