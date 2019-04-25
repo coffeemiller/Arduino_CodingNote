@@ -223,20 +223,88 @@ SQL명령을 사용하여 DB관리에 필요한 모든 기능을 수행한다.
   - EMP 테이블에서 담당하고 있는 업무의 종류를 출력 : ```SELECT DISTINCT job FROM emp;```
   - 부서별로 담당하는 업무를 한번씩 부서번호 오름차순 출력 : ```SELECT DISTINCT deptno, job FROM emp ORDER BY deptno;```
 
-#### 4. 자료형
-#### 5. 연산자
-#### 6. 실습
+
+#### 4. 실습
 #### 7. Summary / Close
 
 -----------------------------------------------------------
 
-
-
 ### [2019-04-25]
 
 #### 1. Review
-#### 3. 실습
-#### 4. Summary / Close
+
+#### 2. SQL문 실습
++ 조건을 기술할때 다양한 연산자를 사용할 수 있다.
+  - ```SELECT * FROM emp WHERE sal >= 3000;```
+  - INITCAP() : 괄호안의 정보에서 앞글자만 대문자로 변환
+
++ 연산자의 종류
+  - 1) 산술연산자 : +, -, `*`, /, MOD()
+  - 2) 비교연산자 : =, !=, <>, ^=, >, >=, <, <=
+  - 3) 논리연산자 : AND, OR, NOT
+  - 4) SQL연산자 : BETWEEN AND, IN, LIKE, IS NULL, NOT NULL
+  - 5) 기타연산자 : DECODE, CASE WHEN
+
++ 날짜값(DATE)을 표현할때는 사용하는 지역과 언어에 따라 표현형식이 달라질수 있다.
+  - SQL문장에서 문자데이터와 날짜데이터를 직접 기술할때는 반드시 단일 인용 부호('')사용.
+  - 미국표현식으로...
+    + ```ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MON-YY';``` 날짜형식 변환
+      - DD는 후에 4자리로 항상 검색해야됨.... RR을 쓰면 2자리로도 인식가능.
+    + ```ALTER SESSION SET NLS_LANGUAGE = AMERCIAN;``` 미국식으로 언어를 바꿈
+    + ```SELECT empno, ename, job, sal, hiredate, deptno FROM emp WHERE hiredate >= '01-JAN-1982';``` 4자리 연도를 표시해야 인식됨.
+
+  - 한국표현식으로...
+    + ```ALTER SESSION SET NLS_DATE_FORMAT = 'RR/MM/DD';``` 2자리연도/월/날
+    + ```ALTER SESSION SET NLS_LANGUAGE = KOREAN;``` 한국식으로 표기
+
++ 논리연산자(AND, OR, NOT)  ==> JAVA에서 &&, ||, !
+  - AND연산자 : ```SELECT empno,ename,job,sal,hiredate,deptno FROM emp WHERE sal >= 1100 AND job = 'MANAGER';```
+  - OR연산자 :  ```SELECT empno,ename,job,sal,hiredate,deptno FROM emp WHERE sal >= 1100 OR job = 'MANAGER';```
+  - OR연산자 : ```SELECT * FROM emp WHERE job='MANAGER' OR job='CLERK' OR job='ANALYST';```
+  - NOT연산자 :  ```SELECT * FROM emp WHERE NOT(job='MANAGER' OR job='CLERK' OR job='ANALYST');```
+
+  - AND, OR, NOT의 연산자 사용법은 Java언어에서 &&,||,!의 사용법과 동일하다.
+
++ SQL에서만 사용하는 SQL연산자가 있다.
+  - 1) BETWEEN AND ====> AND연산의 단순표현
+    + ```SELECT * FROM emp WHERE sal >= 1250 AND sal <= 1500;```
+    + 같은표현으로 ```SELECT * FROM emp WHERE sal BETWEEN 1250 AND 1500;```
+    + AND연산으로 표현된 식의 결과 범위를 가지고 표현될때 BETWEEN a AND b 로 대치가능.
+
+  - 2) IN ====> OR연산의 단순표현
+    + ```SELECT * FROM emp WHERE empno=7902 OR empno=7788 OR empno=7566;```
+    + 같은표현으로 ```SELECT * FROM emp WHERE empno IN(7902,7788,7566);```
+    + OR연산으로 표현된 등가비교의 값이 여러개일때 IN연산자로 대치가능.
+
+  - 3) LIKE
+    + LIKE연
+    + S로시작하는 검색...```SELECT * FROM emp WHERE ename LIKE 'S%';```
+    + S로끝나는 검색...```SELECT * FROM emp WHERE ename LIKE '%S';```
+    + S가(어디든)들어가는 검색...```SELECT * FROM emp WHERE ename LIKE '%S%';```
+    + 와일드카드 ```%``` 한글자도 없거나 한글자이거나, 두글자이거나, 여러글자여도 상관없다.
+    + 와일드카드 ```_``` 한글자만 의미하고 어느글자이든 상관없다.
+    + 5번째가S인 검색...```SELECT * FROM emp WHERE ename LIKE '____S';```
+    + 82년도 검색... ```SELECT * FROM emp WHERE hiredate LIKE '82%';```
+    + 참고
+      - name에 값이 X_Y가 포함되어 있는 문자열을 조회하고자 할 경우 Escape를 사용한다
+      - ```WHERE name LIKE ‘%X\_Y%’ ESCAPE ‘\’;```
+
+  - 4) IS NULL, NOT NULL
+    + 추가수당이 없는(null)인사람...```SELECT * FROM emp WHERE comm IS NULL;```
+    + 추가수당이 없지(null) 않은사람...```SELECT * FROM emp WHERE NOT comm IS NULL;```
+      - 위와 같은 표현.... ```SELECT * FROM emp WHERE comm IS NOT NULL;```
+    + 에러에 유의.... 'IS NULL' <> 'IS NOT NULL' 또는 'NOT 컬럼 IS NULL'
+
++ WHERE조건절에 산술연산, 비교연산, 논리연산, SQL연산(BETWEEN AND, IN, LIKE, IS NULL)사용가능.
+
++ 우선 순위 규칙
+  - 괄호 > 모든 비교 연산자 > NOT > AND > OR
+  - 연산자도 우선순위가 있지만, 직접 괄호를 사용하여 우선순위를 명시적으로 지정하는 것이 좋음.
+
+#### 3. 자료형
+#### 3. 연산자
+#### 4. 실습
+#### 5. Summary / Close
 
 -----------------------------------------------------------
 
