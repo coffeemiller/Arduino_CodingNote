@@ -277,7 +277,7 @@ SQL명령을 사용하여 DB관리에 필요한 모든 기능을 수행한다.
     + OR연산으로 표현된 등가비교의 값이 여러개일때 IN연산자로 대치가능.
 
   - 3) LIKE
-    + LIKE연
+    + LIKE연산은 문자열의 값을 와일드카드(%,`_`)를 사용하여 패턴비교를 수행한다.
     + S로시작하는 검색...```SELECT * FROM emp WHERE ename LIKE 'S%';```
     + S로끝나는 검색...```SELECT * FROM emp WHERE ename LIKE '%S';```
     + S가(어디든)들어가는 검색...```SELECT * FROM emp WHERE ename LIKE '%S%';```
@@ -300,6 +300,31 @@ SQL명령을 사용하여 DB관리에 필요한 모든 기능을 수행한다.
 + 우선 순위 규칙
   - 괄호 > 모든 비교 연산자 > NOT > AND > OR
   - 연산자도 우선순위가 있지만, 직접 괄호를 사용하여 우선순위를 명시적으로 지정하는 것이 좋음.
+
++ ORDER BY절을 사용하여 출력순서를 결정하자(SORT ==> 오름차순 ASC/내림차순 DESC)
+  - 이름으로 오름차순... ```SELECT * FROM emp ORDER BY ename (ASC);```
+  - 이름으로 내림차순... ```SELECT * FROM emp ORDER BY ename DESC;```
+  - 급여1500이상 오름차순...```SELECT * FROM emp WHERE sal > 1500 ORDER BY sal;```
+  - 정렬의 순서
+    + 작은숫자 < 빠른날짜 < A-Z-a-z < NULL
+
+  - 같은표현 3가지
+    + ```SELECT empno, ename, job, sal, sal*12 AS Annsal FROM emp ORDER BY Annsal;```
+    + ```SELECT empno, ename, job, sal, sal*12 AS Annsal FROM emp ORDER BY sal*12;```
+    + ```SELECT empno, ename, job, sal, sal*12 AS Annsal FROM emp ORDER BY 5;```
+
+  - 여러개 기준정렬
+    + ```SELECT deptno, empno, ename, job, sal FROM emp ORDER BY deptno, sal DESC;```
+
+```
+SELECT 컬럼
+FROM 테이블명
+WHERE 조건
+ORDER BY 정렬기준
+GROUP BY
+HAVING
+```
++ 먼저 함수를 학습해야 GROUP BY와 HAVING을 적용할때 용이하다.
 
 #### 3. 자료형
 #### 3. 연산자
