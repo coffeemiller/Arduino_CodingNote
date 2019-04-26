@@ -250,7 +250,7 @@ SQL명령을 사용하여 DB관리에 필요한 모든 기능을 수행한다.
   - 미국표현식으로...
     + ```ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MON-YY';``` 날짜형식 변환
       - DD는 후에 4자리로 항상 검색해야됨.... RR을 쓰면 2자리로도 인식가능.
-    + ```ALTER SESSION SET NLS_LANGUAGE = AMERCIAN;``` 미국식으로 언어를 바꿈
+    + ```ALTER SESSION SET NLS_LANGUAGE = AMERICAN;``` 미국식으로 언어를 바꿈
     + ```SELECT empno, ename, job, sal, hiredate, deptno FROM emp WHERE hiredate >= '01-JAN-1982';``` 4자리 연도를 표시해야 인식됨.
 
   - 한국표현식으로...
@@ -762,9 +762,115 @@ ENAME      HIREDATE    M_ROUND     M_TRUNC    Y_ROUND     Y_TRUNC
 MILLER     23-JAN-82   01-FEB-82   01-JAN-82  01-JAN-82   01-JAN-82
 KING       17-NOV-81   01-DEC-81   01-NOV-81  01-JAN-82   01-JAN-81
 CLARK      09-JUN-81   01-JUN-81   01-JUN-81  01-JAN-81   01-JAN-81
-
-- 변환함수 : TO_CHAR(), TO_NUMBER(), TO_DATE()
 ```
+
++ 형변환함수 : TO_CHAR(), TO_NUMBER(), TO_DATE()
+  - 오라클에서의 형변환은....자동형변환 / 강제형변환-> 형변환 함수를 명시적으로 사용.
+```
+[TO_CHAR(날짜, '형식문자')]
+SQL> ALTER SESSION SET NLS_LANGUAGE='AMERICAN';
+SQL> COL t_hiredate FORMAT a30
+SQL> COL t_kor FORMAT a20
+SQL> SELECT ename,hiredate,TO_CHAR(hiredate, 'fmDD Month YYYY') t_hiredate,
+  2                        TO_CHAR(hiredate, 'YYYY"년" MM"월" DD"일"') t_kor
+  3  FROM emp
+  4  WHERE deptno = 10
+  5  ORDER BY hiredate DESC;
+
+ENAME                HIREDATE T_HIREDATE                     T_KOR
+-------------------- -------- ------------------------------ --------------------
+MILLER               82/01/23 23 January 1982                1982년 01월 23일
+KING                 81/11/17 17 November 1981               1981년 11월 17일
+CLARK                81/06/09 9 June 1981                    1981년 06월 09일
+///////////////////////////////////////////////////////////////////////////////
+
+[TO_CHAR(숫자, '형식지정자') 형식지정자를 통한 문자를 숫자로]
+SQL> SELECT empno, ename, job, sal, TO_CHAR(sal,'L099,999') FROM emp;
+
+EMPNO ENAME                JOB                       SAL TO_CHAR(SAL,'L099,999')
+----- -------------------- ------------------ ---------- ---------------------------------
+7369 SMITH                CLERK                     800         ￦000,800
+7499 ALLEN                SALESMAN                 1600         ￦001,600
+7521 WARD                 SALESMAN                 1250         ￦001,250
+7566 JONES                MANAGER                  2975         ￦002,975
+7654 MARTIN               SALESMAN                 1250         ￦001,250
+//////////////////////////////////////////////////////////////////////////////
+
+[TO_NUMBER('문자') 문자를 숫자로 바꿔줌]
+SQL> SELECT TO_NUMBER('1234') FROM DUAL;
+
+TO_NUMBER('1234')
+-----------------
+             1234
+
+
+<문제풀이 27>
+SQL> SELECT ename, job, TO_CHAR(hiredate, 'RR/MM/DD') t_hire FROM emp WHERE hiredate=TO_DATE('19810222','RR/MM/DD');
+
+ENAME                JOB                T_HIRE
+-------------------- ------------------ ----------------
+WARD                 SALESMAN           81/02/22
+```
+
++ 기타함수
+  - NVL(), DECODE(), CASE WHEN
+```
+[DECODE() 조건적 조회 -> CASE/IF]
+SQL> SELECT empno, ename, job, sal, DECODE(job, 'ANALYST', sal*1.1, 'CLERK', sal*1.15, 'MANAGER', sal*1.2) d_sal FROM emp ORDER BY sal DESC;
+
+     EMPNO ENAME                JOB                       SAL      D_SAL
+---------- -------------------- ------------------ ---------- ----------
+      7839 KING                 PRESIDENT                5000
+      7902 FORD                 ANALYST                  3000       3300
+      7788 SCOTT                ANALYST                  3000       3300
+      7566 JONES                MANAGER                  2975       3570
+      7698 BLAKE                MANAGER                  2850       3420
+      7782 CLARK                MANAGER                  2450       2940
+
+[CASE WHEN()도 있다!!!]
+SQL> SELECT empno, ename, deptno,
+      CASE WHEN deptno=10 THEN 'ACCOUNTING'
+           WHEN deptno=20 THEN 'RESEAECH'
+           WHEN deptno=30 THEN 'SALES'
+           WHEN deptno=40 THEN 'OPERATIONS'
+      END
+   FROM emp;
+
+     EMPNO ENAME                    DEPTNO CASEWHENDEPTNO=10THE
+---------- -------------------- ---------- --------------------
+      7369 SMITH                        20 RESEAECH
+      7499 ALLEN                        30 SALES
+      7521 WARD                         30 SALES
+
+///////////////////////////////////////////////////////////////////////
+<문제풀이 28>
+SQL> COL t_rpad format a20
+SQL> COL r_r format a20
+SQL> SELECT deptno,dname,RPAD(dname,20,'*') t_rpad,
+  2                      RPAD(RTRIM(dname),20,'*') r_r,loc
+  3  FROM dept;
+
+DEPTNO DNAME          T_RPAD               R_R                  LOC
+------ -------------- -------------------- -------------------- --------
+    10 ACCOUNTING     ACCOUNTING********** ACCOUNTING********** NEW YORK
+    20 RESEARCH       RESEARCH  ********** RESEARCH************ DALLAS
+    30 SALES          SALES*************** SALES*************** CHICAGO
+    40 OPERATIONS     OPERATIONS********** OPERATIONS********** BOSTON
+
+
+SQL> SELECT deptno, dname || '|', loc FROM dept;
+
+DEPTNO DNAME||'|'       LOC
+------ ---------------- -----------
+    10 ACCOUNTING|      NEW YORK
+    20 RESEARCH  |      DALLAS
+    30 SALES     |      CHICAGO
+    40 OPERATIONS|      BOSTON
+```
+
++ GROUP함수
+
+
 #### 3. 그룹함수
 #### 4. DML명령
 #### 5. DDL명령
