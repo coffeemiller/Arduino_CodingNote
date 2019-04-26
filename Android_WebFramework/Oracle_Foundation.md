@@ -1115,9 +1115,112 @@ MIN(MIN(SAL))
 
 
 #### 4. DML명령
-#### 5. DDL명령
-#### 6. 실습
-#### 7. Summary / Close
++ Java AWT에서 학습했던 Profile 내용을 테이블로 만들어서 데이터를 추가해 보자
+
++ DDL(Data Definition Language)명령
+  - 테이블을 생성, 구조를 변경, 테이블을 삭제하는 명령
+```
+[테이블을 만들어보자]
+성명 : name  CHAR(15)
+나이 : age   NUMBER(3)
+전화 : phone CHAR(13)
+메일 : email VARCHAR2(20)
+생년월일 : birthday DATE
+
+SQL> CREATE TABLE profile(
+  2  name CHAR(15),
+  3  age NUMBER(3),
+  4  phone CHAR(13),
+  5  email VARCHAR2(20),
+  6  birthday DATE
+  7  );
+
+SQL> SELECT * FROM TAB;
+
+TNAME                                                        TABTYPE         CLUSTERID
+------------------------------------------------------------ -------------- ----------
+BONUS                                                        TABLE
+DEPT                                                         TABLE
+EMP                                                          TABLE
+PROFILE                                                      TABLE
+SALGRADE                                                     TABLE
+
+SQL> DESC profile
+Name                             Null?    Type
+------------------------------- -------- --------------------------------------------
+NAME                                      CHAR(15)
+AGE                                       NUMBER(3)
+PHONE                                     CHAR(13)
+EMAIL                                     VARCHAR2(20)
+BIRTHDAY                                  DATE
+
+- 테이블에 데이터를 추가, 수정, 삭제하는 명령
+- DML(Data Manuflation Language) 명령
+  - 추가 : INSERT INTO
+  - 수정 : UPDATE SET
+  - 삭제 : DELETE FROM
+
+SQL> INSERT INTO profile VALUES('김동민',27,'010-7245-1269','kdm9214@naver.com','');
+SQL> INSERT INTO profile(name,age,phone) VALUES('서영곤',25,'010-8561-2763');
+
+SQL> SELECT * FROM profile;                                                );
+
+NAME           AGE PHONE              EMAIL                            BIRTHDAY
+------------ ----- ------------------ -------------------------------- --------
+김동민          27 010-7245-1269       kdm9214@naver.com                94/09/04
+빈태욱          25 010-8441-2782
+서영곤          25 010-8561-2763
+///////////////////////////////////////////////////////////////////////
+
+- 기존 데이터값을 수정
+SQL> UPDATE profile SET email='qlsxodnr1@naver.com' WHERE name='빈태욱';
+SQL> SELECT * FROM profile;
+NAME           AGE PHONE              EMAIL                            BIRTHDAY
+------------ ----- ------------------ -------------------------------- --------
+김동민          27 010-7245-1269       kdm9214@naver.com                94/09/04
+빈태욱          25 010-8441-2782       qlsxodnr@naver.com
+서영곤          25 010-8561-2763
+
+//////////////////////////////////////
+SQL> UPDATE profile SET email='tjdudrhs26@naver.com', birthday=TO_DATE('19941201','YYYYMMDD') WHERE name='서영곤';
+
+SQL> SELECT * FROM profile;
+NAME           AGE PHONE              EMAIL                            BIRTHDAY
+------------ ----- ------------------ -------------------------------- --------
+김동민          27 010-7245-1269       kdm9214@naver.com                94/09/04
+빈태욱          25 010-8441-2782       qlsxodnr@naver.com
+서영곤          25 010-8561-2763       tjdudrhs26@naver.com             94/12/01
+
+///////////////////////////////////////////////////////////////////////
+
+- 기존 데이터(row)를 삭제하자
+SQL> DELETE FROM profile WHERE name='김동민';
+SQL> DELETE FROM profile WHERE SUBSTR(name,1,1)='김';
+
+///////////////////////////////////////////////////////////////////
+
+- 테이블 구조변경
+SQL> ALTER TABLE profile MODIFY(email VARCHAR2(30));
+Table altered.
+
+SQL> UPDATE profile SET email='tjdydrhs2661@naver.com' WHERE name='서영곤';
+1 row updated.
+
+SQL> SELECT * FROM profile;                                              ';
+NAME           AGE PHONE              EMAIL                            BIRTHDAY
+------------ ----- ------------------ -------------------------------- --------
+김동민          27 010-7245-1269       kdm9214@naver.com                94/09/04
+빈태욱          25 010-8441-2782       qlsxodnr@naver.com
+서영곤          25 010-8561-2763       tjdudrhs2661@naver.com           94/12/01
+
+//////////////////////////////////////////////////////////////////
+
+- 테이블 삭제 (DROP TABLE profile==> profile테이블이 삭제되고 데이타도 사라진다.)
+SQL> DROP TABLE profile;
+```
+
+#### 5. 실습
+#### 6. Summary / Close
 
 -----------------------------------------------------------
 
@@ -1126,6 +1229,7 @@ MIN(MIN(SAL))
 ### [2019-04-29]
 
 #### 1. Review
+#### 5. DDL명령
 #### 3. 실습
 #### 4. Summary / Close
 
