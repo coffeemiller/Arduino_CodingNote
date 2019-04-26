@@ -868,10 +868,252 @@ DEPTNO DNAME||'|'       LOC
     40 OPERATIONS|      BOSTON
 ```
 
-+ GROUP함수
-
-
 #### 3. 그룹함수
+
++ GROUP함수
+  - 전체행이나 GROUP BY절에 의한 그룹에 적용하여 1개의 결과를 리턴하는 함수
+  - COUNT(), SUM(), AVG(), MAX(), VARIANCE(), STDDEV()
+```
+[그룹 함수 사용]
+SELECT		group_function(column) [,group_function(column), . . .]
+    FROM		table_name
+    [WHERE   	condition]
+    [ORDER BY	column];
+
+///////////////////////////////////////////
+SQL> SELECT AVG(sal) FROM emp;
+
+  AVG(SAL)
+----------
+2073.21429
+///////////////////////////////////////////
+SQL> SELECT SUM(sal) FROM emp;
+
+  SUM(SAL)
+----------
+     29025
+//////////////////////////////////////////
+SQL> SELECT SUM(sal)/COUNT(*) FROM emp;
+
+SUM(SAL)/COUNT(*)
+-----------------
+       2073.21429
+/////////////////////////////////////////
+SQL> SELECT MAX(sal) FROM emp;
+
+  MAX(SAL)
+----------
+      5000
+/////////////////////////////////////////
+SQL> SELECT MIN(sal) FROM emp;
+
+  MIN(SAL)
+----------
+       800
+//////////////////////////////////////////
+<문제풀이 1>
+SQL> SELECT AVG(sal), MAX(sal), MIN(sal), SUM(sal) FROM emp WHERE job LIKE 'SAL%';
+
+  AVG(SAL)   MAX(SAL)   MIN(SAL)   SUM(SAL)
+---------- ---------- ---------- ----------
+      1400       1600       1250       5600
+///////////////////////////////////////////
+<문제풀이 2>
+SQL> SELECT MIN(ename), MAX(ename), MIN(hiredate), MAX(hiredate), MIN(sal), MAX(sal) FROM emp;
+
+MIN(ENAME)           MAX(ENAME)           MIN(HIRE MAX(HIRE   MIN(SAL)   MAX(SAL)
+-------------------- -------------------- -------- -------- ---------- ----------
+ADAMS                WARD                 80/12/17 87/05/23        800       5000
+//////////////////////////////////////////
+COUNT() : 갯수 구하기
+COUNT(*) : 전체 갯수 구하기
+COUNT(컬럼명) : NULL값이 아닌 ROW의 갯수
+
+<문제풀이 3>
+SELECT COUNT(*) c_inwon, COUNT(comm) c_comm, AVG(comm) a_comm, AVG(NVL(comm,0)) n_comm, COUNT(deptno) c_dept, COUNT(DISTINCT deptno) c_dis FROM emp;
+```
+
++ SELECT문의 COLUMN을 기술할때 그룹함수를 함께 사용할 수 없다.
+```
+SQL> SELECT COUNT(*), MAX(ename) FROM emp;
+
+  COUNT(*) MAX(ENAME)
+---------- --------------------
+        14 WARD
+
+SQL> SELECT ename, MAX(ename) FROM emp;
+SELECT ename, MAX(ename) FROM emp
+       *
+ERROR at line 1:
+ORA-00937: not a single-group group function
+```
+
++ 단, GROUP BY절에서 사용한 컬럼명은 사용할 수 있다.
+```
+SQL> SELECT COUNT(*) FROM emp GROUP BY deptno;
+
+  COUNT(*)
+----------
+         6
+         5
+         3
+///////////////////////////////////////////////////////
+SQL> SELECT deptno, COUNT(*) FROM emp GROUP BY deptno;
+
+   DEPTNO   COUNT(*)
+---------- ----------
+       30          6
+       20          5
+       10          3
+///////////////////////////////////////////////////////
+SQL> SELECT job, COUNT(*) FROM emp GROUP BY job;
+
+JOB                  COUNT(*)
+------------------ ----------
+CLERK                       4
+SALESMAN                    4
+PRESIDENT                   1
+MANAGER                     3
+ANALYST                     2
+/////////////////////////////////////////////////////////
+SQL> SELECT deptno, COUNT(*), AVG(sal) FROM emp GROUP BY deptno HAVING deptno>=20;
+
+    DEPTNO   COUNT(*)   AVG(SAL)
+---------- ---------- ----------
+        30          6 1566.66667
+        20          5       2175
+
+
+SQL> SELECT deptno, COUNT(*), AVG(sal) FROM emp WHERE deptno>=20 GROUP BY deptno;
+
+    DEPTNO   COUNT(*)   AVG(SAL)
+---------- ---------- ----------
+        30          6 1566.66667
+        20          5       2175
+////////////////////////////////////////////////////
+SQL> SELECT deptno,COUNT(*),AVG(sal),MIN(sal),MAX(sal),SUM(sal) FROM emp WHERE sal>=1250 GROUP BY deptno ORDER BY deptno;
+
+    DEPTNO   COUNT(*)   AVG(SAL)   MIN(SAL)   MAX(SAL)   SUM(SAL)
+---------- ---------- ---------- ---------- ---------- ----------
+        10          3 2916.66667       1300       5000       8750
+        20          3 2991.66667       2975       3000       8975
+        30          5       1690       1250       2850       8450
+
+SQL> SELECT deptno,COUNT(*),AVG(sal),MIN(sal),MAX(sal),SUM(sal) FROM emp WHERE sal>=1250 GROUP BY deptno HAVING deptno>=20 ORDER BY deptno;
+
+    DEPTNO   COUNT(*)   AVG(SAL)   MIN(SAL)   MAX(SAL)   SUM(SAL)
+---------- ---------- ---------- ---------- ---------- ----------
+        20          3 2991.66667       2975       3000       8975
+        30          5       1690       1250       2850       8450
+```
++ SELECT문의 작동순서
+  - 1) FROM절에 의해 테이블 결정
+  - 2) WHERE절이 없으면 모든 ROW, 있으면 조건에 부합하는 ROW
+  - 3) 지정한 컬럼 추출
+  - 4) GROUP BY에 의해 그룹 설정
+  - 5) 그룹함수 적용
+  - 6) 최종 결과로 포함시킬 그룹결정(HAVING절)
+  - 7) ORDER BY에 의해 출력내용순서 결정
+
+```
+SQL> SELECT deptno, job, empno, ename, sal FROM emp ORDER BY deptno, job;
+
+    DEPTNO JOB                     EMPNO ENAME                       SAL
+---------- ------------------ ---------- -------------------- ----------
+        10 CLERK                    7934 MILLER                     1300
+        10 MANAGER                  7782 CLARK                      2450
+        10 PRESIDENT                7839 KING                       5000
+        20 ANALYST                  7788 SCOTT                      3000
+        20 ANALYST                  7902 FORD                       3000
+        20 CLERK                    7876 ADAMS                      1100
+        20 CLERK                    7369 SMITH                       800
+        20 MANAGER                  7566 JONES                      2975
+        30 CLERK                    7900 JAMES                       950
+        30 MANAGER                  7698 BLAKE                      2850
+        30 SALESMAN                 7654 MARTIN                     1250
+        30 SALESMAN                 7521 WARD                       1250
+        30 SALESMAN                 7499 ALLEN                      1600
+        30 SALESMAN                 7844 TURNER                     1500
+
+```
++ 주의점) WHERE절에 GROUP함수를 사용할수 없다. 이유) WHERE절의 조건에 부합하는 ROW를 추출한후 그다음 그룹을 만들기 때문이다.
+```
+SQL> SELECT deptno, COUNT(*), SUM(sal) FROM emp WHERE COUNT(*)>4 GROUP BY deptno;
+SELECT deptno, COUNT(*), SUM(sal) FROM emp WHERE COUNT(*)>4 GROUP BY deptno
+                                                 *
+ERROR at line 1:
+ORA-00934: group function is not allowed here
+```
++ 최종 결과물에 포함 여부는 HAVING절에서 기술한다.
+```
+SQL> SELECT deptno, COUNT(*), SUM(sal) FROM emp GROUP BY deptno HAVING COUNT(*)>=4;
+
+    DEPTNO   COUNT(*)   SUM(SAL)
+---------- ---------- ----------
+        30          6       9400
+        20          5      10875
+/////////////////////////////////////////////////////////////////
+SQL> SELECT job, AVG(sal), SUM(sal) FROM emp GROUP BY job;
+
+JOB                  AVG(SAL)   SUM(SAL)
+------------------ ---------- ----------
+CLERK                  1037.5       4150
+SALESMAN                 1400       5600
+PRESIDENT                5000       5000
+MANAGER            2758.33333       8275
+ANALYST                  3000       6000
+
+SQL> SELECT job, AVG(sal), SUM(sal) FROM emp GROUP BY job HAVING AVG(sal)>=3000;
+
+JOB                  AVG(SAL)   SUM(SAL)
+------------------ ---------- ----------
+PRESIDENT                5000       5000
+ANALYST                  3000       6000
+```
++ 그룹함수를 중첩해서 사용할 수 있다.
+```
+SQL> SELECT deptno, AVG(sal) FROM emp GROUP BY deptno;
+
+    DEPTNO   AVG(SAL)
+---------- ----------
+        30 1566.66667
+        20       2175
+        10 2916.66667
+
+SQL> SELECT MAX(AVG(sal)) FROM emp GROUP BY deptno;
+
+MAX(AVG(SAL))
+-------------
+   2916.66667
+/////////////////////////////////////////////////////////////////////////
+SQL> SELECT deptno, empno, ename, sal FROM emp ORDER BY deptno;
+
+    DEPTNO      EMPNO ENAME                       SAL
+---------- ---------- -------------------- ----------
+        10       7782 CLARK                      2450
+        10       7839 KING                       5000
+        10       7934 MILLER                     1300
+        20       7566 JONES                      2975
+        20       7902 FORD                       3000
+        20       7876 ADAMS                      1100
+        20       7369 SMITH                       800
+
+SQL> SELECT MIN(MIN(sal)) FROM emp GROUP BY deptno;
+
+MIN(MIN(SAL))
+-------------
+          800
+```
+
+##### [오늘의 과제]
++ 4시 이후 5.doc의 연습문제 풀기
+
++ 1) SELECT <- SQL자료형, 연산자, 함수
++ 2) DML
++ 3) DDL  ================> 가장 간단한 DML, DDL명령을 사용할 것임.
++ 무결성제약조건
+
+
 #### 4. DML명령
 #### 5. DDL명령
 #### 6. 실습
