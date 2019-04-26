@@ -455,15 +455,7 @@ ALLEN                         2          2          3          0          0
 BLAKE                         2          2          0          0          0
 CLARK                         2          2          0          0          0
 FORD                          0          0          0          0          0
-JAMES                         0          0          0          0          0
-JONES                         0          0          0          0          0
-KING                          0          0          0          0          0
-MARTIN                        0          0          0          0          0
-MILLER                        3          3          4          4          0
-SCOTT                         0          0          0          0          0
-SMITH                         0          0          0          0          0
-TURNER                        0          0          0          0          0
-WARD                          0          0          0          0          0
+
 
 ===============================================================
 
@@ -627,7 +619,7 @@ POWER(2,3)    SQRT(4) SIGN(-100)
 SQL> SELECT empno,ename,job,ename || CHR(10) || job FROM emp WHERE deptno=20;
 
      EMPNO ENAME                JOB                ENAME||CHR(10)||JOB
----------- -------------------- ------------------ ----------------------------------------
+---------- -------------------- ------------------ ---------------------
       7369 SMITH                CLERK              SMITH
                                                    CLERK
 
@@ -663,6 +655,115 @@ SYSDATE-TO_DATE('19/03/11','RR/MM/DD')
 [날짜표현 방법]
 - ALTER SESSION SET NLS_DATE_FORMAT='RR/MM/DD';
 - ALTER SESSION SET NLS_LANGUAGE='KOREAN';
+
+<문제풀이>
+SQL> SELECT ename,hiredate,SYSDATE,SYSDATE - hiredate "Total Days",
+  2          TRUNC((SYSDATE - hiredate) / 7, 0) Weeks,
+  3          ROUND(MOD((SYSDATE - hiredate), 7), 0) DAYS
+  4  FROM emp
+  5  ORDER BY SYSDATE - hiredate DESC;
+
+ENAME                HIREDATE SYSDATE  Total Days      WEEKS       DAYS
+-------------------- -------- -------- ---------- ---------- ----------
+SMITH                80/12/17 19/04/26 14009.4433       2001          2
+ALLEN                81/02/20 19/04/26 13944.4433       1992          0
+WARD                 81/02/22 19/04/26 13942.4433       1991          5
+JONES                81/04/02 19/04/26 13903.4433       1986          1
+
+
+//////////////////////////////////////////////////////////////////////////////
+[MONTHS_BETWEEN() 두날짜 사이의 월수를 계산]
+SQL> SELECT MONTHS_BETWEEN(SYSDATE, TO_DATE('20150508','YYYYMMDD')) FROM DUAL;
+
+MONTHS_BETWEEN(SYSDATE,TO_DATE('20150508','YYYYMMDD'))
+------------------------------------------------------
+                                            47.5950329
+
+SQL> SELECT ename,hiredate,SYSDATE,MONTHS_BETWEEN(SYSDATE,hiredate) m_between,
+  2          TRUNC(MONTHS_BETWEEN(SYSDATE,hiredate),0) t_between
+  3  FROM emp
+  4  WHERE deptno = 10
+  5  ORDER BY MONTHS_BETWEEN(SYSDATE,hiredate) DESC;
+
+ENAME                HIREDATE SYSDATE   M_BETWEEN  T_BETWEEN
+-------------------- -------- -------- ---------- ----------
+CLARK                81/06/09 19/04/26 454.562819        454
+KING                 81/11/17 19/04/26 449.304755        449
+MILLER               82/01/23 19/04/26 447.111206        447
+//////////////////////////////////////////////////////////////////////
+[ADD_MONTHS() 날짜에 월(개월수)을 더한다]
+SQL> SELECT SYSDATE, ADD_MONTHS(SYSDATE, 5) FROM DUAL;
+
+SYSDATE  ADD_MONT
+-------- --------
+19/04/26 19/09/26
+/////////////////////////////////////////////////////////////////////
+[NEXT_DAY() 돌아오는 요일을 계산]
+- 요일지정 숫자 : 일요일(1), 월요일(2)....토요일(7)
+SQL> SELECT SYSDATE, NEXT_DAY(SYSDATE, 2) FROM DUAL;
+
+SYSDATE  NEXT_DAY
+-------- --------
+19/04/26 19/04/29
+
+SQL> SELECT SYSDATE, NEXT_DAY(SYSDATE, '월요일') FROM DUAL;
+
+SYSDATE  NEXT_DAY
+-------- --------
+19/04/26 19/04/29
+
+<문제풀이>
+SQL> SELECT ename,hiredate,NEXT_DAY(hiredate,'금요일') n_day,
+  2                        NEXT_DAY(hiredate,6) n_6,
+  3                        NEXT_DAY(hiredate,7) n_7
+  4  FROM emp
+  5  WHERE deptno = 10
+  6  ORDER BY hiredate DESC;
+
+ENAME                HIREDATE N_DAY    N_6      N_7
+-------------------- -------- -------- -------- --------
+MILLER               82/01/23 82/01/29 82/01/29 82/01/30
+KING                 81/11/17 81/11/20 81/11/20 81/11/21
+CLARK                81/06/09 81/06/12 81/06/12 81/06/13
+/////////////////////////////////////////////////////////////////////
+
+[LAST_DAY() 해당월의 마지막 날짜]
+SQL> SELECT SYSDATE, LAST_DAY(SYSDATE) FROM DUAL;
+
+SYSDATE  LAST_DAY
+-------- --------
+19/04/26 19/04/30
+
+<문제풀이 23>
+SQL> SELECT empno,ename,hiredate,LAST_DAY(hiredate) l_last,
+  2                              LAST_DAY(hiredate) - hiredate l_day
+  3  FROM emp
+  4  ORDER BY LAST_DAY(hiredate) - hiredate DESC;
+
+     EMPNO ENAME                HIREDATE L_LAST        L_DAY
+---------- -------------------- -------- -------- ----------
+      7698 BLAKE                81/05/01 81/05/31         30
+      7902 FORD                 81/12/03 81/12/31         28
+      7900 JAMES                81/12/03 81/12/31         28
+
+=============================================================================
+
+[날짜를 대상으로 한 반올림, 버림 ==> ROUND(), TRUNC()]
+
+SQL> SELECT ename,hiredate,ROUND(hiredate,'MONTH') m_round,
+  2  TRUNC(hiredate,'MONTH') m_trunc, ROUND(hiredate,'YEAR') y_round,
+  3  TRUNC(hiredate,'YEAR') y_trunc
+  4  FROM emp
+  5  WHERE deptno = 10
+  6  ORDER BY hiredate DESC;
+
+ENAME      HIREDATE    M_ROUND     M_TRUNC    Y_ROUND     Y_TRUNC
+---------- ----------- ----------- ---------- ----------- -----------
+MILLER     23-JAN-82   01-FEB-82   01-JAN-82  01-JAN-82   01-JAN-82
+KING       17-NOV-81   01-DEC-81   01-NOV-81  01-JAN-82   01-JAN-81
+CLARK      09-JUN-81   01-JUN-81   01-JUN-81  01-JAN-81   01-JAN-81
+
+- 변환함수 : TO_CHAR(), TO_NUMBER(), TO_DATE()
 ```
 #### 3. 그룹함수
 #### 4. DML명령
