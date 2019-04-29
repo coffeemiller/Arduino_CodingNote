@@ -1837,7 +1837,116 @@ CONSTRAINT UNI_TAB_DEPTNO_CK CHECK (DEPTNO IN (10,20,30,40,50))
 ```
 
 + 실습한 내용을 종합하여 아래의 테이블 생성을 실습해 보자.
+```sql
+--테이블 생성은 자식 테이블부터 한다.
+DROP TABLE member;
+DROP TABLE post;
+
+-- 테이블 생성은 부모 테이블부터 한다.
+-- 우편번호 테이블 만들기(부모 테이블)
+CREATE TABLE post(
+	post1	CHAR(3),
+	post2	CHAR(3),
+	addr	VARCHAR2(180) CONSTRAINT post_addr_nn NOT NULL,
+-- post1과 post2를 묶어서 pk로 지정
+CONSTRAINT post_post12_pk PRIMARY KEY (post1,post2)
+);
+
+-- 우편번호 테이블에 연습용 데이터를 5개정도 입력해 보자
+INSERT INTO post VALUES('137','070','서울시 서초구 서초동');
+INSERT INTO post VALUES('137','071','서울시 서초구 서초2동');
+INSERT INTO post VALUES('137','072','서울시 서초구 서초3동');
+INSERT INTO post VALUES('063','070','전라북도 전주시 완산구 중노송동');
+INSERT INTO post VALUES('063','071','전라북도 전주시 완산구 서노송동');
+
+
+
+CREATE TABLE member(
+	id	NUMBER(4) CONSTRAINT member_id_pk PRIMARY KEY,
+	name	VARCHAR(30) CONSTRAINT member_name_nn NOT NULL,
+	sex	CHAR(1) CONSTRAINT member_sex_ck CHECK ( sex IN ('1','2')),
+	jumin1	CHAR(6),
+	jumin2	CHAR(7),
+	tel	VARCHAR2(15),
+	post1	CHAR(3),
+	post2	CHAR(3),
+	addr	VARCHAR2(180),
+CONSTRAINT member_jumin12_uk UNIQUE (jumin1,jumin2),
+CONSTRAINT member_post12_fk FOREIGN KEY (post1,post2) REFERENCES post (post1,post2)
+);
+
+
+-- 회원정보 테이블에 연습용 데이터 추가
+INSERT INTO member VALUES(1000,'홍길동','1','871214','1128136','010-1111-1111','063','070','대송빌라 B동 302호');
+INSERT INTO member VALUES(1001,'장길산','2','880512','2128136','010-2222-2222','063','071','125번지');
+INSERT INTO member VALUES(1002,'이순신','1','851111','1234124','010-3333-3333','137','070','영광 오피스텔 402호');
+
+
+-- 데이터베이스에 DML 명령의 모든 내용을 반영시키시오.
+COMMIT;
 ```
+```
+SQL> SELECT * FROM TAB;
+TNAME                      TABTYPE         CLUSTERID
+-------------------------- -------------- ----------
+BONUS                      TABLE
+DEPT                       TABLE
+DEPT01                     TABLE
+EMP                        TABLE
+MEMBER                     TABLE
+POST                       TABLE
+SALGRADE                   TABLE
+
+
+SQL> SELECT * FROM POST;
+POST1  POST2
+------ ------
+ADDR
+---------------------------------------------------------------------------------
+137    070
+서울시 서초구 서초동
+
+137    071
+서울시 서초구 서초2동
+
+137    072
+서울시 서초구 서초3동
+
+063    070
+전라북도 전주시 완산구 중노송동
+
+063    071
+전라북도 전주시 완산구 서노송동
+
+
+SQL> SELECT * FROM member;
+ID NAME                                                         SE JUMIN1       JUMIN2
+-- ------------------------------------------------------------ -- ------------ ---------
+TEL                            POST1  POST2
+------------------------------ ------ ------
+ADDR
+------------------------------------------------------------------------------------------------------------------------
+      1000 홍길동                                                       1  871214       1128136
+010-1111-1111                  063    070
+대송빌라 B동 302호
+
+      1001 장길산                                                       2  880512       2128136
+010-2222-2222                  063    071
+125번지
+
+      1002 이순신                                                       1  851111       1234124
+010-3333-3333                  137    070
+영광 오피스텔 402호
+
+
+SQL> SELECT * FROM post WHERE post1='137' AND post2='070';
+
+POST1  POST2
+------ ------
+ADDR
+------------------------------------------------------------------------------------------------------------------------
+137    070
+서울시 서초구 서초동
 ```
 
 
@@ -1845,9 +1954,31 @@ CONSTRAINT UNI_TAB_DEPTNO_CK CHECK (DEPTNO IN (10,20,30,40,50))
 + 테이블 삭제 DROP TABLE
 
 
-#### 4. DML명령
+##### [오늘의 과제]
++ 복습, 프로젝트 기획 작업
++ 함수관련 연습문제(4.doc, 5.doc)풀어보기
 
-#### 5. 실습
-#### 6. Summary / Close
+#### 4. 실습
+#### 5. Summary / Close
+
 
 -----------------------------------------------------------
+
+### [2019-04-30]
+
+#### 1. Review
+
+#### 4. DML명령
+#### 4. 실습
+#### 5. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-04-30]
+
+#### 1. Review
+
+#### 4. DML명령
+#### 4. 실습
+#### 5. Summary / Close
