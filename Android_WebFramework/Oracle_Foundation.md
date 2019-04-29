@@ -1667,7 +1667,69 @@ CREATE TABLE emp07(
 + 위의 제약조건 기술방법을 컬럼레벨 제약조건 기술이라고 한다.
 + 동일한 내용을 테이블레벨 제약조건으로 기술할 수도 있다.
 
++ 필요에 따라서 제약조건을 테이블레벨형태로 지정할수 있다.
+  - 1) 복합키 사용시
+  - 2) 제약조건 변경시..... 이때는 테이블레벨 형태로 지정해야 한다.
+
++ PK, UK, FK를 복합키로 지정할 수 있다.
+  - 두개이상의 컬럼을 합쳐서 하나의 KEY로 지정하는 방법.
+```sql
+-- 간단한 우편번호 테이블
+-- 현재는 5자리의 통합된 우편번호 코드를 사용한다.
+-- 이전에는 3-3자리로 구성된 우편번호 체계를 사용했다.
+CREATE TABLE post(
+	post1 CHAR(3),
+	post2 CHAR(3),
+	sido  VARCHAR2(30) NOT NULL,
+	gugun VARCHAR2(30) NOT NULL,
+	dong  VARCHAR2(30) NOT NULL,
+	PRIMARY KEY(post1,post2)
+);
+
+-- 우편번호 2개를 합쳐서 PRIMARY KEY로 설정
+```
++ 이와같이 복합키 지정은 테이블레벨 지정방법만 가능하다!!!!!!!!
++ 또한
+
++ 테이블 레벨 제약조건 기술방법 실습
+```sql
+-- 테이블레벨 제약조건(NOT NULL 컬럼레벨 제약조건만 가능)
+CREATE TABLE emp08(
+  empno NUMBER(4),
+  ename VARCHAR2(10) NOT NULL,
+  phone VARCHAR2(13),
+  gender CHAR(1),
+  deptno NUMBER(2),
+PRIMARY KEY(empno),
+UNIQUE(phone),
+CHECK(gender IN('M','m','F','f')),
+FOREIGN KEY(deptno) REFERENCES dept(deptno)
+);
+
+
+-- 테이블 레벨 제약조건에 제약조건명을 지정할때 CONSTRAINT 키워드를 사용한다.
+CREATE TABLE emp08(
+empno NUMBER(4),
+ename VARCHAR2(10) NOT NULL,
+phone VARCHAR2(13),
+gender CHAR(1),
+deptno NUMBER(2),
+CONSTRAINT emp08_empno_pk PRIMARY KEY(empno),
+CONSTRAINT emp08_phone_uk UNIQUE(phone),
+CONSTRAINT emp08_gender_ck CHECK(gender IN('M','m','F','f')),
+CONSTRAINT emp08_deptno_fk FOREIGN KEY(deptno) REFERENCES dept(deptno)
+);
+```
+
++ 여기까지의 내용에서 컬럼레벨과 동일하게 테이블 레벨로 제약조건을 기술할 수 있다.
+  - 주의점) NOT NULL은 반드시 컬럼레벨로만 지정할 수 있다.
+  - 기능상에는 차이가 없으나....'복합키 지정'이나, '제약조건의 수정'은 컬럼레벨에서 지정할 수 없다.
+===========================================================================
++ 지금까지는 교재를 참조하지 않고 제약조건을 설명함. 이제 실습 교재를 참고하여 실습해보자.
+
 #### 3. DDL명령
++ DDL(Data Definition Language)
+  - 테이블 생성, 구조변경, 테이블 삭제+무결성 제약조건
 
 #### 4. DML명령
 
