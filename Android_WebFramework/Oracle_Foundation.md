@@ -1731,6 +1731,120 @@ CONSTRAINT emp08_deptno_fk FOREIGN KEY(deptno) REFERENCES dept(deptno)
 + DDL(Data Definition Language)
   - 테이블 생성, 구조변경, 테이블 삭제+무결성 제약조건
 
++ 테이블을 생성하면 해당 정보는 자료사전(Data Dictionary)에 저장된다. 또한 테이블 생성, 구조변경, 테이블 삭제 등의 명령(DDL)은 적접 데이터베이스에 영향을 미치고 그 내용은 복구할 수 없다.
+  - 단, 새로운 데이터 추가, 수정, 삭제 명령(DML)은 임시작업영역에 영향을 미치고, 직접 데이터베이스에는 반영되지 않음으로 복구할 수 있다.
+  - 참고사항) SQL명령이 동작하는 임시메모리 영역을 '커서'라고 부른다.
+  - 결론적....DDL명령은 커서가 아닌 데이터베이스에 직접 영향을 주고, DML명령은 커서에 영향을 준다.
+
++ 테이블 생성 CREATE TABLE
+```
+CREATE  TABLE		[schema.]table_name
+        ( column	datatype	  [DEFAULT  expr] [column_constraint],
+        . . . . . . . .
+         [table_constraint]);
+
+schema			테이블의 소유자
+table_name		생성하고자 하는 테이블 이름. 사용자 단위로 유일한 이름
+column			테이블에서 사용하는 열 이름. 테이블 단위로 유일한 이름
+datatype		열의 자료형
+DEFAULT expr		INSERT문장에서 값을 생략시 기본적으로 입력되는 값을 명시
+column_constraint 	열정의 부분에서 무결성 제약 조건을 기술
+table_constraint	테이블 정의 부분에서 무결성 제약 조건을 기술
+
+
+CREATE TABLE 테이블명(컬럼명 자료형 [제약조건],
+  .....
+  [제약조건]
+);
+
+
+[테이블명이나 컬럼명, 제약조건명은 규칙]
+문자로 시작, 30글자이내, 영문자, 숫자, 특수기호(_,&,#)
+
+[SQL에서의 자료형]
+- VARCHAR2(n) : 가변길이 문자열(4000byte)
+- CHAR(n) : 고정길이 문자열(2000byte)
+- NUMBER, NUMBER(n), NUMBER(p,s) : 가변정수/정수/실수 (숫자를 나타냄)
+- DATE : 내부적으로 7byte사용, 날짜와 시간정보 기술.
+===================================================
+- LONG : 가변길이 문자(2Gbyte)
+- CLOB : 단일byte 가변길이 문자데이터 (4Gbyte)
+- RAW(n), LONG RAW : 원시 이진 데이터
+- BLOB : 가변길이 이진 데이터
+- BFILE : 외부 파일 이진 데이터
+=================================================================
+
+[제약조건은 아니지만 DEFAULT키워드를 알아보자]
+
++ row(행) 추가시 명시적으로 NULL 입력하면 NULL이 추가된다.
++ 단, 암시적으로 입력하지 않으면... DEFAULT값이 적용된다.
+
+SQL> CREATE TABLE dept01(
+  2  deptno NUMBER(2) PRIMARY KEY,
+  3  dname VARCHAR2(30) NOT NULL,
+  4  loc VARCHAR2(20) DEFAULT '전주'
+  5  );
+Table created.
+
+SQL> INSERT INTO dept01(deptno, dname) VALUES(30,'총무부');
+1 row created.
+
+SQL> SELECT * FROM dept01;                               );
+    DEPTNO DNAME                    LOC
+---------- ------------------------ ----------------------------------------
+        10 영업부                   대구
+        20 기획부
+        30 총무부                   전주
+```
+
++ NOT NULL은 테이블레벨 안된다!!!
+```
+-- 컬럼레벨 NOT NULL 제약조건 지정(ok)
+CREATE TABLE NN_TAB1 (
+	DEPTNO             NUMBER(2) CONSTRAINT UNI_TAB_DEPTNO_NN NOT NULL,
+	DNAME              CHAR(14),
+	LOC                CHAR(13)
+);
+
+-- 아래의 테이블레벨 NOT NULL 제약조건 지정은 error발생
+CREATE TABLE NN_TAB2 (
+	DEPTNO             NUMBER(2),
+	DNAME              CHAR(14),
+	LOC                CHAR(13),
+-- NOT NULL은 테이블레벨로 지정할 수 없다.
+CONSTRAINT UNI_TAB_DEPTNO_NN NOT NULL (DEPTNO)
+);
+```
+
+
++ CHECK(CK)
+```
+-- deptno컬럼에 값을 추가할때 반드시 10,20,30,40,50만 가질수 있도록
+-- 컬럼레벨 제약조건 CHECK 지정
+CREATE TABLE CK_TAB1 (
+	DEPTNO  NUMBER(2) CONSTRAINT UNI_TAB_DEPTNO_CK CHECK (DEPTNO IN (10,20,30,40,50)),
+	DNAME   CHAR(14),
+	LOC     CHAR(13)
+);
+
+-- 테이블레벨로  제약조건 CHECK 지정
+CREATE TABLE CK_TAB2 (
+	DEPTNO  NUMBER(2),
+	DNAME   CHAR(14),
+	LOC     CHAR(13),
+CONSTRAINT UNI_TAB_DEPTNO_CK CHECK (DEPTNO IN (10,20,30,40,50))
+;
+```
+
++ 실습한 내용을 종합하여 아래의 테이블 생성을 실습해 보자.
+```
+```
+
+
++ 테이블 구조 변경 ALTER TABLE
++ 테이블 삭제 DROP TABLE
+
+
 #### 4. DML명령
 
 #### 5. 실습
