@@ -1237,9 +1237,440 @@ SQL> DROP TABLE profile;
   - 변경 ALTER TABLE, ADD MODIFY
   - 삭제 DROP TABLE
 
-#### 2. 무결성 무결성제약조건
+#### 2. 무결성 제약조건(constraint)
++ 관계형 모델의 3대 핵심개념
+  - 1) 저장구조(row, column ==> 2차원 테이블 구조)
+  - 2) 연산자(조건에 맞는 row추출, column추출, 다른테이블과 연결....)
+  - 3) 제약조건(운용되는 데이터에 결함이 없어야 한다. ==> 무결성 제약조건)
+
++ 무결성 제약조건(constraint) : 데이터를 추가, 수정, 삭제하는 과정에서 무결성을 유지할수 있도록 제약을 주는 것(Table구조에.... TABLE생성시 지정).
+
++ 제약조건이 없는 테이블
+```
+SQL> CREATE TABLE emp01(empno NUMBER(4), ename VARCHAR2(10), job VARCHAR2(9), deptno NUMBER(2));
+
+Table created.
+
+SQL> DESC emp01
+Name                     Null?    Type
+------------------------ -------- --------------------------------------------
+EMPNO                             NUMBER(4)
+ENAME                             VARCHAR2(10)
+ JOB                               VARCHAR2(9)
+ DEPTNO                            NUMBER(2)
+
+```
+
++ emp01테이블에 사원정보를 추가
+```
+SQL> INSERT INTO emp01 VALUES(NULL,NULL,'SALESMAN',30);
+
+1 row created.
+
+SQL> SELECT * FROM emp01;
+
+     EMPNO ENAME                JOB                    DEPTNO
+---------- -------------------- ------------------ ----------
+                                SALESMAN                   30
++ 현재 추가된 row는 아무 의미도 없는 데이터이다.
++ 성명이 없고, 다른 다양한 검색에서 식별할 수 있는 방법이 없다.
++ 반드시 사원번호와 성명은 추가시 지정되어야 한다. 없으면 안됨.
++ 위 기능 정상작동? ==> 테이블생성시 empno, ename 컬럼의 제약조건으로 NOT NULL제약조건 지정.
+```
+
++ 제약조건이 있는 emp02테이블 생성
+```
+SQL> CREATE TABLE emp02(empno NUMBER(4) NOT NULL, ename VARCHAR2(10) NOT NULL, job VARCHAR2(9), deptno NUMBER(2));
+
+Table created.
+
+SQL> DESC emp02
+ Name                     Null?    Type
+ ------------------------ -------- --------------------------------------------
+ EMPNO                    NOT NULL NUMBER(4)
+ ENAME                    NOT NULL VARCHAR2(10)
+ JOB                               VARCHAR2(9)
+ DEPTNO                            NUMBER(2)
+
+
++ DESC 명령은 제약조건 중 NOT NULL(NULL을 허용하지 않는다. 즉, 반드시 값이 있어야 한다)을 보여준다.
+```
+
++ 제약조건이 있는 테이블에 사원정보 추가
+```
+SQL> INSERT INTO emp02 VALUES(8000,'홍길동','영업',30);
+
+1 row created.
+
+SQL> SELECT * FROM emp02;
+
+     EMPNO ENAME                JOB                    DEPTNO
+---------- -------------------- ------------------ ----------
+      8000 홍길동               영업                       30
+
+SQL> INSERT INTO emp02 VALUES(NULL,'장길산','기획',10);
+INSERT INTO emp02 VALUES(NULL,'장길산','기획',10)
+                         *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("SCOTT"."EMP02"."EMPNO")
+
++ null이 허용되지 않기때문에 오류
++ empno, ename은 데이터 추가시 반드시 입력되어야 한다. NULL을 허용하지X.
+```
+
++ Oracle에서 지원하는 무결성 제약조건의 종류
+  - 1) 개체무결성 : 모든 row는 다른 row와 식별될수 있는 특성이 있어야 한다.
+    + 기본키(Primary Key : PK)
+  - 2) 참조무결성 : 관계를 가진 테이블간에 결함이 없어야 한다.
+    + 참조키(외래키_Foreign Key : FK)
+  - 3) 영역무결성 : 특정 컬럼 하나,하나는 자기 스스로의 역할이 있다. 그 역할에 부합하는 값만 가져야 한다.
+    + 1. NOT NULL : 추가시 반드시 값이 있어야 한다.
+    + 2. UNIQUE : 추가되는 값은 다른 row의 값과 중복되지 않아야 한다.
+    + 3. CHECK : 지정된 값만 가질수 있다.
+    + 4. 그외는 모두 사용자가 데이터운용시 해결(JDBC프로그램에서 Logic으로 처리).
+
++ 무결성 제약조건을 기술하는 방법
+  - 테이블 생성시 지정
+    + 1. 컬럼 level지정
+      - CREATE TABLE 테이블명(컬럼명 자료형 제약조건, ....);
+    + 2. 테이블 level지정
+      - CREATE TABLE 테이블명(컬럼명 자료형,... 제약조건을 별도로 지정);
+
++ 제약조건에 대한 실습
++ NOT NULL : row추가시 반드시 값이 있어야 한다. NULL은 안된다.
+
++ 제약조건이 위배되면 에러가 발생한다. 이때 위배된 제약조건 몇칭은 특별히 생성시 지정않았다면 자동으로 부여되어 나타난다.    
+```
+SQL> CREATE TABLE emp021(empno NUMBER(4) CONSTRAINT emp02_empno_nn NOT NULL , ename VARCHAR2(10) CONSTRAINT emp02_ename_nn NOT NULL, job VARCHAR2(9), deptno NUMBER(2));
+
+Table created.
+
+SQL> DESC emp021
+Name                                                              Null?    Type
+----------------------------------------------------------------- -------- --------------------------------------------
+EMPNO                                                             NOT NULL NUMBER(4)
+ENAME                                                             NOT NULL VARCHAR2(10)
+JOB                                                                        VARCHAR2(9)
+DEPTNO                                                                     NUMBER(2)
+
+INSERT INTO emp02 VALUES(NULL,'고주몽','기획',10);
+
++ NOT NULL제약조건만 에러발생시 제약조건명을 보여주지 않았다.
++ 나머지 제약조건(PK,FK,Unigue, Check)은 에러발생시 제약조건명을 보여준다.
+```
+
++ UNIQUE 제약조건 : 이미 추가된 row의 값과 동일한 값은 입력할수 없다. 유일한 값만 추가.
+  - 대부분의 경우 설계속성에 지정한다.
+  - 원래 존재하는 값이 아니라 관리하기 위해 특별하게 지정한 값
+  - 현재 emp테이블에서는 사원번호(empno)가 해당되는 특성이다. 동일한 사원번호를 가진 사원은 존재X.
+```
+SQL> CREATE TABLE emp03(empno NUMBER(4) UNIQUE, ename VARCHAR2(10) NOT NULL, job VARCHAR2(9), deptno NUMBER(2));
+
+Table created.
+
+SQL> INSERT INTO emp03 VALUES(8000,'홍길동','영업',30);
+
+1 row created.
+
+SQL> SELECT * FROM emp03;
+
+     EMPNO ENAME                JOB                    DEPTNO
+---------- -------------------- ------------------ ----------
+      8000 홍길동               영업                       30
+```
+
++ 사원번호가 같은 row를 추가해보자(에러발생)
+```
+SQL> INSERT INTO emp03 VALUES(8000,'장길산','기획',10);
+INSERT INTO emp03 VALUES(8000,'장길산','기획',10)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SCOTT.SYS_C007007) violated
+==================================================================
++ 주의점) : UNIQUE 제약조건은 NULL은 허용한다.
+SQL> INSERT INTO emp03 VALUES(NULL,'이순신','대표',20);;;););;;
+
+1 row created.
+
+SQL> INSERT INTO emp03 VALUES(8002,'장길산','영업',30);
+
+1 row created.
+
+SQL> SELECT * FROM emp03;                          20);
+
+     EMPNO ENAME                JOB                    DEPTNO
+---------- -------------------- ------------------ ----------
+      8000 홍길동               영업                       30
+      8001 장길산               기획                       10
+           이순신               대표                       20
+      8002 장길산               영업                       30
+```
++ NOT NULL은 동일한 값이든 뭐든 무조건 값만 입력되면 된다.
++ UNIQUE는 동일한 값은 입력될수 없다. 단, NULL은 허용한다.
+  - 그래서 두가지 특성... 즉, NOT NULL과 UNIQUE를 한꺼번에 가지는 대표속성을 설정하고 이를 기본키라고 부른다.(Primary Key)
+```
+SQL> CREATE TABLE emp04(empno NUMBER(4) PRIMARY KEY, ename VARCHAR2(10) NOT NULL, job VARCHAR2(9), deptno NUMBER(2));
+
+Table created.
+
+SQL> DESC emp04
+ Name                  Null?    Type
+ --------------------- -------- --------------------------------------------
+ EMPNO                 NOT NULL NUMBER(4)
+ ENAME                 NOT NULL VARCHAR2(10)
+ JOB                            VARCHAR2(9)
+ DEPTNO                         NUMBER(2)
+```
++ emp04테이블에서 empno는 반드시 값을 입력해야 하고, 동일한 값은 입력할수 없는 기본키 특성을 가졌다.
+```
+SQL> INSERT INTO emp04 VALUES(8000,'홍길동','판매',30);
+
+1 row created.
+
+SQL> INSERT INTO emp04 VALUES(8001,'장길산','기획',10);
+
+1 row created.
+
+SQL> INSERT INTO emp04 VALUES(NULL,'이순신','연구',20);
+INSERT INTO emp04 VALUES(NULL,'이순신','연구',20)
+                         *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("SCOTT"."EMP04"."EMPNO")
+
+
+SQL> INSERT INTO emp04 VALUES(8002,'이순신','연구',20);
+
+1 row created.
+
+SQL> SELECT * FROM emp04;
+
+     EMPNO ENAME                JOB                    DEPTNO
+---------- -------------------- ------------------ ----------
+      8000 홍길동               판매                       30
+      8001 장길산               기획                       10
+      8002 이순신               연구                       20
+```
+
++ 테이블 생성시 지정된 제약조건은 별도의 테이블에 저장된다.
++ 실제사용시 테이블에는 데이터 즉, row만 저장된다.
+  - 해당 테이블의 정보 즉, 테이블명, 컬럼명, 자료형, 제약조건 등은 자료사전(Data Dictionary)이라는 별도의 테이블에 정보가 저장된다.
+  - SELECT * FROM TAB; 명령으로는 자료사전을 확인할수 없다.
+
++ 자료사전도 테이블이다.
+  - 테이블명 ==> user_xxx로 정해져있다.
+  - 1) 테이블 정보 자료사전 ==> user_tables
+  - 2) 제약조건 정보 자료사전 ==> user_constraints
+  - 3) 제약조건 컬럼 자료사전 ==> user_cons_columns
+```
+SQL> SELECT table_name, status FROM user_tables;
+
+TABLE_NAME                                                   STATUS
+------------------------------------------------------------ ----------------
+DEPT                                                         VALID
+EMP                                                          VALID
+BONUS                                                        VALID
+SALGRADE                                                     VALID
+PROFILE                                                      VALID
+EMP01                                                        VALID
+EMP02                                                        VALID
+EMP021                                                       VALID
+EMP03                                                        VALID
+EMP04                                                        VALID
+
+10 rows selected.
+```
+
++ 제약조건을 지정하면서 CONSTRAINT 키워드를 사용하여 [CONSTRAINT 제약조건명 제약조건종류(NOT NULL, UNIQUE, PRIMARY KEY)] 제약조건명을 지정할 수 있다.
++ CONSTRAINT 키워드를 사용하지 않았다면 제약조건명을 '오라클 시스템'에서 자동으로 부여했다.
+  - SYS_CNNNN
+
++ 내부적으로 저장될때 제약조건 종류는
+  - NOT NULL ==> C
+  - UNIQUE ==> U
+  - PRIMARY KEY ==> P
+  - FOREIGN KEY ==> R
+  - CHECK ==> C
+```
+SQL> SELECT table_name, constraint_name, constraint_type FROM user_constraints;
+
+TABLE_NAME
+------------------------------------------------------------
+CONSTRAINT_NAME                                              CO
+------------------------------------------------------------ --
+EMP03
+SYS_C007007                                                  U
+
+EMP04
+SYS_C007008                                                  C
+
+EMP04
+SYS_C007009                                                  P
+```
++ 테이블 생성시 제약조건을 기술하면 그 내부정보는 자료사전에 저장되고, 이후 DML명령사용시 그 내용이 참조되어 데이터 조작(추가/수정/삭제)이 이루어지고... 이때 제약조건 위배여부를 판단한다.
+
++ 남은 제약조건
+  - 두개 이상의 테이블을 연결하는 제약조건
+  - 참조키 제약조건(Forein Key : FK)
+
++ PK : 한개의 테이블에서 각 row를 식별하는 특성
++ FK : 최소한의 중복을 허용하면서 통합된 데이터를 관리하기 위해 특정항목의 상세데이터는 다른 테이블에 분리하여 관리한다. 이 두테이블 정보를 연결시키는 것이 FK의 역할이다.
+
++ emp 테이블의 deptno는 부서코드만 가지고 있다. 상세부서정보는 deptno
+
++ SCOTT사원이 근무하는 부서명을 알고 싶다면?
+```
+SQL> SELECT * FROM emp WHERE ename='SCOTT';
+
+     EMPNO ENAME                JOB                       MGR HIREDATE        SAL       COMM     DEPTNO
+---------- -------------------- ------------------ ---------- -------- ---------- ---------- ----------
+      7788 SCOTT                ANALYST                  7566 87/04/19       3000                    20
+
+SQL> SELECT * FROM dept WHERE deptno=20;
+
+    DEPTNO DNAME                        LOC
+---------- ---------------------------- --------------------------
+        20 RESEARCH                     DALLAS
+
++ 따로 검색할 수 밖에 없는 불편함...
+```
+
++ 참조키로 연결되어진 여러테이블을 연결하여 정보를 얻는 방법
+  - 1) Sub Query
+  - 2) Join
+
+
++ 현재의 emp테이블과 dept테이블은, emp테이블의 deptno 컬럼에 의해 연결된다.
+  - 이때 상세 데이터를 가진 테이블을 부모테이블이라고 부른다.
+  - emp테이블이 자식테이블이고 dept테이블이 부모테이블이다.
+  - 두 테이블을 연결시킬때, 자식테이블에 FK를 설정한다.
+```
+CREATE TABLE emp (컬럼정보들....  deptno NUMBER(2) REFERENCES dept(deptno));
+```
+  - FK를 설정할때는 반드시 부모테이블부터 먼저 만들어져 있어야 한다.
+  - 이미 dept테이블이 만들어져 있다.(부모테이블)
+  - 자식테이블 emp05를 만들면서 FK를 설정하자.
+```
+SQL> CREATE TABLE emp05(empno NUMBER(4) PRIMARY KEY, ename VARCHAR(10) NOT NULL, job VARCHAR2(9), dno NUMBER(2) REFERENCES dept(deptno));
+
+Table created.
+```
+
++ emp05테이블에 row를 추가할때 반드시 dno는 dept테이블에 존재하는 deptno만 가질수 있다.
+```
+SQL> INSERT INTO emp05 VALUES(8000,'홍길동','판매',30);
+
+1 row created.
+
+SQL> INSERT INTO emp05 VALUES(8001,'장길산','기획',40);
+
+1 row created.
+
+SQL> INSERT INTO emp05 VALUES(8002,'이순신','연구',50);
+INSERT INTO emp05 VALUES(8002,'이순신','연구',50)
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (SCOTT.SYS_C007012) violated - parent key not found
+```
++ 자식테이블(detail)에 row를 추가할때는 반드시 부모테이블(master)에 존재하는 값만 사용할수 있다.
++ 부모테이블의 row를 삭제할때 그 값을 참조하는 자식테이블의 row가 존재하면 삭제할 수 없다.
+```
+SQL> SELECT * FROM dept;
+
+    DEPTNO DNAME                        LOC
+---------- ---------------------------- --------------------------
+        10 ACCOUNTING                   NEW YORK
+        20 RESEARCH                     DALLAS
+        30 SALES                        CHICAGO
+        40 OPERATIONS                   BOSTON
+
+SQL> DELETE FROM dept WHERE deptno=10;
+DELETE FROM dept WHERE deptno=10
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (SCOTT.EMP_DEPTNO_FK) violated - child record found
+```
+
++ 40부서를 삭제하려고 해도 삭제가 안된다. 이유)emp05테이블도 자식테이블이다.
+```
+SQL> SELECT * FROM emp05;
+
+     EMPNO ENAME                JOB                       DNO
+---------- -------------------- ------------------ ----------
+      8000 홍길동               판매                       30
+      8001 장길산               기획                       40
+
+SQL> DELETE FROM dept WHERE deptno=40;
+DELETE FROM dept WHERE deptno=40
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (SCOTT.SYS_C007012) violated - child record found
+```
+
++ CHECK 제약조건(특정컬럼이 지정한 값만 가질수 있다.)
+```
+SQL> CREATE TABLE emp06 (empno NUMBER(4) PRIMARY KEY, ename VARCHAR2(10) NOT NULL, gender CHAR(1) CHECK(gender IN('M','F')));
+Table created.
+
+SQL> INSERT INTO emp06 VALUES(8000,'홍길동','F');
+1 row created.
+
+SQL> SELECT * FROM emp06;
+EMPNO ENAME GE
+----- ----- --
+8000 홍길동  F                                             
+
+SQL> INSERT INTO emp06 VALUES(8001,'이순신','M');
+1 row created.
+
+SQL> SELECT * FROM emp06;
+EMPNO ENAME                GE
+----- -------------------- --                                                            
+8000 홍길동           F
+8001 이순신           M
+
+SQL> INSERT INTO emp06 VALUES(8002,'고주몽','A');
+INSERT INTO emp06 VALUES(8002,'고주몽','A')
+*
+ERROR at line 1:
+ORA-02290: check constraint (SCOTT.SYS_C007014) violated
+```
+
++ 지금까지 제약조건을 지정한 방법이 가장 단순한 방법이다.
+```sql
+-- 가장 단순한 제약조건 기술 방법
+
+CREATE TABLE emp07(
+	empno NUMBER(4) PRIMARY KEY,
+	ename VARCHAR2(10) NOT NULL,
+	phone VARCHAR2(13) UNIQUE,
+	gender CHAR(1) CHECK(gender IN('M','m','F','f')),
+	deptno NUMBER(2) REFERENCES dept(deptno)
+);
+
+
+-- 제약조건명을 지정할 수 있다.
+-- 제약조건명을 테이블명_걸럼명_제약조건종류약어와 같은 형태를 권장한다.
+-- 제약조건 약어(PRIMARY KEY ==> PK, NOT NULL ==> NN, UNIQUE ==> UK, CHECK ==> CK, REFERENCES KEY ==> FK
+CREATE TABLE emp07(
+	empno NUMBER(4) CONSTRAINT emp07_empno_pk PRIMARY KEY,
+	ename VARCHAR2(10) CONSTRAINT emp07_ename_nn NOT NULL,
+	phone VARCHAR2(13) CONSTRAINT emp07_phone_uk UNIQUE,
+	gender CHAR(1) CONSTRAINT emp07_gender_ck CHECK(gender IN('M','m','F','f')),
+	deptno NUMBER(2) CONSTRAINT emp07_deptno_fk REFERENCES dept(deptno)
+);
+
+-- 위와 같이 제약조건을 기술할때 제약조건명도 기술하면,
+-- 제약조건이 위배되었을때 제약조건명이 에러메세지와 함께 나타난다.
+-- 우리는 이 정보를 확인하여 제약조건에 대한 정보를 얻을 수 있다.
+```
+
++ 위의 제약조건 기술방법을 컬럼레벨 제약조건 기술이라고 한다.
++ 동일한 내용을 테이블레벨 제약조건으로 기술할 수도 있다.
+
 #### 3. DDL명령
+
 #### 4. DML명령
+
 #### 5. 실습
 #### 6. Summary / Close
 
