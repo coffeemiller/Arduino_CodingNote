@@ -1224,13 +1224,23 @@ SQL> DROP TABLE profile;
 
 -----------------------------------------------------------
 
-
-
 ### [2019-04-29]
 
 #### 1. Review
-#### 5. DDL명령
-#### 3. 실습
-#### 4. Summary / Close
++ DML명령 - 데이터 조작/운용
+  - 추가 INSERT INTO
+  - 수행 UPDATE SET
+  - 삭제 DELETE FROM
+
++ DDL명령 - 데이터 제반구조
+  - 생성 CREATE TABLE
+  - 변경 ALTER TABLE, ADD MODIFY
+  - 삭제 DROP TABLE
+
+#### 2. 무결성 무결성제약조건
+#### 3. DDL명령
+#### 4. DML명령
+#### 5. 실습
+#### 6. Summary / Close
 
 -----------------------------------------------------------
