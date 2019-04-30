@@ -1967,10 +1967,339 @@ ADDR
 ### [2019-04-30]
 
 #### 1. Review
+#### 2. 무결성 제약조건
+#### 3. DDL명령(9.doc)
++ DESC명령으로는 NOT NULL 제약조건만 확인할 수 있다.
+  - 나머지 제약조건은 자료사전(user_tables, user_constraints, user_cons_columns)을 살펴보아야 한다.
 
-#### 4. DML명령
-#### 4. 실습
-#### 5. Summary / Close
++ user_tables (현재 계정소유자가 가진 테이블의 다양한 내부정보를 저장하고 있다)
+
++ 테이블 생성하고 제약조건등을 지정하면 내부적으로 다양한 자료사전에 해당정보가 저장된다.
+  - 1) user_tables
+  - 2) user_constraints
+  - 3) user_cons_columns
+  - 4) user_objects
+  - 5) user_catalog
+
++ 테이블 생성, 제약조건 지정 => CREATE TABLE
++ 테이블의 구조를 변경, 제약조건을 추가/수정/삭제 => ALTER TABLE
+
++ ALTER TABLE 테이블명
+  - ADD(컬럼명 자료형) <- 컬럼추가
+  - MODIFY(컬럼명 자료형) <- 기존컬럼의 크기, 자료형을 변경
+
++ 기존 데이터가 있을때와 없을때
+```
+SQL> DESC bonus
+ Name                        Null?    Type
+ --------------------------- -------- --------------------------------------------
+ ENAME                                VARCHAR2(10)
+ JOB                                  VARCHAR2(9)
+ SAL                                  NUMBER
+ COMM                                 NUMBER
+
+SQL> SELECT * FROM bonus;
+no rows selected
+
+SQL> ALTER TABLE bonus ADD(etc VARCHAR2(5));
+Table altered.
+
+SQL> DESC bonus
+ Name                        Null?    Type
+ --------------------------- -------- --------------------------------------------
+ ENAME                                VARCHAR2(10)
+ JOB                                  VARCHAR2(9)
+ SAL                                  NUMBER
+ COMM                                 NUMBER
+ ETC                                  VARCHAR2(5)
+
+
++ 우리의 실습환경에는 emp_30이 없다. 예제를 위해 만들어야 한다.
+
+```
++ 컬럼 정보 수정(컬럼명은 변경불가. 자료형, 크기를 변경할 수 있다.)
+  - ALTER TABLE 테이블명 MODIFY(컬럼명 자료형);
+```
++ 테이블에 기존 데이터가 있을때 크기를 변경
+(기존보다 크게 - ok, 기존보다 작게 - error)
+
+SQL> SELECT * FROM emp_30;
+
+     EMPNO ENAME                JOB                HIREDATE        SAL       COMM
+---------- -------------------- ------------------ -------- ---------- ----------
+      7499 ALLEN                SALESMAN           81/02/20       1600        300
+      7521 WARD                 SALESMAN           81/02/22       1250        500
+      7654 MARTIN               SALESMAN           81/09/28       1250       1400
+      7698 BLAKE                MANAGER            81/05/01       2850
+      7844 TURNER               SALESMAN           81/09/08       1500          0
+      7900 JAMES                CLERK              81/12/03        950
+
+6 rows selected.
+
+SQL> ALTER TABLE emp_30 MODIFY(ename VARCHAR2(15));
+
+Table altered.
+```
+
++ 기존테이블에 데이터가 있을때
+```
+SQL> ALTER TABLE emp_30 MODIFY(empno CHAR(4));
+ALTER TABLE emp_30 MODIFY(empno CHAR(4))
+                          *
+ERROR at line 1:
+ORA-01439: column to be modified must be empty to change datatype
+```
+
++ 데이터가 이미 존재하고 있다면, 컬럼의 자료형은 변경할 수 없다.
+```
+SQL> ALTER TABLE emp_30 MODIFY(job CHAR(9));
+
+Table altered.
+
+SQL> DESC emp_30;
+ Name                Null?    Type
+ ------------------- -------- --------------------------------------------
+ EMPNO                        NUMBER(4)
+ ENAME                        VARCHAR2(15)
+ JOB                          CHAR(9)
+ HIREDATE                     DATE
+ SAL                          NUMBER(7,2)
+ COMM                         NUMBER(7,2)
+```
++ 단, VARCHAR2-CHAR간의 변경은 가능하다.
+
++ 제약조건도 추가하거나 변경할 수 있다.
+  - 현재 emp테이블의 제약조건 확인
+    + user_tables, user_constraints, user_cons_columns
+
++ 제약조건이 설정된 컬럼정보를 확인하려면 user_cons_columns 자료사전을 살펴보아야 한다.
+```
+SQL> SELECT constraint_name, table_name, column_name FROM user_cons_columns WHERE table_name='EMP';
+
+CONSTRAINT_NAME
+------------------------------------------------------------
+TABLE_NAME
+------------------------------------------------------------
+COLUMN_NAME
+------------------------------------------------------------
+EMP_EMPNO_PK
+EMP
+EMPNO
+
+EMP_DEPTNO_FK
+EMP
+DEPTNO
+```
+
++ 참고사항) Data Dictionary에 정보가 저장될때 테이블명, 컬럼명, 제약조건명 등은 모두 대문자로만 저장된다.
+
++ 제약조건의 추가도 테이블의 컬럼정보의 추가방법과 동일하다.
+```
+ALTER TABLE emp ADD CONSTRAINT 테이블레벨 제약조건
+
+SQL> ALTER TABLE emp ADD CONSTRAINT emp_ename_uk UNIQUE(ename);
+
+Table altered.
+
+SQL> SELECT * FROM emp;
+
+EMPNO ENAME       JOB            MGR HIREDATE        SAL       COMM     DEPTNO
+----- ----------- ------------------ ---------- -------- ---------- ---------- ----------
+7369 SMITH        CLERK                    7902 80/12/17        800             20
+7499 ALLEN        SALESMAN                 7698 81/02/20       1600 300         30
+7521 WARD         SALESMAN                 7698 81/02/22       1250 500         30
+7876 ADAMS        CLERK                    7788 87/05/23       1100             20
+7900 JAMES        CLERK                    7698 81/12/03        950             30
+7902 FORD         ANALYST                  7566 81/12/03       3000             20
+7934 MILLER       CLERK                    7782 82/01/23       1300             10
+
+14 rows selected.
+
+SQL> INSERT INTO emp(empno,ename,job,deptno) VALUES(8000,'ADAMS','SALESMAN',30);
+INSERT INTO emp(empno,ename,job,deptno) VALUES(8000,'ADAMS','SALESMAN',30)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SCOTT.EMP_ENAME_UK) violated
+```
+
++ 일시적으로 동일성명이 추가하도록 설정할 수 있다.(제약조건 비활성화)
+  - 제약조건 삭제
+  - ALTER TABLE 테이블명
+  - DROP 제약조건
+```
+SQL> ALTER TABLE emp DROP CONSTRAINT emp_ename_uk;
+Table altered.
+
+SQL> INSERT INTO emp(empno,ename,job,deptno) VALUES(8000,'ADAMS','SALESMAN',30);
+1 row created.
+
+SQL> SELECT * FROM emp;
+
+EMPNO ENAME        JOB              MGR HIREDATE        SAL       COMM     DEPTNO
+----- ------------ --------- ---------- -------- ---------- ---------- ----------
+8000 ADAMS         SALESMAN                                                   30
+7369 SMITH        CLERK           7902 80/12/17        800                    20
+7499 ALLEN        SALESMAN        7698 81/02/20       1600        300         30
+7521 WARD         SALESMAN        7698 81/02/22       1250        500         30
+7566 JONES        MANAGER         7839 81/04/02       2975                    20
+7654 MARTIN       SALESMAN        7698 81/09/28       1250       1400         30
+7698 BLAKE        MANAGER         7839 81/05/01       2850                    30
+7782 CLARK        MANAGER         7839 81/06/09       2450                    10
+```
+
++ EMP_EMPNO_PK 제약조건을 일시적으로 비활성화 시키자.
+```
+SQL> INSERT INTO emp(empno,ename,job,deptno) VALUES(7499,'홍길동','CLERK',20);
+INSERT INTO emp(empno,ename,job,deptno) VALUES(7499,'홍길동','CLERK',20)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (SCOTT.EMP_EMPNO_PK) violated
+
+
+SQL> ALTER TABLE emp DISABLE CONSTRAINT emp_empno_pk;
+Table altered.
+
+SQL> INSERT INTO emp(empno,ename,job,deptno) VALUES(7499,'홍길동','CLERK',20);
+1 row created.
+
+SQL> SELECT * FROM emp;                                                    
+EMPNO ENAME        JOB                  MGR HIREDATE        SAL       COMM     DEPTNO
+----- ------------ ------------------ ----- -------- ---------- ---------- ----------
+8000 ADAMS         SALESMAN                                                       30
+7499 홍길동        CLERK                                                           20
+7369 SMITH         CLERK               7902 80/12/17        800                    20
+7499 ALLEN         SALESMAN            7698 81/02/20       1600        300         30
+```
++ 원래의 제약조건을 활성화 시켜보자
+```
+SQL> ALTER TABLE emp ENABLE CONSTRAINT emp_empno_pk;
+ALTER TABLE emp ENABLE CONSTRAINT emp_empno_pk
+*
+ERROR at line 1:
+ORA-02437: cannot validate (SCOTT.EMP_EMPNO_PK) - primary key violated
+```
+  - 다시 원래의 조건으로 돌려놓으면 당연히 오류.... 다시 돌아로려면 '삭제'가 답!!
+```
+SQL> DELETE FROM emp WHERE ename='홍길동';
+1 row deleted.
+
+SQL> ALTER TABLE emp ENABLE CONSTRAINT emp_empno_pk;
+Table altered.
+```
++ EMP테이블의 제약조건 조회
+```
+SQL> SELECT constraint_name,constraint_type,search_condition
+  2  FROM user_constraints
+  3  WHERE table_name = 'EMP';
+
+CONSTRAINT_NAME                                              CO SEARCH_CONDITION
+------------------------------------------------------------ -- ------------------------------
+EMP_EMPNO_PK                                                 P
+EMP_DEPTNO_FK                                                R
+```
++ 컬럼 정보를 보고싶다.
+```
+SQL> SELECT constraint_name, column_name
+  2  FROM user_cons_columns
+  3  WHERE table_name = 'EMP';
+
+CONSTRAINT_NAME
+------------------------------------------------------------
+COLUMN_NAME
+------------------------------------------------------------------------------------------------------------------------
+EMP_EMPNO_PK
+EMPNO
+
+EMP_DEPTNO_FK
+DEPTNO
+```
++ 테이블 이름변경
+```
+SQL> RENAME emp_30 TO emp_temp;
+
+Table renamed.
+
+SQL> SELECT * FROM TAB;
+
+TNAME                                                        TABTYPE         CLUSTERID
+------------------------------------------------------------ -------------- ----------
+BIN$E59MTgJ5Qiqhhhlkf1jcyw==$0                               TABLE
+BIN$H4l6l4DmT2uKjchEPzHuNg==$0                               TABLE
+BONUS                                                        TABLE
+DEPT                                                         TABLE
+DEPT01                                                       TABLE
+EMP                                                          TABLE
+EMP_TEMP                                                     TABLE
+MEMBER                                                       TABLE
+POST                                                         TABLE
+SALGRADE                                                     TABLE
+
+10 rows selected.
+```
++ 테이블의 모든 row를 삭제하고 싶다.
+  - 1) DELETE FROM emp_temp;  <== DML명령 (복구할 수 있다.)
+  - 2) TRUNCATE TABLE emp_temp; <== DDL명령 (복구할 수 없다.)
+```
+SQL> COMMIT;
+Commit complete.
+
+SQL> SELECT * FROM emp_temp;
+EMPNO ENAME        JOB                HIREDATE        SAL       COMM
+------- ------------ ------------------ -------- ---------- ----------
+7499 ALLEN        SALESMAN           81/02/20       1600        300
+7521 WARD         SALESMAN           81/02/22       1250        500
+7654 MARTIN       SALESMAN           81/09/28       1250       1400
+7698 BLAKE        MANAGER            81/05/01       2850
+7844 TURNER       SALESMAN           81/09/08       1500          0
+7900 JAMES        CLERK              81/12/03        950
+
+SQL> DELETE FROM emp_temp;
+6 rows deleted.
+
+SQL> SELECT * FROM emp_temp;
+no rows selected
+
+SQL> ROLLBACK;
+Rollback complete.
+
+SQL> SELECT * FROM emp_temp;
+EMPNO ENAME        JOB                HIREDATE        SAL       COMM
+------- ------------ ------------------ -------- ---------- ----------
+7499 ALLEN        SALESMAN           81/02/20       1600        300
+7521 WARD         SALESMAN           81/02/22       1250        500
+7654 MARTIN       SALESMAN           81/09/28       1250       1400
+7698 BLAKE        MANAGER            81/05/01       2850
+7844 TURNER       SALESMAN           81/09/08       1500          0
+7900 JAMES        CLERK              81/12/03        950
+```
+```
+SQL> TRUNCATE TABLE emp_temp;
+Table truncated.
+
+SQL> SELECT * FROM emp_temp;
+no rows selected
+```
+
++ 테이블 삭제 => DROP TABLE 테이블명;
+  - 부모테이블의 삭제는 불가능.
+  - 자식테이블의 row를 삭제해야 부모테이블 삭제가 가능.
+```
+SQL> DROP TABLE dept;
+DROP TABLE dept
+           *
+ERROR at line 1:
+ORA-02266: unique/primary keys in table referenced by enabled foreign keys
+
+SQL> DROP  TABLE  dept  CASCADE  CONSTRAINT;
+Table dropped.
+```
+  - 제약조건 때문에 삭제할수 없으므로 연관된 제약조건을 삭제하고 테이블을 지워야 함.
+
+
+#### 4. DML명령(10.doc)
+#### 5. JDBC Programming소개
+#### 6. 실습
+#### 7. Summary / Close
 
 
 -----------------------------------------------------------
