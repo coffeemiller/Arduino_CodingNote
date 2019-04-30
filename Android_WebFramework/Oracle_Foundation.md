@@ -2298,6 +2298,123 @@ Table dropped.
 ##### [4시 이후, 9.doc 연습문제 풀어보자.]
 
 #### 4. DML명령(10.doc)
++ 데이터 조작(DML명령)과 트랜잭션 처리
+  - 추가 INSERT INTO
+  - 수정 UPDATE SET
+  - 삭제 DELETE FROM
+  - DML명령은 직접 물리적 데이터베이스에 반영되지 않고 임시 작업영역에 반영된다.
+  - 일련의 작업 수행후 물리적 데이터베이스에 반영시키는 동작을 '트랜잭션(transaction)'이라고 한다.
+    + COMMIT ==> 물리적 DB에 반영
+    + 중도에 문제가 생겼다. ==> 예전상태로 복구 ROLLBACK
+    + 복구 시점 설정 ==> SAVEPOINT
+  - DML명령이 수행될때 사용되는 작업공간을 SQL에서는 커서(CURSOR)라고 부른다.
+
+
++ 데이터 추가
+  - INSERT INTO 테이블명 VALUES(테이블생성시 추가한 컬럼순으로 모든 데이터 입력)
+  - INSERT INTO 테이블명(컬럼명...) VALUES(왼쪽 컬럼순으로 데이터 입력)
+  - 무결성 제약조건에 위배되면 추가되지 않는다.
+```
+SQL> INSERT INTO emp VALUES(1111,'YOONJB','',NULL,SYSDATE,3000,NULL,10);
+1 row created.
+
+SQL> INSERT INTO emp(empno,ename,hiredate,deptno) VALUES(2222,'홍길동',SYSDATE,10);
+1 row created.
+```
+
++ 함수를 이용하여 날짜를 좀더 명확하게 표현할수 있다. TO_DATE('날짜값','형식')
+```
+SQL> INSERT INTO emp(empno,ename,job,hiredate,deptno) VALUES(3334,'HONGKD','SALESMAN',TO_DATE('19920215','YYYYMMDDHH24MISS'),10);
+
+1 row created.
+```
+
++ 특정날짜값을 추가할때 (TO_DATE()함수 사용)
+```
+SQL> INSERT INTO emp(empno,hiredate,deptno)
+  2  VALUES (5555,TO_DATE('1999','YYYY'),30);
+
+  SQL> INSERT INTO emp(empno,hiredate,deptno)
+    2  VALUES (6666,TO_DATE('99','YY'),20);
+```
+
++ 치환변수 : sql*plus 툴에서 키보드로 입력한 값을 저장(추가)하는 방법
+```
+SQL> INSERT INTO dept(deptno,dname,loc) VALUES(&department_id,'&department_name','&location');
+Enter value for department_id: 70
+Enter value for department_name: EDUCATION
+Enter value for location: ATLANTA
+old   1: INSERT INTO dept(deptno,dname,loc) VALUES(&department_id,'&department_name','&location')
+new   1: INSERT INTO dept(deptno,dname,loc) VALUES(70,'EDUCATION','ATLANTA')
+
+1 row created.
+```
+
++ emp테이블의 구조를 복사하여 emp_30테이블을 만들고, 부서번호가 30부서인 row를 복사하였다.
+```
+CREATE TABLE emp_30 AS SELECT * FROM emp WHERE deptno=30;
+```
+  - 위의 문장에서 SELECT문을 sub-query라고 부른다.
+```
+SQL> CREATE TABLE emp_10(id,name,salary,hiredate) AS SELECT empno,ename,sal,hiredate FROM emp WHERE 1=2;
+
+Table created.
+
+SQL> SELECT * FROM TAB;
+
+TNAME                       TABTYPE         CLUSTERID
+--------------------------- -------------- ----------
+BONUS                       TABLE
+DEPT                        TABLE
+EMP                         TABLE
+EMP_10                      TABLE
+SALGRADE                    TABLE
+
+SQL> DESC emp_10
+Name                        Null?    Type
+--------------------------- -------- --------------------------------------------
+ID                                   NUMBER(4)
+ NAME                                 VARCHAR2(10)
+ SALARY                               NUMBER(7,2)
+ HIREDATE                             DATE
+
+SQL> DESC emp
+ Name                        Null?    Type
+ --------------------------- -------- --------------------------------------------
+ EMPNO                       NOT NULL NUMBER(4)
+ ENAME                                VARCHAR2(10)
+ JOB                                  VARCHAR2(9)
+ MGR                                  NUMBER(4)
+ HIREDATE                             DATE
+ SAL                                  NUMBER(7,2)
+ COMM                                 NUMBER(7,2)
+ DEPTNO                               NUMBER(2)
+
+SQL> SELECT * FROM emp_10;
+no rows selected
+```
+
++ INSERT INTO문에서도 sub-query를 사용할 수 있다.
+```
+SQL> INSERT INTO emp_10 SELECT empno,ename,sal,hiredate FROM emp WHERE deptno=10;
+8 rows created.
+
+SQL> SELECT * FROM emp_10;
+  ID NAME                     SALARY HIREDATE
+------- -------------------- ---------- --------
+7782 CLARK                      2450 81/06/09
+7839 KING                       5000 81/11/17
+7934 MILLER                     1300 82/01/23
+1111 YOONJB                     3000 19/04/30
+2222 홍길동                          19/04/30
+3333 HONGKD                          92/02/21
+3334 HONGKD                          92/02/15
+3335 HONGKD                          92/02/15
+
+8 rows selected.
+```
+
+
 #### 5. JDBC Programming소개
 #### 6. 실습
 #### 7. Summary / Close
