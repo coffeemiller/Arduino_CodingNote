@@ -2415,6 +2415,29 @@ SQL> SELECT * FROM emp_10;
 ```
 
 
++ 무결성 계약조건을 위배한 INSERT INTO 명령 예제
+```
+INSERT INTO emp
+VALUES (7788,'YOON','MANAGER',NULL,SYSDATE,NULL,NULL,10);
+
+
+INSERT INTO emp
+VALUES (1144,'YOON','MANAGER',NULL,SYSDATE,NULL,NULL,91);
+
+
+-- 아래의 명령은 mgr컬럼에 self-key제약조건이 설정되어 있을때 위배사항이다.
+INSERT INTO emp
+VALUES (1144,'YOON','MANAGER',1234,SYSDATE,NULL,NULL,10);
+
+
+-- job항목에 NOT NULL제약조건이 설정되었다면 NOT NULL제약조건 위배
+INSERT INTO emp (empno,ename,job)
+VALUES (1144,'YOON','MANAGER');
+```
+
++ 수정 : UPDATE SET
+  - UPDATE 테이블명 SET 컬럼명=값, ...
+  - WHERE 조건
 #### 5. JDBC Programming소개
 #### 6. 실습
 #### 7. Summary / Close
