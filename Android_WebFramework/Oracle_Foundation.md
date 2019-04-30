@@ -2041,7 +2041,7 @@ SQL> ALTER TABLE emp_30 MODIFY(ename VARCHAR2(15));
 Table altered.
 ```
 
-+ 기존테이블에 데이터가 있을때
++ 기존테이블에 데이타가 있을때 자료형의 변경은 불가능하다. 데이타가 없을때 자료형의 변경이 가능하다.
 ```
 SQL> ALTER TABLE emp_30 MODIFY(empno CHAR(4));
 ALTER TABLE emp_30 MODIFY(empno CHAR(4))
@@ -2295,6 +2295,7 @@ Table dropped.
 ```
   - 제약조건 때문에 삭제할수 없으므로 연관된 제약조건을 삭제하고 테이블을 지워야 함.
 
+##### [4시 이후, 9.doc 연습문제 풀어보자.]
 
 #### 4. DML명령(10.doc)
 #### 5. JDBC Programming소개
