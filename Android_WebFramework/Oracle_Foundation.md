@@ -2438,7 +2438,228 @@ VALUES (1144,'YOON','MANAGER');
 + 수정 : UPDATE SET
   - UPDATE 테이블명 SET 컬럼명=값, ...
   - WHERE 조건
-#### 5. JDBC Programming소개
+```
+SQL> UPDATE emp SET deptno=10 WHERE empno=7788;
+1 row updated.
+
+
+SQL> SELECT * FROM emp WHERE empno=7788;
+EMPNO ENAME          JOB                MGR HIREDATE        SAL       COMM     DEPTNO
+----- -------------- ------------------ --- -------- ---------- ---------- ----------
+7788 SCOTT           ANALYST           7566 87/04/19       3000                    10
+
+SQL> UPDATE emp SET deptno=20, sal=3500 WHERE empno=7788;
+1 row updated.
+
+SQL> SELECT * FROM emp WHERE empno=7788;
+EMPNO ENAME          JOB                MGR HIREDATE        SAL       COMM     DEPTNO
+----- -------------- ------------------ --- -------- ---------- ---------- ----------
+7788 SCOTT           ANALYST           7566 87/04/19       3500                    10
+```
+
++ UPDATE명령시 WHERE 조건을 사용하지 않으면 모든 row의 컬럼값이 바뀐다.
+```
+SQL> UPDATE emp SET deptno=10;
+
+14 rows updated.
+
+SQL> SELECT * FROM emp;
+
+EMPNO ENAME          JOB           MGR HIREDATE        SAL       COMM     DEPTNO
+----- -------------- ------------- --- -------- ---------- ---------- ----------
+7369 SMITH          CLERK        7902 80/12/17        800                    10
+7499 ALLEN          SALESMAN     7698 81/02/20       1600        300         10
+7521 WARD           SALESMAN     7698 81/02/22       1250        500         10
+7566 JONES          MANAGER      7839 81/04/02       
+```
+
++ UPDATE시 무결성 제약 조건 ERROR
+```
+-- 자식테이블의 부모테이블이 없는 내용으로 바꾸는 경우...
+SQL> UPDATE emp SET deptno=91 WHERE deptno=10;
+UPDATE emp SET deptno=91 WHERE deptno=10
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (SCOTT.EMP_DEPTNO_FK) violated - parent key not found
+
+-- 부모테이블의 내용을 바꾸는 경우...
+SQL> UPDATE dept SET deptno=15 WHERE deptno=10;
+UPDATE dept SET deptno=15 WHERE deptno=10
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (SCOTT.EMP_DEPTNO_FK) violated - child record found
+```
+
++ 행 삭제 : DELETE FROM
+  - DELETE FROM 테이블명 WHERE 조건;
+  - WHERE을 쓰지 않으면 전부다 삭제....
+```
+SQL> DELETE FROM emp WHERE empno=7499;
+1 row deleted.
+
+SQL> DELETE emp WHERE TO_CHAR(hiredate,'YYYY')='1980';
+1 row deleted.
+```
+
++ 무결성 제약조건 ERROR
+```
+SQL> SELECT * FROM dept;
+
+DEPTNO DNAME                        LOC
+------ ---------------------------- --------------------------
+    10 ACCOUNTING                   NEW YORK
+    20 RESEARCH                     DALLAS
+    30 SALES                        CHICAGO
+    40 OPERATIONS                   BOSTON
+
+SQL> DELETE dept WHERE dname='ACCOUNTING';
+DELETE dept WHERE dname='ACCOUNTING'
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (SCOTT.EMP_DEPTNO_FK) violated - child record found
+```
++ 여기까지가 단순 DML명령을 표현한 것이다.
+
++ 트랜잭션처리(TRANSACTION PROCESS)
+  - 여러개의 DML명령이 결합되어 논리적인 작업단위를 이룰때 이를 트랜잭션이라고 한다.
+  - COMMIT, SAVEPOINT, ROLLBACK 문장으로 TRANSACTION의 논리를 제어할 수 있다.
+
++ 1) COMMIT ==> 현재까지의 모든 DML작업내용을 물리적 DB에 반영시켜라.
++ 2) SAVEPOINT ==> 현재까지의 상태에 대한 복구시점 설정.
++ 3) ROLLBACK ==> 트랜잭션의 시작부분 or SAVEPOINT시점으로 복구시켜라.
+```
+-- 테이블을 생성하는 sql구문부터가 트랜젝션의 시작!!
+SQL> UPDATE emp SET deptno=30 WHERE empno=7788;
+1 row updated.
+
+SQL> COMMIT;
+Commit complete.
+
+SQL> --여기서부터가 새로운 트랜잭션의 시작
+SQL>
+SQL> DELETE FROM emp;
+14 rows deleted.
+
+SQL> ROLLBACK;
+Rollback complete.
+
+
+-- 7788의 업무를 CLERK으로 변경
+SQL> UPDATE emp SET job='CLERK' WHERE empno=7788;
+1 row updated.
+
+-- 현재의 시점을 복구시점으로 설정
+SQL> SAVEPOINT p1;
+Savepoint created.
+
+-- 모든 row의 업무를 MANAGER로 변경
+SQL> UPDATE emp  SET job='MANGER';
+14 rows updated.
+
+-- 업무가 MANGER로 바뀌기 전으로 롤백
+SQL> ROLLBACK TO SAVEPOINT p1;
+Rollback complete.
+```
+##### [4시 이후, 연습문제 풀이 10.doc]
+
+
++ 지금까지 SELECT, DML명령, DDL명령을 현재의 도구 즉, sql*plus에서 사용하였다. 이를 Java Program으로 변경시켜 사용해 보자 ==> JDBC Programming(java.sql패키지의 클래스를 사용)
+
+#### 5. JDBC Programming소개(JDBC코딩절차)
++ JDBC Programming(JAVA Programming에서 데이터베이스 서버에 접속하여 SQL명령을 실행)
+
++ 1. Project 생성
+  - Build-Path에서 외부라이브러리를 참조할수 있도록 설정
+  - C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar
+
++ 2. 코딩절차
+  - 1) Oracle JDBC Driver load
+  - 2) CONNECT
+
+```java
+//JDBCTest.java
+package com.jica.jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
+
+public class JDBCTest {
+	static final String url = "jdbc:oracle:thin:@127.0.0.1:1521:xe";
+	static final String id = "SCOTT";
+	static final String password = "TIGER";
+
+	public static void main(String[] args) throws SQLException {
+		// jdbc프로그램
+
+		// 1.jdbc Oracle 드라이버 로드
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		// 2.Oracle서버에 계정 로그인-서버접속
+		Connection connection;
+		connection = DriverManager.getConnection(url,id,password);
+
+		// 3.connection객체를 이용하여 SQL명령을 실행시킬 수 있는 Statement객체 생성.
+		//                             =======> Statement
+		Statement statement = connection.createStatement();
+
+		// 4.statement객체를 이용하여 SQL명령 실행
+		// SQL명령 -- Query
+		//         -- DML(INSERT, UPDATE, DELETE)
+		//         -- DDL(CREATE TABLE, ALTER TABLE, DROP TABLE)
+
+		String sql = "SELECT * FROM emp WHERE empno=7788";
+		//SELECT명령의 결과값을 저장할 객체가 있어야 한다.
+		ResultSet resultSet = null;
+
+		//5.명령을 실행시켜 그 결과를 가져온다.
+		//가져온 값을 사용한다.
+		resultSet = statement.executeQuery(sql);
+		//          statement.executeUpdate(sql); ==> DML명령
+		//          statement.execute(sql);       ==> DDL명령  
+
+		//명령수행 결과를 해석해서 화면에 보여준다.
+		//emp테이블의 구조
+		//      SQL자료형                        Java자료형
+		//          =================================
+		//1 EMPNO    NUMBER(4)           int
+		//2 ENAME    VARCHAR2(10)        String
+		//3 JOB      VARCHAR2(9)         String
+		//4 MGR      NUMBER(4)           int
+		//5 HIREDATE DATE                java.lang.Date
+		//6 SAL      NUMBER(7,2)         double
+		//7 COMM     NUMBER(7,2)         double
+		//8 DEPTNO   NUMBER(2)           int
+		// -------------------------------------------
+
+		if (resultSet.next()) {
+			int empno = resultSet.getInt(1);  //getInt("EMPNO")
+			String ename = resultSet.getString(2); //getString("ENAME")
+			String job = resultSet.getString(3); //getString("JOB")
+			int mgr = resultSet.getInt(4);
+			Date hiredate = resultSet.getDate(5);
+			double sal = resultSet.getDouble(6);
+			double comm = resultSet.getDouble(7);
+			int deptno = resultSet.getInt(8);
+
+			System.out.println(empno+","+ename+","+job+","+mgr+","+hiredate+","+sal+","+comm+","+deptno);
+		}		
+
+		//6. 모든 작업이 종료되었으므로, 연결종료.
+		resultSet.close();
+		statement.close();
+		connection.close();
+	}
+}
+```
+
 #### 6. 실습
 #### 7. Summary / Close
 
