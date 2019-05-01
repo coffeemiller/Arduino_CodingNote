@@ -2673,7 +2673,8 @@ public class JDBCTest {
   - 1. jdbc Library
   - 2. Driver load
 ```java
- Class.forName("oracle.jdbc.driver.OracleDriver");
+//C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar
+Class.forName("oracle.jdbc.driver.OracleDriver"); // Oracle
 ```
   - 3. 서버에 로그인(접속)
 ```java
@@ -2715,12 +2716,104 @@ connection.close();
   - `*.war` ==> Java로 작성된 웹용 서버프로그램을 배포할 때 사용(servlet/JSP)
 
 
++ 코딩절차(복습)
+  - 1) Oracle JDBC DRIVER load
+```java
+  Class.forName("oracle.jdbc.driver.OracleDriver"); // Oracle
+  Class.forName("com.microsoft.jdbc.sqlserver.SQLServerDriver"); //MS-SQL
+  Class.forName("com.mysql.jdbc.Driver"); //MySQL
+```
+  - 2) URL
+```java
+  static final String url = "jdbc:oracle:thin:@127.0.0.1:1521:xe"; //Oracle
+  static final String url = "jdbc:microsoft:sqlserver://localhost:1433"; //MS-SQL
+  static final String url = "jdbc:mysql://localhost:"; //MySQL
+```
+  - 3) 서버접속
+```java
+Connection connection;
+connection = DriverManager.getConnection(url,id,password);
+```
+  - 4) SQL명령을 실행시키기 위한 준비
+```java
+//connection객체를 이용하여 SQL명령을 실행시킬 수 있는 Statement객체 생성
+Statement statement = connection.createStatement();
+//SQL 명령문 작성
+String sql = "SELECT * FROM emp WHERE empno=7788";
+```
+  - 5) SQL명령 실행
+```java
+ResultSet rs = statement.executeQuery(sql);
+int n = statement.executeUpdate(sql);
+statement.execute(sql);
+```
+  - 6) 객체 close
+```java
+//모든 작업이 종료되었으므로, 연결종료.
+rs.close();
+statement.close();
+connection.close();
+```
+
+
 #### 2. Join
 + 두개 이상의 테이블에서 정보를 추출하는 방법
   - SELECT 컬럼
   - FROM 테이블1, 테이블2
   - WHERE 조인조건
 
++ JOIN이란
+  - 두개 이상의 테이블을 결합하여 원하는 결과를 추출하는 방법
+  - 테이블을 설계(생성)할때 PK,EK로
+
++ JONES사원의 근무지를 알고싶다.
+```sql
+SQL> SELECT empno,ename,deptno FROM emp WHERE ename='JONES';
+EMPNO ENAME         DEPTNO
+------- --------- ----------
+7566 JONES             20
+
+SQL> SELECT deptno,loc FROM dept WHERE deptno=20;
+DEPTNO LOC
+-------- --------------------------
+    20 DALLAS
+```
++ 위 두개의 SELECT문은 1개의 문장으로 해결할수 있는 방법
+  - 1) JOIN
+  - 2) Sub-Query
+
++ JOIN문의 작성법
+```sql
+SELECT 테이블명.컬럼명, ....
+FROM 테이블1, 테이블2, ....
+WHERE 조인조건
+-------------------------------------------
+SELECT		table1.column1 [,table2.column2, . . . . .]
+ 	FROM	table1, table2
+ 	WHERE	table1.column1 = table2.column2;
+```
+
++ JOIN의 종류
+  - 1) Cartesian Product ==> CROSS JOIN (실무에서 사용하지 않음)
+  - 2) Equi-Join ==> 두테이블간의 FK를 사용하여 동등비교에 의한 결합(PK,FK)
+  - 3) Non Equi-Join ==> 동등비교가 아닌, 두테이블간의 다른 조건의 결합 (등급,학점)
+  - 4) Outer Join ==> 조건에 부합되지 않은 row도 함께 결합시킨다.
+  - 5) Self Join ==> 하나의 테이블에서 Equi-Join
+  - 6) Join관련 연산자 =>> Set Operators
+
++ CROSS JOIN : 무의미한 JOIN으로 각각테이블의 row갯수를 곱한 값
++ Equi-Join (FK에 의한 두테이블의 연결) => 실무에서 가장 많이 사용
+  - 조인조건에 동등비교(=) 반드시 조건식에 사용한다.
+  - Equi-Join을 ANSI 표준에서는 INNER JOIN(내부조인)이라고도 부른다.
+```sql
+SQL> SELECT e.empno, e.ename, d.deptno, d.loc
+  2 FROM emp e,dept d
+  3 WHERE e.deptno=d.deptno AND e.ename='JONES';
+
+EMPNO ENAME            DEPTNO LOC
+----- ------------ ---------- --------------------------
+7566 JONES                20 DALLAS
+```
 
 #### 3. Sub-Query
 #### 4. 실습
