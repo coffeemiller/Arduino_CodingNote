@@ -3047,7 +3047,175 @@ DEPTNO
 
 #### 3. Sub-Query(서브쿼리)
 + SELECT문이나 DML, DDL 문장내부에 존재하는 SELECT문을 지칭합니다.
++ 알려지지 않은 기준에 의한 데이터 검색을 위한 NESTED SUBQUERY와 데이터 조작 문장에 SUBQUERY를 사용.
 
++ ALLEN 사원의 부서명을 알고싶다면...
+```sql
+SQL> SELECT deptno FROM emp WHERE ename='ALLEN';
+DEPTNO
+--------
+    30
+
+SQL> SELECT dname FROM dept WHERE deptno=30;
+DNAME
+----------------------------
+SALES
+
+-- 위의 2가지 SELECT문을 하나의 문장으로 표현하자 ==> Sub-Query
+SQL> SELECT dname
+2 FROM dept
+3 WHERE deptno=(SELECT deptno FROM emp WHERE ename='ALLEN');
+
+DNAME
+----------------------------
+SALES
+```
+
++ 서브쿼리의 결과값
+  - 1) 단일값
+  - 2) 단일행 여러컬럼
+  - 3) 여러행 단일컬럼
+  - 4) 여러행 여러컬럼(다중)
+  - 단일값을 나타내는 서브쿼리는 지금까지 사용한 비교연산자(=,!=,>,>=,<,<=) 사용.
+  - 다중컬럼, 다중행 서브쿼리일때는 비교연산자 사용X. => 별도의 연산자 사용.
+
++ 서브쿼리 사용시 주의점
+  - 1) 반드시 괄호()로 묶어야 한다.
+  - 2) 단일행 단일컬럼의 결과값일때 연산자(기존동일)
+  - 3) 여러행, 여러컬럼일때 사용하는 연산자(복수행연산자)
+    + IN, NOT IN, ANY, ALL, EXISTS
+  - 4) 서브쿼리는 메인쿼리의 조건식에서 연산자 오른쪽에 위치해야 한다.
+
+
++ 단일행 서브쿼리
+```sql
+SQL> SELECT empno,ename,job,sal FROM emp WHERE sal>(SELECT sal FROM emp WHERE ename='WARD');
+
+EMPNO ENAME                JOB                       SAL
+----- -------------------- ------------------ ----------
+7499 ALLEN                SALESMAN                 1600
+7566 JONES                MANAGER                  2975
+7698 BLAKE                MANAGER                  2850
+7782 CLARK                MANAGER                  2450
+7788 SCOTT                ANALYST                  3000
+7839 KING                 PRESIDENT                5000
+7844 TURNER               SALESMAN                 1500
+7902 FORD                 ANALYST                  3000
+7934 MILLER               CLERK                    1300
+
+9 rows selected.
+```
+
++ EMP 테이블에서 사원번호가 7521의 업무와 같고 급여가 7934보다 많은 사원의 정보를 사원번호,이름,담당업무,입사일자,급여를 출력하여라.
+```sql
+-- 업무가 SALESMAN이고 급여가 1300달러보다 많이 받는 사원정보를 출력
+SQL> SELECT empno,ename,job,hiredate,sal FROM emp WHERE job='SALESMAN' AND sal>1300;
+
+EMPNO ENAME                JOB                HIREDATE        SAL
+------- -------------------- ------------------ -------- ----------
+7499 ALLEN                SALESMAN           81-02-20       1600
+7844 TURNER               SALESMAN           81-09-08       1500
+
+SQL> SELECT empno,ename,job,hiredate,sal FROM emp WHERE job=(SELECT job FROM emp WHERE empno=7521) AND sal>(SELECT sal FROM emp WHERE empno=7934);
+
+EMPNO ENAME                JOB                HIREDATE        SAL
+------- -------------------- ------------------ -------- ----------
+7499 ALLEN                SALESMAN           81-02-20       1600
+7844 TURNER               SALESMAN           81-09-08       1500
+```
+
++ 서브쿼리에서 그룹함수를 사용할 수 있다.``(COUNT(*), SUM(), AVG(), MIN(), MAX())``
+```sql
+-- EMP 테이블에서 급여의 평균보다 적은 사원의 정보를 사원번호,이름,담당업무,급여,부서번호를 출력하여라
+-- 평균급여보다 적게 급여를 받는 사원정보를 출력하시오.
+SQL> SELECT AVG(sal) FROM emp;
+
+  AVG(SAL)
+----------
+2073.21429
+
+SQL> SELECT empno,ename,job,sal FROM emp WHERE sal<(SELECT AVG(sal) FROM emp);
+EMPNO ENAME                JOB                       SAL
+------- -------------------- ------------------ ----------
+7369 SMITH                CLERK                     800
+7499 ALLEN                SALESMAN                 1600
+7521 WARD                 SALESMAN                 1250
+7654 MARTIN               SALESMAN                 1250
+7844 TURNER               SALESMAN                 1500
+7876 ADAMS                CLERK                    1100
+7900 JAMES                CLERK                     950
+7934 MILLER               CLERK                    1300
+
+8 rows selected.
+```
+
++ HAVING절에서도 SUB-QUERY를 사용할수 있다.
+```sql
+-- EMP 테이블에서 20번 부서의 최소 급여보다 많은 모든 부서를 출력하여라.
+SQL> SELECT deptno,MIN(sal)
+  2  FROM emp
+  3  GROUP BY deptno
+  4  HAVING MIN(sal) > (SELECT MIN(sal)
+  5  			FROM emp
+  6  			WHERE deptno = 20);
+
+DEPTNO  MIN(SAL)
+------- ---------
+   10      1300
+   30       950
+
+```
+
++ 업무별 평균급여가 업무별 평균최소급여보다 큰 업무와 평균급여를 출력하시오.
+```sql
+-- 업무별 평균급여
+SQL> SELECT job,AVG(sal) FROM emp GROUP BY job;
+
+JOB                  AVG(SAL)
+------------------ ----------
+CLERK                  1037.5
+SALESMAN                 1400
+PRESIDENT                5000
+MANAGER            2758.33333
+ANALYST                  3000
+
+
+SQL> SELECT job,AVG(sal)
+  2  FROM emp
+  3  GROUP BY job
+  4  HAVING AVG(sal) > (SELECT MIN(AVG(sal))
+  5                          FROM emp
+  6                          GROUP BY job);
+
+JOB                  AVG(SAL)
+------------------ ----------
+SALESMAN                 1400
+PRESIDENT                5000
+MANAGER            2758.33333
+ANALYST                  3000
+```
+
+
++ 여기까지는 서브쿼리의 결과값이 단일행 단일값이다.
+
+
++ 이제는 서브쿼리의 결과값이 다중행이거나 다중컬럼일때를 살펴보자
+  - 이때 사용하는 연산자가 따로 정해져 있다.
+  - IN, NOT IN, ANY, ALL, EXISTS
+
+
++ 다중행, 다중컬럼
+```sql
+
+```
+
+```sql
+
+```
+
+```sql
+
+```
 #### 4. 실습
 #### 5. Summary / Close
 
