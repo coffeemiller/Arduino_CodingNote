@@ -2863,7 +2863,191 @@ TKB SPORT SHOP             610         2       8.4     101.4
 
 +  위까지가 제일 많이 사용하는 Equi-Join 예이다.
 
-#### 3. Sub-Query
++ JOIN
+  - 1) CROSS JOIN
+  - 2) Equi-JOIN ...............> INNER JOIN
+  - 3) NON Equi-JOIN
+
++ emp와 salgrade에서 특정사원의 급여 구간을 구하고 싶다면?
+```sql
+-- TURNER 사원의 급여 구간을 구하시오.
+-- EMP 테이블에서 사원번호,이름,업무,급여,급여의 등급,하한값,상한값을 출력하여라.
+SQL> SELECT e.empno,e.ename,e.job,e.sal,s.grade,s.losal,s.hisal
+  2  FROM salgrade s,emp e
+  3  WHERE e.sal BETWEEN s.losal AND s.hisal AND e.deptno = 10;
+
+EMPNO ENAME      JOB             SAL     GRADE     LOSAL     HISAL
+------- ---------- --------- --------- --------- --------- ---------
+ 7839 KING       PRESIDENT      5000         5      3001      9999
+ 7782 CLARK      MANAGER        2450         4      2001      3000
+ 7934 MILLER     CLERK          1300         2      1201      1400
+```
+
++ INNER JOIN과 OUTER JOIN
+  - Equi-JOIN을 INNER JOIN이라고 부른다.(결과값이 등가비교에 의해 일치하는 자료만.)
+  - OUTER JOIN(결과값이이 일치하지 않는 자료도 보여줌.)
+
++ 모든 사원의 부서명도 함께 출력하시오.
+```sql
+SQL> SELECT e.empno,e.ename,e.job,e.deptno,d.deptno,d.dname FROM emp e, dept d WHERE e.deptno=d.deptno;
+
+EMPNO ENAME            JOB                 DEPTNO     DEPTNO DNAME
+----- ---------------- --------------- ---------- ---------- ------------------
+7369 SMITH             CLERK                   20         20 RESEARCH
+7499 ALLEN             SALESMAN                30         30 SALES
+7521 WARD              SALESMAN                30         30 SALES
+7566 JONES             MANAGER                 20         20 RESEARCH
+7654 MARTIN            SALESMAN                30         30 SALES
+7698 BLAKE             MANAGER                 30         30 SALES
+7782 CLARK             MANAGER                 10         10 ACCOUNTING
+7788 SCOTT             ANALYST                 20         20 RESEARCH
+7839 KING              PRESIDENT               10         10 ACCOUNTING
+7844 TURNER            SALESMAN                30         30 SALES
+7876 ADAMS             CLERK                   20         20 RESEARCH
+7900 JAMES             CLERK                   30         30 SALES
+7902 FORD              ANALYST                 20         20 RESEARCH
+7934 MILLER            CLERK                   10         10 ACCOUNTING
+
+14 rows selected.
+-- 결과를 잘 분석해보면 dept테이블에는 10,20,30,40 부서코드의 row가 있다.
+-- emp테이블에 40부서에 속한 사원이 없기대문에 결과값에 40부서정보는 한번도 출력되지 않았다.
+```
++ FK에 의한 자식테이블과 부모테이블의 Eaui-JOIN에서 자식 테이블에 값이 조재하지 않으면 부모테이블의 일치하지 않는 값은 나타나지 않으므로 NON Equi-JOIN을 사용하여 일치하지 않은는 값도 확인하게 한다.
+```sql
+SQL> SELECT e.empno,e.ename,e.job,e.deptno,d.deptno,d.dname FROM emp e, dept d WHERE e.deptno(+)=d.deptno;
+
+EMPNO ENAME            JOB                 DEPTNO     DEPTNO DNAME
+----- ---------------- --------------- ---------- ---------- ------------------
+7369 SMITH             CLERK                   20         20 RESEARCH
+7499 ALLEN             SALESMAN                30         30 SALES
+7521 WARD              SALESMAN                30         30 SALES
+7566 JONES             MANAGER                 20         20 RESEARCH
+7654 MARTIN            SALESMAN                30         30 SALES
+7698 BLAKE             MANAGER                 30         30 SALES
+7782 CLARK             MANAGER                 10         10 ACCOUNTING
+7788 SCOTT             ANALYST                 20         20 RESEARCH
+7839 KING              PRESIDENT               10         10 ACCOUNTING
+7844 TURNER            SALESMAN                30         30 SALES
+7876 ADAMS             CLERK                   20         20 RESEARCH
+7900 JAMES             CLERK                   30         30 SALES
+7902 FORD              ANALYST                 20         20 RESEARCH
+7934 MILLER            CLERK                   10         10 ACCOUNTING
+                                                          40 OPERATIONS
+15 rows selected.
+
+-- Equi-JOIN시 자식 테이블의 컬럼에 (+)붙여야 OUTER JOIN의 효과가 있다.
+```
+
++ SELF-JOIN : 동일한 테이블의 다른 컬럼과 연결시키는 JOIN이다.
+```sql
+-- emp테이블에서 mgr은 직속상사 사원번호이다.
+-- emp테이블에서 직속상사의 성명을 출력하시오
+--같은 테이블에서의 JOIN은 FROM절에 사용할 테이블을 동일하게 사용하고 별칭만 다르게 주어 구한다.
+
+SQL> SELECT e.empno,e.ename,e.job,e.mgr,m.ename FROM emp e, emp m WHERE e.mgr=m.empno;
+
+EMPNO ENAME                JOB                       MGR ENAME
+----- -------------------- ------------------ ---------- --------------------
+7902 FORD                 ANALYST                  7566 JONES
+7788 SCOTT                ANALYST                  7566 JONES
+7900 JAMES                CLERK                    7698 BLAKE
+7844 TURNER               SALESMAN                 7698 BLAKE
+7654 MARTIN               SALESMAN                 7698 BLAKE
+7521 WARD                 SALESMAN                 7698 BLAKE
+7499 ALLEN                SALESMAN                 7698 BLAKE
+7934 MILLER               CLERK                    7782 CLARK
+7876 ADAMS                CLERK                    7788 SCOTT
+7782 CLARK                MANAGER                  7839 KING
+7698 BLAKE                MANAGER                  7839 KING
+7566 JONES                MANAGER                  7839 KING
+7369 SMITH                CLERK                    7902 FORD
+
+13 rows selected.
+```
+
++ EMP 테이블에서 Self join하여 관리자를 출력하여라.
+```sql
+SQL> SELECT worker.ename || '의 관리자는 ' || manager.ename || '이다'
+  2  FROM emp worker, emp manager
+  3  WHERE worker.mgr = manager.empno;
+
+WORKER.ENAME||'의관리자는'||MANAGER.
+------------------------------------
+BLAKE의 관리자는 KING이다
+CLARK의 관리자는 KING이다
+. . . . . . . . .
+13 rows selected.
+```
+
++ SET OPERATERS : 연산자
+  - SET 연산자 => 집합 연산자
+
++ 합집합(UNION, UNION ALL)
+```sql
+SQL> SELECT deptno FROM emp UNION SELECT deptno FROM dept;
+DEPTNO
+--------
+    10
+    20
+    30
+    40
+
+SQL> SELECT deptno FROM emp UNION ALL SELECT deptno FROM dept;
+DEPTNO
+--------
+    20
+    30
+    30
+    20
+    30
+    30
+    10
+    20
+    10
+    30
+    20
+    30
+    20
+    10
+    10
+    20
+    30
+    40
+
+18 rows selected.
+```
+
++ A집합 10,20,30... B집합 10,20,30,40  ==> 합집합(UNION) => 10,20,30,40
++ A집합 10,20,20,30...20 B집합 10,20,40  ==> 합집합(UNION ALL) => 10,20,20,30,40
+
+
++ 교집합(INTERSECT)
+```sql
+SQL> SELECT deptno FROM dept INTERSECT SELECT deptno FROM dept;
+
+DEPTNO
+--------
+    10
+    20
+    30
+    40
+```
+
++ 차집합(MINUS)
+```sql
+SQL> SELECT deptno FROM dept MINUS SELECT deptno FROM emp;
+
+DEPTNO
+--------
+    40
+```
+
++ 6.doc연습문제를 풀어봅시다.
+
+
+#### 3. Sub-Query(서브쿼리)
++ SELECT문이나 DML, DDL 문장내부에 존재하는 SELECT문을 지칭합니다.
+
 #### 4. 실습
 #### 5. Summary / Close
 
