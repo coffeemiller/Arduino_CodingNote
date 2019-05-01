@@ -3236,38 +3236,105 @@ EMPNO ENAME         JOB             MGR HIREDATE       SAL      COMM     DEPTNO
 ```
 
 + ANY()연산자
+  - 서브쿼리의 결과가 여러값일때, 1개라도 일치하면(같으면) ==> IN(서브쿼리)
+  - 서브쿼리의 결과가 여러값일때, >,>=,<,<=,=,!=, ANY
 ```sql
+--EMP 테이블에서 30번 부서의 최소 급여를 받는 사원 보다 많은 급여를 받는 사원의 정보를 사원번호,이름,업무,입사일자,급여,부서번호를 출력하여라. 단 30번은 제외
 
+-- 30번 부서의 최소급여
+SQL> SELECT MIN(sal) FROM emp GROUP BY deptno HAVING deptno=30;
+
+MIN(SAL)
+---------
+     950
+
+
+SQL> SELECT empno,ename,job,hiredate,sal,deptno
+  2  FROM emp
+  3  WHERE deptno != 30 AND sal > ANY (SELECT sal
+  4  					FROM emp
+  5  					WHERE deptno = 30);
+
+EMPNO ENAME      JOB       HIREDATE                 SAL    DEPTNO
+---- ---------- --------- ------------------ --------- ---------
+7839 KING       PRESIDENT 17-NOV-81               5000        10
+7782 CLARK      MANAGER   09-JUN-81               2450        10
+7566 JONES      MANAGER   02-APR-81               2975        20
+7902 FORD       ANALYST   03-DEC-81               3000        20
+7788 SCOTT      ANALYST   09-DEC-82               3000        20
+7876 ADAMS      CLERK     12-JAN-83               1100        20
 ```
 
-
-
++ ALL 연산자도 동일하게 사용한다. 그러나 의미는 다른다.
+  - ANY(값들) -> 값들 중 MIN의 의미
+    - val > ANY(10,76,28,30,95) ==> val의 값이 어느값이라도 한개라도 큰 값. 즉, 가장 작은 값보다 크면 된다.
+  - ALL(값들) -> 값들 중 MAX의 의미
+    - val > ALL(10,76,28,30,95) ==> val의 값이 모든 값보다 커야 한다. 즉 가장 큰값보다 크면 된다.
 ```sql
+SQL> SELECT * FROM emp WHERE deptno!=30 AND sal>ALL(SELECT sal FROM emp WHERE deptno=30);
 
+EMPNO ENAME       JOB              MGR HIREDATE     SAL    COMM     DEPTNO
+---------- -------------------- ------------------ ---------- -------- --------
+7566 JONES       MANAGER         7839 81-04-02    2975                 20
+7788 SCOTT       ANALYST         7566 87-04-19    3000                 20
+7902 FORD        ANALYST         7566 81-12-03    3000                 20
+7839 KING        PRESIDENT            81-11-17    5000                 10
+
+SQL> SELECT * FROM emp WHERE deptno!=30 AND sal>2850;
+
+SQL> SELECT * FROM emp WHERE deptno!=30 AND sal>ALL(950,1250,1500,1600,2850);
 ```
 
-
-
++ EXISTS 연산자
 ```sql
+--EMP 테이블에서 적어도 한명의 사원으로부터 보고를 받을 수 있는 사원의 정보를 사원번호,이름,업무,입사일자,급여를 출력하여라. 단 사원번호 순으로 정렬하여라.
 
+-- 말단사원이 아닌 사원정보를 출력하시오.
+-- emp테이블에서 mgr에 한번이라도 나타나는 사원을 출력하시오.
+
+SQL> SELECT empno,ename,job,hiredate,sal,deptno
+  2  FROM emp e
+  3  WHERE EXISTS (SELECT *
+  4                 FROM emp
+  5                 WHERE e.empno = mgr)
+  6  ORDER BY empno;
+
+EMPNO ENAME      JOB       HIREDATE                 SAL    DEPTNO
+------ ---------- --------- ------------------ --------- ---------
+7566 JONES      MANAGER   02-APR-81               2975        20
+7698 BLAKE      MANAGER   01-MAY-81               2850        30
+7782 CLARK      MANAGER   09-JUN-81               2450        10
+7788 SCOTT      ANALYST   09-DEC-82               3000        20
+7839 KING       PRESIDENT 17-NOV-81               5000        10
+7902 FORD       ANALYST   03-DEC-81               3000        20
 ```
 
-
-
++ 다중 열 SUBQUERY : 서브쿼리의 결과가 다중일때
 ```sql
+--EMP 테이블에서 급여와 보너스가 부서 30에 있는 어떤 사원의 보너스와 급여에 일치하는 사원의 이름,부서번호,급여,보너스를 출력하여라.
 
+SQL> SELECT ename,deptno,sal,comm
+  2  FROM emp
+  3  WHERE sal IN (SELECT sal
+  4  			FROM emp
+  5  			WHERE deptno = 30)
+  6  AND NVL(comm,-1) IN (SELECT NVL(comm,-1)
+  7  			FROM emp
+  8  			WHERE deptno = 30);
+
+ENAME         DEPTNO       SAL      COMM
+---------- --------- --------- ---------
+JAMES             30       950
+BLAKE             30      2850
+TURNER            30      1500         0
+MILLER            10      1500       300
+ALLEN             30      1600       300
+WARD              30      1250       500
+MARTIN            30      1250      1400
 ```
 
++ 서브쿼리에 필요에 따라 다중컬럼을 리턴하는 문장도 필요하다.
 
-
-```sql
-
-```
-
-
-```sql
-
-```
 #### 4. 실습
 #### 5. Summary / Close
 
