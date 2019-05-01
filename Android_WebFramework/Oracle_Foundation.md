@@ -2669,6 +2669,94 @@ public class JDBCTest {
 ### [2019-05-01]
 
 #### 1. Review
++ JDBC Programming (java.sql패키지)
+  - 1. jdbc Library
+  - 2. Driver load
+```java
+ Class.forName("oracle.jdbc.driver.OracleDriver");
+```
+  - 3. 서버에 로그인(접속)
+```java
+Connection c = DriverManager.getConnection(url,id,password);
+```
+  - 4. SQL명령 작성/요청
+```java
+//connection객체를 이용하여 SQL명령을 실행시킬 수 있는 Statement객체 생성
+Statement statement = connection.createStatement();
+//SQL 명령문 작성
+String sql = "SELECT * FROM emp WHERE empno=7788";
+//SELECT명령의 결과값을 저장할 객체가 있어야 한다.
+ResultSet resultSet = null;
+```
+  - 5. ResultSet활용
+```java
+//명령을 실행시켜 그 결과를 가져온다. 가져온 값을 사용한다.
+resultSet = statement.executeQuery(sql);
+```
+  - 6. 모든 작업 닫기
+```java
+//모든 작업이 종료되었으므로, 연결종료.
+resultSet.close();
+statement.close();
+connection.close();
+```
+
++ 제약조건
+  - PK : NOT NULL + UNIQUE
+  - FK : FOREIGN KEY
+  - NN : NOT NULL
+  - UK
+  - CK
+  - 테이블 생성시 설정.... DML명령사용시 작동
+
++ 참고사항
+  - `*.jar` ==> 압축파일, 컴파일된 자바 라이브러리 파일(`*.class`)
+  - 자바설치폴더\bin\javac.exe, java.exe, jar.exe(압축)
+  - `*.war` ==> Java로 작성된 웹용 서버프로그램을 배포할 때 사용(servlet/JSP)
+
+
+#### 2. Join
++ 두개 이상의 테이블에서 정보를 추출하는 방법
+  - SELECT 컬럼
+  - FROM 테이블1, 테이블2
+  - WHERE 조인조건
+
+
+#### 3. Sub-Query
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+### [2019-05-02]
+
+#### 1. Review
+
+#### 4. DML명령
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+### [2019-05-03]
+
+#### 1. Review
+
+#### 4. DML명령
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+### [2019-05-06]
+
+#### 1. Review
 
 #### 4. DML명령
 #### 4. 실습
