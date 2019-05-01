@@ -3206,12 +3206,64 @@ ANALYST                  3000
 
 + 다중행, 다중컬럼
 ```sql
+-- 3개의 값중 1개라도 같으면 참으로 판단 ==> sal IN(950, 800, 1300)
+-- IN(), NOT IN() 사용
+SQL> SELECT empno,ename,job,hiredate,sal,deptno
+  2  FROM emp
+  3  WHERE sal IN (SELECT MIN(sal)
+  4  			FROM emp
+  5  			GROUP BY deptno);
+
+EMPNO ENAME      JOB       HIREDATE                 SAL    DEPTNO
+------- ---------- --------- ------------------ --------- ---------
+ 7369 SMITH      CLERK     17-DEC-80                800        20
+ 7900 JAMES      CLERK     03-DEC-81                950        30
+ 7934 MILLER     CLERK     23-JAN-82               1300        10
+```
++ 결국 IN()연산자는 하나라도 값이 일치하면 참이다.
+```sql
+SQL> SELECT * FROM emp WHERE sal IN(SELECT MIN(sal) FROM emp GROUP BY job);
+
+EMPNO ENAME         JOB             MGR HIREDATE       SAL      COMM     DEPTNO
+------- ------------- ------------------- ------- -------------------- --------
+7369 SMITH         CLERK          7902 80-12-17       800                   20
+7521 WARD          SALESMAN       7698 81-02-22      1250       500         30
+7654 MARTIN        SALESMAN       7698 81-09-28      1250      1400         30
+7782 CLARK         MANAGER        7839 81-06-09      2450                   10
+7788 SCOTT         ANALYST        7566 87-04-19      3000                   20
+7839 KING          PRESIDENT           81-11-17      5000                   10
+7902 FORD          ANALYST        7566 81-12-03      3000                   20
+```
+
++ ANY()연산자
+```sql
 
 ```
+
+
 
 ```sql
 
 ```
+
+
+
+```sql
+
+```
+
+
+
+```sql
+
+```
+
+
+
+```sql
+
+```
+
 
 ```sql
 
