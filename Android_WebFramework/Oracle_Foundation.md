@@ -2815,6 +2815,54 @@ EMPNO ENAME            DEPTNO LOC
 7566 JONES                20 DALLAS
 ```
 
++ Table에 Alias 사용 : 코딩시간 절약... 메모리 절약.
+```sql
+SQL> SELECT e.empno,e.ename,e.job,e.deptno,
+  2  d.deptno,d.dname,d.loc
+  3  FROM dept d,emp e
+  4  WHERE d.deptno = e.deptno
+  5  ORDER BY d.deptno;
+
+EMPNO ENAME      JOB          DEPTNO    DEPTNO DNAME          LOC
+----- ---------- --------- --------- --------- -------------- -------------
+ 7839 KING       PRESIDENT        10        10 ACCOUNTING     NEW YORK
+ 7782 CLARK      MANAGER          10        10 ACCOUNTING     NEW YORK
+ 7934 MILLER     CLERK            10        10 ACCOUNTING     NEW YORK
+ 7566 JONES      MANAGER          20        20 RESEARCH       DALLAS
+ 7788 SCOTT      ANALYST          20        20 RESEARCH       DALLAS
+ 7876 ADAMS      CLERK            20        20 RESEARCH       DALLAS
+```
+
++ AND 연산자 사용 : SALESMAN사원만 사원번호, 이름, 급여, 부서명, 근무지 출력
+```sql
+SQL> SELECT e.empno,e.ename,e.sal,d.dname,d.loc
+  2  FROM dept d,emp e
+  3  WHERE d.deptno = e.deptno AND e.job = 'SALESMAN';
+
+EMPNO ENAME            SAL DNAME          LOC
+------- ---------- --------- -------------- ----------
+ 7654 MARTIN          1250 SALES          CHICAGO
+ 7499 ALLEN           1600 SALES          CHICAGO
+ 7844 TURNER          1500 SALES          CHICAGO
+ 7521 WARD            1250 SALES          CHICAGO
+```
+
++ 3개 이상의 테이블을 연결시키는 JOIN
+```sql
+SQL> SELECT c.name,o.ordid,i.itemid,i.itemtot,o.total
+  2  FROM customer c,ord o,item i
+  3  WHERE c.custid = o.custid AND o.ordid = i.ordid
+  4  AND c.name = 'TKB SPORT SHOP';
+
+NAME                     ORDID    ITEMID   ITEMTOT     TOTAL
+-------------------- --------- --------- --------- ---------
+TKB SPORT SHOP             610         3        58     101.4
+TKB SPORT SHOP             610         1        35     101.4
+TKB SPORT SHOP             610         2       8.4     101.4
+```
+
++  위까지가 제일 많이 사용하는 Equi-Join 예이다.
+
 #### 3. Sub-Query
 #### 4. 실습
 #### 5. Summary / Close
