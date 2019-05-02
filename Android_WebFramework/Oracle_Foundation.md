@@ -3345,7 +3345,133 @@ MARTIN            30      1250      1400
 ### [2019-05-02]
 
 #### 1. Review
+#### 2. 단일행 다중열을 리턴하는 SUBQUERY
++ EMP 테이블에서 급여와 보너스가 부서 30에 있는 어떤 사원의 보너스와 급여에 일치하는 사원의 이름,부서번호,급여,보너스를 출력하여라.
+```sql
+-- 급여와 보너스를 쌍으로 한꺼번에 같은지 비교하고 싶은데,
+-- 단일행 서브쿼리를 사용하면 쌍으로 비교하지 못하여 원하는 결과가 나오지 않는다.
 
+SQL> SELECT ename,deptno,sal,comm
+  2  FROM emp
+  3  WHERE sal IN (SELECT sal
+  4  			FROM emp
+  5  			WHERE deptno = 30)
+  6  AND NVL(comm,-1) IN (SELECT NVL(comm,-1)
+  7  			FROM emp
+  8  			WHERE deptno = 30);
+
+ENAME         DEPTNO       SAL      COMM
+---------- --------- --------- ---------
+JAMES             30       950
+BLAKE             30      2850
+TURNER            30      1500         0
+MILLER            10      1500       300
+ALLEN             30      1600       300
+WARD              30      1250       500
+MARTIN            30      1250      1400
+```
+
++ 업무별로 최소 급여를 받는 사원의 정보를 사원번호,이름,업무,부서번호를 출력하여라. 단 업무별로 정렬하여라.
+```sql
+-- 아래처럼 여러행 단일컬럼 서브쿼리로 수행하면 잘못된 결과
+-- 즉 업무별 최소급여와 급여액이 같은 사원은 모두 출력된다.
+SQL> SELECT empno,ename,job,sal,deptno
+  2  FROM emp
+  3  WHERE sal IN (SELECT MIN(sal)
+  4                        FROM emp
+  5                        GROUP BY job)
+  6  ORDER BY job;
+
+EMPNO ENAME                JOB                       SAL     DEPTNO
+------- -------------------- ------------------ ---------- ----------
+7788 SCOTT                ANALYST                  3000         20
+7902 FORD                 ANALYST                  3000         20
+7369 SMITH                CLERK                     800         20
+7900 JAMES                CLERK                    2450         30
+7782 CLARK                MANAGER                  2450         10
+7839 KING                 PRESIDENT                5000         10
+7521 WARD                 SALESMAN                 1250         30
+7654 MARTIN               SALESMAN                 1250         30
+8 rows selected.
+
+
+-- 실제로 수행되는 내용이다.
+SQL> SELECT empno,ename,job,sal,deptno
+  2  FROM emp
+  3  WHERE sal IN (800,1250,5000,2450,3000)
+  4  ORDER BY job;
+
+EMPNO ENAME                JOB                       SAL     DEPTNO
+------- -------------------- ------------------ ---------- ----------
+7788 SCOTT                ANALYST                  3000         20
+7902 FORD                 ANALYST                  3000         20
+7369 SMITH                CLERK                     800         20
+7900 JAMES                CLERK                    2450         30
+7782 CLARK                MANAGER                  2450         10
+7839 KING                 PRESIDENT                5000         10
+7521 WARD                 SALESMAN                 1250         30
+7654 MARTIN               SALESMAN                 1250         30
+8 rows selected.
+
+
+-- 이것에 대한 해결책으로 12번문제 답으로 나타낼수 있다.
+SQL> SELECT empno,ename,job,sal,deptno
+  2  FROM emp
+  3  WHERE (job,sal) IN (SELECT job,MIN(sal)
+  4                       FROM emp
+  5                       GROUP BY job)
+  6  ORDER BY job;
+
+EMPNO ENAME                JOB                       SAL     DEPTNO
+------- -------------------- ------------------ ---------- ----------
+7788 SCOTT                ANALYST                  3000         20
+7902 FORD                 ANALYST                  3000         20
+7369 SMITH                CLERK                     800         20
+7782 CLARK                MANAGER                  2450         10
+7839 KING                 PRESIDENT                5000         10
+7521 WARD                 SALESMAN                 1250         30
+7654 MARTIN               SALESMAN                 1250         30
+
+7 rows selected.
+```
+
++ 서브쿼리에서 NULL값 비교
+```sql
+-- 말단사원이 아닌 사원을 구하는 쿼리문장(잘못된문장)
+SQL> SELECT e.empno,e.ename,e.job,e.sal
+  2  FROM emp e
+  3  WHERE e.empno NOT IN (SELECT m.mgr
+  4                         FROM emp m);
+
+-- 위의 표현에서 서브쿼리의 결과값에 NULL이 포함되어 있어 발생한 문제이다.
+```
+
++ FROM절에서의 SUBQUERY
+```sql
+SQL> SELECT e.ename,e.job,d.dname,d.loc
+2 FROM dept d,emp e
+2 WHERE job='MANAGER' AND e.deptno=d.deptno;
+
+ENAME       JOB          DNAME            LOC
+----------- ------------ ---------------- --------------------------
+JONES       MANAGER      RESEARCH         DALLAS
+BLAKE       MANAGER      SALES            CHICAGO
+CLARK       MANAGER      ACCOUNTING       NEW YORK
+
+
+SQL> SELECT e.ename,e.job,d.dname,d.loc
+  2  FROM (SELECT ename,job,deptno
+  3         FROM emp
+  4         WHERE job = 'MANAGER') e, dept d
+  5  WHERE e.deptno = d.deptno;
+
+ENAME      JOB       DNAME          LOC
+---------- --------- -------------- -------------
+BLAKE      MANAGER   SALES          CHICAGO
+CLARK      MANAGER   ACCOUNTING     NEW YORK
+JONES      MANAGER   RESEARCH       DALLAS
+
+```
 #### 4. DML명령
 #### 4. 실습
 #### 5. Summary / Close
