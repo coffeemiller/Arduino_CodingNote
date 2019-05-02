@@ -3482,6 +3482,41 @@ JONES      MANAGER   RESEARCH       DALLAS
 + 오라클 서버에 접속하면, Connection객체가 만들어진다. 이를 이용하여 모든 작업이 이루어진다.
 + 접속을 종료하면 Connection객체가 소멸된다. 그런데 데이터베이스는 서버이므로 다수의 사용자가 접속하여 동시에 작업하는게 일반적으로... 서버에 부담을 줄이기 위해 한번 접속했을때 작업수행을 마치고 곧장 접속을 해제하기를 권장한다.
 
+
++ 날짜와 시간을 관리할때 다음의 클래스를 사용한다.
+```
+java.lang.Date
+  java.util.Date
+
+단점으로 Deprecated된 메서드가 많아서...
+Calendar, GregorianCalendar를 많이 사용한다.
+```
+  - Jva교재 2권의 chapter 10에 유용한 날짜관련기능들(달력만들기 포함)이 있으므로 필요한 시점에 학습해주세요.
+
++ sql*plus에서는 특정항목을 변경하는 것이 일반적이지만, java에서는 해당 row 전체를 바꿔야 한다.
+
+```
+----------------------------EmpDao-----------------------
+getConnet()
+close()
+
+[ 기능별 메서드 ]
+Emp query(int empno)
+ArrayList<Emp> query()
+Emp query(String ename)
+ArrayList<Emp> queryByDept(int eDept)
+...필요하다면 다양하게 메서드를 만든다.
+
+int insert(Emp)
+int update(int empno, int sal)
+int update(Emp)
+
+int delete(int empno)
+----------------------------------------------------------
+위의 코드중에서는 유사한 기능을 수행하는 코드들이 각 메서드에
+반복으로 나타나는 경우가 많으므로 이를 다듬을 필요가 있다(여러분들 몫)
+```
+
 #### 4. 실습
 #### 5. Summary / Close
 
