@@ -3470,9 +3470,18 @@ ENAME      JOB       DNAME          LOC
 BLAKE      MANAGER   SALES          CHICAGO
 CLARK      MANAGER   ACCOUNTING     NEW YORK
 JONES      MANAGER   RESEARCH       DALLAS
-
 ```
-#### 4. DML명령
+
+#### 4. Eclipse에서 SQL
++ JDBC Programming
+  - 일반적으로 Java 프로그램 코드에서는 여러가지 기능을 수행해야 하므로, JDBC 관련기능을 수행하는 독립적인 클래스를 만들어서 작업하는 것이 일반적이다.
+  - 이러한 기능을 수행하는 클래스 및 객체를 Data Access Object라고 부른다.(DAO)
+  - 연습용으로 우선 emp 테이블에서 SELECT, INSERT INTO, UPDATE SET, DELETE FROM, CREATE TABLE 정도를 테스트 해보자.
+  - ===> EmpDao 클래스를 만들자.
+
++ 오라클 서버에 접속하면, Connection객체가 만들어진다. 이를 이용하여 모든 작업이 이루어진다.
++ 접속을 종료하면 Connection객체가 소멸된다. 그런데 데이터베이스는 서버이므로 다수의 사용자가 접속하여 동시에 작업하는게 일반적으로... 서버에 부담을 줄이기 위해 한번 접속했을때 작업수행을 마치고 곧장 접속을 해제하기를 권장한다.
+
 #### 4. 실습
 #### 5. Summary / Close
 
