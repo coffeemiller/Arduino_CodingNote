@@ -3517,6 +3517,11 @@ int delete(int empno)
 반복으로 나타나는 경우가 많으므로 이를 다듬을 필요가 있다(여러분들 몫)
 ```
 
+##### [오늘의 과제]
++ 1. JOIN, Sub-Query 교재 연습문제 풀기(화요일까지 작성해서 제출)
++ 2. 오늘 작성한 코드를 분석해보는것
+  - (0502프로젝트의 JDBCTest.java, EmpDao.java,Emp.java)
+
 #### 4. 실습
 #### 5. Summary / Close
 
