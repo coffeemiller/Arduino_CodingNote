@@ -3569,8 +3569,12 @@ p.executeSql();
 
 + 참고) CallableStatement도 있다. ==> PL/SQL문을 호출할때 사용.
 
-#### 4. 실습
-#### 5. Summary / Close
+##### [오늘의 과제]
++ 1. 6.doc, 7.doc 연습문제 풀기
++ 2. 오늘 작성한 예제 복습(예제코드를 분석)
+
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
