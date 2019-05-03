@@ -3522,13 +3522,7 @@ int delete(int empno)                   사원번호(PK)로 삭제
 + 2. 오늘 작성한 코드를 분석해보는것
   - (0502프로젝트의 JDBCTest.java, EmpDao.java,Emp.java)
 
-```
-com.jica.profile
-   AWTProfile.java
-com.jica.prifile.ui
-   AddDialog.java
-   DeleteDialog.java
-```
+
 #### 4. 실습
 #### 5. Summary / Close
 
@@ -3540,7 +3534,23 @@ com.jica.prifile.ui
 
 #### 1. Review
 #### 2. AWT학습시 작성했던 Profile관리 프로그램과 JDBC기능을 결합
+```
+com.jica.profile
+   AWTProfile.java
+com.jica.prifile.ui
+   AddDialog.java
+   DeleteDialog.java
+```
 
++ profile테이블 생성
+```
+CREATE TABLE profile(
+  name VARCHAR2(15) CONSTRAINT profile_name_pk PRIMARY KEY,
+	age NUMBER(3),
+  phone CHAR(13),
+  email VARCHAR2(30)
+);
+```
 #### 4. DML명령
 #### 4. 실습
 #### 5. Summary / Close
