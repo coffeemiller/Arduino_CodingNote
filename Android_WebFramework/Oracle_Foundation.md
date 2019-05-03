@@ -3551,7 +3551,24 @@ CREATE TABLE profile(
   email VARCHAR2(30)
 );
 ```
-#### 4. DML명령
+
++ ProfileDao클래스
+  - 오라클 서버에서 수행할 sql명령어를 처리하는 메서드들을 작성
+
++ PreparedStatement
+  - Statement객체를 이용하여 sql 명령을 실행시켰다.
+  - 단점이... sql문장을 작성할때, 숫자형은 ''없이 사용하고 문자형과 날짜형은 ''을 사용하여 변수의 값을 설정할때 (노가다;;;)어려움이 있다.
+  - 그래서 미리 컴파일 된 sql문장을 이용하여 손쉽게 작성하도록 할수 있다. => PreparedStatement
+```java
+//PreparedStatement 객체생성전에... sql문을 만들어야 한다!!!
+String sql = "sql명령을 작성하면서 ?을 사용하여 값을 비워둔다";
+PreparedStatement p = connection.PreparedStatement(sql);
+p.setXXX(index,"값");
+p.executeSql();
+```
+
++ 참고) CallableStatement도 있다. ==> PL/SQL문을 호출할때 사용.
+
 #### 4. 실습
 #### 5. Summary / Close
 
