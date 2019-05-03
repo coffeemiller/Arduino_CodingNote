@@ -3501,17 +3501,17 @@ getConnet()
 close()
 
 [ 기능별 메서드 ]
-Emp query(int empno)
-ArrayList<Emp> query()
-Emp query(String ename)
-ArrayList<Emp> queryByDept(int eDept)
+Emp query(int empno)                    사원번호(PK)로 검색
+ArrayList<Emp> query()                  모든사원 검색
+Emp query(String ename)                 사원명으로 검색
+ArrayList<Emp> queryByDept(int eDept)   부서별로 검색
 ...필요하다면 다양하게 메서드를 만든다.
 
-int insert(Emp)
-int update(int empno, int sal)
-int update(Emp)
+int insert(Emp)                         데이터추가
+int update(int empno, int sal)          사원번호로(PK) 검색해서 수정
+int update(Emp)                         사원번호로 검색해서 모든 컬럼수정
 
-int delete(int empno)
+int delete(int empno)                   사원번호(PK)로 삭제
 ----------------------------------------------------------
 위의 코드중에서는 유사한 기능을 수행하는 코드들이 각 메서드에
 반복으로 나타나는 경우가 많으므로 이를 다듬을 필요가 있다(여러분들 몫)
@@ -3522,6 +3522,13 @@ int delete(int empno)
 + 2. 오늘 작성한 코드를 분석해보는것
   - (0502프로젝트의 JDBCTest.java, EmpDao.java,Emp.java)
 
+```
+com.jica.profile
+   AWTProfile.java
+com.jica.prifile.ui
+   AddDialog.java
+   DeleteDialog.java
+```
 #### 4. 실습
 #### 5. Summary / Close
 
@@ -3532,6 +3539,7 @@ int delete(int empno)
 ### [2019-05-03]
 
 #### 1. Review
+#### 2. AWT학습시 작성했던 Profile관리 프로그램과 JDBC기능을 결합
 
 #### 4. DML명령
 #### 4. 실습
