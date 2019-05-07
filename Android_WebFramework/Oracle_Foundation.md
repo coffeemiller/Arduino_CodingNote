@@ -3834,8 +3834,122 @@ END;
     + 3. 이미 존재하는(테이블에 존재하는) 자료형을 그대로 사용(참조형)
     + 4. BLOB(큰 이진데이터 즉, 사진/음원/동영상)
 
+```sql
+--현재 SCOTT계정이 소유하고 있는 SEQUENCE알아보기
+SELECT * FROM user_sequences;
+--empno_sequences 시퀀스 만들기
+CREATE SEQUENCE empno_sequences START WITH 8000 INCREMENT BY 1;
+
+--emp테이블에 성명, 급여, 부서번호를 입력하여 row를 추가하는 PL/SQL문장 실행
+@C:\SCWork\OracleWork\0507\chap15_1.sql
+```
 
 #### 4. 자료형
++ 스칼라자료형
+```
+  - 단일값을 가지는 변수에 사용
+   ==> NUMBER, NUMBER(n), NUMBER(p,s), CHAR(n), VARCHAR2(n),
+    BOOLEAN ==> TRUE, FALSE, NULL, BINARY_INTEGER
+
+  - 참조형
+   ==> 테이블명%ROWTYPE, 테이블명.컬럼명%TYPE
+   ===========================================================
+
+  - 복합형 사용자가 만들어서 사용하는 자료형
+    1) 배열형 ==> 테이블형
+    2) RECORD형 ==> 여러항목의 묶음
+
+- 배열형  ==> TABLE TYPE
+- JAVA언어에서 동일한 자료형의 기억장소 모임 ==> 배열 int arr[]={10,20,30,40,50}
+
+- 배열형선언
+  - TYPE 자료형
+  - TYPE score_table_type IS TABLE OF NUMBER(3) INDEX BY BINARY_INTEGER;
+- 배열변수선언
+  - score_table score_table_type;
+  - i BINARY_INTEGER := 0;
+- 배열사용
+  - score_table(0) := 10;
+  - score_table(1) := 20;
+  - score_table(i+2) := 30;
+```
+
+```sql
+REM 문제2) TABLE 변수를 사용하여 EMP 테이블에서 이름과 업무를 출력하여라.
+
+SET SERVEROUTPUT ON
+
+DECLARE
+	-- 변수선언형식
+	-- 변수명 자료형 [:=초기값];
+
+	-- TABLE TYPE 선언
+	TYPE  ename_table_type IS TABLE OF emp.ename%TYPE
+		INDEX BY BINARY_INTEGER;
+
+	-- TABLE TYPE 선언
+	TYPE  job_table_type IS TABLE OF emp.job%TYPE
+		INDEX BY BINARY_INTEGER;
+
+	-- TABLE 변수, 선언 및 생성
+	ename_table	ename_table_type;
+	job_table	job_table_type;
+	i		BINARY_INTEGER := 0;
+
+
+BEGIN
+	-- 아직 반복문을 학습하지 않았는데 사용한 코딩
+	-- 아직 RECORD형변수도 학습하지 않았다.
+	FOR  k IN (SELECT ename,job FROM emp) LOOP
+		i := i + 1;
+		ename_table(i) := k.ename;
+		job_table(i) := k.job;
+	END LOOP;
+	FOR j IN 1..i LOOP
+		DBMS_OUTPUT.PUT_LINE(RPAD(ename_table(j),12) ||
+			RPAD(job_table(j),9));
+	END LOOP;
+
+END;
+/
+SET SERVEROUTPUT OFF
+```
+
+
++ RECORD형 : 배열형 즉, TABLE TYPE이 한가지 종류의 값만 여러개 저장할 수 있는 자료형.
+  - RECORD TYPE은 여러가지 종류의 값을 저장할 수 있는 자료형이다.
+  - 1) 형선언
+  - 2) 변수 선언
+  - 3) 변수 사용
+
++ 현재 emp테이블의 EMPNO와 ENAME, JOB을 저장할 수 있는 변수를 만들어보자
+```sql
+--1) 형선언
+TYPE emp_rec1 IS RECORD(empno NUMBER(4), ename VARCHAR2(10), job VARCHAR2(9));
+
+--2) RECORD형 변수선언
+myrec emp_rec1;
+
+--3) RECORD형 변수사용
+myrec.empno=7788;
+myrec.ename='홍길동';
+myrec.job='영업';
+```
+
+
+```sql
+SQL> SELECT empno,ename,sal,deptno FROM emp WHERE ename='FORD';
+
+EMPNO ENAME                       SAL     DEPTNO
+----- -------------------- ---------- ----------
+ 7902 FORD                       3000         20
+```
++ RECORD TYPE을 사용하여 위의 결과를 만드시오. (사용할수 있는 방법전체)
+  - 1) 4개의 변수사용
+  - 2) 위의 4개값만 표현할수 있는 RECORD TYPE을 선언하여 사용
+
++ 필요에 따라 개별변수를 사용하거나, TABLE TYPE, RECORD TYPE 등을 사용할 수 있다.
+
 #### 5. 제어문
 #### 6. DML명령
 #### 7. 실습
