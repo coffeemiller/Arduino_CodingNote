@@ -3950,6 +3950,36 @@ EMPNO ENAME                       SAL     DEPTNO
 
 + 필요에 따라 개별변수를 사용하거나, TABLE TYPE, RECORD TYPE 등을 사용할 수 있다.
 
+
++ 바인드 변수 or HOST변수
+  - PL/SQL에서 항상 사용하는 것이 아니라, PL/SQL문장을 sql*plus TOOL에서 사용할때, 변수에 값을 저장한 후 이용하는 기법을 말한다.
+  - 키보드로 입력받는것
+```sql
+ACCEPT p_name PROMPT '안내문구'
+&v_name
+
+--VAR(IABLE) 변수명 표현으로 변수를 선언하여 사용할 수 있다.
+VARIABLE return_code NUMBER := 5
+--초기값 지정은 PL/SQL 내부변수 선언시만 사용한다.
+VARIABLE return_code NUMBER
+--host변수 return_code를 선언하였다. 단, 값이 지정되지 않았다.
+-- 이 값(return_code)을 출력하고 싶다면, PRINT를 사용한다.
+PRINT return_code
+--이러한 host변수의 값은, 필요에 따라 PL/SQL문장에서 사용할 수 있다.
+--단 :host변수명 형태를 사용한다.
+--억지스럽지만.... 어쩔수 없이 PL/SQL문장 작성
+DECLARE
+ BEGIN
+  :return_code := 500;
+END;
+/
+--결론
+--PL/SQL문장 내부에서 sql*plus에서 VAR표현으로 만들어 놓은 변수 즉, HOST변수를
+--참조하고 싶다면 :HOST변수명 을 이용하면 된다.
+
+--참고 ACCEPT로 입력받는 변수값을 참고하고 싶을때는 ==> %변수명, '&변수명'
+--여기까지가 자료형에 대한 학습이었다.
+```
 #### 5. 제어문
 #### 6. DML명령
 #### 7. 실습
