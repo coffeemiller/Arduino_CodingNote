@@ -3583,8 +3583,258 @@ p.executeSql();
 ### [2019-05-07]
 
 #### 1. Review
++ 1) SQL명령 (JDBC Programming을 사용)
+  - TABLE/VIEW, INDEX, SEQUENCE
++ 2) JBBC Programming
++ 3) PL/SQL : 저장프로시저(실행코드)
+  - FUNCTION/PROCEDURE ==> PACKAGE
+  - 이름이 없는 프로시저
+
++ 12장, 13장, 14장 ==> VIEW, INDEX, 보완관련명령(스스로학습)
++ 11장 시퀀스(SEQUENCE)
+
 #### 2. PL/SQL 개요
++ 시퀀스(SEQUENCE) : 자동순번을 관리하는 객체
+  - emp테이블의 사원번호, dept테이블의 부서번호를 자동관리한다면?
+  - 시퀀스를 생성하면 자료사전 user_sequences에 정보가 저장된다.
+
++ 실습용 테이블 만들기
+```sql
+CREATE TABLE emp01 AS SELECT empno,ename,hiredate FROM emp WHERE 1=0;
+```
+  - 기존 emp테이블의 일부컬럼구조를 복사하고 row는 가져오지 않는다.
+  - empno를 자동으로 관리하겠다. 즉, 시퀀스(만들어서)로 관리할 것이다.
+```sql
+CREATE SEQUENCE emp01_seq START WITH 8000 INCREMENT BY 1 MAXVALUE 10000;
+-- 8000번부터 시작해서... 1씩 증가하여.... 10000번까지만 시퀀스(emp01_seq) 생성
+```
++ emp01테이블에 row추가
+```sql
+SQL> DESC emp01
+ Name           Null?    Type
+ -------------- -------- --------------------------------------
+ EMPNO                   NUMBER(4)
+ ENAME                   VARCHAR2(10)
+ HIREDATE                DATE
+
+SQL> INSERT INTO emp01 VALUES(emp01_seq.NEXTVAL,'JULIA',SYSDATE);
+1 row created.
+
+SQL> SELECT * FROM emp01;
+EMPNO ENAME                HIREDATE
+----- -------------------- --------
+ 8000 JULIA                19/05/07
+```
+  - 시퀀스는 최초 생성후 시퀀스명.NEXTVA를 사용해야 첫값이 만들어진다. 이후에 시퀀스.CURRVAL을 사용할수 있다.
+```sql
+SQL> SELECT emp01_seq.CURRVAL FROM DUAL;
+   CURRVAL
+----------
+      8000
+```
+
++ 지금부터 dept테이블의 부서번호 시퀀스를 사용하여 관리하자.
+```sql
+SQL> CREATE SEQUENCE dept_deptno_seq INCREMENT BY 10 START WITH 50 MAXVALUE 100;
+Sequence created.
+
+SQL> SELECT dept_deptno_seq.CURRVAL  ==> 오류... NEXTVAL를 사용하지X
+```
+
++ dept테이블에 row추가(dept_deptno_seq)
+```sql
+SQL> INSERT INTO dept VALUES(dept_deptno_seq.NEXTVAL, '영업부','분당구');
+1 row created.
+
+SQL> SELECT * FROM dept;                                           
+DEPTNO DNAME                        LOC
+------ ---------------------------- --------------------------
+    10 ACCOUNTING                   NEW YORK
+    20 RESEARCH                     DALLAS
+    30 SALES                        CHICAGO
+    40 OPERATIONS                   BOSTON
+    50 영업부                       분당구
+```
+
++ 시퀀스 수정
+```sql
+ALTER SEQUENCE dept_deptno_seq INCREMENT BY 5;
+-- 생성시 사용한 START WITH 이외 값들 변경이 가능하다.
+INSERT INTO dept VALUES(dept_deptno_seq.NEXTVAL, '자재부','강남구');
+```
+
++ 시퀀스 삭제
+```sql
+DROP SEQUENCE 시퀀스명;
+
+
+SQL> SELECT * FROM user_sequences;
+
+SEQUENCE_NAME         MIN_VALUE  MAX_VALUE INCREMENT_BY CY OR CACHE_SIZE
+--------------------- ---------- ---------- ------------ -- -- ----------
+LAST_NUMBER
+-----------
+DEPT_DEPTNO_SEQ                                                       1        100            5 N  N          20
+        105
+
+EMP01_SEQ                                                             1      10000            1 N  N          20
+       8020
+
+
+SQL> DROP SEQUENCE dept_deptno_seq;
+Sequence dropped.
+
+SQL> SELECT * FROM user_sequences;
+SEQUENCE_NAME        MIN_VALUE  MAX_VALUE INCREMENT_BY CY OR CACHE_SIZE
+-------------------- ---------- ---------- ------------ -- -- ----------
+LAST_NUMBER
+-----------
+EMP01_SEQ             1      10000            1 N  N          20
+8020
+```
+
+
++ PL/SQL(Oracle's Procedual Language extension to SQL)
+  - 프로그램이 가능하도록 SQL을 확장한 것
+  - PL/SQL ==> SQL문장 + 변수 + 제어문을 블럭구조로 표시
+
+```sql
+-- REMARK = rem
+REM PL/SQL 소개 예제
+
+-- 입력한 값 중복 출력금지
+SET VERIFY OFF
+-- 출력문 화면에 띄위기
+SET SERVEROUTPUT ON
+
+-- 아래의 문장은 sql*plus tool명령으로 키보드로 값을 입력받아
+-- 자체변수에 입력된 값을 저장한다.
+ACCEPT  p_name   PROMPT  ' 이    름: '
+
+-- 여기서부터가 PL/SQL이다.
+-- PL/SQL은 블럭(BLOCK)구조로 이루어져 있다.
+-- 선언절
+-- 실행절
+-- 예외처리절(부)
+
+-- 아래의 코드는 이름이 없는 블럭럭이다.(일시적으로만 한번 실행되는 PL/SQL문)
+-- 이름이 있는 블럭은 서버 내부에 코드를 저장하여 필요할때 호출하여 사용한다.
+-- CREATE FUNCTION 프로시저명
+
+DECLARE
+	-- 변수 선언 및 초기화
+	-- 변수명 자료형 [:= 초기값];
+	v_empno	emp.empno%TYPE;
+	v_name	emp.ename%TYPE := UPPER('&p_name');
+	v_sal	emp.sal%TYPE;
+	v_job	emp.job%TYPE;
+BEGIN
+	-- 실행문장을 작성(SQL문, 변수사용, 제어문, 함수)
+	-- PL/SQL내부에서 SELECT문은 그 결과값을 변수에 저장한다.(INTO절을 사용한다)
+	-- PL/SQL내부에서 SELECT문은 그 결과 row없으면 예외발생, 여러개의 row가 있어도 예외발생.
+	-- 1건의 row만 발생할때 정상처리
+	SELECT empno,job,sal
+		INTO v_empno,v_job,v_sal
+		FROM emp
+		WHERE ename = v_name;
+
+	-- 조건문
+	IF v_job IN ('MANAGER','ANALYST') THEN
+		v_sal := v_sal * 1.5;
+	ELSE
+		v_sal := v_sal * 1.2;
+	END IF;
+
+	-- DML명령
+	UPDATE emp
+		SET sal = v_sal
+		WHERE empno = v_empno;
+
+	-- 직전의 SQL명령의 결과값이 있으면(SQL 커서의 상태값 참조)
+	IF SQL%FOUND THEN
+		-- 처리결과를 화면에 보여주기
+		DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT||'개의 행이 갱신되었습니다.');
+	ELSE
+		DBMS_OUTPUT.PUT_LINE('갱신된 자료가 없습니다.');
+	END IF;
+
+-- 예외처리절
+EXCEPTION
+	-- 위의 BEGIN내부의 실행문장에 오류가 발생하면 자동 점프되어 실행.
+	WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE(v_name || '는 자료가 없습니다.');		
+	WHEN TOO_MANY_ROWS THEN
+		DBMS_OUTPUT.PUT_LINE(v_name || '는 동명 이인입니다.');		
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('기타 에러가 발생 했습니다.');		
+END;
+/
+
+-- 입력값 중복출력 복귀
+SET VERIFY ON
+-- 출력화면 끄기
+SET SERVEROUTPUT OFF
+```
+
++ 프로그램 개발의 모듈화
+  - 1)	블록 내에서 논리적으로 관련된 문장들의 그룹화할 수 있다.
+  - 2)	강력한 프로그램을 작성하기 위해 서브 블록들을 큰 블록에 포함할 수 있다.
+  - 3)	복잡한 문제에 대한 프로그래밍이 적절히 나뉘어진 모듈들의 집합으로 구성된다.
+    - 프로시저(PROCEDURE), 함수(FUNCTION)을 만들어서 저장한 후 호출하여 사용가능
+
++ 식별자 선언
+  - 1)	변수, 상수 등을 선언하고 SQL과 절차적인 프로그램에서 사용한다.
+  - 2)	데이터베이스의 테이블과 Record를 기반으로 하는 dynamic한 변수 선언이 가다.
+  - 3)	단일형 데이터 타입과 복합형 데이터 타입을 선언할 수 있다.
+
++ 절차적 언어 구조로 된 프로그램 작성
+  - 1)	IF문은 조건에 따라 일련의 문장을 실행한다.
+  - 2)	LOOP문을 사용하여 일련의 문장을 반복적으로 실행한다.
+  - 3)	Explicit Cursor를 이용한 Multi-row 질의 처리한다.
+
++ ERROR 처리
+  - 1)	Exception 처리 루틴을 이용하여 Oracle8 Server 에러를 처리한다.
+  - 2)	사용자 정의 에러를 선언하고 Exception 처리 루틴으로 처리 가능하다.
+
++ PL/SQL 블럭의 구조
+```sql
+DECLARE
+  변수선언 및 초기화
+  variables, cursor, user_defined, exception
+BEGIN
+  실행문장(SQL, 변수, 제어문)
+  SQL,PL/SQL statements;
+EXCEPTION
+  제어처리
+  actions to perform when errors occur
+END;
+```
+
++ 참고사항
+  - 1)	PL/SQL Block내에서는 한 문장이 종료할 때마다 세미콜론(;)을 기술한다.
+  - 2)	END뒤에 세미콜론(;)을 사용하여 하나의 Block이 끝났다는 것을 명시한다.
+  - 3)	PL/SQL Block의 작성은 편집기를 통해 파일로 작성할 수 있고 SQL*Plus에서 바로 작성할 수 있다.
+  - 4)	SQL Buffer에서 PL/SQL을 실행하기 위해 “/”을 사용하며 성공적으로 실행 된다면 PL/SQL procedure successfully completed라는 Message가 출력된다.
+
+
++ 블럭의 종류
+  - 1) 이름이 없는 블럭(별도의 외부파일이나 버퍼에 작성한 실행문장)
+  - 2) 이름이 있는 블럭(데이터베이스 내부에 PL/SQL문에 이름을 부여하여 저장하여 필요시 호출하여 사용하는 블럭)
+    - 프로시저(PROCEDURE), 함수(FUNCTION)  ==>  PACKAGE
+![블럭의 종류](유형.png "블럭의 종류")
+
+
 #### 3. 변수
++ PL/SQL에서의 변수사용
+  - 1) 반드시 선언부에 선언후에 사용할수 있다.
+  - 2) 형식 ==> 변수명 자료형 [:=초기값];   대입연산자 ==> :=
+  - 3) 자료형의 종류
+    + 1. 단일값(CHAR, VARCHAR2, NUMBER, DATE, BOOLEAN, BINARY_INTEGER,....) ==> 스칼라(Scalar)
+    + 2. 복합형(자바언어의 배열과 유사 ==> TABLE형, RECORD형) <- 사용자가 만드는 자료형
+    + 3. 이미 존재하는(테이블에 존재하는) 자료형을 그대로 사용(참조형)
+    + 4. BLOB(큰 이진데이터 즉, 사진/음원/동영상)
+
+
 #### 4. 자료형
 #### 5. 제어문
 #### 6. DML명령
