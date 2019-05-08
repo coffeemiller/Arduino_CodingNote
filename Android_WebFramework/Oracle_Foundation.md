@@ -4157,6 +4157,23 @@ SET SERVEROUTPUT OFF
 
 + 암시적 커서는 SQL문장이 작동하는 동안을 OPEN되어 있고 1개의 문장이 끝나면 CLOSE된다. 우리는 SQL문장 이후에 암시적커서의 속성값을 사용하므로 SQL%ISOPEN은 항상 FALSE이다.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```sql
 REM 문제6) ITEM 테이블에서 ORDID가 605인 자료를 모두 삭제하여라.
 
@@ -4374,17 +4391,13 @@ SET SERVEROUTPUT OFF
 + 반복문 ==> PL/SQL에서는 LOOP문
 ```java
 for(제어변수초기화; 종료조건; 제어변수증감) {
-
 }
 
 while(반복조건) {
-
 }
 
 do{
-
 }while(조건){
-
 }
 ```
 
@@ -4560,12 +4573,10 @@ REM 문제7) EVEN_ODD(ID:NUMBER(4) GUBUN:VARCHAR2(6)) 테이블을 작성하여
 REM START숫자와 END 숫자를 입력 받아 그사이의 숫자를 ID에 ID의 숫자가 짝수이면
 REM GUBUN에 “짝수”를 홀수이면 GUBUN에 “홀수”라고 입력하는 SCRIPT를 FOR문으로 작성.
 
-
 DROP TABLE even_odd;
 CREATE TABLE even_odd(
 id       NUMBER(4) CONSTRAINT even_odd_id_pk PRIMARY KEY,
 gubun    VARCHAR2(6));
-
 
 SET VERIFY OFF
 SET SERVEROUTPUT ON
@@ -4604,7 +4615,7 @@ SET SERVEROUTPUT OFF
   - 3)WHILE LOOP문
 ```sql
 WHILE 조건 LOOP
-
+  반복내용
 END LOOP;
 //////////////////////////////////////////////
 REM 문제8) WHILE문으로 아래와 같이 출력하는 SCRIPT를 작성하여라.
@@ -4677,6 +4688,8 @@ END;
 SET VERIFY ON
 SET SERVEROUTPUT OFF
 ```
+
+
 #### 5. 프로시저(PROCEDURE), 함수(FUNCTION)
 #### 6. 실습
 #### 7. Summary / Close
