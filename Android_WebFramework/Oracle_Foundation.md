@@ -4145,93 +4145,6 @@ SET SERVEROUTPUT OFF
   ```
 
 
-#### 3. 커서
-+ 커서(CURSOR) : PL/SQL에서 SQL명령을 오라클서버에서 실행시킬때 사용하는 메모리영역을 지칭하는 용어.
-+ 특별히 커서변수를 사용하지 않으면 암시적 커서가 사용된다고 말한다. 암시적 커서에서 SELECT명령은 1건의 row가 결과로 도출되어야만 정상적으로 정보를 저장할수 있다. 그래서 결과가 없거나 여러건이면 예외를 발생시키는 것이다.
-+ 만일 여러건을 대상으로한 SELECT명령을 사용하려면 명시적 커서변수를 선언하여 이를 사용하여야 한다.
-
-+ 암시적 커서의 상태값중 PL/SQL에서 최소한의 정보를 접근할수 있도록 커서명칭을 정해놓았다.
-  - 커서명칭 ==> SQL%
-  - 최소한 속성명을 지칭하는 용어 ==> NOT_FOUND, FOUND, ISOPEN, ROWCOUNT
-  - SQL%NOT_FOUND, SQL%FOUND, SQL%ROWCOUNT, SQL%ISOPN ==> 항상 TRUE
-
-+ 암시적 커서는 SQL문장이 작동하는 동안을 OPEN되어 있고 1개의 문장이 끝나면 CLOSE된다. 우리는 SQL문장 이후에 암시적커서의 속성값을 사용하므로 SQL%ISOPEN은 항상 FALSE이다.
-
-
-
-##### [여러건 SELECT명령 사용]
-+ 명시적 커서(CURSOR)
-  - 다중 행 SELECT 문장에 의해 RETURN되는 각 행을 개별적으로 처리하기 위해 명시적 CURSOR를 사용.
-
-+ 다중행을 리턴하는 SELECT문이 예외를 발생시키지 않고 정상적으로 작동하려면 반드시 명시적 커서를 변수로 선언하고 사용해야 한다.
-
-+ 명시적 커서 사용법
-  - 1) 커서 변수 선언
-```sql
-CURSOR 커서명 IS 수행할 SELECT문장;
-
-DECLARE
-  CURSOR emp_cursor IS	SELECT empno,ename,sal
-		FROM emp
-		WHERE deptno = v_deptno
-		ORDER BY empno;
-```
-
-  - 2) 커서 OPEN => CURSOR변수의 SELECT문장을 실행시키는 것
-```sql
-OPEN 커서명;
-
-BEGIN
-  OPEN emp_cursor;
-  -- ==> 커서변수의 SELECT문장이 실행되고 그결과값이 저장된 공간을 커서명으로 접근할수 있도록 준비된다.
-```
-
-  - 3) SELECT문의 결과값에서 1건의 ROW를 추출하는 명령
-```sql
---커서명으로 접근하여 SELECT문의 결과값중 1개 row를 추출
-FETCH 커서명 INTO 결과저장 변수들,...;
-EXIT WHEN 커서명%NOTFOUND;
-
-BEGIN
-  FETCH emp_cursor INTO v_empno,v_ename,v_sal;
-  EXIT WHEN emp_cursor%NOTFOUND;
-```
-
-  - 4) 커서 CLOSE
-```sql
-CLOSE 커서명;
-
-BEGIN
-  CLOSE emp_cursor;
-```
-
-+ 명시적 CURSOR의 제어
-  - 명시적 CURSOR를 사용하기 위해서는 4가지 단계를 거처야 한다.
-  - 1)	수행되기 위한 질의의 구조를 정의하고 이름을 지정함으로써 CURSOR를 선언한다.
-  - 2)	CURSOR를OPEN한다. OPEN문장은 질의를 실행하고 참조되는 임의의 변수를 바인드 합니다. 질의에 의해 식별된 행을 active set이라 불리고 인출(FETCH) 가능합니다.
-  - 3)	CURSOR에서 데이터를 인출(FETCH)합니다. FETCH문장은 CURSOR에서 변수로 현재 행을 로드합니다. 각 인출(FETCH)은 활성 셋(active set)에서 다음 행으로 그 포인터를 이동하도록 합니다.
-  - 4)	CURSOR를 CLOSE합니다. CLOSE 문장은 행의 할성 셋(active set)을 해제 합니다. 이제 새로운 할성 셋(active set)을 생성하기 위해 CURSOR를 다시 OPEN할 수 있습니다.
-
-![EXPLICIT CURSOR의 흐름도](cursor.png "EXPLICIT CURSOR의 흐름도")
-
-
-
-+ 지금까지는 명시적커서에서 FETCH(인출)한 값을 단일변수에 저장했다. 이제 RECORED 변수에 저장해 보자.
-
-
-
-```sql
-```
-
-
-
-
-
-
-
-
-
-
 
 ```sql
 REM 문제6) ITEM 테이블에서 ORDID가 605인 자료를 모두 삭제하여라.
@@ -4261,7 +4174,7 @@ PRINT rows_deleted
 ```
 
 
-#### 4. 제어문
+#### 3. 제어문
 + PL/SQL에서 사용하는 선택문, 반복문에 대하여 학습(18.doc)
   - JAVA언어(if, if else, else if, switch case, for, while, do while)
   - PL/SQL
@@ -4749,9 +4662,308 @@ SET SERVEROUTPUT OFF
 ```
 
 
-#### 5. 프로시저(PROCEDURE), 함수(FUNCTION)
-#### 6. 실습
-#### 7. Summary / Close
+#### 4. 커서
++ 커서(CURSOR) : PL/SQL에서 SQL명령을 오라클서버에서 실행시킬때 사용하는 메모리영역을 지칭하는 용어.
++ 특별히 커서변수를 사용하지 않으면 암시적 커서가 사용된다고 말한다. 암시적 커서에서 SELECT명령은 1건의 row가 결과로 도출되어야만 정상적으로 정보를 저장할수 있다. 그래서 결과가 없거나 여러건이면 예외를 발생시키는 것이다.
++ 만일 여러건을 대상으로한 SELECT명령을 사용하려면 명시적 커서변수를 선언하여 이를 사용하여야 한다.
+
++ 암시적 커서의 상태값중 PL/SQL에서 최소한의 정보를 접근할수 있도록 커서명칭을 정해놓았다.
+  - 커서명칭 ==> SQL%
+  - 최소한 속성명을 지칭하는 용어 ==> NOT_FOUND, FOUND, ISOPEN, ROWCOUNT
+  - SQL%NOT_FOUND, SQL%FOUND, SQL%ROWCOUNT, SQL%ISOPN ==> 항상 TRUE
+
++ 암시적 커서는 SQL문장이 작동하는 동안을 OPEN되어 있고 1개의 문장이 끝나면 CLOSE된다. 우리는 SQL문장 이후에 암시적커서의 속성값을 사용하므로 SQL%ISOPEN은 항상 FALSE이다.
+
+
+
+##### [여러건 SELECT명령 사용]
++ 명시적 커서(CURSOR)
+  - 다중 행 SELECT 문장에 의해 RETURN되는 각 행을 개별적으로 처리하기 위해 명시적 CURSOR를 사용.
+
++ 다중행을 리턴하는 SELECT문이 예외를 발생시키지 않고 정상적으로 작동하려면 반드시 명시적 커서를 변수로 선언하고 사용해야 한다.
+
++ 명시적 커서 사용법
+  - 1) 커서 변수 선언
+```sql
+CURSOR 커서명 IS 수행할 SELECT문장;
+
+DECLARE
+  CURSOR emp_cursor IS	SELECT empno,ename,sal
+		FROM emp
+		WHERE deptno = v_deptno
+		ORDER BY empno;
+```
+
+  - 2) 커서 OPEN => CURSOR변수의 SELECT문장을 실행시키는 것
+```sql
+OPEN 커서명;
+
+BEGIN
+  OPEN emp_cursor;
+  -- ==> 커서변수의 SELECT문장이 실행되고 그결과값이 저장된 공간을 커서명으로 접근할수 있도록 준비된다.
+```
+
+  - 3) SELECT문의 결과값에서 1건의 ROW를 추출하는 명령
+```sql
+--커서명으로 접근하여 SELECT문의 결과값중 1개 row를 추출
+FETCH 커서명 INTO 결과저장 변수들,...;
+EXIT WHEN 커서명%NOTFOUND;
+
+BEGIN
+  FETCH emp_cursor INTO v_empno,v_ename,v_sal;
+  EXIT WHEN emp_cursor%NOTFOUND;
+```
+
+  - 4) 커서 CLOSE
+```sql
+CLOSE 커서명;
+
+BEGIN
+  CLOSE emp_cursor;
+```
+
++ 명시적 CURSOR의 제어
+  - 명시적 CURSOR를 사용하기 위해서는 4가지 단계를 거처야 한다.
+  - 1)	수행되기 위한 질의의 구조를 정의하고 이름을 지정함으로써 CURSOR를 선언한다.
+  - 2)	CURSOR를OPEN한다. OPEN문장은 질의를 실행하고 참조되는 임의의 변수를 바인드 합니다. 질의에 의해 식별된 행을 active set이라 불리고 인출(FETCH) 가능합니다.
+  - 3)	CURSOR에서 데이터를 인출(FETCH)합니다. FETCH문장은 CURSOR에서 변수로 현재 행을 로드합니다. 각 인출(FETCH)은 활성 셋(active set)에서 다음 행으로 그 포인터를 이동하도록 합니다.
+  - 4)	CURSOR를 CLOSE합니다. CLOSE 문장은 행의 할성 셋(active set)을 해제 합니다. 이제 새로운 할성 셋(active set)을 생성하기 위해 CURSOR를 다시 OPEN할 수 있습니다.
+
+![EXPLICIT CURSOR의 흐름도](cursor.png "EXPLICIT CURSOR의 흐름도")
+
+
+
++ 지금까지는 명시적커서에서 FETCH(인출)한 값을 단일변수에 저장했다. 이제 RECORED 변수에 저장해 보자.
+
+```sql
+--문제1) 부서번호를 입력받아 사원번호,이름,급여를 출력하는 SCRIPT를 작성하여라.
+--      10 부서 ==> 3건, 20 부서 ==> 5건,  30부서 == 6건
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+
+ACCEPT  p_deptno PROMPT ' 부서번호를 입력하시오 : '
+
+DECLARE
+	v_deptno 	emp.deptno%TYPE := &p_deptno;
+	--RECORD TYPE 선언
+	TYPE emp_record_type IS RECORD (
+		empno emp.empno%TYPE,
+		ename emp.ename%TYPE,
+		sal emp.sal%TYPE
+	);
+
+	--emp_record_type변수 선언
+	emp_record emp_record_type;
+
+	v_sal_total	NUMBER(10,2) := 0;
+
+	--명시적 커서의 사용
+	--1) 커서변수 선언
+	--아래처럼 실행하고 싶은 SELECT문장과 함께 CURSOR(커서)변수를 선언한다.
+	--이때 내부의 SELECT문장이 실행되는 것은 아니다.
+	CURSOR emp_cursor IS
+		SELECT empno,ename,sal
+			FROM emp
+			WHERE deptno = v_deptno
+			ORDER BY empno;
+
+
+BEGIN
+	--2) 커서 OPEN ==> 커서변수의 SELECT문을 실행시키고 그 결과값을 저장한 공간을
+	--                커서변수명으로 접근할수 있도록한다.
+	OPEN emp_cursor;
+
+	DBMS_OUTPUT.PUT_LINE('사번    이 름         급   여');
+	DBMS_OUTPUT.PUT_LINE('----  ----------  ----------------');
+
+	LOOP
+	    -- 3) SELECT문의 결과값에서 1건의 ROW를 추출하는 명령
+		FETCH emp_cursor INTO emp_record;
+		-- EXIT WHEN emp_cursor%NOTFOUND;
+		IF emp_cursor%NOTFOUND THEN
+		  EXIT;
+		END IF;  
+
+		v_sal_total := v_sal_total + emp_record.sal;
+		DBMS_OUTPUT.PUT_LINE(RPAD(emp_record.empno,6) ||
+		                     RPAD(emp_record.ename,12) ||
+							 LPAD(TO_CHAR(emp_record.sal,'$99,999,990.00'),16));
+	END LOOP;
+	DBMS_OUTPUT.PUT_LINE('----------------------------------');
+	DBMS_OUTPUT.PUT_LINE(RPAD(TO_CHAR(v_deptno),2) || '번 부서의 합    ' ||
+		                 LPAD(TO_CHAR(v_sal_total,'$99,999,990.00'),16));
+    -- 4) 커서 CLOSE : 내부적으로 사용했던 모든 메모리공간 제거						 
+	CLOSE emp_cursor;
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+
+```
+
+
+```sql
+REM 문제2) DEPT 테이블의 내용을 조회하는 SCRIPT을 작성하여라. 단 %ROWTYPE을 사용하여라.
+
+
+SET SERVEROUTPUT ON
+DECLARE
+	--dept테이블과 동일한 구조를 가진 record변수를 손쉽게 선언하는 방법
+	dept_record	dept%ROWTYPE;
+
+	--커서변수 선언
+	CURSOR dept_cursor IS
+		SELECT *
+			FROM dept
+			ORDER BY deptno;
+
+BEGIN
+	--커서 open
+	OPEN dept_cursor;
+	DBMS_OUTPUT.PUT_LINE('부서번호    부 서 명       위    치');
+	DBMS_OUTPUT.PUT_LINE('--------  -------------  ------------');
+
+	LOOP
+		--FETCH(1건의 row를 추출)
+		FETCH dept_cursor INTO dept_record;
+		EXIT WHEN dept_cursor%NOTFOUND;
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.deptno,2) || '        '
+ 		|| RPAD(dept_record.dname,15) || RPAD(dept_record.loc,12));
+	END LOOP;
+
+	--커서 close
+	CLOSE dept_cursor;
+END;
+/
+SET SERVEROUTPUT OFF
+```
+
+```sql
+REM 문제3) DEPT 테이블의 내용을 조회하는 SCRIPT을 작성하여라. 단 RECORD TYPE을 선언하여 사용하여라.
+
+SET SERVEROUTPUT ON
+
+DECLARE
+	--RECORD TYPE 선언
+	TYPE dept_record_type IS RECORD
+		(v_deptno	dept.deptno%TYPE,
+		v_dname		dept.dname%TYPE,
+		v_loc		dept.loc%TYPE
+	);
+
+	--RECORD변수 선언
+	dept_record	dept_record_type;
+
+	--CURSOR변수 선언
+	CURSOR dept_cursor IS
+		SELECT *
+			FROM dept
+			ORDER BY deptno;
+
+BEGIN
+	--CURSOR OPEN
+	OPEN dept_cursor;
+
+	DBMS_OUTPUT.PUT_LINE('부서번호    부 서 명       위    치');
+	DBMS_OUTPUT.PUT_LINE('--------  -------------  ------------');
+	LOOP
+		FETCH dept_cursor INTO dept_record;
+		EXIT WHEN dept_cursor%NOTFOUND;
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.v_deptno,2) || '        '
+                         || RPAD(dept_record.v_dname,15) ||
+                         RPAD(dept_record.v_loc,12));
+	END LOOP;
+
+	--CURSOR CLOSE
+	CLOSE dept_cursor;
+END;
+/
+SET SERVEROUTPUT OFF
+
+```
+
+
++ FOR문장에서 좀더 간편하게 CURSOR를 사용할 수 있다.
+```sql
+FOR 레코드변수 IN 커서 LOOP
+  수행할문장
+END LOOP;
+```
+
+  - 커서변수 선언으로~
+```sql
+REM 문제4) CURSOR FOR LOOP를 사용하여 DEPT 테이블의 자료를 조회하여라.
+
+SET SERVEROUTPUT ON
+
+DECLARE
+	--커서변수 선언
+	CURSOR dept_cursor IS
+		SELECT *
+			FROM dept
+			ORDER BY deptno;
+
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('부서번호    부 서 명       위    치');
+	DBMS_OUTPUT.PUT_LINE('--------  -------------  ------------');
+
+	--아래의 FOR문장을 작동시키면 내부적으로
+	--1) dept_cursor를 OPEN한다.
+	--2) FETCH시켜 그결과를 dept_record라는 RECORD변수를 스스로 만든다.
+	--3) FETCH된 값이 있으면 반복문 내부를 실행시킨다.
+	--4) FETCH된 값이 없으면 반복문을 탈출한다.
+	--5) 반복문이 탈출되면 스스로 CURSOR를 CLOSE한다.
+	FOR dept_record IN dept_cursor LOOP
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.deptno,2) || '        '
+			                || RPAD(dept_record.dname,15)
+							|| RPAD(dept_record.loc,12));
+	END LOOP;
+END;
+/
+SET SERVEROUTPUT OFF
+```
+
+
+
+  - 커서변수 선언없이~ (이름이 없는 커서변수)
+```sql
+REM 문제4) CURSOR FOR LOOP를 사용하여 DEPT 테이블의 자료를 조회하여라.
+
+SET SERVEROUTPUT ON
+
+DECLARE
+
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('부서번호    부 서 명       위    치');
+	DBMS_OUTPUT.PUT_LINE('--------  -------------  ------------');
+
+	--아래의 FOR문장을 작동시키면 내부적으로
+	--0) Sub-Query 즉, SELECT문을 사용하여 내부적으로 커서변수를 만든다.
+	--1) 이름이 없는 커서를 OPEN한다.
+	--2) FETCH시켜 그결과를 dept_record라는 RECORD변수를 스스로 만든다.
+	--3) FETCH된 값이 있으면 반복문 내부를 실행시킨다.
+	--4) FETCH된 값이 없으면 반복문을 탈출한다.
+	--5) 반복문이 탈출되면 스스로 CURSOR를 CLOSE한다.
+	FOR dept_record IN (SELECT * FROM dept ORDER BY deptno)	LOOP
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.deptno,2) || '        '
+			                || RPAD(dept_record.dname,15)
+							|| RPAD(dept_record.loc,12));
+	END LOOP;
+END;
+/
+SET SERVEROUTPUT OFF
+```
+
+
++ 커서에서 아직 남아있는 문법이 있다.
+ - 커서에 매개변수를 전달하는 방법...20.doc
+
++ 여기까지의 모든 문법을 적용하여 PL/SQL문법을 데이터베이스 내부에 저장해보자(저장프로시져 ==> PROCEDURE, FUNCTION)
+
+
+#### 5. 실습
+#### 6. Summary / Close
 
 
 -----------------------------------------------------------
@@ -4759,7 +4971,28 @@ SET SERVEROUTPUT OFF
 ### [2019-05-09]
 
 #### 1. Review
+#### 2. 프로시저(PROCEDURE), 함수(FUNCTION)
 
-#### 4. DML명령
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+### [2019-05-10]
+
+#### 1. Review
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-05-13]
+
+#### 1. Review
+
 #### 4. 실습
 #### 5. Summary / Close
