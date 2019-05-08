@@ -4296,7 +4296,313 @@ END;
 /
 SET VERIFY ON
 SET SERVEROUTPUT OFF
+```
 
+  - 3.다중선택(else if, switch case)
+```java
+if(조건) {
+    실행문1;
+  } else if(조건){
+    실행문2;
+  } else if(조건){
+    실행문3;
+}
+```
+```sql
+IF 조건 THEN
+  실행문장1;
+ELSEIF 조건
+  실행문장2;
+ELSEIF 조건
+  실행문장3;
+END IF;
+```
++ 실습
+```sql
+REM 문제3) 이름을 입력받아 업무를 조회하여 업무별로 급여를 갱신하는 SCRIPT를 작성하여라.
+REM 단 PRESIDENT:10%,MANAGER:20%,ANALYST:30%,
+REM SALESMAN:40%,CLERK:50%를 적용한다.
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+
+ACCEPT  p_name   PROMPT  ' 이    름: '
+
+DECLARE
+	v_empno	emp.empno%TYPE;
+	v_name	emp.ename%TYPE := UPPER('&p_name');
+	v_sal	emp.sal%TYPE;
+	v_job	emp.job%TYPE;
+
+BEGIN
+	SELECT empno,job
+		INTO v_empno,v_job,v_sal
+		FROM emp
+		WHERE ename = v_name;
+	IF v_job = 'PRESIDENT' THEN
+		v_sal := v_sal * 1.1;
+	ELSIF v_job = 'MANAGER' THEN
+		v_sal := v_sal * 1.2;
+	ELSIF v_job = 'ANALYST' THEN
+		v_sal := v_sal * 1.3;
+	ELSIF v_job = 'SALESMAN' THEN
+		v_sal := v_sal * 1.4;
+	ELSIF v_job = 'CLERK' THEN
+		v_sal := v_sal * 1.5;
+	ELSE
+		v_sal := NULL;
+	END IF;
+
+	UPDATE emp
+		SET sal = v_sal
+		WHERE empno = v_empno;
+	DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || '개의 행이 갱신되었습니다.');
+
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE(v_name || '는 자료가 없습니다.');
+	WHEN TOO_MANY_ROWS THEN
+		DBMS_OUTPUT.PUT_LINE(v_name || '는 동명 이인입니다.');
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('기타 에러가 발생 했습니다.');
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
+
++ 반복문 ==> PL/SQL에서는 LOOP문
+```java
+for(제어변수초기화; 종료조건; 제어변수증감) {
+
+}
+
+while(반복조건) {
+
+}
+
+do{
+
+}while(조건){
+
+}
+```
+
+  - 1)기본LOOP문
+```sql
+LOOP
+  ...
+  IF 조건 THEN => 단순하게 EXIT WHEN 조건;
+    EXIT;
+  END IF;
+  ...
+END LOOP;
+/////////////////////////////////////////////////
+REM 문제4) LOOP문으로 아래와 같이 출력하는 SCRIPT를 작성하여라.
+/*
+*
+**
+***
+****
+*****
+*/
+
+
+SET SERVEROUTPUT ON
+
+DECLARE
+	v_cnt	NUMBER := 1;
+	v_str	VARCHAR2(20) := NULL;
+BEGIN
+	LOOP
+		v_str := v_str || '*';
+		DBMS_OUTPUT.PUT_LINE(v_str);
+		v_cnt := v_cnt + 1;
+		IF v_cnt >= 20 THEN
+			EXIT;
+		END IF;
+	END LOOP;
+END;
+/
+SET SERVEROUTPUT OFF
+//////////////////////////////////////////////////
+REM 1부터 100까지 합계를 계산하시오.
+
+SET SERVEROUTPUT ON
+DECLARE
+	v_number NUMBER := 1;
+	v_sum    NUMBER := 0;
+
+BEGIN
+	--가장 간단한 반복문(BASIC LOOP문)
+	LOOP
+		v_sum := v_sum + v_number;
+		/*
+		IF v_number >= 100 THEN
+			EXIT;
+		END IF;
+		*/
+		EXIT WHEN v_number>=100;
+
+		v_number := v_number+1;
+	END LOOP;
+
+	DBMS_OUTPUT.PUT_LINE('합계 : '||v_sum);
+END;
+/
+SET SERVEROUTPUT OFF
+///////////////////////////////////////////////////
+
+REM 문제5) even_odd(id:NUMBER(4) gubun:VARCHAR2(6)) 테이블을 작성하여
+REM START숫자와 END 숫자를 입력 받아 그사이의 숫자를 ID에
+REM ID의 숫자가 짝수이면 GUBUN에 “짝수”를 홀수이면 GUBUN에 “홀수”라고 입력하는
+REM SCRIPT를 LOOP문으로 작성하여라.
+
+
+--PL/SQL에서는 DDL문장을 지원하지 않으므로 직접 명령을 작성
+DROP TABLE even_odd;
+
+CREATE TABLE even_odd(
+id      NUMBER(4) CONSTRAINT even_odd_id_pk PRIMARY KEY,
+gubun   VARCHAR2(6)
+);
+
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+ACCEPT  p_start PROMPT ' START 숫자를 입력하시오 : '
+ACCEPT  p_end   PROMPT '  END  숫자를 입력하시오 : '
+
+
+--여기서부터가 PL/SQL문장
+DECLARE
+	v_start	even_odd.id%TYPE := &p_start;
+	v_end	even_odd.id%TYPE := &p_end;
+
+BEGIN
+	IF &p_start > &p_end THEN
+		DBMS_OUTPUT.PUT_LINE('START가 END보다 큼니다.');
+	ELSE
+		--DML문장이므로 PL/SQL에서 가능
+		DELETE FROM even_odd;
+
+		LOOP
+			IF MOD(v_start,2) = 0 THEN
+				INSERT INTO even_odd
+					VALUES (v_start,'짝수');
+			ELSE
+				INSERT INTO even_odd
+					VALUES (v_start,'홀수');
+			END IF;
+			v_start := v_start + 1;
+			EXIT WHEN v_start > v_end;
+		END LOOP;
+
+		DBMS_OUTPUT.PUT_LINE(&p_start ||'부터 ' || &p_end || '까지 ' ||
+			TO_CHAR(&p_end - &p_start + 1) ||
+                          '건의 자료가 입력되었습니다.');
+	END IF;
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
+
+
+
+  - 2)FOR 반복문
+```java
+for(i=5; i<=50; i++){
+}
+
+for(i=50; i>=5; i--){
+}
+```
+```sql
+FOR i IN 5..50 LOOP
+
+END LOOP;
+/////////////////////
+FOR i IN REVERSE 5..50 LOOP
+
+END LOOP;
+///////////////////////////////////////////////
+FOR 반복제어변수 IN 시작값..종료값 LOOP
+  반복내용
+END LOOP;
+//////////////////////////////////////////////
+FOR RECORD변수 IN SELECT문 LOOP
+  반복내용
+END LOOP;
+///////////////////////////////////
+REM 문제6) FOR문으로 아래와 같이 출력하는 SCRIPT를 작성하여라.
+/*
+*
+**
+***
+****
+*****
+*/
+
+SET SERVEROUTPUT ON
+DECLARE
+	v_str	VARCHAR2(20) := NULL;
+BEGIN
+	FOR i_idx IN 1..20 LOOP
+		v_str := v_str || '*';
+		DBMS_OUTPUT.PUT_LINE(v_str);
+	END LOOP;
+END;
+/
+SET SERVEROUTPUT OFF
+////////////////////////////////////////////////////////
+REM 문제7) EVEN_ODD(ID:NUMBER(4) GUBUN:VARCHAR2(6)) 테이블을 작성하여
+REM START숫자와 END 숫자를 입력 받아 그사이의 숫자를 ID에 ID의 숫자가 짝수이면
+REM GUBUN에 “짝수”를 홀수이면 GUBUN에 “홀수”라고 입력하는 SCRIPT를 FOR문으로 작성.
+
+
+DROP TABLE even_odd;
+CREATE TABLE even_odd(
+id       NUMBER(4) CONSTRAINT even_odd_id_pk PRIMARY KEY,
+gubun    VARCHAR2(6));
+
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+ACCEPT  p_start PROMPT ' START 숫자를 입력하시오 : '
+ACCEPT  p_end   PROMPT '  END  숫자를 입력하시오 : '
+
+DECLARE
+	v_start NUMBER(4) := &p_start;
+	v_end NUMBER(4) := &p_end;
+
+BEGIN
+	IF v_start > v_end THEN
+		DBMS_OUTPUT.PUT_LINE('START가 END보다 큼니다.');
+	ELSE
+		DELETE FROM even_odd;
+
+		FOR i_idx IN REVERSE v_start .. v_end LOOP
+			IF MOD(i_idx,2) = 0 THEN
+				INSERT INTO even_odd
+					VALUES (i_idx,'짝수');
+			ELSE
+				INSERT INTO even_odd
+					VALUES (i_idx,'홀수');
+			END IF;
+		END LOOP;
+		DBMS_OUTPUT.PUT_LINE(&p_start ||'부터 ' || &p_end || '까지 ' ||
+		         TO_CHAR(&p_end - &p_start + 1) ||
+                          '건의 자료가 입력되었습니다.');
+	END IF;
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
+
+  - 3)WHILE LOOP문
+```sql
 ```
 #### 5. 프로시저(PROCEDURE), 함수(FUNCTION)
 #### 6. 실습
