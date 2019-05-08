@@ -4159,10 +4159,54 @@ SET SERVEROUTPUT OFF
 
 
 
+##### [여러건 SELECT명령 사용]
++ 명시적 커서(CURSOR)
+  - 다중 행 SELECT 문장에 의해 RETURN되는 각 행을 개별적으로 처리하기 위해 명시적 CURSOR를 사용.
 
++ 다중행을 리턴하는 SELECT문이 예외를 발생시키지 않고 정상적으로 작동하려면 반드시 명시적 커서를 변수로 선언하고 사용해야 한다.
 
++ 명시적 커서 사용법
+  - 1) 커서 변수 선언
+```sql
+CURSOR 커서명 IS 수행할 SELECT문장;
 
+DECLARE
+  CURSOR emp_cursor IS	SELECT empno,ename,sal
+		FROM emp
+		WHERE deptno = v_deptno
+		ORDER BY empno;
+```
 
+  - 2) 커서 OPEN => CURSOR변수의 SELECT문장을 실행시키는 것
+```sql
+OPEN 커서명;
+
+BEGIN
+  OPEN emp_cursor;
+  -- ==> 커서변수의 SELECT문장이 실행되고 그결과값이 저장된 공간을 커서명으로 접근할수 있도록 준비된다.
+```
+
+  - 3) SELECT문의 결과값에서 1건의 ROW를 추출하는 명령
+```sql
+--커서명으로 접근하여 SELECT문의 결과값중 1개 row를 추출
+FETCH 커서명 INTO 결과저장 변수들,...;
+EXIT WHEN 커서명%NOTFOUND;
+
+BEGIN
+  FETCH emp_cursor INTO v_empno,v_ename,v_sal;
+  EXIT WHEN emp_cursor%NOTFOUND;
+```
+
+  - 4) 커서 CLOSE
+```sql
+CLOSE 커서명;
+
+BEGIN
+  CLOSE emp_cursor;
+```
+
+```sql
+```
 
 
 
