@@ -4055,100 +4055,97 @@ SET SERVEROUTPUT OFF
   - 6)	그룹 함수는 테이블의 행 그룹에 적용되기 때문에 SUM같은 그룹 함수는 SQL에서 사용합니다.
 
 
+  + DML명령사용시 주의점(INSERT INTO, UPDATE SET, DELETE)
+  ```sql
+  REM 문제3) 초기값이 8000부터 9999까지 1씩 증가하는 SEQUENCE(EMPNO_SEQUENCE)를
+  REM 생성하여 EMP 테이블에 등록하는 SCRIPT를 작성하여라.
+  REM 단 이름은 JONG, 업무는 MANAGER,부서번호는 10이다.
 
-#### 3. 제어문
+  --SQL> CREATE SEQUENCE empno_sequence
+  --  2  INCREMENT BY 1
+  --  3  START WITH 8000
+  --  4  MAXVALUE 9999
+  --  5  NOCYCLE
+  --  6  NOCACHE;
 
-+ DML명령 사용시
-```sql
-REM 문제3) 초기값이 8000부터 9999까지 1씩 증가하는 SEQUENCE(EMPNO_SEQUENCE)를
-REM 생성하여 EMP 테이블에 등록하는 SCRIPT를 작성하여라.
-REM 단 이름은 JONG, 업무는 MANAGER,부서번호는 10이다.
+  SET VERIFY OFF
+  SET SERVEROUTPUT ON
+  DECLARE
+        v_empno       emp.empno%TYPE;
+  BEGIN
+  	  --아래의 코드는 시퀀스의 값을 v_empno에 저장하기 위해 사용했다.
+        /*SELECT empno_sequence.NEXTVAL
+               INTO v_empno
+               FROM DUAL;
+  		INSERT INTO emp(empno,ename,job,deptno)
+               VALUES (v_empno,'JONG','MANAGER',10);
+  	  */
+        INSERT INTO emp(empno,ename,job,deptno)
+               VALUES (empno_sequence.NEXTVAL,'JOENJU','MANAGER',20);
 
---SQL> CREATE SEQUENCE empno_sequence
---  2  INCREMENT BY 1
---  3  START WITH 8000
---  4  MAXVALUE 9999
---  5  NOCYCLE
---  6  NOCACHE;
+  	  --아래의 SQL%ROWCOUNT는 암시적커서의 상태값을 나타낸다.
+  	  DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' 개의 행이 추가되었습니다.');
+   END;
+  /
+  SET VERIFY ON
+  SET SERVEROUTPUT OFF
+  ```
 
-SET VERIFY OFF
-SET SERVEROUTPUT ON
-DECLARE
-      v_empno       emp.empno%TYPE;
-BEGIN
-	  --아래의 코드는 시퀀스의 값을 v_empno에 저장하기 위해 사용했다.
-      /*SELECT empno_sequence.NEXTVAL
-             INTO v_empno
-             FROM DUAL;
-		INSERT INTO emp(empno,ename,job,deptno)
-             VALUES (v_empno,'JONG','MANAGER',10);
-	  */
-      INSERT INTO emp(empno,ename,job,deptno)
-             VALUES (empno_sequence.NEXTVAL,'JOENJU','MANAGER',20);
+  + PL/SQL내부에서 DML명령의 영향을 받은 ROW의 갯수를 알수있는 방법
+    - 암시적 커서의 상태값을 SQL%ROWCOUNT
 
-	  --아래의 SQL%ROWCOUNT는 암시적커서의 상태값을 나타낸다.
-	  DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' 개의 행이 추가되었습니다.');
- END;
-/
-SET VERIFY ON
-SET SERVEROUTPUT OFF
-```
+  + 문제4) 사원번호가 7369인 사원의 급여에 1000을 더하여 갱신하여라
+  ```sql
+  SET VERIFY OFF
+  SET SERVEROUTPUT ON
 
-+ PL/SQL내부에서 DML명령의 영향을 받은 ROW의 갯수를 알수있는 방법
-  - 암시적 커서의 상태값을 SQL%ROWCOUNT
+  DECLARE
+  	v_sal	emp.sal%TYPE := 1000;
+  BEGIN
+  	/*
+  	UPDATE emp
+  		SET sal = sal + v_sal
+  		WHERE empno = 7369;
+  	*/
+  	UPDATE emp
+  		SET sal = NVL(sal,0) + v_sal
+  		WHERE deptno = 10;
+  	DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' 개의 행이 추가되었습니다.');
+  END;
+  /
+  SET VERIFY ON
+  SET SERVEROUTPUT OFF
+  ```
 
-+ 문제4) 사원번호가 7369인 사원의 급여에 1000을 더하여 갱신하여라
-```sql
-SET VERIFY OFF
-SET SERVEROUTPUT ON
+  + 문제5) 사원번호가 7654인 사원의 정보를 삭제하여라
+  ```sql
+  DECLARE
+  	v_empno	emp.empno%TYPE := 7654;
+  BEGIN
+  	DELETE emp
+  		WHERE empno = v_empno;
+  	--SELECT문은 결과값의 ROW가 없거나, 여러건이면 예외를 발생시키지만
+  	--DML문장은 영향받은 ROW가 없어도, 여러건이어도 예외를 발생시키지 않는다.
+  END;
+  /
+  ```
 
-DECLARE
-	v_sal	emp.sal%TYPE := 1000;
-BEGIN
-	/*
-	UPDATE emp
-		SET sal = sal + v_sal
-		WHERE empno = 7369;
-	*/
-	UPDATE emp
-		SET sal = NVL(sal,0) + v_sal
-		WHERE deptno = 10;
-	DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' 개의 행이 추가되었습니다.');
-END;
-/
-SET VERIFY ON
-SET SERVEROUTPUT OFF
-```
+  + COMMIT또는 ROLLBACK SQL문장으로 트랜잭션 논리를 제어
+  ```sql
+  DECLARE
+  	v_empno	emp.empno%TYPE := 7934;
+  BEGIN
+  	DELETE emp
+  		WHERE empno = v_empno;
 
-+ 문제5) 사원번호가 7654인 사원의 정보를 삭제하여라
-```sql
-DECLARE
-	v_empno	emp.empno%TYPE := 7654;
-BEGIN
-	DELETE emp
-		WHERE empno = v_empno;
-	--SELECT문은 결과값의 ROW가 없거나, 여러건이면 예외를 발생시키지만
-	--DML문장은 영향받은 ROW가 없어도, 여러건이어도 예외를 발생시키지 않는다.
-END;
-/
-```
-
-+ COMMIT또는 ROLLBACK SQL문장으로 트랜잭션 논리를 제어
-```sql
-DECLARE
-	v_empno	emp.empno%TYPE := 7934;
-BEGIN
-	DELETE emp
-		WHERE empno = v_empno;
-
-	--PL/SQL문장 내부에서도 트랜잭션명령어를 사용할수 있다.
-    COMMIT;
-END;
-/
-```
+  	--PL/SQL문장 내부에서도 트랜잭션명령어를 사용할수 있다.
+      COMMIT;
+  END;
+  /
+  ```
 
 
-#### 4. 커서
+#### 3. 커서
 + 커서(CURSOR) : PL/SQL에서 SQL명령을 오라클서버에서 실행시킬때 사용하는 메모리영역을 지칭하는 용어.
 + 특별히 커서변수를 사용하지 않으면 암시적 커서가 사용된다고 말한다. 암시적 커서에서 SELECT명령은 1건의 row가 결과로 도출되어야만 정상적으로 정보를 저장할수 있다. 그래서 결과가 없거나 여러건이면 예외를 발생시키는 것이다.
 + 만일 여러건을 대상으로한 SELECT명령을 사용하려면 명시적 커서변수를 선언하여 이를 사용하여야 한다.
@@ -4158,7 +4155,149 @@ END;
   - 최소한 속성명을 지칭하는 용어 ==> NOT_FOUND, FOUND, ISOPEN, ROWCOUNT
   - SQL%NOT_FOUND, SQL%FOUND, SQL%ROWCOUNT, SQL%ISOPN ==> 항상 TRUE
 
++ 암시적 커서는 SQL문장이 작동하는 동안을 OPEN되어 있고 1개의 문장이 끝나면 CLOSE된다. 우리는 SQL문장 이후에 암시적커서의 속성값을 사용하므로 SQL%ISOPEN은 항상 FALSE이다.
 
+```sql
+REM 문제6) ITEM 테이블에서 ORDID가 605인 자료를 모두 삭제하여라.
+
+--sql*plus에서 자체로 만드는 host변수
+--host변수값을 PL/SQL내부에서 참조할때는 :host변수  형태로 참조할수 있다.
+VARIABLE  rows_deleted VARCHAR2(60)
+
+--PL/SQL문장
+DECLARE
+	v_ordid		NUMBER := 605;
+BEGIN
+
+	DELETE FROM item
+		WHERE  ordid = v_ordid;
+	--위의 DELETE명령실행시 암시적 커서가 사용된다.
+
+	IF SQL%FOUND THEN
+		:rows_deleted := SQL%ROWCOUNT || ' rows deleted.';
+	ELSE
+		:rows_deleted := '삭제한 자료가 없습니다.';
+	END IF;
+END;
+/
+--sql*plus 자체명령으로 host변수의 값을 출력한다.
+PRINT rows_deleted
+```
+
+
+#### 4. 제어문
++ PL/SQL에서 사용하는 선택문, 반복문에 대하여 학습(18.doc)
+  - JAVA언어(if, if else, else if, switch case, for, while, do while)
+  - PL/SQL
+
++ PL/SQL에서의 선택문
+  - 1.단순조건
+```java
+if(조건) {
+  실행문;
+}
+```
+```sql
+IF 조건 THEN
+  실행문장;
+END IF;
+```
+
+  - 2.양자택일조건
+```java
+if(조건) {
+  실행문1;
+} else {
+  실행문2;
+}
+```
+```sql
+IF 조건 THEN
+  실행문장1;
+ELSE
+  실행문장2;
+END IF;
+```
++ 실습
+```sql
+REM 문제1) 이름,급여,부서번호를 입력받아 EMP 테이블에 자료를 등록하는 SCRIPT를 작성하여라.
+REM 단 10번 부서일 경우 입력한 급여의 20%를 추가하고 초기값이 9000부터 9999까지 1씩
+REM 증가하는 SEQUENCE(EMP_EMPNO_SEQ)작성하여 사용하고 아래의 표를 참고하여라.
+
+SET VERIFY OFF
+--sql*plus자체에서 host변수에 추가할 데이터입력
+ACCEPT  p_name   PROMPT  ' 이    름: '
+ACCEPT  p_sal    PROMPT  ' 급    여: '
+ACCEPT  p_deptno PROMPT  ' 부서번호: '
+
+--여기서부터가 PL/SQL문장
+DECLARE
+	--host변수의 값을 초기값으로 가지는 PL/SQL변수선언
+	v_name		VARCHAR2(10) := UPPER('&p_name');
+	v_sal		NUMBER(7,2) := &p_sal;
+	v_deptno	NUMBER(2) := &p_deptno;
+
+BEGIN
+	IF v_deptno = 10 THEN
+		v_sal := v_sal * 1.2;
+	END IF;
+
+	INSERT INTO emp(empno,ename,sal,deptno)
+		VALUES (emp_empno_seq.NEXTVAL,v_name,v_sal,v_deptno);
+	COMMIT;
+END;
+/
+SET VERIFY ON
+
+///////////////////////////////////////////////////////////////////
+
+REM 문제2) 이름을 입력받아 그 사람의 업무가 MANAGER','ANALYST'이면
+REM 급여의 50%를 가산하여 갱신하고 업무가 MANAGER','ANALYST'이 아니면
+REM 20%를 가산하는 SCRIPT를 작성하여라.
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+ACCEPT  p_name   PROMPT  ' 이    름: '
+
+
+DECLARE
+	v_empno	emp.empno%TYPE;
+	v_name	emp.ename%TYPE := UPPER('&p_name');
+	v_sal	emp.sal%TYPE;
+	v_job	emp.job%TYPE;
+
+BEGIN
+	SELECT empno,job,sal
+		INTO v_empno,v_job,v_sal
+		FROM emp
+		WHERE ename = v_name;
+	--위의 문장에서 입력된 성명과 동일한 사원이 있으면
+	--v_empno, v_job, v_sal에 사원번호와 업무,급여가 저장된다.
+	--없으면 예외발생
+	IF v_job IN ('MANAGER','ANALYST') THEN
+		v_sal := v_sal * 1.5;
+	ELSE
+		v_sal := v_sal * 1.2;
+	END IF;
+
+	UPDATE emp
+		SET sal = v_sal
+		WHERE empno = v_empno;
+	DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || '개의 행이 갱신되었습니다.');
+
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE(v_name || '는 자료가 없습니다.');
+	WHEN TOO_MANY_ROWS THEN
+		DBMS_OUTPUT.PUT_LINE(v_name || '는 동명 이인입니다.');
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('기타 에러가 발생 했습니다.');
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+
+```
 #### 5. 프로시저(PROCEDURE), 함수(FUNCTION)
 #### 6. 실습
 #### 7. Summary / Close
