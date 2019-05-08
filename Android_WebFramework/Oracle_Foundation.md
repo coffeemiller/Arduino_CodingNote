@@ -3983,10 +3983,8 @@ END;
 
 + 관심있는 사람만 15.doc, 16.doc 연습문제 풀어보기
 
-#### 5. 제어문
-#### 6. DML명령
-#### 7. 실습
-#### 8. Summary / Close
+#### 5. 실습
+#### 6. Summary / Close
 
 
 -----------------------------------------------------------
@@ -3994,10 +3992,43 @@ END;
 ### [2019-05-08]
 
 #### 1. Review
++ 1) 형선언
+  - TYPE emp_rec1 IS RECORD(empno NUMBER(4), ename VARCHAR2(10), job VARCHAR2(9));
 
-#### 4. DML명령
-#### 4. 실습
-#### 5. Summary / Close
++ 2) RECORD형 변수선언
+  - myrec emp_rec1;
+
++ 3) RECORD형 변수사용
+  - myrec.empno=7788;
+  - myrec.ename='홍길동';
+  - myrec.job='영업';
+
++ 단일값을 가지는 변수에 사용
+   ==> NUMBER, NUMBER(n), NUMBER(p,s), CHAR(n), VARCHAR2(n),
+    BOOLEAN ==> TRUE, FALSE, NULL, BINARY_INTEGER
+
++ 참조형
+   ==> 테이블명%ROWTYPE, 테이블명.컬럼명%TYPE
+
+#### 2. PL/SQL에서의 SQL문장 (17.doc)
++ SELECT문의 결과값은 변수에 저장한다.
+  - 그래서 SELECT문에 INTO절이 필요하다.
+  - 커서(CURSOR) : SQL문장이 실행되는 임시메모리 영역을 총칭하는 용어.
+  임시적커서와 명시적 커서가 있다.  ---> 커서변수를 우리가 만들어서 사용
+  - 임시적커서의 대표적인 상태값을 알려주는 표현들이 있다.
+      - SOL%NOTFOUND, SOL%ROWCOUNT
+
++ PL/SQL내부에서는 SELECT문과 DML문장, TRANSACTION문장만 지원된다.
+  - PL/SQL에서는 DDL, DCL문장은 사용할 수 없다.
+
++ SELECT문 사용시 주의점.
+
+
+#### 3. 제어문
+#### 4. 커서
+#### 5. 프로시저(PROCEDURE), 함수(FUNCTION)
+#### 6. 실습
+#### 7. Summary / Close
 
 
 -----------------------------------------------------------
