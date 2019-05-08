@@ -4021,7 +4021,128 @@ END;
 + PL/SQL내부에서는 SELECT문과 DML문장, TRANSACTION문장만 지원된다.
   - PL/SQL에서는 DDL, DCL문장은 사용할 수 없다.
 
-+ SELECT문 사용시 주의점.
++ SELECT문 사용법
+  - SELECT문의 결과값을 변수에 저장하기 위해 INTO절을 사용한다.
+  - 결과값이 없거나 여러 ROW가 리턴되면 예외발생(암시적 커서)
+  - 변수로 단일변수 여러개나, RECORD변수 여러개
+
++ 문제2) 부서번호를 입력받아 급여의 합을 출력하는 SCRIPT를 작성하여라.
+```sql
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+ACCEPT p_deptno PROMPT '부서번호를 입력하시오(급여의 합을 구함) : '
+DECLARE
+	-- v_deptno emp.deptno%TYPE := &p_deptno;
+	v_sal_total	NUMBER;
+BEGIN
+	SELECT SUM(sal)
+		INTO v_sal_total
+		FROM emp
+		WHERE deptno = &p_deptno;
+	DBMS_OUTPUT.PUT_LINE(&p_deptno || '번 부서 급여의 합 : ' ||
+		LTRIM(TO_CHAR(v_sal_total,'$99,999,999')));
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
++ Guidelines
+  - 1)	세미콜론(;)으로 개별 SQL문장을 종료한다.
+  - 2)	SELECT문장이 PL/SQL에 내장될 때 INTO절을 사용한다.
+  - 3)	WHERE절은 선택적이며 입력변수, 상수, 리터럴, 또는 PL/SQL의 표현식을 지정하기 위해 사용될 수 있다.
+  - 4)	SELECT절에서의 데이터베이스 열과 INTO절에서의 출력 변수의 수를 동일하게 좌측부터 1대1대응되게 지정해야 한다.
+  - 5)	식별자의 데이터형과 열의 데이터형을 갖도록 보증하기 위해 %TYPE 속성을 사용합니다. INTO절의 변수의 데이터형과 변수의 수는 SELECT에서 기술한 Column의 수와 일치하여야 합니다.
+  - 6)	그룹 함수는 테이블의 행 그룹에 적용되기 때문에 SUM같은 그룹 함수는 SQL에서 사용합니다.
+
+
++ DML명령 사용시
+```sql
+REM 문제3) 초기값이 8000부터 9999까지 1씩 증가하는 SEQUENCE(EMPNO_SEQUENCE)를
+REM 생성하여 EMP 테이블에 등록하는 SCRIPT를 작성하여라.
+REM 단 이름은 JONG, 업무는 MANAGER,부서번호는 10이다.
+
+--SQL> CREATE SEQUENCE empno_sequence
+--  2  INCREMENT BY 1
+--  3  START WITH 8000
+--  4  MAXVALUE 9999
+--  5  NOCYCLE
+--  6  NOCACHE;
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+DECLARE
+      v_empno       emp.empno%TYPE;
+BEGIN
+	  --아래의 코드는 시퀀스의 값을 v_empno에 저장하기 위해 사용했다.
+      /*SELECT empno_sequence.NEXTVAL
+             INTO v_empno
+             FROM DUAL;
+		INSERT INTO emp(empno,ename,job,deptno)
+             VALUES (v_empno,'JONG','MANAGER',10);
+	  */
+      INSERT INTO emp(empno,ename,job,deptno)
+             VALUES (empno_sequence.NEXTVAL,'JOENJU','MANAGER',20);
+
+	  --아래의 SQL%ROWCOUNT는 암시적커서의 상태값을 나타낸다.
+	  DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' 개의 행이 추가되었습니다.');
+ END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
+
++ PL/SQL내부에서 DML명령의 영향을 받은 ROW의 갯수를 알수있는 방법
+  - 암시적 커서의 상태값을 SQL%ROWCOUNT
+
++ 문제4) 사원번호가 7369인 사원의 급여에 1000을 더하여 갱신하여라
+```sql
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+
+DECLARE
+	v_sal	emp.sal%TYPE := 1000;
+BEGIN
+	/*
+	UPDATE emp
+		SET sal = sal + v_sal
+		WHERE empno = 7369;
+	*/
+	UPDATE emp
+		SET sal = NVL(sal,0) + v_sal
+		WHERE deptno = 10;
+	DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' 개의 행이 추가되었습니다.');
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
+
++ 문제5) 사원번호가 7654인 사원의 정보를 삭제하여라
+```sql
+DECLARE
+	v_empno	emp.empno%TYPE := 7654;
+BEGIN
+	DELETE emp
+		WHERE empno = v_empno;
+	--SELECT문은 결과값의 ROW가 없거나, 여러건이면 예외를 발생시키지만
+	--DML문장은 영향받은 ROW가 없어도, 여러건이어도 예외를 발생시키지 않는다.
+END;
+/
+```
+
++ COMMIT또는 ROLLBACK SQL문장으로 트랜잭션 논리를 제어
+```sql
+DECLARE
+	v_empno	emp.empno%TYPE := 7934;
+BEGIN
+	DELETE emp
+		WHERE empno = v_empno;
+
+	--PL/SQL문장 내부에서도 트랜잭션명령어를 사용할수 있다.
+    COMMIT;
+END;
+/
+```
 
 
 #### 3. 제어문
