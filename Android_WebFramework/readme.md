@@ -1,5 +1,17 @@
+
+## [JAVA 기초](Java_Foundation\Java_Foundation.md) - 2019/003/05
+
+## [Oracle 기초](Oracle_Foundation.md) - 2019/04/24
+
+## [WebFrameWork 기초](WebFrameWork.md) - ????/??/??
+
+## [Android 기초](Android.md) - ????/??/??
+
+
+
 # 안드로이드 및 웹 프레임워크 전문개발자 양성과정
 #### 이용섭 강사 ( 010-7242-9424 / argus10@hanmail.net )
+
 
 ### [2019-03-04]
 + 분석 - 설계 - 구현
@@ -44,11 +56,3 @@
 
 
 #### 2. 간단 TEST
-
-## [JAVA 기초](Java_Foundation.md) - 2019/003/05
-
-## [Oracle 기초](Oracle_Foundation.md) - 2019/04/24
-
-## [WebFrameWork 기초](WebFrameWork.md) - ????/??/??
-
-## [Android 기초](Android.md) - ????/??/??
