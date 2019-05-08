@@ -4205,6 +4205,21 @@ BEGIN
   CLOSE emp_cursor;
 ```
 
++ 명시적 CURSOR의 제어
+  - 명시적 CURSOR를 사용하기 위해서는 4가지 단계를 거처야 한다.
+  - 1)	수행되기 위한 질의의 구조를 정의하고 이름을 지정함으로써 CURSOR를 선언한다.
+  - 2)	CURSOR를OPEN한다. OPEN문장은 질의를 실행하고 참조되는 임의의 변수를 바인드 합니다. 질의에 의해 식별된 행을 active set이라 불리고 인출(FETCH) 가능합니다.
+  - 3)	CURSOR에서 데이터를 인출(FETCH)합니다. FETCH문장은 CURSOR에서 변수로 현재 행을 로드합니다. 각 인출(FETCH)은 활성 셋(active set)에서 다음 행으로 그 포인터를 이동하도록 합니다.
+  - 4)	CURSOR를 CLOSE합니다. CLOSE 문장은 행의 할성 셋(active set)을 해제 합니다. 이제 새로운 할성 셋(active set)을 생성하기 위해 CURSOR를 다시 OPEN할 수 있습니다.
+
+![EXPLICIT CURSOR의 흐름도](cursor.png "EXPLICIT CURSOR의 흐름도")
+
+
+
++ 지금까지는 명시적커서에서 FETCH(인출)한 값을 단일변수에 저장했다. 이제 RECORED 변수에 저장해 보자.
+
+
+
 ```sql
 ```
 
