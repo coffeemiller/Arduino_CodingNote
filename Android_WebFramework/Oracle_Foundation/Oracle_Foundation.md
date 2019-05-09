@@ -5112,15 +5112,48 @@ SET SERVEROUTPUT OFF
 
 
 #### 3. 예외처리(EXCEPTION)
-
-
++ PL/SQL 코드를 실행할 때 error 발생하는 경우가 있다.
 ```sql
+DECLARE
+  변수선언;
+BEGIN
+  실행문장;
+  ...
+EXCEPTION
+  예외처리부;
+END;
+/
 ```
 
++ 예외를 발생시키는 두 가지 방법
+  - 1)	Oracle 오류가 발생하면 관련된 예외가 자동적으로 발생한다. 예를 들어, 오류 ORA-01403는 데이터베이스에서 검색된 행이 전혀 없을 때 발생하며 PL/SQL은 NO_DATA_FOUND라 는 예외를 발생시킨다.
+  - 2)	블록에 RAISE문을 써서 명시적으로 예외를 발생시킬 수 있다. 발생하는 예외를 사용자가 정의한 것일 수도 있고 미리 정의된 것일 수도 있다
 
+
++ PL/SQL에서의 예외 종류
+  - 1) 정의된 ORACLE SERVER ERROR
+  - 2) 정의되지 않은 ORACLE SERVER ERROR
+  - 3) 사용자가 정의하는 ERROR
+
++ 예외정의
 ```sql
+EXCEPTION
+	WHEN  exception1 [OR exception2, . . . .] THEN
+		statement1;
+		statement2;
+		. . . . . .
+	[WHEN  exception2 [OR exception3, . . . .] THEN
+		statement3;
+		statement4;
+		. . . . . .]
+	[WHEN  OTHERS THEN
+		statement5;
+		statement6;
+		. . . . . .]
+END;
 ```
 
++ WHEN OTHERS 예외 처리기
 
 ```sql
 ```
