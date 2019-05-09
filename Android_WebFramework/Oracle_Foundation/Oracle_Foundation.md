@@ -5402,10 +5402,51 @@ RAISE_APPLICATION_ERROR(에러코드,'에러메세지');
 
 
 #### 4. 저장 (PROCEDURE / FUNCTION)
-+ 서브 프로그램(저장프로시저 ==> PROCEDURE / FUNCTION ==> PACKAGE)
++ 서브 프로그램 SUB-PROGRAM(저장프로시저 ==> PROCEDURE / FUNCTION ==> PACKAGE)
 
++ 자주사용하는 PL/SQL블럭을 데이터베이스 내부에 저장시켜 놓고, 필요할때마다 호출하여 사용할수 있는 PL/SQL코드
 
++ 종류
+  - 프로시저(PROCEDURE) : 리턴값이 없는 저장된 PL/SQL코드
+  - 함수(FUNCTION) : 리턴값이 있는 저장된 PL/SQL코드
+
++ sql*plus 툴에서는 EXECUTE 명령으로 호출
++ JDBC 프로그램 CallableStatement를 사용하여 호출
+
++ 실제 작성한 프로시저의 내용이 text로 저장되어 있다.
+  - 프로시저는 내부에 컴파일되어 저장되어 있으므로 필요할때 호출하여 사용가능하다.
+
++ PROCEDURE, FUNCTION을 작성했다 ==> 관련된 자료사전명칭(user_objects, user_procedures)
 ```sql
+--PROCEDURE 작성예제
+
+CREATE OR REPLACE PROCEDURE emp_sal_update(
+		p_empno IN emp.empno%TYPE, p_sal IN emp.sal%TYPE)
+IS
+	--필요하다면 변수를 선언한다.
+BEGIN
+	UPDATE emp
+		SET sal = p_sal
+		WHERE empno = p_empno;
+
+	IF SQL%NOTFOUND THEN
+		DBMS_OUTPUT.PUT_LINE(TO_CHAR(p_empno) ||
+				'는 없는 사원번호입니다.');
+	ELSE
+		DBMS_OUTPUT.PUT_LINE(TO_CHAR(SQL%ROWCOUNT) ||
+				'명의 자료를 수정하였습니다.');
+	END IF;
+END emp_sal_update;
+/
+```
+
++ 저장된 emp_sal_update 프로시저를 호출해 보자
+```sql
+SQL> SET SERVEROUTPUT ON
+SQL> EXECUTE emp_sal_update(7788,3500)
+1명의 자료를 수정하였습니다.
+
+PL/SQL procedure successfully completed.
 ```
 
 
@@ -5413,9 +5454,34 @@ RAISE_APPLICATION_ERROR(에러코드,'에러메세지');
 ```
 
 
+
 ```sql
 ```
 
+
+
+```sql
+```
+
+
+
+```sql
+```
+
+
+
+```sql
+```
+
+
+
+```sql
+```
+
+
+
+```sql
+```
 
 #### 5. 실습
 #### 6. Summary / Close
