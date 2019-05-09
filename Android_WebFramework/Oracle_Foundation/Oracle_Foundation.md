@@ -5677,9 +5677,78 @@ G_DEPTNO
       20
 ```
 
-
-
 ```sql
+--문제5) EMP 테이블에서 이름을 입력 받아 부서번호,부서명,급여를 검색하는 FUNCTION을 작성하여라.
+--단 부서번호를 RETURN에 사용하여라.
+
+-- 주의점) 함수의 리턴값은 1개뿐이다. 그래서 나머지값은 출력용 매개변수를 이용한다.
+CREATE OR REPLACE FUNCTION emp_disp(
+	v_ename	IN 	emp.ename%TYPE,
+	v_dname	OUT	dept.dname%TYPE,
+	v_sal	OUT 	emp.sal%TYPE)
+
+RETURN NUMBER
+IS
+	v_deptno	emp.deptno%TYPE;
+	v_dname_temp	dept.dname%TYPE;
+	v_sal_temp	emp.sal%TYPE;
+
+BEGIN
+	SELECT sal,deptno
+		INTO v_sal_temp,v_deptno
+		FROM emp
+		WHERE ename = UPPER(v_ename);
+
+	SELECT dname
+		INTO v_dname_temp
+		FROM dept
+		WHERE deptno = v_deptno;
+
+	--출력용 매개변수에 값저장(부서명,급여)
+	v_dname := v_dname_temp;
+	v_sal := v_sal_temp;
+
+	DBMS_OUTPUT.PUT_LINE('성    명 : ' || v_ename);
+	DBMS_OUTPUT.PUT_LINE('부서번호 : ' || TO_CHAR(v_deptno));
+	DBMS_OUTPUT.PUT_LINE('부 서 명 : ' || v_dname_temp);
+	DBMS_OUTPUT.PUT_LINE('급    여 : ' || TO_CHAR(v_sal_temp,'$999,999'));
+	RETURN v_deptno;
+
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE('입력한 MANAGER는 없습니다.');
+	WHEN TOO_MANY_ROWS THEN
+		DBMS_OUTPUT.PUT_LINE('자료가 2건 이상입니다.');
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');
+END;
+/
+--출력용 매개변수와 리턴값을 저장한 변수를 생성
+SQL> SET SERVEROUTPUT ON
+SQL> VAR g_deptno NUMBER
+SQL> VAR g_dname VARCHAR2(20)
+SQL> VAR g_sal NUMBER
+SQL> EXECUTE :g_deptno := emp_disp('SCOTT',:g_dname,:g_sal)
+성    명 : SCOTT
+부서번호 : 20
+부 서 명 : RESEARCH
+급    여 :    $3,000
+PL/SQL procedure successfully completed.
+
+SQL> PRINT g_deptno
+G_DEPTNO
+---------
+      20
+
+SQL> PRINT g_sal
+ G_SAL
+--------
+  3000
+
+SQL> PRINT g_dname
+G_DNAME
+------------------
+RESEARCH
 ```
 
 
