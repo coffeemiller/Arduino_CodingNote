@@ -5202,7 +5202,7 @@ my_error EXCEPTION;
 ```
     - 에러변수와 표준에러코드를 연동시켜 에러가 발생하면 점프하도록 설정
 ```sql
-PRAGMA EXCEPTION_INIT(my_error, 표준에러코드);
+PRAGMA EXCEPTION_INIT(my_error, -표준에러코드);
 ```
 
     - 제약조건의 추가는 테이블레벨 형식으로 추가할수 있다.
@@ -5265,6 +5265,7 @@ SET SERVEROUTPUT OFF
 ```
 
   - 4) 사용자가 예외를 발생시키는 방법
+    - 방법1)
     - 에러변수 선언
 ```sql
 user_error EXCEPTION;
@@ -5319,8 +5320,10 @@ SET VERIFY ON
 SET SERVEROUTPUT OFF
 ```
 
++ WHEN OTHERS 예외 처리기
 + 참고) 예외코드와 예외메세지를 알고싶다면 다음을 사용할수 있다.
 ```sql
+--방법1)
 --문제4) 삭제하고자 하는 사원의 이름을 입력하여 삭제하여라.단 가능한 모든 에러를 처리하여라.
 
 SET VERIFY OFF
@@ -5353,26 +5356,67 @@ END;
 /
 SET VERIFY ON
 SET SERVEROUTPUT OFF
+////////////////////////////////////////////////////////
+--방법2)
+--문제5) 삭제하고자 하는 사원의 이름을 입력하여 삭제하여라.단 가능한 모든 에러를 처리하여라.
+
+SET VERIFY OFF
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+ACCEPT  p_ename PROMPT '삭제하고자 하는 사원의 이름을 입력하시오 : '
+DECLARE
+	v_ename		emp.ename%TYPE := UPPER('&p_ename');
+
+	v_err_code	NUMBER;
+	v_err_msg	VARCHAR2(255);
+BEGIN
+	DELETE emp
+		WHERE ename = v_ename;
+
+	--만일 존재하지 않는 사원이름을 삭제명령을 시키면
+	IF SQL%NOTFOUND THEN
+		RAISE_APPLICATION_ERROR(-20100,'no data found');
+	END IF;
+EXCEPTION
+	WHEN OTHERS THEN
+		ROLLBACK;
+		v_err_code := SQLCODE;
+		v_err_msg := SQLERRM;
+		DBMS_OUTPUT.PUT_LINE('에러 번호 : ' || TO_CHAR(v_err_code));
+		DBMS_OUTPUT.PUT_LINE('에러 내용 : ' || v_err_msg);
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
 ```
-
-+ WHEN OTHERS 예외 처리기
-
-
-
-
-
-
+    - 방법2)
 ```sql
+RAISE_APPLICATION_ERROR(에러코드,'에러메세지');
+```
+
++ 참고) 예외코드와 예외메세지를 알고싶다면 다음을 사용할수 있다.
+```
+    예외코드   SQLCODE	 
+	    예외메세지  SQLERRM
 ```
 
 
-```sql
-```
-
-
-```sql
-```
 #### 4. 저장 (PROCEDURE / FUNCTION)
++ 서브 프로그램(저장프로시저 ==> PROCEDURE / FUNCTION ==> PACKAGE)
+
+
+```sql
+```
+
+
+```sql
+```
+
+
+```sql
+```
+
+
 #### 5. 실습
 #### 6. Summary / Close
 
