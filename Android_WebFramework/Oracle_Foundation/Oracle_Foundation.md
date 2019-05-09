@@ -5068,17 +5068,78 @@ END;
 SET SERVEROUTPUT OFF
 ```
 
-+ 
-
++ FOR UPDATE절
+ - 행을 갱신하거나 삭제하기 전에 행을 잠글 수 있다.
 ```sql
+CURSOR  cursor_name IS
+	SELECT . . . . .
+		FOR UPDATE [NOWAIT] [OF column1[,column2,. . . .]];
 ```
 
++ SUBQUERY
+  - SUBQUERY은 다른SQL데이터 조작 문장 속에 있는 질의.
 ```sql
+-- 문제5) CURSOR에서 SUBQUERY를 이용하여 부서번호,부서명,인원수를 출력하여라.
+
+SET SERVEROUTPUT ON
+
+DECLARE
+	v_cnt	NUMBER;
+	--부서인원수가 5명이상인 부서정보를 출력하는 커서변수 선언
+	CURSOR dept_cursor IS
+		SELECT d.deptno,d.dname
+			FROM dept d
+			WHERE 5 <= (SELECT count(*)
+				FROM emp
+				WHERE deptno = d.deptno);
+
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('부서번호    부 서 명     인원수');
+	DBMS_OUTPUT.PUT_LINE('--------  -------------  ------');
+
+	FOR dept_record IN dept_cursor LOOP
+		SELECT COUNT(*)
+			INTO v_cnt
+			FROM emp
+			WHERE deptno = dept_record.deptno;
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.deptno,2) || '       ' ||
+			RPAD(dept_record.dname,15) || LPAD(v_cnt,4));
+	END LOOP;
+END;
+/
+SET SERVEROUTPUT OFF
 ```
 
-```sql
-```
+
 #### 3. 예외처리(EXCEPTION)
+
+
+```sql
+```
+
+
+```sql
+```
+
+
+```sql
+```
+
+
+```sql
+```
+
+
+```sql
+```
+
+
+```sql
+```
+
+
+```sql
+```
 #### 4. 저장 (PROCEDURE / FUNCTION)
 #### 5. 실습
 #### 6. Summary / Close
