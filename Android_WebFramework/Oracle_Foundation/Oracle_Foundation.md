@@ -4971,10 +4971,117 @@ SET SERVEROUTPUT OFF
 ### [2019-05-09]
 
 #### 1. Review
-#### 2. 프로시저(PROCEDURE), 함수(FUNCTION)
++ 결과가 여러건인 SELECT문을 사용할때 ==> 커서변수(명시적커서)
 
-#### 4. 실습
-#### 5. Summary / Close
+
+#### 2. 커서(멤버변수)
++ 용어정리
+ - 매개변수(parameter), 인수, 인자(argument)
+
+```java
+class A {
+  ...
+  int sum(int x, int y) {  //<====== 메서드를 정의
+    ... //(형식 매개변수,인수)
+    실행코드;
+  }
+}
+int a=10, b=20;
+
+A obj = new A();
+obj.sum(a,b); //<====메서드 호출
+obj.sum(100,200); //<==== 실(acture) 매개변수, 인수
+```
+
++ 매개변수가 있는 커서
+  - 1) 커서변수 선언
+```sql
+CURSOR 커스변수명(변수명 자료형) IS
+  SELECT문<-내부에서 변수를 사용;
+```
+  - 2) 커서 OPEN
+```sql
+OPEN 커서변수명(값);
+```
++ 문제1) DEPT 테이블의 내용을 조회하는 SCRIPT을 작성하여라. 단 매개변수를 이용하여라
+```sql
+SET SERVEROUTPUT ON
+DECLARE
+	--RECORD변수
+	dept_record dept%ROWTYPE;
+	--커서변수 선언
+	CURSOR dept_cursor (v_deptno NUMBER) IS
+		SELECT *
+			FROM dept
+			WHERE deptno = v_deptno;
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('부서번호    부 서 명       위    치');
+	DBMS_OUTPUT.PUT_LINE('--------  -------------  ------------');
+
+	--커서 OPEN시 커서 내부의 SELECT문장이 실행된다. 이때 매개변수를 전달한다.
+	OPEN dept_cursor(10);
+	FETCH dept_cursor INTO dept_record;
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.deptno,2) || '        '
+						  || RPAD(dept_record.dname,15)
+						  || RPAD(dept_record.loc,12));
+	CLOSE dept_cursor;
+
+
+	OPEN dept_cursor(20);
+	FETCH dept_cursor INTO dept_record;
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.deptno,2) || '        '
+						  || RPAD(dept_record.dname,15)
+						  || RPAD(dept_record.loc,12));
+	CLOSE dept_cursor;
+
+END;
+/
+SET SERVEROUTPUT OFF
+```
+
+```sql
+DECLARE
+	--커서변수 선언
+	CURSOR dept_cursor (v_deptno NUMBER) IS
+		SELECT *
+			FROM dept
+			WHERE deptno = v_deptno;
+BEGIN
+	DBMS_OUTPUT.PUT_LINE('부서번호    부 서 명       위    치');
+	DBMS_OUTPUT.PUT_LINE('--------  -------------  ------------');
+
+	--FOR반복구문에서 커서를 사용하면
+  --자동적으로 커서가 OPEN되고 FETCH수행하고 반복끝나면 커서CLOSE.
+	FOR dept_record IN dept_cursor(10) LOOP
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.deptno,2) || '        '
+						  || RPAD(dept_record.dname,15)
+						  || RPAD(dept_record.loc,12));
+	END LOOP;
+
+	FOR dept_record IN dept_cursor(20) LOOP
+		DBMS_OUTPUT.PUT_LINE(LPAD(dept_record.deptno,2) || '        '
+			   			  || RPAD(dept_record.dname,15)
+						  || RPAD(dept_record.loc,12));
+	END LOOP;
+END;
+/
+SET SERVEROUTPUT OFF
+```
+
++ 
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
+#### 3. 예외처리(EXCEPTION)
+#### 4. 저장 (PROCEDURE / FUNCTION)
+#### 5. 실습
+#### 6. Summary / Close
 
 
 
