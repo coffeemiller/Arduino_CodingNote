@@ -5449,28 +5449,232 @@ SQL> EXECUTE emp_sal_update(7788,3500)
 PL/SQL procedure successfully completed.
 ```
 
++ PROCEDURE 생성
+```sql
+CREATE  [OR  REPLACE]  PROCEDURE  procedure_name
+	[(argument1  [mode1]  datatype [{:= | DEFAULT} expression]
+ 	[,argument2  [mode2]  datatype [{:= | DEFAULT} expression], . . .])]
+{IS | AS}
+  변수생성
+BEGIN
+	pl/sql_block;
+END;
+```
 
 ```sql
+SQL> CREATE SEQUENCE empno_sequence START WITH 8000 INCREMENT BY 1;
+Sequence created.
+
+--문제1) EMP 테이블에 새로운 사원의 정보를 이름,업무,매니저,급여를 입력받아 등록하는
+--프로시저를 생성하여라. 단 부서 번호는 매니저의 부서 번호와 동일하게 하고
+--보너스는 SALESMAN은 0을 그 외는 NULL을 입력하여라.
+
+-- emp_input('홍길동','CLERK',7698,1000) 30부서
+CREATE OR REPLACE PROCEDURE emp_input(
+	v_name	IN 	emp.ename %TYPE,
+	v_job	IN 	emp.job %TYPE,
+	v_mgr	IN 	emp.mgr %TYPE,
+	v_sal	IN 	emp.sal %TYPE)
+IS
+	--변수선언
+	v_comm		emp.comm%TYPE;
+	v_deptno		emp.deptno%TYPE;
+	--예외변수 선언
+	manager_error	EXCEPTION;
+
+BEGIN
+	--전달된 값으로 업무의 유효성검사와 수당을 결정
+	IF UPPER(v_job) NOT IN ('PRESIDENT','MANAGER','ANALYST',
+				'SALESMAN','CLERK') THEN
+		RAISE manager_error;
+	ELSIF UPPER(v_job) = 'SALESMAN' THEN
+		v_comm := 0;
+	ELSE
+		v_comm := NULL;
+	END IF;
+
+	--전달된 직송상사번호로 부서번호를 결정
+	SELECT deptno
+		INTO v_deptno
+		FROM emp
+		WHERE empno = v_mgr;
+
+	--데이터 저장
+	INSERT INTO emp
+		VALUES (empno_sequence.NEXTVAL,v_name,UPPER(v_job),
+			v_mgr,SYSDATE,v_sal,v_comm,v_deptno);
+EXCEPTION
+	WHEN manager_error THEN
+		DBMS_OUTPUT.PUT_LINE('담당 업무가 잘못 입력되었습니다.');
+	WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE('입력한 MANAGER는 없습니다.');
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');
+END;
+/
+
+Procedure created.
+//////////////////////
+--프로시저 실행
+SQL> SET SERVEROUTPUT ON
+SQL> EXECUTE emp_input('홍길동','CLERK',7698,1000)
+PL/SQL procedure successfully completed.
+
+SQL> EXECUTE emp_input('장길산','OPERATION',7788,2000)
+담당 업무가 잘못 입력되었습니다.
+PL/SQL procedure successfully completed.
+```
+
++ 출력용(OUT) 매개변수 사용법
+```sql
+CREATE OR REPLACE PROCEDURE dname_sal_disp(
+	v_ename	IN 	emp.ename%TYPE,
+	v_dname	OUT 	dept.dname%TYPE,
+	v_sal	OUT 	emp.sal%TYPE)
+IS
+	v_deptno	emp.deptno%TYPE;
+BEGIN
+	SELECT sal,deptno
+		INTO v_sal,v_deptno
+		FROM emp
+		WHERE ename = UPPER(v_ename);
+	SELECT dname
+		INTO v_dname
+		FROM dept
+		WHERE deptno = v_deptno;
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE('입력한 MANAGER는 없습니다.');
+	WHEN TOO_MANY_ROWS THEN
+		DBMS_OUTPUT.PUT_LINE('자료가 2건 이상입니다.');
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');
+END;
+/
+////////////////////////////////
+SQL> VAR g_dname VARCHAR2(14)
+SQL> VAR g_sal NUMBER
+
+-- 프로시저 호출
+SQL> EXECUTE dname_sal_disp('SCOTT',:g_dname,:g_sal)
+SQL> PRINT g_dname
+G_DNAME
+---------------
+RESEARCH
+
+SQL> PRINT g_sal
+ G_SAL
+--------
+  3000
+```
+
+```sql
+--문제3) 숫자로만이루어진 전화번호의 중간에 –을 삽입하는 프로시저를 만드시오
+--72429424  --> 7242-9424를 만들어 준다.
+
+CREATE OR REPLACE PROCEDURE tel(
+	v_tel	IN OUT	VARCHAR2)
+IS
+BEGIN
+	v_tel := SUBSTR(v_tel,1,4) || '-' || SUBSTR(v_tel,5);
+	DBMS_OUTPUT.PUT_LINE('전화번호 : ' || v_tel);
+END tel;
+/
+///////////////////////////////////////////////
+SQL> VAR g_tel VARCHAR2(20)
+--host변수 g_tel에 값을 저장하기 위해 PL/SQL블럭을 작동시켜야 한다.
+SQL> BEGIN
+  2  :g_tel := '72429424';
+  3  END;
+  4  /
+
+SQL> SET SERVEROUTPUT ON
+SQL> EXECUTE tel(:g_tel)
+전화번호 : 7242-9424
+PL/SQL procedure successfully completed.
+
+SQL> PRINT g_tel
+G_TEL
+-------------------------
+7242-9424
+```
+
++ 프로시저 생성/호출
+```
+CREATE OR REPLACE PROCEDURE 프로시저명(
+    매개변수명 mode 자료형, ...)
+IS
+  지역변수 선언 및 초기화
+BEGIN
+  매개변수와 지역변수를 사용하여 SQL문장 작성
+  ...
+END 프로시저명;
+/
+
+--호출
+EXECUTE 프로시저명(매개변수,...)
 ```
 
 
++ 함수 생성/호출
+```
+CREATE OR REPLACE FUNCTION 함수명(
+    매개변수명 mode 자료형, ...)
+RETURN 자료형
+IS
+  지역변수 선언 및 초기화
+BEGIN
+  매개변수와 지역변수를 사용하여 SQL문장 작성
+  ...
+  끝날때 RETURN값;
+END 함수명;
+/
 
-```sql
+--호출
+EXECUTE host변수 := 함수명(매개변수,...)
 ```
 
++ 참고) mode : IN 입력용 / OUT 출력용 / IN OUT 입,출력용
 
 
 ```sql
-```
+--문제4) EMP 테이블에서 이름으로 부서 번호를 검색하는 함수를 작성하여라.
 
+CREATE OR REPLACE FUNCTION ename_deptno(
+	v_ename	IN 	emp.ename%TYPE)
+RETURN NUMBER
+IS
+	v_deptno	emp.deptno%TYPE;
 
+BEGIN
+	SELECT deptno
+		INTO v_deptno
+		FROM emp
+		WHERE ename = UPPER(v_ename);
 
-```sql
-```
+	DBMS_OUTPUT.PUT_LINE('부서번호 : ' || TO_CHAR(v_deptno));
+	RETURN v_deptno;
 
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE('입력한 MANAGER는 없습니다.');
+	WHEN TOO_MANY_ROWS THEN
+		DBMS_OUTPUT.PUT_LINE('자료가 2건 이상입니다.');
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');
+END;
+/
+----------------------------------------
+--함수를 호출하면 리턴값이 있으므로 그값을 저장할 host변수를 생성
+SQL> VAR g_deptno NUMBER
+SQL> EXECUTE :g_deptno := ename_deptno('SCOTT')
+부서번호 : 20
+PL/SQL procedure successfully completed.
 
-
-```sql
+SQL> PRINT g_deptno
+G_DEPTNO
+---------
+      20
 ```
 
 
