@@ -5153,14 +5153,213 @@ EXCEPTION
 END;
 ```
 
++ java에서의 예외처리
+  - 1) 시스템에게 맡긴다.
+```java
+main() throws Exception{
+  ...
+  실행중 예외가 발생;
+  ...
+}
+```
+  - 2) 직접 예외트랩을 설치하여 처리
+```java
+void method() {
+  ...
+  try{
+    예외발생 가능코드
+  }catch(예외클래스 예외객체){
+    예외처리
+  }
+}
+```
+  - 자바시스템에서 발생가능한 모든 예외종류를 클래스로 만들어서 제공해주고 있다.
+```
+Object
+  Throwable
+    Exception
+      ... 다양한 종류의 예외클래스
+      RuntimeException
+        ...하위예외클래스
+```
+
++ PL/SQL에서 예외처리
+  - 1)오라클에서는 미리 모든 에러에 대하여 정의해 놓았다.
+    - 이중에서 자주발생하는 에러에 대하여 EXCEPTION절에서 사용할수 있도록 명칭을 정해놓은 것을 [미리 정의된 오라클 서버에러]라고 한다.
+    - 명칭을 정해놓지 않은 에러코드를 [정의되지 않은 오라클 서버에러]
+
+  - 2) 미리정의된 오라클 서버에러처리방법
+    - EXCEPTION절을 작성해 놓으면 미리정의된 오라클 서버에러는 자동으로 EXCEPTION절로 점프하므로 이곳에서 미리정의된 명칭을 사용하여 에러치리를 한다.
+```sql
+WHEN 에러명칭 THEN
+  처리내용
+```
+
+  - 3) 미리정의되지 않은 오라클 서버에러 처리 방법
+    - 에러변수 선언
+```sql
+my_error EXCEPTION;
+```
+    - 에러변수와 표준에러코드를 연동시켜 에러가 발생하면 점프하도록 설정
+```sql
+PRAGMA EXCEPTION_INIT(my_error, 표준에러코드);
+```
+
+    - 제약조건의 추가는 테이블레벨 형식으로 추가할수 있다.
+```sql
+EXCEPTION
+  WHEN 알려진 에러명칭 THEN
+    처리내용
+  ...
+  WHEN my_error THEN
+    처리내용
+```
+```sql
+SQL> ALTER TABLE emp ADD CONSTRAINT emp_mgr_fk FOREIGN KEY(mgr) REFERENCES emp(empno);
+Table altered.
+
+SQL> INSERT INTO emp(empno,ename,job,mgr,sal,deptno) VALUES(8000,'JICA','CLERK',8001,1000,10);
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (SCOTT.EMP_MGR_FK) violated - parent key not found
+
+//////////////////////////////////////////////////////////
+
+--문제2) 삭제하고자 하는 사원의 이름을 입력하여 자료를 삭제하여라.
+--EXCEPTION절을 이용하여 각종 에러를 처리하여라.
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+
+ACCEPT  p_ename PROMPT '삭제하고자 하는 사원의 이름을 입력하시오 : '
+
+DECLARE
+	v_ename		emp.ename%TYPE := '&p_ename';
+	v_empno		emp.empno%TYPE;
+	--예외변수(미리정의되지 않은 오라클서버에러를 처리하기위해 선언)
+	emp_constraint	EXCEPTION;
+	PRAGMA  EXCEPTION_INIT (emp_constraint, -2292);
+
+BEGIN
+	SELECT empno
+		INTO v_empno
+		FROM emp
+		WHERE ename = UPPER(v_ename);
+	--데이터 삭제시 주의요함
+	DELETE emp
+		WHERE empno = v_empno;
+
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+	    DBMS_OUTPUT.PUT_LINE('&p_ename' || '는 자료가 없습니다.');
+	WHEN TOO_MANY_ROWS THEN
+	    DBMS_OUTPUT.PUT_LINE('&p_ename' || '는 자료가 여러개 있습니다.');
+	WHEN emp_constraint THEN
+	    DBMS_OUTPUT.PUT_LINE('&p_ename' || '는 삭제할 수 없습니다.');
+	WHEN OTHERS THEN
+	    DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
+
+  - 4) 사용자가 예외를 발생시키는 방법
+    - 에러변수 선언
+```sql
+user_error EXCEPTION;
+```
+    - BEGIN절 내부에서 에러를 발생시키고 싶을때    
+```sql
+RAISE user_error;
+//////////////////////////////////
+--문제3) 조회하고자 하는 부서번호를 입력받아 사원번호,이름,담당업무,급여를
+--출력하여라. 단 가능한 모든 에러를 EXCEPTION에서 처리한다.
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+
+ACCEPT  p_deptno  PROMPT '조회하고자 하는 부서번호를 입력하시오 : '
+
+DECLARE
+
+	v_deptno	 emp.deptno%TYPE := &p_deptno;
+
+	--커서변수
+	CURSOR emp_cursor IS
+		SELECT empno,ename,job,sal
+			FROM emp
+			WHERE deptno = v_deptno;
+	--사용자정의 예외변수
+	emp_deptno_ck	EXCEPTION;
+
+BEGIN
+	IF v_deptno NOT IN (10,20,30) THEN
+		--사용자가 예외를 발생시킴
+		RAISE emp_deptno_ck;
+	ELSE
+		DBMS_OUTPUT.PUT_LINE('사번   이  름   담당업무     급   여');
+		DBMS_OUTPUT.PUT_LINE('---- ---------- --------- ------------');
+
+		FOR emp_record IN emp_cursor LOOP
+		    DBMS_OUTPUT.PUT_LINE(RPAD(emp_record.empno,4) || ' ' ||
+		       RPAD(emp_record.ename,11) || RPAD(emp_record.job,10) ||
+		           RPAD(TO_CHAR(emp_record.sal,'$999,990.00'),12));
+		END LOOP;
+	END IF;
+
+EXCEPTION
+	WHEN emp_deptno_ck THEN
+		DBMS_OUTPUT.PUT_LINE(&p_deptno || '는 자료가 없습니다.');
+	WHEN OTHERS THEN
+		DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
+
++ 참고) 예외코드와 예외메세지를 알고싶다면 다음을 사용할수 있다.
+```sql
+--문제4) 삭제하고자 하는 사원의 이름을 입력하여 삭제하여라.단 가능한 모든 에러를 처리하여라.
+
+SET VERIFY OFF
+SET SERVEROUTPUT ON
+
+ACCEPT  p_ename PROMPT '삭제하고자 하는 사원의 이름을 입력하시오 : '
+
+DECLARE
+	v_ename		emp.ename%TYPE := '&p_ename';
+	v_empno		emp.empno%TYPE;
+	v_err_code	NUMBER;
+	v_err_msg	VARCHAR2(255);
+
+BEGIN
+	SELECT empno
+		INTO v_empno
+		FROM emp
+		WHERE ename = UPPER(v_ename);
+	DELETE emp
+		WHERE empno = v_empno;
+
+EXCEPTION
+	WHEN OTHERS THEN
+		ROLLBACK;
+		v_err_code := SQLCODE;
+		v_err_msg := SQLERRM;
+		DBMS_OUTPUT.PUT_LINE('에러 번호 : ' || TO_CHAR(v_err_code));
+		DBMS_OUTPUT.PUT_LINE('에러 내용 : ' || v_err_msg);
+END;
+/
+SET VERIFY ON
+SET SERVEROUTPUT OFF
+```
+
 + WHEN OTHERS 예외 처리기
 
-```sql
-```
 
 
-```sql
-```
+
 
 
 ```sql
