@@ -5751,9 +5751,143 @@ G_DNAME
 RESEARCH
 ```
 
-
-
++ 패키지(PACKAGE)
 ```sql
+CREATE OR REPLACE PACKAGE research
+IS
+   PROCEDURE inputdata(
+      jimun IN VARCHAR2,
+      sdate IN VARCHAR2,
+      edate IN VARCHAR2,
+      sdata IN VARCHAR2  -- '콜라$사이다$오렌지$이온음료'
+   );
+
+   PROCEDURE  vote(
+      renum1  NUMBER,
+      ranum2  NUMBER,
+      reip    VARCHAR2
+   );
+
+   FUNCTION getCnt( num number ) RETURN NUMBER;
+
+   PROCEDURE sresult( num number );
+END research;
+/
+
+CREATE OR REPLACE PACKAGE BODY research
+IS
+   PROCEDURE inputdata(
+       jimun IN VARCHAR2,
+       sdate IN VARCHAR2,
+       edate IN VARCHAR2,
+       sdata IN VARCHAR2
+   )
+   IS
+      TYPE myarr IS TABLE OF VARCHAR2(50)
+      INDEX BY BINARY_INTEGER;
+
+      arr myarr;
+
+      idx   BINARY_INTEGER;
+      len   INTEGER;
+      temp  VARCHAR2(50);
+
+      pos    INTEGER;
+      isize  INTEGER;
+      target INTEGER;
+   BEGIN
+      INSERT INTO researchT  VALUES(rt_seq.nextval, jimun, sdate, edate);
+
+      idx := 1;
+      len := LENGTH(sdata);
+      temp := '';
+
+      pos := 1;
+      LOOP
+         target := INSTR(sdata, '$', pos);
+         IF  target = 0 THEN
+            arr(idx) := SUBSTR(sdata, pos);
+            EXIT;
+         ELSE
+            isize := target - pos;
+            temp := SUBSTR(sdata, pos, isize);
+            arr(idx) := temp;
+            pos := target + 1;
+            idx := idx + 1;
+         END IF;
+      END LOOP;
+
+      FOR i IN 1..arr.count LOOP
+         INSERT INTO researchA VALUES(ra_seq.NEXTVAL, arr(i), rt_seq.CURRVAL);
+      END LOOP;
+      DBMS_OUTPUT.PUT_LINE('설문이 하나 등록 되었습니다.');
+   END;
+
+   PROCEDURE  vote(
+       renum1  NUMBER,
+       ranum2  NUMBER,
+       reip    VARCHAR2
+   )
+   IS
+   BEGIN
+       -- sysdate 삭제!!!!!
+       -- INSERT INTO resultT VALUES(rs_seq.NEXTVAL, renum1, ranum2, sysdate, reip);
+       INSERT INTO resultT VALUES(rs_seq.NEXTVAL, renum1, ranum2, reip);
+       DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || '건이 등록되었습니다');
+   END;
+
+   FUNCTION getCnt( num number )
+      RETURN NUMBER
+   IS
+      cnt INTEGER;
+   BEGIN
+      -- resultT 테이블에는 renum이 없다. rtnum으로 변경!!!!!
+      -- SELECT COUNT(*) INTO cnt FROM resultT WHERE renum = num;
+      SELECT COUNT(*) INTO cnt FROM resultT WHERE rtnum = num;
+
+      RETURN cnt;
+   END;
+
+   PROCEDURE sresult( num number )
+   IS
+       CURSOR c1 IS SELECT r.ratext rt, rst.*
+                    FROM researchA r, (SELECT ranum, count(*) cnt
+                                       FROM resultT
+				       -- resultT 테이블에는 renum이 없다. rtnum으로 변경!!!!!
+                                       -- WHERE renum = num
+				       WHERE rtnum = num
+                                       GROUP BY ranum
+                                       ORDER BY ranum) rst
+                   WHERE r.rAnum = rst.ranum;
+
+       -- rtText에 들어있는 문자가 59바이트라 59이상 잡아줘야한다.!!!!
+       -- text VARCHAR2(50);
+
+       text VARCHAR2(100);
+       tcnt NUMBER;
+   BEGIN
+       SELECT rtText INTO text
+       FROM researchT WHERE rtnum = num;
+
+       DBMS_OUTPUT.PUT_LINE('설문' || num || '번 ' || text);
+       DBMS_OUTPUT.PUT_LINE('======================');
+       tcnt := getCnt(num);
+       DBMS_OUTPUT.PUT_LINE('총 참여인원 : ' || getCnt(num));
+       DBMS_OUTPUT.PUT_LINE('======================');
+       FOR aa IN c1 LOOP
+          DBMS_OUTPUT.PUT(aa.rt || '       ');
+          DBMS_OUTPUT.PUT(aa.cnt || '     ');
+          DBMS_OUTPUT.PUT_LINE(ROUND((aa.cnt/tcnt) * 100, 1) || '%');
+       END LOOP;
+       DBMS_OUTPUT.PUT_LINE('======================');
+   EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+         DBMS_OUTPUT.PUT_LINE('입력한 설문항목이 없습니다.');
+      WHEN OTHERS THEN
+         DBMS_OUTPUT.PUT_LINE('기타 에러입니다.');    
+   END;
+END research;
+/
 ```
 
 #### 5. 실습
