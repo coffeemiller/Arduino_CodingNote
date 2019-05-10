@@ -496,6 +496,20 @@ public class TcpIpServer4 implements Runnable {
 
 ```
 ##### [1:1 Chat]
+```
+-------------------1대 1 채팅 프로그램 -------------------------------
+client                                    Server
+
+Socket s = new Socket("192.168.20.7",7777);
+           ---------------------------------> Socket s = ss.accept();       
+====================================================================
+Socket::s                                Socket::s
+|---- InputStream <--------------------------OutputStream <----|
+| |-->OuputStream -------------------------->InputStream ----| |
+| |                                                          | |
+| |---Sender쓰레드                          Receiver쓰레드<---| |
+|---> Receiver쓰레드                       Sender쓰레드 --------|
+```
 + TcpIpClient5.java
 ```java
 package com.jica.tcp;
@@ -615,12 +629,21 @@ class Receiver extends Thread {
 
 ##### [Multi Chat]
 ```
+-------------------다 대 대 채팅프로그램 ----------------------------------------
+client                                    Server
+                                         ServerSocket ss = new ServerSocket(8000);
+      A                                  while(true){
+Socket s = new Socket(ip,8000) -------->Socket s = ss.accept();
+                                    |        s로 Thread만든다.
+                                    |        쓰레드 시작
+      B                             |        쓰레드 정보저장
+Socket s = new Socket(ip,8000)------|
+                                    |     }
+      C                             |
+Socket s = new Socket(ip,8000)------|
 ```
-+
 
-+ TcpIpClient.java
-```java
-```
+
 #### 3. TCP/IP
 #### 4. UDP
 #### 5. 실습
