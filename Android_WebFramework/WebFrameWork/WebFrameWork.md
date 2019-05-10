@@ -816,7 +816,6 @@ public class TcpIpMultichatServer {
 		} // run
 	} // ReceiverThread
 } // class
-
 ```
 
 #### 3. 실습
