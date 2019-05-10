@@ -1,8 +1,7 @@
 
-
 ### [2019-05-10]
 
-#### 1. Review
+#### 1. Prolog
 #### 2. Network Programming
 + 3가지 구성요소
   - 1) IP : 컴퓨터를 식별하는 값
@@ -15,6 +14,10 @@
     - TCP
     - UDP
     - HTTP
+
++ 클라이언트(Client) : html, javascript  <- 디자이너 + 프로그래머
++ 서버(Server) : php, Servlet, Jsp  <- 프로그래머
+
 
 #### 3. TCP/IP
 #### 4. UDP
