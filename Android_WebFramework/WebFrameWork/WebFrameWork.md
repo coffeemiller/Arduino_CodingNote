@@ -643,11 +643,184 @@ Socket s = new Socket(ip,8000)------|
 Socket s = new Socket(ip,8000)------|
 ```
 
++ TcpIpMultichatClient.java
+```java
+package com.jica.tcpchat;
 
-#### 3. TCP/IP
-#### 4. UDP
-#### 5. 실습
-#### 6. Summary / Close
+import java.net.*;
+import java.io.*;
+import java.util.Scanner;
+
+public class TcpIpMultichatClient {
+	public static void main(String args[]) {
+
+		try {
+      // 채팅서버에 접속
+  		String serverIp = "192.168.20.27";  //강사컴
+      //String serverIp = "127.0.0.1";
+      // 소켓을 생성하여 연결을 요청한다.
+			Socket socket = new Socket(serverIp, 8888);
+
+			System.out.println("서버에 연결되었습니다.");
+			Thread sender   = new Thread(new ClientSender(socket, "강사"));
+			Thread receiver = new Thread(new ClientReceiver(socket));
+
+			sender.start();
+			receiver.start();
+		} catch(ConnectException ce) {
+			ce.printStackTrace();
+		} catch(Exception e) {}
+	} // main
+
+	static class ClientSender extends Thread {
+		Socket socket;
+		DataOutputStream out;
+		String name;
+
+		ClientSender(Socket socket, String name) {
+			this.socket = socket;
+			try {
+				out = new DataOutputStream(socket.getOutputStream());
+				this.name = name;
+			} catch(Exception e) {}
+		}
+
+		public void run() {
+			Scanner scanner = new Scanner(System.in);
+			try {
+				if(out!=null) {
+					out.writeUTF(name); // 최초 접속시 접속자 명을 전송한다.
+				}
+
+				while(out!=null) {
+					out.writeUTF("["+name+"]"+scanner.nextLine());					}
+			} catch(IOException e) {}
+		} // run()
+	} // ClientSender
+
+	static class ClientReceiver extends Thread {
+		Socket socket;
+		DataInputStream in;
+
+		ClientReceiver(Socket socket) {
+			this.socket = socket;
+			try {
+				in = new DataInputStream(socket.getInputStream());
+			} catch(IOException e) {}
+		}
+
+		public void run() {
+			while(in!=null) {
+				try {
+					System.out.println(in.readUTF());
+				} catch(IOException e) {}
+			}
+		} // run
+	} // ClientReceiver
+} // class
+
+```
+
++ TcpIpMultichatServer.java
+```java
+package com.jica.tcpchat;
+
+import java.net.*;
+import java.io.*;
+import java.util.*;
+
+public class TcpIpMultichatServer {
+	//현재 접속된 클라이언트의 정보 (OutputStream 저장)
+	HashMap clients;
+
+	TcpIpMultichatServer() {
+		clients = new HashMap();
+		//동기화 코드
+		Collections.synchronizedMap(clients);
+	}
+
+	public void start() {
+		ServerSocket serverSocket = null;
+		Socket socket = null;
+
+		try {
+			serverSocket = new ServerSocket(8888);
+			System.out.println("서버가 시작되었습니다.");
+
+			while(true) {
+				socket = serverSocket.accept();
+				System.out.println("["+socket.getInetAddress()+":"+socket.getPort()+"]"+"에서 접속하였습니다.");
+
+				//접속자가 서버로 전송하는 데이타를 읽는 수신 쓰레드를 만든다.
+				ServerReceiver thread = new ServerReceiver(socket);
+				thread.start();
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	//                        Socket을가진 쓰레드
+	//                      |-->[[홍길동,out],[장길산,out],[임꺽정,out]]  
+  //              clients |
+	//tms 0x100 ---------[0x200]
+	void sendToAll(String msg) {
+		Iterator it = clients.keySet().iterator();
+
+		while(it.hasNext()) {
+			try {
+				DataOutputStream out = (DataOutputStream)clients.get(it.next());
+				out.writeUTF(msg);
+			} catch(IOException e){}
+		} // while
+	} // sendToAll
+
+	public static void main(String args[]) {
+		//	new TcpIpMultichatServer().start();
+		TcpIpMultichatServer tms = new TcpIpMultichatServer();
+		tms.start();
+	}
+
+	class ServerReceiver extends Thread {
+		Socket socket;
+		DataInputStream in;
+		DataOutputStream out;
+
+		ServerReceiver(Socket socket) {
+			this.socket = socket;
+			try {
+				in  = new DataInputStream(socket.getInputStream());
+				out = new DataOutputStream(socket.getOutputStream());
+			} catch(IOException e) {}
+		}
+
+		public void run() {
+			String name = "";
+			try {
+				name = in.readUTF();
+				sendToAll("#"+name+"님이 들어오셨습니다.");
+
+				clients.put(name, out);
+				System.out.println("현재 서버접속자 수는 "+ clients.size()+"입니다.");
+
+				while(in!=null) {
+					sendToAll(in.readUTF());
+				}
+			} catch(IOException e) {
+				// ignore
+			} finally {
+				sendToAll("#"+name+"님이 나가셨습니다.");
+				clients.remove(name);
+				System.out.println("["+socket.getInetAddress() +":"+socket.getPort()+"]"+"에서 접속을 종료하였습니다.");
+				System.out.println("현재 서버접속자 수는 "+ clients.size()+"입니다.");
+			} // try
+		} // run
+	} // ReceiverThread
+} // class
+
+```
+
+#### 3. 실습
+#### 4. Summary / Close
 
 
 -----------------------------------------------------------
@@ -655,7 +828,8 @@ Socket s = new Socket(ip,8000)------|
 ### [2019-05-13]
 
 #### 1. Review
-
+#### 3. TCP/IP
+#### 4. UDP
 #### 4. 실습
 #### 5. Summary / Close
 
