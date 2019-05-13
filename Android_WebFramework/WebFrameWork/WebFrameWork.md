@@ -901,10 +901,24 @@ cmd mode에서 실행        웹서버(Tomcat)
 ```
 일반 Logic은 Java프로그램으로 작성하고 프로그램 실행결과를 html 태그로 작성한다.
 ```
-  - Eclipse EE 내부에서의 Project구조와 실제 Tomcat웹서버에서 인식하는 Project구조는 다른다.
+  - Eclipse EE 내부에서의 Project구조와 탐색기의 구조, 실제 Tomcat웹서버에서 인식하는 Project구조는 다른다.
+```
+html/WEB-INF/web.xml  <== 현재 Web Application의 모든 구성요소
+            /classes/패키지단위의 컴파일된 서블릿코드(*.class)
+            /lib/서블릿에서 사용하는 외부라이브러리파일(*.jar)
+    /html파일, 기타 다양한 resource(*.gif, *.wav, *.jpg,...)
+    jsp파일
 ```
 
-```
+  - 서블릿의 구성 => Java코드가 중심이고 + html코드는 결과를 만들어내기위한 보조벅인 작업
+
+  - 서블릿 객체는 클라이언트의 최초 요청시 Tomcat웹서버에 의해 생성되고, 이후부터의 요청은 쓰레드 처리에 의해 doGet()/doPost()의 메서드가 실행되어 그 결과값이 응답된다.
+
+  - 서블릿 호출시는 http://localhost:8088/html/HundredServlet
+
+
+
+  - JSP(Java Server Page) ==> HTML태그가 중심이고 + 필요할때 Java코드를 호출하여 사용.
 
 #### 3. 개발환경설치(웹서버)
 #### 4. HTML과 Servlet/JSP
