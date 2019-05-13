@@ -827,10 +827,45 @@ public class TcpIpMultichatServer {
 ### [2019-05-13]
 
 #### 1. Review
-#### 3. TCP/IP
-#### 4. UDP
-#### 4. 실습
-#### 5. Summary / Close
++ Java ---> Network(IP,Port,Protocol)
+  - Protocol(TCP:전화, UDP:편지, HTTP:)
+  - Socket Program(TCP,UDP)
+  - Web Program(HTTP)
+
++ Oracle
++ Web Program
+  - 인터넷(www)
+  - 정보제공자(웹서버) - Tomcat, Begin,...
+
+#### 2. Web Program
+##### 웹 프로그램 개발환경 설정
++ 0. 교재에서의 웹환경
+```
+cmd mode에서 실행        웹서버(Tomcat)
+웹브라우저               웹어플리케이션(직접작성)
+         ---request--->    html, *.java, *jsp
+         <--response----
+```
+
++ 1. 우리의 실습 웹환경
+```
+cmd mode에서 실행        웹서버(Tomcat)
+웹브라우저               웹어플리케이션(직접작성)
+         ---request--->    프로젝트 단위 -- html, *.java, *jsp
+         <--response----
+```
+  - 0) Jdk 설치
+  - 1) Eclipse EE 설치
+  - 2) Tomcat설치  -- 주의)http/1.1 port 8088로 변경했음.
+    - 실행방법(우측하단 트레이, cmd mode에서 직접실행)
+    - 우리가 사용할 방법(Eclipse EE 내부에 Tomcat서버를 복사하여 내부에서 실행)
+    
+
+#### 3. 개발환경설치(웹서버)
+#### 4. HTML과 Servlet/JSP
+#### 5. HTML태그
+#### 6. 실습
+#### 7. Summary / Close
 
 
 
