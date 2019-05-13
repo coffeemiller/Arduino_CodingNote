@@ -872,7 +872,15 @@ cmd mode에서 실행        웹서버(Tomcat)
       + 위 설정내용을 교제 cmd mode에서 웹어플리케이션을 사용할때 반드시 설정해야 한다. 우리 Eclipse EE 내부에서 톰킷을 사용하므로 설정하지 않아도 무방하다.
 
   - 3) Eclipse EE내부에서 웹서버로 Tomcat85를 연동시키자.	 - 서버 생성
+    + 이클립스 화면구성 - 좌측(window - show view - general - Project Explorer)
 
+
++ 웹어플리케이션의 구조(이클립스 내부에서 보여지는 구조)
+  - Eclipse EE에서의 프로젝트 구조(File/New/Dynamic Web Project, "html")
+  - html <== 웹어플리케이션 명칭
+  - html\Java Resources\src\패키지단위의 Servlet코드(`*.java`)
+  - html\build\패키지단위로 컴파일된 Servlet코드(`*.class`)
+  - html\WebContent\html문서(`*.html`), javaScript코드(`*.js`), JSP코드(`*.jsp`), 기타 다양한 resource(`*.gif, *.jpg, *.avi`)... 필요하다면 하위폴더를 만들어서 저장.
 
 
 #### 3. 개발환경설치(웹서버)
