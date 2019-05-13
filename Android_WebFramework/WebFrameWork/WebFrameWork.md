@@ -859,7 +859,21 @@ cmd mode에서 실행        웹서버(Tomcat)
   - 2) Tomcat설치  -- 주의)http/1.1 port 8088로 변경했음.
     - 실행방법(우측하단 트레이, cmd mode에서 직접실행)
     - 우리가 사용할 방법(Eclipse EE 내부에 Tomcat서버를 복사하여 내부에서 실행)
-    
+
+    - 환경변수 설정을 권장
+      + (1) PATH -- cmd모드의 어느곳에서든 Tomcat8이라고 입력하면 Tomcat이 기동되도록
+        - ```C:\tomcat85\bin```
+      + (2) CLASS PATH 추가 -- JAVA프로그램 컴파일시 기본 라이브러리뿐만아니라 추가 라이브러리를 자동인식할수 있도록 설정(Java프로그램==>Servlet, JSP)
+        - ```C:\tomcat85\lib\servlet-api.jar```
+      + (3) TOMCAT_HOME 설정
+        - ```C:\tomcat85```
+      + (4) CATALINA_HOME 설정
+        - ```C:\tomcat85```
+      + 위 설정내용을 교제 cmd mode에서 웹어플리케이션을 사용할때 반드시 설정해야 한다. 우리 Eclipse EE 내부에서 톰킷을 사용하므로 설정하지 않아도 무방하다.
+
+  - 3) Eclipse EE내부에서 웹서버로 Tomcat85를 연동시키자.	 - 서버 생성
+
+
 
 #### 3. 개발환경설치(웹서버)
 #### 4. HTML과 Servlet/JSP
