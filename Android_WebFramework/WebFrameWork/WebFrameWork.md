@@ -837,7 +837,7 @@ public class TcpIpMultichatServer {
   - 인터넷(www)
   - 정보제공자(웹서버) - Tomcat, Begin,...
 
-#### 2. Web Program
+#### 2. Web Program / 개발환경설치(웹서버)
 ##### 웹 프로그램 개발환경 설정
 + 0. 교재에서의 웹환경
 ```
@@ -881,6 +881,12 @@ cmd mode에서 실행        웹서버(Tomcat)
   - html\Java Resources\src\패키지단위의 Servlet코드(`*.java`)
   - html\build\패키지단위로 컴파일된 Servlet코드(`*.class`)
   - html\WebContent\html문서(`*.html`), javaScript코드(`*.js`), JSP코드(`*.jsp`), 기타 다양한 resource(`*.gif, *.jpg, *.avi`)... 필요하다면 하위폴더를 만들어서 저장.
+    - 실행시에는 Servlet으로 작동
+
+
+
+
+#### 3. HTML과 Servlet/JSP
 
 + 실습으로... 가장 기본적인 html문서를 작성해보자.
   - WebContent\jica.html
@@ -914,17 +920,28 @@ html/WEB-INF/web.xml  <== 현재 Web Application의 모든 구성요소
 
   - 서블릿 객체는 클라이언트의 최초 요청시 Tomcat웹서버에 의해 생성되고, 이후부터의 요청은 쓰레드 처리에 의해 doGet()/doPost()의 메서드가 실행되어 그 결과값이 응답된다.
 
+  - html 호출시는 http://localhost:8088/html/jica.html
   - 서블릿 호출시는 http://localhost:8088/html/HundredServlet
-
+  - jsp 호출시는 http://localhost:8088/html/Hundred.jsp
 
 
   - JSP(Java Server Page) ==> HTML태그가 중심이고 + 필요할때 Java코드를 호출하여 사용.
+  - jsp(Hundred.jsp)코드도 실행될때는 웹서버에 의한 Servlet(Hundred_jsp.java --> Hundred_jsp.class)으로 변환되고 변환된 JSP에서는 다음의 구성요소를 자유롭게 사용한다.
+    - 1) html 태그
+    - 2) jsp 태그 및 추가 라이브러리
+    - 3) java코드를 호출하여 사용
+    - 4) EL 및 JSTL등의 외부라이브러리
 
-#### 3. 개발환경설치(웹서버)
-#### 4. HTML과 Servlet/JSP
-#### 5. HTML태그
-#### 6. 실습
-#### 7. Summary / Close
+
+
+##### [오늘의 과제]
++ 1) 실습내용 이해
++ 2) 수업참고자료 "서블릿_JSP개요.ppt" 읽어볼것
++ 3) 교재1장 읽어볼것
+
+
+#### 4. 실습
+#### 5. Summary / Close
 
 
 
@@ -933,7 +950,7 @@ html/WEB-INF/web.xml  <== 현재 Web Application의 모든 구성요소
 ### [2019-05-14]
 
 #### 1. Review
-
+#### 4. HTML태그
 #### 4. 실습
 #### 5. Summary / Close
 
