@@ -1108,14 +1108,19 @@ Network - Socket(TCP,UDP)
 
 
 + 상대경로
+```
   - 현재경로에 같은 파일(이미지) : `*.jpg`
+```
+
 + 절대경로
+```
   - ./ : 현재경로
   - ../ : 부모경로
-
+```
 
 
 + 글자태그
+```
   - <h1> ~ </h>
   - <font color="rgb값이 색상문자열"> 글자 </font>
   - argb : Alpha(투명도:0~255, 0 완전투명, 255 완전불투명)
@@ -1124,7 +1129,7 @@ Network - Socket(TCP,UDP)
   - <i>
   - <sup>
   - <sub>
-
+```
 
 
 + third.html
@@ -1317,6 +1322,13 @@ Network - Socket(TCP,UDP)
  </body>
 </html>
 ```
+
+
++ image.html
+```html
+```
+
+
 
 #### 5. 테이블 태그
 #### 6. FORM 태그
