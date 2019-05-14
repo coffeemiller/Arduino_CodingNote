@@ -950,6 +950,31 @@ html/WEB-INF/web.xml  <== 현재 Web Application의 모든 구성요소
 ### [2019-05-14]
 
 #### 1. Review
+```
+Network - Socket(TCP,UDP)
+        - Web Program(HTTP)
+```
++ client(사용자)
+  1) HTML문서를 해석/표현
+  2) 사용자에반응 -> 자체(javaScript)
+  3) 서버에 요청
+
++ server(정보제공자)
+  1) 웹사이트 - 웹어플리케이션
+  2) html, jpg, JSP, PHP...
+
+
++ 개발환경설치
+  1. Eclipse EE - 웹 어플리케이션
+  2. 웹서버에서 동작 - Tomcat8.5
+
+```
+웹어플리케이션명 /html문서, 기타 resource
+                /WZB-inf/web.xml
+                /classes/패키지단위
+                /lib/*.jar
+```
+
 #### 2. HTML태그
 #### 3. 기본태그
 #### 4. Link iamge 태그
