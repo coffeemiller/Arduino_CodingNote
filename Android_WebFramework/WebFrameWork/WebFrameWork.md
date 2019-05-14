@@ -1402,22 +1402,378 @@ Network - Socket(TCP,UDP)
 
 
 #### 5. 테이블 태그
++ CELLPADDING 하나의 셀 내용값이 경계와의 거리(위,왼쪽,오른쪽,아래)
++ CELLSPACING 셀과 셀끼리의 간격
 
 + [table1.html](./table1.html)
 ```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+<TITLE> 테이블 만들기 연습 </TITLE>
 
+</HEAD>
+
+<BODY>
+
+<TABLE BORDER = "1" WIDTH = "70%">
+	<TR><TH>제목1</TH><TH>제목2</TH></TR>
+	<TR><TD></TD><TD>셀2</TD></TR>
+	<TR><TD>&nbsp;</TD><TD>셀4</TD></TR>
+</TABLE>
+<BR>
+
+BORDER: 테두리의 두께
+<TABLE WIDTH = "300" BORDER="4" ALIGN = "CENTER">
+<CAPTION>테이블의 구성 </CAPTION>
+<TR>
+	<TH>제목1</TH><TH>제목2</TH><TH>제목3</TH>
+</TR>
+<TR ALIGN = "CENTER">
+	<TD>1번</TD><TD>2번</TD><TD>3번</TD>
+</TR>
+<TR>
+	<TD>4번</TD><TD>5번</TD><TD>6번</TD>
+</TR>
+</TABLE>
+<BR>
+
+<P>&LT;TABLE <FONT COLOR=BLUE><B>BORDER=10</B></FONT> CELLPADDING=0 CELLSPACING=0 BGCOLOR=FFBBBB WIDTH=80%&GT;</P>
+<TABLE BORDER=10 CELLPADDING=0 CELLSPACING=0 BGCOLOR=FFBBBB WIDTH=80%>
+<TR BGCOLOR=FFFF00>
+	<TD>1번 줄 - 1번 칸</TD>
+	<TD>1번 줄 - 2번 칸</TD>
+	<TD>1번 줄 - 3번 칸</TD>
+</TR>
+<TR BGCOLOR=FF0000>
+	<TD>2번 줄 - 1번 칸</TD>
+	<TD>2번 줄 - 2번 칸</TD>
+	<TD>2번 줄 - 3번 칸</TD>
+</TR>
+<TR>
+	<TD>3번 줄 - 1번 칸</TD>
+	<TD>3번 줄 - 2번 칸</TD>
+	<TD>3번 줄 - 3번 칸</TD>
+</TR>
+<TR>
+	<TD>4번 줄 - 1번 칸</TD>
+	<TD>4번 줄 - 2번 칸</TD>
+	<TD>4번 줄 - 3번 칸</TD>
+</TR>
+</TABLE>
+
+<P><B>BORDER</B>: 테두리의 두께</P><BR>
+
+<P>&LT;TABLE BORDER=1 <FONT COLOR=BLUE><B>CELLPADDING=10</B></FONT> CELLSPACING=0 BGCOLOR=FFBBBB WIDTH=80%&GT;</P>
+<TABLE BORDER=1 CELLPADDING=10 CELLSPACING=0 BGCOLOR=FFBBBB WIDTH=80%>
+<TR BGCOLOR=FFFF00>
+	<TD BGCOLOR=0000FF>1번 줄 - 1번 칸</TD>
+	<TD BGCOLOR=0000FF>1번 줄 - 2번 칸</TD>
+	<TD >1번 줄 - 3번 칸</TD>
+</TR>
+<TR BGCOLOR=FFFF00>
+	<TD>2번 줄 - 1번 칸</TD>
+	<TD>2번 줄 - 2번 칸</TD>
+	<TD>2번 줄 - 3번 칸</TD>
+</TR>
+</TABLE>
+
+<P><B>CELLPADDING</B>: 테두리와 내용(글자)와의 거리
+</P><BR>
+
+<P>&LT;TABLE BORDER=1 CELLPADDING=0 <FONT COLOR=BLUE><B>CELLSPACING=10</B></FONT> BGCOLOR=FFBBBB WIDTH=80%&GT;</P>
+<TABLE BORDER=1 CELLPADDING=0 CELLSPACING=10 BGCOLOR=FFBBBB WIDTH=80%>
+<TR BGCOLOR=FFFF00>
+	<TD>1번 줄 - 1번 칸</TD>
+	<TD>1번 줄 - 2번 칸</TD>
+	<TD>1번 줄 - 3번 칸</TD>
+</TR>
+<TR BGCOLOR=FFFF00>
+	<TD>2번 줄 - 1번 칸</TD>
+	<TD>2번 줄 - 2번 칸</TD>
+	<TD>2번 줄 - 3번 칸</TD>
+</TR>
+</TABLE>
+<P><B>CELLSPACING</B>: 칸과 칸의 공간 거리</P><BR>
+
+<P>&LT;TABLE BORDER=10 <FONT COLOR=BLUE><B>CELLPADDING=10 CELLSPACING=10</B></FONT> BGCOLOR=FFBBBB WIDTH=80%&GT;</P>
+<TABLE BORDER=10 CELLPADDING=10 CELLSPACING=10 BGCOLOR=FFBBBB WIDTH=80%>
+<TR BGCOLOR=FFFF00>
+	<TD>1번 줄 - 1번 칸</TD>
+	<TD>1번 줄 - 2번 칸</TD>
+	<TD>1번 줄 - 3번 칸</TD>
+</TR>
+<TR BGCOLOR=FFFF00>
+	<TD>2번 줄 - 1번 칸</TD>
+	<TD>2번 줄 - 2번 칸</TD>
+	<TD>2번 줄 - 3번 칸</TD>
+</TR>
+</TABLE><BR>
+
+<TABLE CELLPADDING = "20" BGCOLOR ="#FFFFAA" BORDER = "1" BORDERCOLORLIGHT = "#FF2400" BORDERCOLORDARK= "#660033">
+<TR>
+	<TD>1번</TD><TD>2번</TD><TD>3번</TD>
+</TR>
+</TABLE>
+<BR>
+
+<TABLE CELLSPACING = "20" BACKGROUND = "./image/bg.gif" BORDER = "1" BORDERCOLORLIGHT = "#FF2400" BORDERCOLORDARK= "#660033">
+<TR>
+	<TD>1번</TD><TD>2번</TD><TD>3번</TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
 ```
 
 
-+ table2.html
-```html
+```
+필요에 따라 행(줄) <TR>
+           열(칸) <TD> 을 병합할 수 있다.
+```
 
++ [table2.html](table2.html)
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> 테이블 만들기 2 </TITLE>
+</HEAD>
+
+<BODY>
+<TABLE BORDER="1" WIDTH="300">
+    <TR>
+		<TH>제목1</TH>
+		<TH>제목2</TH>
+    </TR>
+    <TR>
+		<TD COLSPAN="2" BGCOLOR="GRAY">COLSPAN="2"</TD>
+    </TR>
+    <TR>
+		<TD ROWSPAN="2" BGCOLOR="GREEN">ROWSPAN="2"</TD>
+		<TD>셀4</TD>
+    </TR>
+    <TR>
+		<TD>셀6</TD>
+    </TR>
+</TABLE>
+
+<P>
+<TABLE BORDER="1" CELLSPACING="10" WIDTH="300">
+    <TR>
+		<TD>셀1</TD>
+		<TD>셀2</TD>
+    </TR>
+    <TR>
+		<TD>셀3</TD>
+		<TD>셀4</TD>
+    </TR>
+</TABLE>
+</P>
+
+<P>
+<TABLE BORDER="1" CELLSPACING="5" CELLPADDING="10" WIDTH="300">
+    <TR>
+		<TD>셀1</TD>
+		<TD>셀2</TD>
+    </TR>
+    <TR>
+		<TD>셀3</TD>
+		<TD>셀4</TD>
+    </TR>
+</TABLE>
+</P>
+
+<P>
+<TABLE BORDER="1" WIDTH="300" HEIGHT="50%">
+    <TR>
+	<TD>셀1</TD>
+	<TD>셀2</TD>
+    </TR>
+</TABLE>
+
+<TABLE BORDER="1" WIDTH="50%" HEIGHT="100">
+    <TR>
+	<TD>셀1</TD>
+	<TD>셀2</TD>
+    </TR>
+</TABLE>
+</P>
+
+<P>
+<TABLE BORDER="1" WIDTH="300">
+    <TR>
+		<TD ALIGN="LEFT">셀1(LEFT)</TD>
+    </TR>
+    <TR>
+		<TD ALIGN="CENTER">셀2(CENTER)</TD>
+    </TR>
+    <TR>
+		<TD ALIGN="RIGHT">셀3(RIGHT)</TD>
+    </TR>
+</TABLE>
+</P>
+
+<P>
+<TABLE BORDER="1" WIDTH="300" HEIGHT="300">
+    <TR>
+		<TD VALIGN="TOP">셀1(TOP)</TD>
+		<TD VALIGN="MIDDLE">셀2(MIDDLE)</TD>
+		<TD VALIGN="BOTTOM">셀3(BOTTOM)</TD>
+    </TR>
+</TABLE>
+</P>
+
+<P>
+<TABLE BORDER="1" WIDTH="300" HEIGHT="300" BGCOLOR="#2B2B2B">
+    <TR>
+		<TD VALIGN="TOP" BGCOLOR="RED">셀1(LEFT)</TD>
+		<TD VALIGN="MIDDLE">셀2(CENTER)</TD>
+		<TD VALIGN="BOTTOM">셀3(RIGHT)</TD>
+    </TR>
+</TABLE>
+
+</P>
+</BODY>
+</HTML>
 ```
 
 
-+ table3.html
++ [table3.html](table3.html)
 ```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> 테이블 병합2 </TITLE>
+</HEAD>
 
+<BODY>
+<TABLE WIDTH = "300" BORDER ALIGN = "CENTER">
+<CAPTION>테이블 좌우 합치기 </CAPTION>
+<TR>
+	<TD COLSPAN = "2">1번2번</TD>
+	<TD>3번</TD>
+</TR>
+<TR>
+	<TD>4번</TD>
+	<TD>5번</TD>
+	<TD>6번</TD>
+</TR>
+<TR>
+	<TD>7번</TD>
+	<TD COLSPAN = "2">8번9번</TD>
+</TR>
+</TABLE>
+
+<HR>
+<TABLE WIDTH = "300" HEIGHT = "200" BORDER ="1" ALIGN = "CENTER">
+<CAPTION>셀의 간격</CAPTION>
+<TR>
+	<TD WIDTH = "100">1번</TD>
+	<TD WIDTH = "200">2번</TD>
+	<TD WIDTH = "100">3번</TD>
+</TR>
+<TR>
+	<TD WIDTH = "100">4번</TD>
+	<TD WIDTH = "100">5번</TD>
+	<TD WIDTH = "100">6번</TD>
+</TR>
+</TABLE>
+<HR>
+<TABLE WIDTH = "300" HEIGHT = "200" ALIGN = "CENTER">
+<TR>
+	<TD WIDTH = "100" ALIGN = "LEFT">1번</TD>
+	<TD WIDTH = "100" ALIGN = "CENTER">2번</TD>
+	<TD WIDTH = "100" ALIGN = "RIGHT">3번</TD>
+</TR>
+<TR>
+	<TD VALIGN = "TOP" ALIGN = "CENTER">4번</TD>
+	<TD VALIGN = "MIDDLE">5번</TD>
+	<TD VALIGN = "BOTTOM">6번</TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>
+```
+
+
++ link태그
+  1) 다른 페이지와 연결
+  2) 현재 페이지에서의 화면 이동
+  `<a href="연결될페이지">글자나 그림</a>`
+
+
++ 예제1 - [main.html](main.html)
+```html
+<HTML>
+<HEAD>
+	<TITLE> 페이지 링크1 </TITLE>
+</HEAD>
+
+<BODY>
+	<a href="#" name="top" />
+	<A href="page_1.html">페이지1 가기</A>로가기<BR>
+	<A HREF="page_2.html">페이지2 가기</A><BR>
+	<A HREF="page_3.html">페이지3 가기</A><BR><BR><BR>
+
+	<A HREF="http://www.daum.net">다음사이트로 이동...<P></A>
+</BODY>
+</HTML>
+```
+
++ 예제2 - [Home.html](Home.html)
+```html
+<HTML>
+<HEAD>
+	<TITLE> Home </TITLE>
+</HEAD>
+
+<BODY>
+	<TABLE border="0" width="100%" cellspacing="0" cellpadding="4"
+	  style="border:1px solid gray;margin-bottom:5px">
+	  <TR>
+		<TD width="100%" height="50" class="fontbasic">
+		  <A href="http://www.daum.net"><img border="0" alt="js guide - professional javascript" src="jsguide.png" width="180" height="50"></A>
+		</TD>
+	  </TR>
+	  <TR>
+		<TD width="100%" style="border-top:1px solid lightgrey" class="topmenu">
+		  <A HREF="Home.html">처음으로</A> |
+		  <A HREF="HtmlPage.html">HTML</A> |
+		  <A HREF="JScriptPage.html">JScript</A> |
+		  <A HREF="StyleSheetPage.html">StyleSheet</A> |
+		  <A HREF="JSPPage.html">JSP</A> |
+		</TD>
+	  </TR>
+	</TABLE>
+	<!-- Homl.html의 구체적인 화면구성 Tag를 표현 -->
+	Home.html
+</BODY>
+</HTML>
+
+```
+
++ 예제3 - [imgMapTest.html](imgMapTest.html)
+```html
+<!-- imgMapTest.html -->
+<HTML>
+<HEAD>
+	<TITLE>이미지맵</TITLE>
+</HEAD>
+<BODY>
+	<IMG src="./img.jpg" usemap="#myimg">
+	<MAP name="myimg">
+		<!-- 원 모양 : 중심점 반지름 X,Y,R-->
+		<AREA shape="circle" coords="130,110,52" href="https://www.daum.net/" target="_blank">
+		<!-- 사각 모양 : 시작좌표, 마지막좌표, x1,y1,x2,y2-->
+		<AREA shape="rect" coords="270,51,377,158" href="https://www.naver.com/" target="_blank">
+		<!-- 각 꼭지점의 좌표들..-->
+		<AREA shape="poly" coords="520,60,450,160,597,158" href="http://www.itkor.co.kr/" target="_blank">
+	</MAP>
+</BODY>
+</HTML>
 ```
 
 #### 6. FORM 태그

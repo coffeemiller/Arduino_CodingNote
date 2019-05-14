@@ -1,0 +1,18 @@
+
+<<!-- imgMapTest.html -->
+<HTML>
+<HEAD>
+	<TITLE>이미지맵</TITLE>
+</HEAD>
+<BODY>
+	<IMG src="./img.jpg" usemap="#myimg">
+	<MAP name="myimg">
+		<!-- 원 모양 : 중심점 반지름 X,Y,R-->
+		<AREA shape="circle" coords="130,110,52" href="https://www.daum.net/" target="_blank">
+		<!-- 사각 모양 : 시작좌표, 마지막좌표, x1,y1,x2,y2-->
+		<AREA shape="rect" coords="270,51,377,158" href="https://www.naver.com/" target="_blank">
+		<!-- 각 꼭지점의 좌표들..-->
+		<AREA shape="poly" coords="520,60,450,160,597,158" href="http://www.itkor.co.kr/" target="_blank">
+	</MAP>
+</BODY>
+</HTML>
