@@ -1054,8 +1054,56 @@ Network - Socket(TCP,UDP)
 #### 4. Link iamge 태그
 
 + second.html
-```html
+```
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> HTML 기본태그 연습 </title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="argus">
+  <meta name="Keywords" content="HTML 기본태그">
+  <meta name="Description" content="HTML 기본태그 학습">
+  <script>
+  	//javaScript문법에 맞는 표현을 사용하여 코딩
+  	//인터프리터 언어(변수,연산자,제어문,다양한 형태의 객체, 함수-function)
+  </script>
+  <style>
+  	<!-- 본문에서 사용되는 다양한 태그들의 속성값을 정의해 놓고 편리하게 사용 -->  	
+  </style>
 
+  <!-- HEAD 태그에 기술되는 내용
+    0) 문서 제목 - TITLE 태그
+	1) 문서의 정보를 검색엔진에게 제공 - META 태그
+	2) JavaScript 코드 : 이곳에 작성하기를 권장
+	3) css : 문서의 스타일 쉬트
+  -->
+ </head>
+
+<!--
+	상대경로 : 현재위치를 기준으로 위치 지정  "bg.gif"
+	절대경로 : 웹어플리케이션을 기준으로 경로지정  "./image/bg.gif"
+													"/html/image/bg.gif"
+													"http://localhost:8088/html/image/bg.gif"													
+ -->
+ <body BGCOLOR="00FF00" TEXT="#FF0000" BACKGROUND="./image/bg.gif">
+  <!-- BODY 태그에 기술되는 내용
+    다양한 종류의 태그를 사용하여 정보를 표현한다.
+ *  0) 글자 및 이미지 태그
+	2) 문장 장식 태그, 움직이는 글자
+	3) 테이블 태그
+ *  4) 링크 태그
+	5) 프래임 태그(영역구분) -- <div> 태그 사용을 권장
+ *  6) 사용자와 상호작용하는 태그(정보의 입력, 선택) -- <form>
+  -->
+  <img src="./img/frog.jpg" width="200" height="200" border="1" alt="풍선도움말"/>
+  <BR>
+	아래의 참고사이트는 여러분들이 학습할때 방문하여 정보를 얻으세요.<br>
+	아주 유용한 사이트입니다.<br>
+  <h2>참고사이트</h2>
+  <a href="http://www.trio.co.kr">트리오 사이트</a><br>
+  <a href="http://www.w3schools.com">W3 학습 사이트</a><br>
+ </body>
+</html>
 ```
 
 
@@ -1065,6 +1113,210 @@ Network - Socket(TCP,UDP)
   - ./ : 현재경로
   - ../ : 부모경로
 
+
+
++ 글자태그
+  - <h1> ~ </h>
+  - <font color="rgb값이 색상문자열"> 글자 </font>
+  - argb : Alpha(투명도:0~255, 0 완전투명, 255 완전불투명)
+  - 삼원색(Red,Green,Blue)
+  - <b>
+  - <i>
+  - <sup>
+  - <sub>
+
+
+
++ third.html
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> 글자 태그 </title>
+ </head>
+
+ <body>
+  <!-- 글자의 크기를 지정하는 헤드라인 태그 -->
+  <h1>문서의 제목 1</h1>
+  <h2>문서의 제목 1</h2>
+  <h3>문서의 제목 1</h3>
+  <h4>문서의 제목 1</h4>
+  <h5>문서의 제목 1</h5>
+  <h6>문서의 제목 1</h6>
+
+  <p> FONT 태그 연습 -- 글자의 속성(글꼴, 크기, 색상등)	</p>
+
+  전주정보문화산업진흥원 JICA jica 보통글씨<br>
+  <hr>
+  <font COLOR="FF0000" >전주정보문화산업진흥원 JICA jica</font><br>
+  <font COLOR="CCCCCC" >전주정보문화산업진흥원 JICA jica</font><br>
+  <font COLOR="GOLD" >전주정보문화산업진흥원 JICA jica</font><br>
+  <font COLOR="BLUE" >전주정보문화산업진흥원 JICA jica</font><br>
+
+  <hr>
+  <font SIZE="1">전주정보문화산업진흥원 JICA jica</font><br>
+  <font SIZE="3">전주정보문화산업진흥원 JICA jica</font><br>
+  <font SIZE="5">전주정보문화산업진흥원 JICA jica</font><br>
+  <font SIZE="7">전주정보문화산업진흥원 JICA jica</font><br>
+
+  <hr>
+  <font FACE="궁서">전주정보문화산업진흥원 JICA jica</font><br>
+  <font FACE="바탕">전주정보문화산업진흥원 JICA jica</font><br>
+  <font FACE="Comic Sans MS">전주정보문화산업진흥원 JICA jica</font><br>
+  <font FACE="Impact">전주정보문화산업진흥원 JICA jica</font><br>
+
+  <!-- 수평선 긋기 -->
+  <hr>
+  수평으로(Horizental)으로 선을 긋는다.
+  <hr width="50%" align=left>
+  <hr width="50">
+  <hr width="50%" size=4 color=silver>
+  <hr width="50%" size=1 align=right>
+
+  <!-- 특수기능을 가진 특수문자 -->  
+  &lt; 혹은 &#60; : (<)의 문자기호 <br>
+  &gt; 혹은 &#62; : (>)의 문자기호 <br>
+  &amp; 혹은 &#38; : (&)의 문자기호 <br>
+  &nbsp; 혹은 &#160; : ( ) 공백의 문자기호<br>
+  &copy; 혹은 &#169; : () 저작권의 문자기호<br>
+
+  &int; 혹은 &#8747; : 인터그랄<br>
+  &sum; 혹은 &#8721; : 합계기호<br>
+  &Aring; 혹은 &#197; :
+ </body>
+</html>
+
+```
+
+
++ forth.html
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> 글자 장식태그 </title>
+ </head>
+
+ <body>
+  스타일 태그 - 장식 태그<br>
+  <font SIZE="4" COLOR="#000000">전주정보문화산업진흥원!</font><br>
+  <b>안드로이드 개발자반 화이팅!</b><br>
+  <i>전주(Jeonju)</i><br>
+  <s>정보문화(취소선)</s><br>
+  <u>산업진흥원</u><br>
+  x<sup>2</sup> 1og<sub>10</sub> 윗첨자와 아래첨자<br>
+  <tt>스마트폰(smart phone)</tt><br>
+  <small>스마트폰</small><br>
+  <big>스마트폰</big><br>
+
+  <hr>
+  <pre>
+  html문서내용에서는 기본으로 공백,탭(1번만 적용)하고 엔터기호는 무시된다.
+  pre태그는 공백,탭,엔터기호를 그대로 인식하도록 표현하는 태그이다.
+  HTML 태그를 주마간산 형식으로 살펴보고 있   습   니  다.   쭉~
+
+             안녕!
+  복습한다 생각하고 살펴봅시다.
+  </pre>
+  <hr>
+  점심시간!<br>
+  <center>내용을 수평 중앙에 포시합니다.  속성은 없습니다.</center>
+  단, center태그는 HTML5에서 권장하지 않는다. 이제 식사하러 갑시다<br>
+
+  <center> <h4>중앙 위치</h4> </center>
+
+  <hr>
+  <hr width="70%" align="left" size="1" >
+  <hr width="70%" align="center" size="2" >
+  <hr width="70%" align="right" size="3" >
+  <hr width="70%" align="right" size="4" >
+ </body>
+</html>
+
+```
+
+
++ 목록태그 : 여러개의 항목을 보여주는 태크
+
++ list.html
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> 목록(리스트) 태그 사용법 </title>
+ </head>
+
+ <body>
+	<marquee WIDTH="200" SCROLLAMOUT="10" BEHAVIOR="ALTERNATE" >목록 태그 사용법</marquee><br>
+
+	<pre>
+	리스트 태그는 상위와 하위가 있는 체계화된 목록을 만들때 사용되며
+	그 종류는 다음과 같다.
+		    1. 정의목록(DL:definition List),
+	        2. 번호가 없는 목록(UL:unordered List),
+			3. 번호가 있는 목록(OL:ordered List)의 세가지가 있다.
+
+    정의목록(DL) 태그는 그내용으로 다음 두가지 요소(Element)를 갖는다.
+	    1. 정의목록 제목(DT:definition title).
+		2. 정의목록 데이타(DD:definition data).
+
+    번호가 없는 목록(UL) 태그는 그내용으로 갖는 Element는
+	    LI(List Item)을 사용한다.
+		UL혹은 LI모두 type 속성을 이용하여 그 모양을 설정한다.
+		type속성은(disc:꽉찬 원, circle:테두리 원, square:네모모양)
+
+    번호가 있는 목록(OL) 태그도 마찬가지로 LI을 사용한다.
+	    OL, LI 모두 type속성을 사용한다.
+		typ속성은("a", "A", "i", "I")
+	</pre>
+	<hr>
+
+	<dl>
+	<dt>언어 수업내용
+		<dd> JAVA Language
+		<dd> Web Programming
+    <dt>취업분야
+		<dd> 기본 Web 프로그램 작성분야
+		<dd> 안드로이드 APP 개발분야
+	</dl>
+
+	<hr>
+	<ul type="disc" >
+		<li> Review
+		<li> HTML 개요
+		<li> 태그작성 연습1
+		     <ul type="circle">
+			     <li> 글자와 문자태그
+				 <li> 이미지 태그
+			 </ul>
+		<li> 태그작성 연습2
+			 <ul type="square">
+				 <li> 테이블 태그
+				 <li> form 태그
+			 </ul>
+	</ul>
+	<hr>
+
+	<ol type="A">
+		<li> JAVA언어 학습
+		<li> Oracle
+		<li> WEB Programming
+			<ol type="I">
+				<li> HTML
+				<li> JavaScript
+				<li> Servlet
+				<li> JSP
+				<li> Framework
+			</ol>
+        <li> Android
+		    <ol type="a" start="3">
+				<li> 기본 Widget 사용법
+				<li> 고급 Widget 사용법
+			</ol>
+	</ol>
+ </body>
+</html>
+```
 
 #### 5. 테이블 태그
 #### 6. FORM 태그
