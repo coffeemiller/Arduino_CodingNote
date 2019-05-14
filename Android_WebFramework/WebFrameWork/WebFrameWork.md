@@ -999,11 +999,109 @@ Network - Socket(TCP,UDP)
   - HTML은 대소문자 구분을 하지 않음
   - 태그로 구성되어 있다.
     - 기본형식 : <태그명 속성=값,...>   </태그명>
+![HTML의 동작원리](html.jpg "HTML의 동작원리")
 
+
++ 태그?
+  - HTML 문서의 모양과 행동 양식을 정해주는 하나의 명령어
+  - 시작 태그;<>와 종료 태그;</>가 짝을 이뤄 사용되는 것이 일반적임(짝없는것도!)
+  - 태그들은 서로 중복 사용될 수 없다
+  - 태그의 속성값을 기술할때 ""을 사용할수도 있고 안할수도 있다.
+  - 특정 리소스(이미지,음원)를 접근할때는 상대경로와 절대경로로 접근할수 있다.
+```html
+<html>
+  <head>
+      <title>Document</title>
+  </head>
+  <body>
+
+  </body>
+</html>
+```
 
 
 #### 3. 기본태그
+
++ first.html
+```html
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <title> 기본 태그 연습 </title>
+ </head>
+
+ <body>
+  안녕하세요.<br><br><br><br>
+  처음으로 HTML을 학습합니다.<br>
+  전주정보문화산업진흥원의 스마트폰 개발자 과정! 화 이   팅!<br><br>
+  화 이 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;팅!<br><br>
+  지금까지는 기본 태그만 사용하여 본문을 작성하고 있습니다.<br>
+  화일 저장시 확장자는 *.html, *.htm으로 저장해야 합니다.<br>
+  <!-- 주석표시 입니다. <br> 태그는 줄바꿈기능을 수행합니다. -->
+  위의 내용은 주석표시입니다.
+  <p>
+  열심히 공부합시다.<br>
+  <!-- <P> 태그는 문단의 단락을 표현하는 태그입니다. -->
+  </p>
+  HTML과 JavaScript는 웹프로그램의 기본구성요소입니다.
+ </body>
+</html>
+```
+
+
+
 #### 4. Link iamge 태그
+
++ second.html
+```html
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <title> HTML 기본태그 연습 </title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="argus">
+  <meta name="Keywords" content="HTML 기본태그">
+  <meta name="Description" content="HTML 기본태그 학습">
+  <script>
+  	//javaScript문법에 맞는 표현을 사용하여 코딩
+  	//인터프리터 언어(변수,연산자,제어문,다양한 형태의 객체, 함수-function)
+  </script>
+
+  <!-- HEAD 태그에 기술되는 내용
+	0) 문서 제목 - TITLE 태그
+	1) 문서의 정보를 검색엔진에게 제공 - META 태그
+	2) JavaScript 코드 : 이곳에 작성하기를 권장
+	3) css : 문서의 스타일 쉬트
+  -->
+ </head>
+
+ <body BGCOLOR="00FF00" TEXT="#FF0000" BACKGROUND="bg.gif">
+  <!-- BODY 태그에 기술되는 내용
+    다양한 종류의 태그를 사용하여 정보를 표현한다.
+	0) 글자 및 이미지 태그
+	2) 문장 장식 태그, 움직이는 글자
+	3) 테이블 태그
+	4) 링크 태그
+	5) 프래임 태그(영역구분) -- <div> 태그 사용을 권장
+	6) 사용자와 상호작용하는 태그(정보의 입력, 선택) -- <form>
+  -->
+  <img src="img/frog.jpg" width="100" height="100" border="0" alt="풍선도움말"><BR>
+
+  <h2>참고사이트</h2>
+  <a href="http://www.trio.co.kr">트리오 사이트</a><br>
+  <a href="http://www.w3schools.com">W3 학습 사이트</a><br>
+ </body>
+</html>
+```
+
+
++ 상대경로
+  - 현재경로에 같은 파일(이미지) : `*.jpg`
++ 절대경로
+  - ./ : 현재경로
+  - ../ : 부모경로
+
+
 #### 5. 테이블 태그
 #### 6. FORM 태그
 #### 7. 실습
