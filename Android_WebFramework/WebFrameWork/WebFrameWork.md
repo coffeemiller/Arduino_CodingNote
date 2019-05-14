@@ -1023,7 +1023,7 @@ Network - Socket(TCP,UDP)
 
 #### 3. 기본태그
 
-+ first.html
++ [first.html](./first.html)
 ```html
 <!DOCTYPE HTML>
 <html>
@@ -1053,7 +1053,7 @@ Network - Socket(TCP,UDP)
 
 #### 4. Link iamge 태그
 
-+ second.html
++ [second.html](./second.html)
 ```
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -1132,7 +1132,7 @@ Network - Socket(TCP,UDP)
 ```
 
 
-+ third.html
++ [third.html](third.html)
 ```html
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -1194,7 +1194,7 @@ Network - Socket(TCP,UDP)
 ```
 
 
-+ forth.html
++ [forth.html](./forth.html)
 ```html
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -1243,7 +1243,7 @@ Network - Socket(TCP,UDP)
 
 + 목록태그 : 여러개의 항목을 보여주는 태크
 
-+ list.html
++ [list.html](./list.html)
 ```html
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -1324,13 +1324,102 @@ Network - Socket(TCP,UDP)
 ```
 
 
-+ image.html
+
++ 이미지 태그
+
++ [image.html](./image.html)
 ```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> 이미지 태그 연급 </TITLE>
+</HEAD>
+
+<BODY>
+<PRE>
+	IMG태그 : "<IMG SRC="" WIDTH="" HEIGHT="" BORDER="0" ALT="">"
+	SRC = 이미지 화일명과 경로: URL 설명을 참조하라.
+	WIDTH = LENGTH: 이미지의 너비를 픽셀로 지정한다.
+	HEIGHT = LENGTH: 이미지의 높이를 픽셀로 지정한다.
+	BORDER = PIXELS: 테두리(BORDER)의 폭을 픽셀(PIXEL)로 지정한다.
+	ALT = TEXT 이미지을 디스플레이 할 수 없는 사용도구에서,
+		이 애트리뷰트는 설명을 제공하는 대체 텍스트를 지정한다.
+		또한 마우스를 올려 놓을때 대체 텍스트가 나타난다.
+	ALIGN = "LEFT","RIGHT","TOP","MIDDLE","BOTTOM"
+</PRE>
+<HR>
+	<ul>
+		<li> 현재 html문서내의 폴더에 파일이 있다. 파일명만 기술</li>
+		<li> 현재 html문서의 하위 폴더에 있다.     폴더/파일명</li>
+		<li> 현재 html문서의 상위폴더를 지칭할때 ../하위폴더/파일명</li>
+	</ul>
+	<pre>
+		/home/image/log.gif
+			 /doc/index.html
+			 /index.html
+	</pre>
+<hr>
+<IMG SRC = "./img/dog1.gif" /><br> <!-- 상대경로 -->
+<IMG SRC = "./img/dog1.gif" Width="192" height="192" align="left">내용이 없다면
+<HR>
+<br>
+<br>
+<P>
+<P>
+
+<IMG SRC = "./img/dog2.gif" WIDTH = "120" HEIGHT = "100" ALIGN ="RIGHT" /><BR>
+진돗개2<BR>
+이미지를 보여주고 텍스트를 기술합니다.<br>
+내용이 많으면 어떻게<BR>
+기술될까요<BR>
+<P>
+<HR>
+
+<P>
+<IMG SRC = "./img/dog4.gif" WIDTH = "120" HEIGHT = "100" ALIGN="LEFT">진돗개43<BR>
+진돗개3<BR>
+이미지를 보여주고 텍스트를 기술합니다.<BR>
+내용이 많으면 어떻게<BR>
+기술될까요<BR>
+</P>
+<HR>
+<CENTER><IMG SRC = "./img/dog3.gif" WIDTH = "120" HEIGHT = "100" ALT="난 삽살개야! 멍~" >삽살개<BR></CENTER>
+<HR>
+<IMG SRC = "./img/dog4.gif" WIDTH = "120" HEIGHT = "100" border="1" ALIGN="TOP">진돗개4<BR><BR>
+<HR>
+<IMG SRC = "./img/dog5.gif" WIDTH = "120" HEIGHT = "100" border="3" ALIGN="MIDDLE">진돗개5<BR><BR>
+<HR>
+<IMG SRC = "./img/dog6.gif" WIDTH = "120" HEIGHT = "100" ALIGN="BOTTOM">진돗개6<BR><BR>
+<HR>
+<FONT SIZE = "5">bibi1004의 도트캐릭터</FONT><BR><BR>
+<!-- 외부사이트의 이미지를 가져 올수도 있다-->
+<IMG SRC = "https://www.sports-g.com/wp-content/uploads/2018/12/%EC%86%90%ED%9D%A5%EB%AF%BC-%ED%86%A0%ED%8A%B8%EB%84%98-EPL-696x976.jpg"  ALT = "도트"  BORDER = "2" ALIGN="LEFT">
+
+</BODY>
+</HTML>
 ```
 
 
 
 #### 5. 테이블 태그
+
++ [table1.html](./table1.html)
+```html
+
+```
+
+
++ table2.html
+```html
+
+```
+
+
++ table3.html
+```html
+
+```
+
 #### 6. FORM 태그
 #### 7. 실습
 #### 8. Summary / Close
