@@ -975,7 +975,33 @@ Network - Socket(TCP,UDP)
                 /lib/*.jar
 ```
 
-#### 2. HTML태그
++ 향후 웹프로그램 학습순서
+  1) HTML 태그
+  2) JavaScript
+  3) Servlet
+  4) JSP
+    html태그, JavaScript, JSP태그, [자바코드]
+    자바코드를 전혀 사용하지 않고 작성(외부 라이브러리 사용...EL, JSTL)
+```
+  MVC패턴적용(모델1)   
+  -----request--------->서블릿작동(Logic처리)
+                           |
+                           |
+                           V
+ <-----response----------  JSP(Presentation-View처리)
+```
+
+#### 2. HTML(HyperText Markup Language)태그
++ HTML의 정의와 특징
+  - 모든 월드 와이드 웹 문서(웹브라우저)를 작성하는데 쓰이는 표준 파일 형식
+  - 파일 확장자는 `*.htm` 또는 `*.html`
+  - 웹 브라우저는 확장자에 의해 HTML문서로 인식
+  - HTML은 대소문자 구분을 하지 않음
+  - 태그로 구성되어 있다.
+    - 기본형식 : <태그명 속성=값,...>   </태그명>
+
+
+
 #### 3. 기본태그
 #### 4. Link iamge 태그
 #### 5. 테이블 태그
