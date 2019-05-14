@@ -999,6 +999,7 @@ Network - Socket(TCP,UDP)
   - HTML은 대소문자 구분을 하지 않음
   - 태그로 구성되어 있다.
     - 기본형식 : <태그명 속성=값,...>   </태그명>
+    - 기본형식 : <태그명 속성=값,.../>
 ![HTML의 동작원리](html.jpg "HTML의 동작원리")
 
 
@@ -1054,44 +1055,7 @@ Network - Socket(TCP,UDP)
 
 + second.html
 ```html
-<!DOCTYPE HTML>
-<html>
- <head>
-  <title> HTML 기본태그 연습 </title>
-  <meta name="Generator" content="EditPlus">
-  <meta name="Author" content="argus">
-  <meta name="Keywords" content="HTML 기본태그">
-  <meta name="Description" content="HTML 기본태그 학습">
-  <script>
-  	//javaScript문법에 맞는 표현을 사용하여 코딩
-  	//인터프리터 언어(변수,연산자,제어문,다양한 형태의 객체, 함수-function)
-  </script>
 
-  <!-- HEAD 태그에 기술되는 내용
-	0) 문서 제목 - TITLE 태그
-	1) 문서의 정보를 검색엔진에게 제공 - META 태그
-	2) JavaScript 코드 : 이곳에 작성하기를 권장
-	3) css : 문서의 스타일 쉬트
-  -->
- </head>
-
- <body BGCOLOR="00FF00" TEXT="#FF0000" BACKGROUND="bg.gif">
-  <!-- BODY 태그에 기술되는 내용
-    다양한 종류의 태그를 사용하여 정보를 표현한다.
-	0) 글자 및 이미지 태그
-	2) 문장 장식 태그, 움직이는 글자
-	3) 테이블 태그
-	4) 링크 태그
-	5) 프래임 태그(영역구분) -- <div> 태그 사용을 권장
-	6) 사용자와 상호작용하는 태그(정보의 입력, 선택) -- <form>
-  -->
-  <img src="img/frog.jpg" width="100" height="100" border="0" alt="풍선도움말"><BR>
-
-  <h2>참고사이트</h2>
-  <a href="http://www.trio.co.kr">트리오 사이트</a><br>
-  <a href="http://www.w3schools.com">W3 학습 사이트</a><br>
- </body>
-</html>
 ```
 
 
