@@ -2225,7 +2225,7 @@ class Test{
 ##### [오늘의 과제]
 + html태그중 <form>관련 태그를 웹상에서 찾아보기
 
-
+vscode 연습중
 #### 5. 실습
 #### 6. Summary / Close
 
