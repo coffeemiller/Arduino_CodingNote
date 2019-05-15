@@ -2010,13 +2010,166 @@ BORDER: 테두리의 두께
   - 단, 파일명뿐만아니라 파일내용도 서버로 전송하려면 <form ... enctype="multipart/form-data"를 적용해야한다.
 
 
+
 #### 4. JavaScript 개요
-#### 5. 변수
-#### 6. 제어문
-#### 7. 함수
-#### 8. 객체
-#### 9. 실습
-#### 10. Summary / Close
++ HTML에서 동작하는 인터프리터 언어
++ 웹브라우저에서 자체반응하는 기능을 수행
+  - 즉, 서버로 요청을 보내지 않고 웹브라우저 자체에서 HTML문서의 내용을 검색/편집하는 기능을 수행하여 결과적으로 사용자에게 보여지는 내용이 달라지도록(반응하도록) 한다.
+
++ 언어이므로 자료형/벼수, 연산자, 제어문, 객체도 존재
++ 함수(Function)를 많이 사용
+
++ 메서드(method)는 객체의 멤버로서 존재하는 실행코드이다.
+  그러나!!! 함수(function)는 독자적으로 존재하는 실행코드의 모음.
+```
+Java언어                  JavaScript언어
+객체.멤버변수              객체.property, arribute
+객체.메서드()              객체.메서드()
+```
+
++ 변수사용
+```
+<Java 언어(인터프리터)>
+int a = 10;
+1) a는 프로그램시작부터 끝까지 정수값만 저장하여 사용할수 있다.
+2) 반드시 선언후에 사용해야한다.
+3) 선언시 반드시 자료형을 명시해야 한다.
+
+a = "abc"; //error
+b = 3.14;  //error
+
+
+<JavaScript 언어(스크립트)>
+var a = 10;  //ok
+b = "3.14";   //ok
+...
+a = "abc";    //ok
+```
+
++ 대소문자를 구분한다. (A != a)
+
+
++ JavaScript코드는
+  1) html 문서 내부에 script태그 내부에 작성한다.
+```javascript
+  <script>
+    JS코드
+  </script>
+```
+  2) 별도의 독자적인 파일 형태로 코드가 존재할수 있다.
+```javascript
+<script src="chek.js">
+</script>
+```
+
+  3) script태그는 html문서 내부에서 여러번 사용할 수 있다.
+  - [script1.html](script1.html)
+```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> JavaScript 개요 </title>
+  <!-- HTML문서가 웹브라우저에 의해 해석되기 시작하면
+       1) 자동으로 window객체가 자동으로 만들어진다.
+           document객체
+		   location객체
+		   history객체
+		   navigator 개체
+		   event 객체
+		   screen 객체
+		   --------------------------------
+		   window.document
+		   window.location
+		   window.history
+		   window.event
+		   window.screen
+		   window.navigator
+       2) html화일의 내부 구성요소 즉, 태그들을 하나하나 읽으면서
+	      그 구성요소에 따라서 documnet객체의 내부 구성요소로
+		  해석되어 객체로 표현되어진다.
+		  DOM(Document Object Model) ==> 이진 Tree 구조
+       3) 사용자의 행위에 따라 발생하는 이벤트 처리 코드를
+	      JavaScript를 이용하여 작성하고 사용하게 된다.
+		  ==> 동적인 처리를 지원한다.
+	-->
+   <script LANGUAGE="javascript">
+		var test;  //변수선언 --> 자료형을 결정하지 않는다.
+
+		//아래의 코드가 자동으로 만들어진 window객체의 메서드를 호출한 표현이다.
+		window.document.write("자바 스크립트 입니다.<br>");
+		//window객체의 속성을 사용할때는 window를 생략할 수 있다.
+		document.write("<h2> 예제 1 : 이것이 기본 태그입니다.</h2>");
+   </script>
+
+   <script type="text/javascript">
+		window.document.write("<h2> 예제2 : language속성에는 스트립트 언어의 종류를 기술합니다. </h2>");
+   </script>
+
+   <script type="text/javascript" src="first.js" charset="utf-8">
+   		//src속성을 사용했을때 내부코드는 무시된다.
+		window.document.write("외부의 스크립트 화일을 참조할 때는 스크립트 태그 내부의 문장은 작동하지 않습니다.<br>");
+   </script>
+
+   <script type="text/javascript">
+   		//윈도우 화면에 경고창을 보여주세요.
+		window.alert("스크립트도 독립된 프로그래밍 언어입니다.");
+   </script>
+
+   <script type="text/javascript">
+		function test(){
+			//html문서가 최초 load되어 한번 작동한 이후에
+			//document의 write()메서드를 사용하면 이전내용은 모두 지워진다.
+			document.write("함수는 호출될때만 작동합니다.<br>");
+			window.alert("함수 호출에의해 동작했습니다.");
+		}
+   </script>
+ </head>
+
+ <body>
+	<br>자바 스크립트의 작동구조를 이해하는 것이 중요합니다.<br>
+	<script type="text/javascript">
+		// 스크립트는 <head>태그 내부에 작성하기를 권장하지만
+		// 상황에 따라 <body>태그 내부에 작성 할 수도 있다.
+		document.write(" body 태그 내부에서 스크립트를 실행합니다.");
+	</script>
+	<form>
+		<input type="button" value="함수호출" onClick="test()"/>
+	</form>
+ </body>
+</html>
+
+```
+
++ script2.html
+  - 지역변수와 전역변수
+  - 함수 안에서 변수를 선언했어도...var로 선언하면 함수 내에서만 사용가능한 지역변수, 그냥 문자로 선언하면 어디서든 쓸수 있는 전역변수로 사용된다.
+```javascript
+
+```
+
+```
+class Test{
+  int age; //단일값 속성
+  Date today; //개체 속성
+  Profile profiles[] = new Profile[5];  //컬렉션 속성
+}
+
+속성
+  1) 단일값 속성
+  2) 개체 속성
+  3) 컬렉션 속성
+
+메서드
+  1) 일반메서드
+  2) 이벤트처리와 관련된 메서드 : onXXXX()
+```
+
+
+##### [오늘의 과제]
++ html태그중 <form>관련 태그를 웹상에서 찾아보기
+
+#### 5. 실습
+#### 6. Summary / Close
 
 
 
@@ -2027,6 +2180,62 @@ BORDER: 테두리의 두께
 
 #### 1. Review
 #### 2. FORM 태그
+
+#### 5. 변수
+
+
+```javascript
+```
+
+
+```javascript
+```
+
+
+```javascript
+```
+
+
+```javascript
+```
+#### 6. 제어문
+#### 7. 함수
+#### 8. 객체
+####
+####
+####
+####
+#### 4. 실습
+#### 5. Summary / Close
+
+
+-----------------------------------------------------------
+
+### [2019-05-17]
+
+#### 1. Review
+#### 2. FORM 태그
+
+#### 5. 변수
+
+
+```javascript
+```
+
+
+```javascript
+```
+
+
+```javascript
+```
+
+
+```javascript
+```
+#### 6. 제어문
+#### 7. 함수
+#### 8. 객체
 ####
 ####
 ####
