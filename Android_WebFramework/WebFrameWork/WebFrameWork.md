@@ -1852,6 +1852,8 @@ BORDER: 테두리의 두께
 ![HTTP 요청](./img/html_1.png "HTTP 요청")
     - enctype => 사진과 같은 파일을 서버로 전송할때 필요한 옵션
 
+
+
 + form태그에서 실제 디이터를 선택하거나 입력하는 기능을 수행하는 기능
   - 내부태그는 name속성
   - 한줄로 문자열을 입력받는다.
@@ -1877,6 +1879,10 @@ BORDER: 테두리의 두께
     8) `<select name="text" size="number" multiple>`
       `<option value="text">text name`
       `</select>`
+  - form작업을 마무리하고 선택/입력
+    9) `<input type="submit" value="전송하기">`
+      `<input type="reset" value = "다시쓰기">`
+      `<input type="image" name="submit" src="button1.gif" border="0">`
 
 + [Form.html](Form.html)
 ```html
@@ -1976,6 +1982,7 @@ BORDER: 테두리의 두께
  </BODY>
 </HTML>
 ```
+
 
 #### 4. JavaScript 개요
 #### 5. 변수
