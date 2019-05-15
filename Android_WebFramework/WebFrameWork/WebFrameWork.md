@@ -1983,6 +1983,32 @@ BORDER: 테두리의 두께
 </HTML>
 ```
 
++ 이미지 버튼을 만들때, reset활용
+  - onclick : 클릭했을때 수행하는 명령
+  - document.form[0] : 현재 띄워진 문서
+  - .reset() : 리셋 명령어
+  - return false : 서버로 전송하지 않도록 명령...(;는 추가 명령시...)
+```html
+<INPUT type="image" name="submit" src="button1.gif" border="0">&nbsp;
+<INPUT type="image" name="reset" src="button2.gif" border="0" onclick="document.forms[0].reset();return false">
+```
+
+
+
++ 화면에는 보이지 않지만 서버로 전송되는 데이터
+```html
+<input type="hidden" name="식별자" value="값" >
+```
+  - 프로그램 로직과 연관시켜서 많이 사용된다. -> 쿠키,세션관리처리에서 사용
+
+
+
++ 서버로 파일을 전송하고 싶다면
+```html
+<input type="file" name="file" size="">
+```
+  - 단, 파일명뿐만아니라 파일내용도 서버로 전송하려면 <form ... enctype="multipart/form-data"를 적용해야한다.
+
 
 #### 4. JavaScript 개요
 #### 5. 변수
