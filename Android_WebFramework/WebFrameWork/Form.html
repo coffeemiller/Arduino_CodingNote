@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 폼태그 연습 </TITLE>
+  <META NAME="Generator" CONTENT="EditPlus">
+  <META NAME="Author" CONTENT="">
+  <META NAME="Keywords" CONTENT="">
+  <META NAME="Description" CONTENT="">
+ </HEAD>
+
+ <BODY>
+
+  <FORM action="서버url" method="get" enctype="">
+     <!-- TEXT 입력 -->
+	 이 름 <INPUT type="text" name="id" size="10"><BR>  
+ 	 주 소 <INPUT type="text" name="addr" size="50" value="강원도 춘천시 교동"><BR>
+ 	 전화번호<INPUT type="text" name="phone" size="14" maxlength="14"><BR>
+     E-Mail <INPUT type="text" name="email" value="argus10@hanmail.net" readonly><BR>
+     <BR><BR>
+
+     나 이 <INPUT type="text" name="age" size="20">
+	 <BR><BR>
+
+     <!-- 암호 입력 -->
+	 암 호 <INPUT TYPE="password" NAME="pass">
+	 <BR><BR>
+
+	 <!-- 여러줄 입력 -->
+	 자기소개<BR>
+	 <TEXTAREA NAME="memo" ROWS="5" COLS="40">자기소개를 입력하세요</TEXTAREA>
+	 <BR><BR>
+	 <HR>
+
+ 	 <!-- radio box-->
+     <INPUT type="radio" name="fruit" value="yes">사과 &nbsp;&nbsp;
+     <INPUT type="radio" name="fruit" value="포도" checked>포도&nbsp;&nbsp;
+     <INPUT type="radio" name="fruit" value="메론">메론<br>
+	 <BR><BR>
+	 
+ 	 <!-- check box-->
+	가보고 싶은 곳은?<BR>
+	<INPUT type=checkbox name="city" value="Roma">Roma<BR>
+	<INPUT type=checkbox name="city" value="Paris" checked>Paris<BR>
+	<INPUT type=checkbox name="city" value="London">London<BR>
+	<INPUT type=checkbox name="city" value="NewYork">New York
+     <BR><BR>
+	 <HR>
+	
+    <SELECT name="favorite1">
+	    <OPTION value="사과">사과</OPTION>
+		<OPTION value="포도">포도</OPTION>
+	    <OPTION value="복숭아">복숭아</OPTION>
+		<OPTION value="수박">수박</OPTION>
+	    <OPTION value="바나나" selected>바나나</OPTION>
+    </SELECT>
+	<BR><BR><BR>
+
+	<SELECT name="favorite2" size="10" multiple>
+		<OPTION value="사과">사과</OPTION>
+	    <OPTION value="포도">포도</OPTION>
+	    <OPTION value="복숭아">복숭아</OPTION>
+	    <OPTION value="수박">수박</OPTION>
+	    <OPTION value="바나나" selected>바나나</OPTION>
+	    <OPTION value="감" selected>감</OPTION>
+	    <OPTION value="귤" selected>귤</OPTION>
+	    <OPTION value="파인애플" >파인애플</OPTION>
+	 </SELECT>
+	 <BR><BR>
+	 <HR>
+
+	 <!-- 버튼 - TEXT --> 
+	<INPUT TYPE="submit" value="전송하기">&nbsp;&nbsp;<INPUT TYPE="reset" value = "다시쓰기">
+	 <BR><BR>
+	 <HR>
+
+	<!-- 버튼 - 이미지 -->
+	<INPUT type="image" name="submit" src="button1.gif" border="0">&nbsp;
+	<INPUT type="image" name="reset" src="button2.gif" border="0">
+	<BR><BR> 
+    <HR>
+
+	<!-- hidden 화면에 보여지지 않지만 전송버튼(submit)에 의해서
+	action에서 지정한 서버프로그램으로 데이타는 전송된다.-->
+	<INPUt type="hidden" name="key" value="ABC">
+	<BR><BR>
+	<HR>
+
+	<!-- file -->
+	파일첨부 : <input type="file" name="file" size="13">
+	<BR><BR>
+	<HR>
+
+  </FORM>
+ </BODY>
+</HTML>

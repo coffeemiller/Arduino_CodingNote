@@ -1791,6 +1791,208 @@ BORDER: 테두리의 두께
 ### [2019-05-15]
 
 #### 1. Review
++ 한글이 깨질때
+```html
+<META CHARSET="EUC-KR">
+<!--또는-->
+<META CHARSET="UTF-8">
+```
+
+
+#### 2. FRAME 태그
++ 프레임을 상하로 나눌때
+```html
+<frameset rows=“”>
+    <frame src=“” name=“”>
+    …
+</frameset>
+
+```
+
++ 프레임을 좌우로 나눌때
+```html
+<frameset cols=“”>
+    <frame src=“” name=“”>
+    …
+</frameset>
+```
+
+
+#### 3. FORM 태그
++ 사용자로부터 선택받거나 입력받은 데이터를 서버로 전송하는 기능
+
++ html5에서 좀더 추가된 많은 form 내부 태그가 있다.
++ html에서는 form태그의 기능적인 측면을 살펴보고 JavaScript에서 이벤트처리와 관련된 내용을 보자.
+
+```html
+<form action="http://localhost:8088/html/Hundred" method="get">
+  <!--다양한 내부태그-->
+</form>
+```
+
++ get 방식은 주소창에 모든것이 들어나지만.... post 방식은 노출되지 않는다.
+```html
+<form id="식별자" class="분류기준" name="명칭" action="http://localhost:8088/html/Hundred" method="post">
+  <!--다양한 내부태그-->
+</form>
+```
+
++ multipart/form-data를 이요하여, 사진이나 기타 미디어를 전송하게 한다.
+```html
+<form action="http://localhost:8088/html/Hundred"
+                  method="post" enctype="multipart/form-data">
+  <!--다양한 내부태그-->
+</form>
+```
+
++ form태그의 action속성 : 서버의 어느 동적웹컴퍼넌트(서블릿,JSP)에 사용자가 입력한 데이터를 진송할 것인가를 지정.
+  - method : 데이터잔송하는 http프로토콜의 내부형식을 지정.
+    - get => 데이터 노출
+    - post => 데이터 노출X
+![HTTP 요청](./img/html_1.png "HTTP 요청")
+    - enctype => 사진과 같은 파일을 서버로 전송할때 필요한 옵션
+
++ form태그에서 실제 디이터를 선택하거나 입력하는 기능을 수행하는 기능
+  - 내부태그는 name속성
+  - 한줄로 문자열을 입력받는다.
+    1) `<input type="text">`
+    2) `<input type="password">`
+  - 여러줄로 문자열을 입력받는다.
+    3) `<textarea rows="줄수" col="칸수">초기문자열</textarea>`
+  - 여러항목중 한개의 항목만 선택하는 radio button
+    4) `<input type="radio" name="fruit" value="yes">사과`
+       `<input type="radio" name="fruit" value="포도" checked>포도`
+       `<input type="radio" name="fruit" value="메론">메론`
+  - 여러개 항목을 선택할 수 있는 checkbox
+    5) `<input type=checkbox name="text" value="value">명칭`
+  - 목록에서 항목을 선택할수 있는 select
+    6) `<select name="text">`
+      `<option value="text">text name`
+      `</select>`
+    - size속성을 사용하면 리스트형식으로 동작.
+    7) `<select name="text" size="number">`
+      `<option value="text">text name`
+      `</select>`
+    - multiple속성을 사용하면 복수(여러항목_ctrl)선택 가능으로 동작.
+    8) `<select name="text" size="number" multiple>`
+      `<option value="text">text name`
+      `</select>`
+
++ [Form.html](Form.html)
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 폼태그 연습 </TITLE>
+  <META NAME="Generator" CONTENT="EditPlus">
+  <META NAME="Author" CONTENT="">
+  <META NAME="Keywords" CONTENT="">
+  <META NAME="Description" CONTENT="">
+ </HEAD>
+
+ <BODY>
+
+  <FORM action="서버url" method="get" enctype="">
+     <!-- TEXT 입력 -->
+	 이 름 <INPUT type="text" name="id" size="10"><BR>  
+ 	 주 소 <INPUT type="text" name="addr" size="50" value="강원도 춘천시 교동"><BR>
+ 	 전화번호<INPUT type="text" name="phone" size="14" maxlength="14"><BR>
+     E-Mail <INPUT type="text" name="email" value="argus10@hanmail.net" readonly><BR>
+     <BR><BR>
+
+     나 이 <INPUT type="text" name="age" size="20">
+	 <BR><BR>
+
+     <!-- 암호 입력 -->
+	 암 호 <INPUT TYPE="password" NAME="pass">
+	 <BR><BR>
+
+	 <!-- 여러줄 입력 -->
+	 자기소개<BR>
+	 <TEXTAREA NAME="memo" ROWS="5" COLS="40">자기소개를 입력하세요</TEXTAREA>
+	 <BR><BR>
+	 <HR>
+
+ 	 <!-- radio box-->
+     <INPUT type="radio" name="fruit" value="yes">사과 &nbsp;&nbsp;
+     <INPUT type="radio" name="fruit" value="포도" checked>포도&nbsp;&nbsp;
+     <INPUT type="radio" name="fruit" value="메론">메론<br>
+	 <BR><BR>
+
+ 	 <!-- check box-->
+	가보고 싶은 곳은?<BR>
+	<INPUT type=checkbox name="city" value="Roma">Roma<BR>
+	<INPUT type=checkbox name="city" value="Paris" checked>Paris<BR>
+	<INPUT type=checkbox name="city" value="London">London<BR>
+	<INPUT type=checkbox name="city" value="NewYork">New York
+     <BR><BR>
+	 <HR>
+
+    <SELECT name="favorite1">
+	    <OPTION value="사과">사과</OPTION>
+		<OPTION value="포도">포도</OPTION>
+	    <OPTION value="복숭아">복숭아</OPTION>
+		<OPTION value="수박">수박</OPTION>
+	    <OPTION value="바나나" selected>바나나</OPTION>
+    </SELECT>
+	<BR><BR><BR>
+
+	<SELECT name="favorite2" size="10" multiple>
+		<OPTION value="사과">사과</OPTION>
+	    <OPTION value="포도">포도</OPTION>
+	    <OPTION value="복숭아">복숭아</OPTION>
+	    <OPTION value="수박">수박</OPTION>
+	    <OPTION value="바나나" selected>바나나</OPTION>
+	    <OPTION value="감" selected>감</OPTION>
+	    <OPTION value="귤" selected>귤</OPTION>
+	    <OPTION value="파인애플" >파인애플</OPTION>
+	 </SELECT>
+	 <BR><BR>
+	 <HR>
+
+	 <!-- 버튼 - TEXT -->
+	<INPUT TYPE="submit" value="전송하기">&nbsp;&nbsp;<INPUT TYPE="reset" value = "다시쓰기">
+	 <BR><BR>
+	 <HR>
+
+	<!-- 버튼 - 이미지 -->
+	<INPUT type="image" name="submit" src="button1.gif" border="0">&nbsp;
+	<INPUT type="image" name="reset" src="button2.gif" border="0">
+	<BR><BR>
+    <HR>
+
+	<!-- hidden 화면에 보여지지 않지만 전송버튼(submit)에 의해서
+	action에서 지정한 서버프로그램으로 데이타는 전송된다.-->
+	<INPUt type="hidden" name="key" value="ABC">
+	<BR><BR>
+	<HR>
+
+	<!-- file -->
+	파일첨부 : <input type="file" name="file" size="13">
+	<BR><BR>
+	<HR>
+
+  </FORM>
+ </BODY>
+</HTML>
+```
+
+#### 4. JavaScript 개요
+#### 5. 변수
+#### 6. 제어문
+#### 7. 함수
+#### 8. 객체
+#### 9. 실습
+#### 10. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+### [2019-05-16]
+
+#### 1. Review
 #### 2. FORM 태그
 ####
 ####
