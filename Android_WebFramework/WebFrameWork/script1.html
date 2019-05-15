@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> JavaScript 개요 </title>
+  <!-- HTML문서가 웹브라우저에 의해 해석되기 시작하면 
+       1) 자동으로 window객체가 자동으로 만들어진다.
+           document객체
+		   location객체
+		   history객체
+		   navigator 개체
+		   event 객체
+		   screen 객체
+		   --------------------------------
+		   window.document
+		   window.location
+		   window.history
+		   window.event
+		   window.screen
+		   window.navigator
+       2) html화일의 내부 구성요소 즉, 태그들을 하나하나 읽으면서
+	      그 구성요소에 따라서 documnet객체의 내부 구성요소로 
+		  해석되어 객체로 표현되어진다.
+		  DOM(Document Object Model) ==> 이진 Tree 구조
+       3) 사용자의 행위에 따라 발생하는 이벤트 처리 코드를
+	      JavaScript를 이용하여 작성하고 사용하게 된다.
+		  ==> 동적인 처리를 지원한다.	
+	-->
+   <script LANGUAGE="javascript">
+		var test;  //변수선언 --> 자료형을 결정하지 않는다.
+		
+		//아래의 코드가 자동으로 만들어진 window객체의 메서드를 호출한 표현이다.
+		window.document.write("자바 스크립트 입니다.<br>");
+		//window객체의 속성을 사용할때는 window를 생략할 수 있다.
+		document.write("<h2> 예제 1 : 이것이 기본 태그입니다.</h2>");
+   </script>
+
+   <script type="text/javascript">
+		window.document.write("<h2> 예제2 : language속성에는 스트립트 언어의 종류를 기술합니다. </h2>");
+   </script>
+
+   <script type="text/javascript" src="first.js" charset="utf-8">
+   		//src속성을 사용했을때 내부코드는 무시된다.
+		window.document.write("외부의 스크립트 화일을 참조할 때는 스크립트 태그 내부의 문장은 작동하지 않습니다.<br>");
+   </script>
+
+   <script type="text/javascript">
+   		//윈도우 화면에 경고창을 보여주세요.
+		window.alert("스크립트도 독립된 프로그래밍 언어입니다.");
+   </script>
+
+   <script type="text/javascript">
+		function test(){
+			//html문서가 최초 load되어 한번 작동한 이후에
+			//document의 write()메서드를 사용하면 이전내용은 모두 지워진다.
+			document.write("함수는 호출될때만 작동합니다.<br>");
+			window.alert("함수 호출에의해 동작했습니다.");
+		}
+   </script>
+ </head>
+   
+ <body>
+	<br>자바 스크립트의 작동구조를 이해하는 것이 중요합니다.<br>
+	<script type="text/javascript">
+		// 스크립트는 <head>태그 내부에 작성하기를 권장하지만
+		// 상황에 따라 <body>태그 내부에 작성 할 수도 있다.
+		document.write(" body 태그 내부에서 스크립트를 실행합니다.");
+	</script>
+	<form>
+		<input type="button" value="함수호출" onClick="test()"/>
+	</form>
+ </body>
+</html>

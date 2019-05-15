@@ -2140,10 +2140,67 @@ a = "abc";    //ok
 
 ```
 
-+ script2.html
++ [script2.html](script2.html)
   - 지역변수와 전역변수
   - 함수 안에서 변수를 선언했어도...var로 선언하면 함수 내에서만 사용가능한 지역변수, 그냥 문자로 선언하면 어디서든 쓸수 있는 전역변수로 사용된다.
 ```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 자바 스크립트 자료형과 변수 </TITLE>
+  <SCRIPT LANGUAGE="JavaScript">
+	document.write(" 조금있으면 자율학습시간 입니다.");
+	// 변수 선언 :
+	// 함수밖에 선언되거나 직접 사용한 모든 변수는 전역변수 이다.
+	var i;           //초기값 지정이 없다(undefined)
+	var j = 20;      //초기값 지정
+	i = 10;
+	k = 30; // 선언 없이 변수에 값을 직접 치환했다.
+	document.write("<p>");
+	document.write(i+j);
+	document.write("</p>");
+
+	document.bgColor = "yellow";
+
+	// 경고창 띄우기
+	window.alert("자바스크립트의 변수사용방법입니다.");
+
+	document.write(k + "<BR>");
+
+	// 자바스크립트의 함수 기본 형태
+	function test(){
+		var l = 50;		// 지역변수 선언
+		g = 30;			// 함수안에서 선언없이
+						// 값을 직접 치환하면 g는 전역변수가 된다.
+		document.write("test()가 호출되었습니다.<BR>");
+		document.write(l + " " + g + "<BR>");
+	}
+
+	function test2(){
+		document.write("test2()가 호출되었습니다.<BR>");
+		//i,j,k는 함수밖에서 선언하거나 확보했으므로 전역변수이다.
+		//g는 함수내부에서 선언했지만 var가 없으므로 전역변수이다.
+		//l은 test()함수 내부에서 var과 함께 선언했으므로 test()에서만 사용할 수 있는 지역변수이다.
+		//document.write(i+" " + j + " " + k + " " + g + " " + l);
+		document.write(i+" " + j + " " + k + " " + g );
+	}
+  </SCRIPT>
+ </HEAD>
+
+ <BODY>
+  <SCRIPT LANGUAGE="JavaScript">
+	document.bgColor = "blue";
+	document.write((i+j+k) + "<BR>" );
+
+	//자바스크립트에서 Java언어와 마찬가지로
+	//객체를 사용할때 속성(property)과 메서드(method)를 사용한다.
+
+	// 함수 호출
+	test();
+	test2();
+  </SCRIPT>
+ </BODY>
+</HTML>
 
 ```
 
