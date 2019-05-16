@@ -2987,7 +2987,7 @@ window.navigator   :  navigator 개체
 </HTML>
 ```
 
-+ [array.html](array2.html)
++ [array2.html](array2.html)
 ```html
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
