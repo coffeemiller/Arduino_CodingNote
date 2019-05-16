@@ -2662,9 +2662,13 @@ window.navigator   :  navigator 개체
 
 + 자바스크립트에서는 사용자가 필요시 직접호출하여 사용할 수 있는 내장함수들이 있다.
 ```
-1) eval(표현식)    표현식을 직접컴파일하여 실행시키고 그 결과를 리턴한다.
-2) parseFloat("문자열숫자"); 명시적으로 문자열을 실수형으로 변환
-   parseInt("문자열숫자"); 명시적으로 문자열을 정수형으로 변환
+1) eval(표현식)  ----   표현식을 직접컴파일하여 실행시키고 그 결과를 리턴한다.
+2) parseFloat("문자열숫자"); ---- 명시적으로 문자열을 실수형으로 변환
+   parseInt("문자열숫자",[8,10,16]); ---- 명시적으로 문자열을 정수형으로 변환
+3) escape("문자") ---- 해당표현에 대한 ascii코드값을 구해준다.
+	단, 문자('A'~'Z', 'a'~'z', +, -, %, / 제외)
+4) isNaN(변수명이나 표현) ---- 숫자자료형아 아니면 참, 숫자자료형이면 거짓.
+	변수에 숫자결과값을 저장해야 하는데 문장을 실행시켰을때의 결과값이 숫자가 아닐때
 ```
 
 + [script9.html](script9.html)
@@ -2678,8 +2682,7 @@ window.navigator   :  navigator 개체
 		
 		word = "3 * 5";	//문자열
 		document.write("typof(word) : " + typeof(word) + "<BR>");
-		
-		num = 3 * 5;	//숫자형
+				num = 3 * 5;	//숫자형
 		document.write("typof(num) : " + typeof(num) + "<BR>");
 		
 		// eval(표현식)
@@ -2704,9 +2707,12 @@ window.navigator   :  navigator 개체
 		document.write("num3 : " + num3 + " typeof(num3): " + typeof(num3) + "<BR>");
 		document.write(parseFloat("AB5") + "<BR>");
 		document.write("<HR>");
+
+
 		//parseInt() 정수형은 진법을 지정할 수 있다.
+		//parseInt("15"); --> 15;
 		//  15(8)
-        //  001101   ==> 8+4+1	
+    //  001101   ==> 8+4+1	
 		//  15(16)
 		//  00010101  ==>  16 + 4 + 1
 		num1 = parseInt("15" ,8); //8진수 문자열 "15" 를 10진수로 표현
@@ -2720,11 +2726,14 @@ window.navigator   :  navigator 개체
 		document.write( parseInt("15.23") + "<BR>");  // 15 
 		document.write( parseInt("AB5") + "<BR>");  // NaN
 		document.write("<HR>");
+		//---------------------------------------------------------
+
 		num1 = "$"; //36   16진수로 표현 24
 		num2 = "&"; //38                 26
 		num3 = "+"; //43                 2B 적용안됨(사칙연산기호 제외)
 		num4 = " "; //32                 20
 		num5 = "a"; //97                 61 적용안됨(문자는 제외)
+
 		//escape() 함수를 이용하여 ascii 코드값을 얻는다.
 		document.write(escape(num1) + "<BR>");		// %24
 		document.write(escape(num2) + "<BR>");		// %26
@@ -2732,6 +2741,7 @@ window.navigator   :  navigator 개체
 		document.write(escape(num4) + "<BR>");		// %20	
 		document.write(escape(num5) + "<BR>");		//  a
 		document.write("<HR>");
+
 		// isNaN() 숫자자료형이 아님면 참, 숫자자료형이면 거짓
 		num1 = "argus10";
 		num2 = 400;
@@ -2756,6 +2766,26 @@ window.navigator   :  navigator 개체
   
 + JavaScript에서 동동비교시에는 `===`사용하자!!!
 
+
+
++ 자바스크립트에서 함수를 생성하여 사용하기
+
+1) 함수 정의하기
+```
+	function 함수명([인자명]) {
+		변수를 선언하거나 초기화;
+		실행문장들....;
+		[return 값;]
+	}
+	
+	<자바에서는 리턴이 있다.>
+	int m1() {
+		...
+		return 5;
+	}
+```
+2) 함수명은 자료형으로 취급되고 필요하다면 변수에 함수명을 대입할수도 있다.
+3) 함수호출시 전달하는 인자의 갯수는 가변적일수 있다. 또한 함수 내부에 인자값을 저장하는 속성(property)이 있다.
 
 
 + [script10.html](script10.html)
