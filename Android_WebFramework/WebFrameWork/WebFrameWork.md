@@ -2908,8 +2908,9 @@ window.navigator   :  navigator 개체
   + JavaScript에서 제공되는 미리 준비된 클래스(proto type)를 사용하여 만들어지는 객체를 의미한다.
 
 
-+ core내장객체 : 생성할때는 new 키워드를 사용할 수 있다.
-  + String이나 Array는 new
++ core내장객체 : 생성할때는 new 키워드를 사용할 수 있다.(권장)
+  + String이나 Array는 new를 사용하지 않아도 표현가능.(비추)
+  + 생성시 작동하는 메서드를 생성자(constructor)라고 부른다.
   0) 배열    Array
      1) var arr = [10,20,30,40,50];
      2) 동일한 표현으로 var arr2 = new Array(10,20,30,40,50);
@@ -2929,6 +2930,179 @@ window.navigator   :  navigator 개체
 
 
 
+
++ core내장객체는 html태그에 의해서 생성되는 객체가 아니라, 사용자가 특정 로직을 구현할대 필요에 의해서 생성하는 객체이다.
+
+
+
++ 배열(array) ==> 여러개의 데이터를 모아놓고 인덱스(첨자)를 사용하여 접근한다.
+  - Java언어에서의 배열과 유사하나, 몇가지 차이점이 있다.
+  - 차이점)
+    - 0) 요소값의 자료형이 각기 다를수도 있다.
+    - 1) 최초생성시 요소의 갯수를 지정하지 않을 수 있다. 또한 최초생성시 요소의 갯수가 결정되어 있어도 사용시 변경할 수 있다.
+    - 2) Java에서는 배열의 크기를 접근하는 length는 사용자가 변경할수 없었다. 그런데 JavaScript에서는 가능하다.
+    - 3) 배열크기를 넘어선 요소값을 표현을 하면 undefinded값이 표출된다.
+
+    - Array도 Object 자료형이므로 속성과 메서드가 있다.
+      - 속성 : length (변경하면 배열의 크기가 바뀐다.) => ok
+      - 메서드 : 다양한 메서드가 제공된다.
+ 
+
++ [array.html](array.html)
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 내장 객체 -- Array </TITLE>
+  <SCRIPT LANGUAGE="JavaScript">
+	// 기본형으로 배열 
+	// var myArray = ["전북", "전주시", "정보문화산업진흥원", 2014];
+	// var myArray = new Array("전북", "전주시", "정보문화산업진흥원", 2014);
+	var myArray = new Array();
+	myArray[0] = "전북";
+	myArray[1] = "전주시";
+	myArray[2] = "정보문화산업진흥원";
+	myArray[3] = 2014;
+	myArray[7] = 200.2;	// error ?
+	
+	var size = myArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(myArray[i] + "<BR>");
+	}
+	document.write("<hr>");
+	
+	
+	myArray.length = 3; //? 에러가 발생하지 않고 배열의 크기를 3으로 줄인다.
+	for( i=0; i<myArray.length; i++){
+		document.write(myArray[i] + "<BR>");
+	}
+	document.write(myArray[j]);
+  </SCRIPT>	
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
+```
+
++ [array.html](array2.html)
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 내장 객체 -- Array </TITLE>
+  <SCRIPT LANGUAGE="JavaScript">
+	var myArray = new Array();
+	myArray.length = 5;
+	myArray[0] = "전북";
+	myArray[1] = "전주시";
+	myArray[2] = "정보문화산업진흥원";
+	myArray[3] = 2014;
+	myArray[4] = 200.2;
+	
+	var size = myArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(myArray[i] + "<BR>");
+	}
+	document.write("<HR>");
+	
+	// 배열에 적용할 수 있는 메서드
+	// join : 배열의 요소값들은 모두 결합시켜 하나의 문자열을 만든다.
+	var myJoinString = myArray.join("/");
+	document.write(myJoinString + " typeof(myJoinString) : " + typeof(myJoinString) +"<BR>");
+	document.write("<HR>");
+
+	// myArray      --->["전북","전주시","정보문화산업진흥원",2014,200.2]
+	// mySliceArray --->["완주","정보문화산업진흥원"]
+	
+	// slice() : 현재의 배열의 요소를 분할하여 독립된 배열을 생성 기능을 수행
+	var mySliceArray = myArray.slice(1,3);  
+	// 위의 코드는 myArray의 1번째요소부터 3이전 즉, 2번째 요소까지 
+	// 추출하여 별도의 배열을 만들어라
+
+	size = mySliceArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(mySliceArray[i] + "<BR>");
+	}
+	mySliceArray[0] = "완주";
+	
+	size = mySliceArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(mySliceArray[i] + "<BR>");
+	}
+
+	size = myArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(myArray[i] + "<BR>");
+	}
+	document.write("<HR>");
+
+	// concat() : 두 배열을 결합시키는 기능을 수행
+	// myArray  --->["전북","전주시","정보문화산업진흥원",2014,200.2]
+    // myArray2 --->["스마트폰과정", "Android"]
+    // myArray3 --->["전북","전주시","정보문화산업진흥원",2014,200.2,"스마트폰과정", "Android"]
+	var myArray2 = new Array("스마트폰과정", "Android");
+	var myArray3 = myArray.concat(myArray2);
+	size = myArray3.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(myArray3[i] + "<BR>");
+	}
+	document.write("<HR>");
+
+	// myArray        --->["전북","전주시","정보문화산업진흥원",2014,200.2]
+    // myReverseArray --->[200.2,2014","정보문화산업진흥원","전주시", "전북"]
+		
+	// reverse() : 요소들을 역순으로 배열하는 기능
+	var myReverseArray = myArray.reverse();
+	size = myReverseArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(myReverseArray[i] + "<BR>");
+	}
+	document.write("<HR>");
+
+	// sort() : 배열요소들을 정렬하는 기능
+	// 오름차순으로  ==> 정수,실수,문자열순으로 정렬하여 배치한다.
+	var myArray4 = new Array("ABC", 20, "AB", 3.15, 10, "A");
+	var mySortedArray = myArray4.sort();
+	size = mySortedArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(mySortedArray[i] + "<BR>");
+	}
+	document.write("<HR>");
+	document.write("pop하기 전의 myArray 요소값들-------<br>");
+	size = myArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(myArray[i] + "<BR>");
+	}
+	//배열을 스택으로 사용할때 pop,push메서드
+	var value = myArray.pop();
+	document.write("pop된 요소값 : " + value +"<BR>");
+
+	var size = myArray.length;
+	document.write(size + "<BR>");
+	for( i=0; i<size; i++){
+		document.write(myArray[i] + "<BR>");
+	}
+	document.write("<HR>");
+  </SCRIPT>	
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
+
+```
 
 #### 6. 실습
 #### 7. Summary / Close
