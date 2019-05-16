@@ -2659,6 +2659,8 @@ window.navigator   :  navigator 개체
 ```
 
 
+#### 4. 함수
+
 + 자바스크립트에서는 사용자가 필요시 직접호출하여 사용할 수 있는 내장함수들이 있다.
   1) eval(표현식)  ----   표현식을 직접컴파일하여 실행시키고 그 결과를 리턴한다.
   2) parseFloat("문자열숫자"); ---- 명시적으로 문자열을 실수형으로 변환
@@ -2785,24 +2787,149 @@ window.navigator   :  navigator 개체
 		return 5;
 	}
 ```
-
+  + HTML(JavaScript)에서는 마우스나 키패드등 사용자에 의한 어떤 행위가 발생하면 그 행위 자체를 이벤트(Event)라고 부르고 그때 부가적으로 발생한 데이터를 window.event 객체에 특정 속성에 자동으로 값이 저장된다.
   
+	+ 함수자체도 객체로 인식한다. 객체는 속성값이 있다.
+  	+ 인자값을 전달하는 속성이 있는데, 그 명칭이 arguments이고 이것은 배열[] 이다.
 
 
 + [script10.html](script10.html)
 ```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 자바 스트립트에서의 사용자정의 함수의 특성 </TITLE>
+  <SCRIPT LANGUAGE="JavaScript">
+
+	function myFunction(){
+		var methodUdf = myFunction;      // 함수명을 변수에 대입했다. ?
+		var methodObj = document.write;  // document객체의 메서드를 변수에 대입했다.
+		var refDocument = document; // document객체를 변수에 대입했다.
+
+		document.write("methodUdf : " +  typeof(methodUdf) + "<BR>");
+		document.write("methodObj : " +  typeof(methodObj) + "<BR>");
+		document.write("refDocument : " +  typeof(refDocument) + "<BR>");
+	}
+
+	function test(a,b){
+		var c;
+		c = a + b;
+		return c;
+	}
+	
+	// 인자전달이 없는 함수라고 할지라도 사용자가 인자를 전달할 수 있다.
+	function calc(){
+		// 자바스크립트에서는 함수도 객체로 취급한다(function 객체)
+		// 호출될때 전달되는 인자값을 저장한 속성(Property)를 가지고 있다.
+		// 이 속성이 arguments라는 배열이다.
+		// 모든함수는 함수가 호출되자마자 전달되는 인자값을 해당함수의
+		// arguments에 저장하고 있다.
+		// calc.arguments[0], [1], [2], ...
+		document.write("typof(calc) : " + typeof(calc) +"<BR>");
+		document.write("인자의 갯수 : " + calc.arguments.length + "<BR>");
+		document.write(calc.arguments[0] + "<BR>");
+		document.write(calc.arguments[1] + "<BR>");
+		document.write(calc.arguments[2] + "<BR>");
+		document.write(calc.arguments[3] + "<BR>");
+		document.write(calc.arguments[4] + "<BR>");
+		if (typeof(calc.arguments[5]) == "undefined"){
+			document.write("6번째 인자는 없습니다. <BR>");
+		}
+	}
+
+	// phoneCheck1()이 호출되었다는것은 TEXT에서 입력했다는 뜻이다.
+	// 이때를 이벤트가 발생했다고 한다.  이벤트가 발생하면 발생된 이벤트에 대한
+	// 정보를 자바스크립트는 내부적으로 event라는 객체를 생성해서 정보를
+	// 저장하고 있다.
+	function phoneCheck1(){
+		//window.alert(window.event.keyCode+" 키를 눌렀습니다.");
+		//사용자가 누른 키 값을 확인
+		if (window.event.keyCode==45) {
+			return;
+		}
+		
+		if((window.event.keyCode < 48) || (window.event.keyCode > 57)){
+			window.alert("전화번호는 숫자만 입력가능합니다.");
+			//event.returnValue = true;	// 입력값이 나타난다.
+			event.returnValue = false;  // 입력값이 나타나지 않는다.
+		}
+	}
+
+	function phoneCheck2(){
+		// TEXT phone2에 현재 입력되어진 값을 얻어오고 싶다.
+		// FORM 개체
+		// String.fromCharCode(아스키코드) ==> 아스키코드값에 해당하는 문자
+		
+		//html태그에서 name속성을 지정하면 java script에서 
+		//해당 태그가 객체로 만들어진것을 접근(식별)할수 있다.
+		
+		//window.document.forms[0]
+		if( isNaN(frmPhone.phone2.value + String.fromCharCode(event.keyCode))){
+			window.alert("전화번호는 숫자만 입력가능");
+			frmPhone.phone2.value = "";			
+			frmPhone.phone2.focus();
+			event.returnValue = false;
+		}
+		
+	}
+  </SCRIPT>
+ </HEAD>
+
+ <BODY>
+	<FORM NAME="frmPhone" METHOD="POST" ACTION="">
+		전화번호1 <INPUT TYPE="text" NAME="phone1" SIZE=13 onKeyPress="phoneCheck1();"><BR>
+		전화번호2 <INPUT TYPE="text" NAME="phone2" SIZE=11 onKeyPress="phoneCheck2();"><BR>
+		<INPUT TYPE="button" VALUE="확인" onClick="calc(2,999,'Android','자바스크립트',0.5);">
+		<INPUT TYPE="button" VALUE="확인2" ONCLICK="myFunction();">
+	</FORM>
+	<SCRIPT LANGUAGE="JavaScript">
+		document.write("함수호출 결과1 : " + test(3,4) + "<BR>");
+		document.write("함수호출 결과2 : " + test("전주","정보문화산업진흥원") + "<BR>");
+		document.write("함수호출 결과3 : " + test() + "<BR>");
+	</SCRIPT>
+	<pre>
+		위의 FORM태그는 객체로 만들어지고 그 객체를 식별하는 명칭을 frmPhone가 사용된다.
+		또한 INPUT TYPE="TEXT"태그 또한 객체로 만들어져지고 phone1명칭으로 식별된다.
+		그리고 form객체에 text의 관계는 포함관계가 된다.
+	</pre>
+  
+ </BODY>
+</HTML>
+
 ```
 
 
 ```javascript
 ```
 
-#### 4. 함수
+
 #### 5. 객체
-####
-####
-####
-####
++ core내장객체는 자바언어처럼
+  + JavaScript에서 제공되는 미리 준비된 클래스(proto type)를 사용하여 만들어지는 객체를 의미한다.
+
+
++ core내장객체 : 생성할때는 new 키워드를 사용할 수 있다.
+  + String이나 Array는 new
+  0) 배열    Array
+     1) var arr = [10,20,30,40,50];
+     2) 동일한 표현으로 var arr2 = new Array(10,20,30,40,50);
+
+  1) 문자열  String
+     1) var str = "JICA";         //typeof(str) ==> string
+     2) 동일한 표현으로 var str2 = new String("JICA");   //typeof(str) ==> object
+
+  2) 날짜    Date
+
+  3) 함수    Function
+     1) var fn = new Function();
+
+  4) 수학관련기능 Math
+
+  5) 숫자 Number
+
+
+
+
 #### 6. 실습
 #### 7. Summary / Close
 
