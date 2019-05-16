@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 자바스크립트의 연산자와 제어문 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		// 선택문 : if, if else, if else if, switch case
+		var score = 40;
+		var scroe2 = 80;
+
+		if( score == 40){
+			document.write("40점이군요.<BR>"); 
+		}
+		
+		
+		if (score < 40) {
+			document.write("40점보다 작습니다.<br>")
+		} else {
+			document.write("40점과 같거나 큽니다.<br>")
+		}
+		
+
+		var point = 55;
+		if( (point >= 90) && (point <= 100)){
+			document.write("A학점 입니다.<BR>");
+		}else if( (point < 60) && (point > 0)){
+			document.write("F학점 입니다.<BR>");
+		}else {
+			document.write("평범한 학점 입니다.<BR>");
+		}
+
+		var bloodtype = 1.5;
+		document.write("당신의 혈액형은 ");
+		switch (bloodtype){
+		case "A" : document.write("A형 이군요 <BR>");break;
+		case 3 : document.write("B형 이군요 <BR>");break;
+		case 1.5 : document.write("AB형 이군요 <BR>");break;
+		case true : document.write("O형 이군요 <BR>");break;
+		default : document.write(" 엥~ 당신은 외계인?! <BR>");break;
+		}
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>

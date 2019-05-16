@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 버튼을 클릭하여 자바스크립트 함수 호출하기 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+	    
+		var global1 = "(함수 밖) 전역변수1";
+		
+		function thisFunction(){
+			var local1 = "(함수 안) 지역변수1";
+			global2 = "(함수 안) 전역변수2";
+			var local2 = "(함수 안) 지역변수2";
+
+			window.alert(global1 + "\n" + global2 + "\n" + local1 + "\n" + local2);
+		}
+
+		var a;
+		var test = "Jeonju";
+		test = 15;
+		test = 3.14;
+		document.write("test :  " + test + "<BR>");
+
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+    <FORM> 
+    	<!-- 아래의 버튼클릭시 이벤트처리코드를 설정(직접 js코드를 길게 작성할수도 있고,
+    	 함수를 호출하도록 표현할수도 있다. -->
+		<INPUT TYPE="button" VALUE="함수호출1" onClick="a = 3; thisFunction(); window.alert(global1); window.alert(global2); window.alert(a);"><BR>
+
+		<SCRIPT LANGUAGE="JavaScript">
+			thisFunction();
+		</SCRIPT>
+
+		<INPUT TYPE="button" VALUE="함수호출2" onClick="thisFunction()"><BR>
+		<!-- 링크태그에서 href에 설정하는 값들은
+			1) html파일명
+			2) 동적웹컴퍼넌트(servlet,jsp)의 url
+			3) 이벤트 처리 코드(함수호출) -->
+		<A HREF="JavaScript:thisFunction()">클릭해주세요</A><BR>
+		<A HREF="#" onClick="thisFunction()">나도 클릭해주세요.</A><BR>
+		<HR>
+		<INPUT TYPE="button" VALUE="함수호출3" onClick="window.alert(a);">
+	</FROM>
+ </BODY>
+</HTML>

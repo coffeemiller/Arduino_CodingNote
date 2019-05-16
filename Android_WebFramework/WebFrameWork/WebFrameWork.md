@@ -2071,7 +2071,7 @@ a = "abc";    //ok
   <title> JavaScript 개요 </title>
   <!-- HTML문서가 웹브라우저에 의해 해석되기 시작하면
        1) 자동으로 window객체가 자동으로 만들어진다.
-           document객체
+       document객체
 		   location객체
 		   history객체
 		   navigator 개체
@@ -2215,10 +2215,11 @@ class Test{
   1) 단일값 속성
   2) 개체 속성
   3) 컬렉션 속성
+	4) 이벤트 속성 (onXXX = "실행코드 혹은 함수명/메서드명")
 
 메서드
-  1) 일반메서드
-  2) 이벤트처리와 관련된 메서드 : onXXXX()
+  1) 일반메서드 (자유롭게 호출하여 사용)
+  2) 이벤트처리와 관련된 메서드
 ```
 
 
@@ -2250,29 +2251,508 @@ class Test{
 + HTML의 태그 : 기능/표현
 + JavaScript : HTML의 모든 태그가 객체(개체)로 만들어 진다.
 	- DOM(Document Object Model)
-	
+```
+window.document    :  document객체
+window.location    :  location객체
+window.history     :  history객체
+window.event       :  event 객체
+window.screen      :  screen 객체
+window.navigator   :  navigator 개체
+
+자주 많이 사용하는 객체(개체)들은.... 'window'를 배고 바로 사용가능.
+```
 
 
 
 
 #### 2. 변수
+```
+	함수안에서의 변수 선언과 사용
+	1) var 변수명 = 값;	  	지역변수
+	2) 변수명 = 값;		    전역변수
+
+	함수밖에서의 변수 선언과 사용
+	1) var 변수명 = 값      전역변수
+  2) 변수명 = 값;         전역변수  
+```
++ JavaScript의 변수사용
+	1) var 변수명 [=초기값];
+   	- 변수가 선언되고 치기값이 설정되었다.
+	2) var 변수명;
+   	- 변수가 선언되고 아직 값이 지정되지 않았다. 이때 변수의 값을 사용하면 undefined가 나온다.
+	3) 변수명 = 값;
+   	- 선언없이 직접 값을 할당하는 표현도 가능하다 -- 무조건 전역변수가 된다.
+	
+	참고) 객체를 사용할때 객체에 값이 지정되지 않았다는 의미로 null을 사용할수 있다.
 
 
+
++ 변수를 선언도 하지않고 사용하면 내부적으로는 에러가 발생되고 해당문장은 무시된다.
+
++ 변수의 종류
+  + 전역변수(global variable)과 지역변수(local variable)
+  1) 전역변수는 실행된 이후에는 모든 곳에서(함수포함) 자유롭게 사용하는 변수
+  2) 지역변수는 함수내부에 var로 선언된 변수로 해당 함수가 호출되었을때만 사용하는 변수 (다른곳 즉, 다른 함수에서는 사용할수 없다.)
+
+
+
++ [scpript3.html](scpript3.html)
 ```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 변수선언과 사용 </TITLE>
+	<!--
+	함수안에서의 변수 선언과 사용
+	1) var 변수명 = 값;	  	지역변수
+	2) 변수명 = 값;		    전역변수
+
+	함수밖에서의 변수 선언과 사용
+	1) var 변수명 = 값      전역변수
+    2) 변수명 = 값;         전역변수       
+	-->
+	<SCRIPT LANGUAGE="JavaScript">
+		var Temp;	// 전역변수 선언
+
+		temp = 10;	// 전역변수 할당 및 값지정
+		document.write("temp : " + temp + "<BR>");
+		temp = "전주정보문화산업진흥원";  // Ok
+		document.write("temp : " + temp + "<BR>");
+
+		document.write("<HR>");
+		document.write("Temp : " + Temp + "<BR>"); 
+		// undefinded 선언했지만 값을 한번도 지정하지 않았다.
+		// null  아직 유효한 값을 정하지못했다는 의미로 지정한 값
+
+		var temp1 = 100, temp2 = 200;
+		document.write("temp1:" + temp1 + " temp2:" + temp2 + "<BR>");
+		document.write("<HR>");
+
+		document.write("Temp : " + Temp2 + "<BR>"); 
+		//위의 코드에서 Temp2는 선언도 하지않고 사용했으므로 에러가 발생한다.
+		//이때 웹브라우저의 설정상태에 따라 경고메세지가 보이기도 하고
+		//에러가 무시되기도 한다.
+		//------------------------------------------------------
+		myName = "argus"; // 전역변수 myName을 할당함과 동시에 값지정
+		var myAge = 35;
+		var yourName = "홍길동";
+		yourAge = 40;	  // 전역변수 yourAge를 할당함과 동시에 값지정  
+		yourAge = 25;	  // 값을 치환한것이다.
+		
+		var ourAge = 25;
+		var zero1;
+		
+		//null을 값으로 가지면 자동으로 객체로 인식된다.
+		var zero2 = null;
+
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+ 	자바 스크립트는 인터프리터 언어이므로 변수의 사용법이<br>
+ 	java 언어와 다르다.
+ </BODY>
+</HTML>
+
 ```
 
 
++ [scpript4.html](scpript4.html)
 ```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 버튼을 클릭하여 자바스크립트 함수 호출하기 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+	    
+		var global1 = "(함수 밖) 전역변수1";
+		
+		function thisFunction(){
+			var local1 = "(함수 안) 지역변수1";
+			global2 = "(함수 안) 전역변수2";
+			var local2 = "(함수 안) 지역변수2";
+
+			window.alert(global1 + "\n" + global2 + "\n" + local1 + "\n" + local2);
+		}
+
+		var a;
+		var test = "Jeonju";
+		test = 15;
+		test = 3.14;
+		document.write("test :  " + test + "<BR>");
+
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+    <FORM> 
+    	<!-- 아래의 버튼클릭시 이벤트처리코드를 설정(직접 js코드를 길게 작성할수도 있고,
+    	 함수를 호출하도록 표현할수도 있다. -->
+		<INPUT TYPE="button" VALUE="함수호출1" onClick="a = 3; thisFunction(); window.alert(global1); window.alert(global2); window.alert(a);"><BR>
+
+		<SCRIPT LANGUAGE="JavaScript">
+			thisFunction();
+		</SCRIPT>
+
+		<INPUT TYPE="button" VALUE="함수호출2" onClick="thisFunction()"><BR>
+		<!-- 링크태그에서 href에 설정하는 값들은
+			1) html파일명
+			2) 동적웹컴퍼넌트(servlet,jsp)의 url
+			3) 이벤트 처리 코드(함수호출) -->
+		<A HREF="JavaScript:thisFunction()">클릭해주세요</A><BR>
+		<A HREF="#" onClick="thisFunction()">나도 클릭해주세요.</A><BR>
+		<HR>
+		<INPUT TYPE="button" VALUE="함수호출3" onClick="window.alert(a);">
+	</FROM>
+ </BODY>
+</HTML>
 ```
 
 
+
++ JavaScript에서의 자료형
+	- 숫자         number  : 정수값이나 실수값
+	- 문자,문자열  string  : 문자열
+	- 논리형       boolean : 논리값(true,false)
+	- 객체형       object  : 객체(객체는 new를 이용하여 생성할수 있다.)
+	- core 내장객체----[배열(array), 문자열(string), 날짜형(Date), 수학기능(Math)]
+
+	- 함수형       function: 함수명도 자료형으로 표현될수 있다.	
+
++ 변수를 선언하거나 할당할때 자료형을 지정하지 않으므로 해당변수의 자료형을 알고 싶다면 `typeof(변수나 값)`을 사용한다.
+
+
+
++ [script5.html](script5.html)
 ```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 자바스크립트의 자료형 </TITLE>
+ </HEAD>
+	 <SCRIPT LANGUAGE="JavaScript">
+		function testFunction(){
+		}
+
+		// typeof() 함수를 사용하여 자료형을 판단할 수 있다.
+		// -- 기본자료형
+		// -- number  : 정수, 실수
+		// -- string  : 문자열
+		// -- boolean : 논리값(true,false)
+		var age = 20;
+		var str = "전주정보문화진흥원";
+		var weight = 72.8;
+		var flag = true;
+		var test1;
+
+		// -- 객체형 : object
+		// -- 배열
+		// -- 내장객체(Date, String, ...)
+		
+		// 상태(인스턴스변수) ->프로퍼티(property, attribute):속성 
+		// 행위(메서드)       ->함수,메서드
+		
+		var test2 = null;
+		var arr = [10,20,30,40,50];	// 배열
+		var arr2 = new Array(10,20,30,40,50);
+		
+		var today = new Date();
+		var myName = new String("홍길동");
+
+		document.write( typeof(10) + "<BR>");
+		document.write( typeof(age)+ "<BR>");
+		document.write( typeof(str)+ "<BR>");
+		document.write( typeof(weight)+ "<BR>");
+		document.write( typeof(flag)+ "<BR>");
+		document.write( typeof(test1)+ "<BR>");
+		document.write("<HR>");
+		document.write( typeof(test2)+ "<BR>");
+		document.write( typeof(arr)+ "<BR>");
+		// 함수명도 자료형으로 나타낸다 : function
+		document.write( typeof(testFunction)+ "<BR>");
+		document.write( typeof(today)+ "<BR>");
+		document.write( typeof(myName)+ "<BR>");
+		document.write("<hr>");
+		
+		document.write( arr[0] + " " + arr[2] + " " + arr[4] + "<BR>");
+
+		var arr2 = [10, "홍길동", true, 3.14, new Date()];
+		for(var i=0; i<arr2.length; i++){
+			document.write(arr2[i] + "<BR>");
+		}
+	 </SCRIPT>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
+
 ```
 
 
-```javascript
-```
+
+
+
 #### 3. 제어문
++ 자바스크립트에서의 연산자와 제어문 - Java언어와 99%동일하다.
+```
+1) Variables., Operatiors
+    1. 변수의 선언 및 규칙
+    2. 연산자(산술, 관계, 논리)
+
+2) Statement
+    1. 제어문(if, switch문)
+    2. 반복문(for문, while문, do while문)
+
+3) JavaScript function
+    1. 함수의 기본 형식
+    2. window객체의 유용한 Method
+    3. 내장함수
+```
+
+
++ [script6.html](script6.html)
+```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 자바스크립트의 연산자와 제어문 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		// 선택문 : if, if else, if else if, switch case
+		var score = 40;
+		var scroe2 = 80;
+
+		if( score == 40){
+			document.write("40점이군요.<BR>"); 
+		}
+		
+		
+		if (score < 40) {
+			document.write("40점보다 작습니다.<br>")
+		} else {
+			document.write("40점과 같거나 큽니다.<br>")
+		}
+		
+
+		var point = 55;
+		if( (point >= 90) && (point <= 100)){
+			document.write("A학점 입니다.<BR>");
+		}else if( (point < 60) && (point > 0)){
+			document.write("F학점 입니다.<BR>");
+		}else {
+			document.write("평범한 학점 입니다.<BR>");
+		}
+
+		var bloodtype = 1.5;
+		document.write("당신의 혈액형은 ");
+		switch (bloodtype){
+		case "A" : document.write("A형 이군요 <BR>");break;
+		case 3 : document.write("B형 이군요 <BR>");break;
+		case 1.5 : document.write("AB형 이군요 <BR>");break;
+		case true : document.write("O형 이군요 <BR>");break;
+		default : document.write(" 엥~ 당신은 외계인?! <BR>");break;
+		}
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
+
+```
+
+
+
++ [script7.html](script7.html)
+```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 자바스크립트의 반복문 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		// 구구단을 출력해 보자
+		for( i=2; i <= 9; i++){
+			document.write("<BR> " + i + " 단 <BR>");
+			for(j=1; j<=9; j++){
+				document.write(i + " * " + j + " = " + (i*j) + "<BR>");
+			}
+			document.write("--------------\n");
+		}
+
+		var i = 1;
+		var total = 0;
+		while( i <= 100){
+			total += i;
+			i++;
+		}
+		document.write("<HR>");
+		document.write("1부터 100까지의 합은 " + total + " 입니다.<BR>");
+
+		i = 0;
+		total = 0;
+		do{
+			i++;
+			total += i;
+		}while(i<100);
+		document.write("1부터 100까지의 합은 " + total + " 입니다.<BR>");
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
+
+```
+
+
++ 자바스크립트에서 간단한 대화상자를 보여주는 3가지 방법
+  + 1) window.alert() 경고창 -- 확인
+  + 2) window.prompt()  사용자로부터 값을 입력받는다.
+  + 3) window.confirm() 사용자의 선택 -- 확인/취소
+
+
++ [script8.html](script8.html)
+```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> window객체의 3가지 대화상자 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		var age;
+		// 입력을 받을수 있는 대화상자
+		age = window.prompt("당신의 나이는?", "나이 입력");
+		document.write("age : " + age + " typeof(age): " + typeof(age) + "<BR>");
+		intage = age * 3; // age가 숫자문자열이면 숫자형으로 형변환을 
+						  // 수행한후 곱하기를 수행함
+						  // age가 숫자문자열이 아니면 연산을 수행하지 않고
+						  // NaN 이라는 값을 intage에 저장한다.
+		document.write("intage : " + intage + " typeof(intage): " + typeof(intage));
+		
+		// 알려주기만 하는 대화상자
+		window.alert("나이 : " + age );
+
+		// 사용자의 확인을 요구하는 대화상자(확인-->true, 취소-->false);
+		isOk = window.confirm("모든 내용이 맞습니까?");
+		if (isOk){
+			window.alert("확인 되었습니다.");
+		}else{
+			window.alert("취소 되었습니다.");
+		}
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
+
+```
+
+
++ 자바스크립트에서는 사용자가 필요시 직접호출하여 사용할 수 있는 내장함수들이 있다.
+```
+1) eval(표현식)    표현식을 직접컴파일하여 실행시키고 그 결과를 리턴한다.
+2) parseFloat("문자열숫자"); 명시적으로 문자열을 실수형으로 변환
+   parseInt("문자열숫자"); 명시적으로 문자열을 정수형으로 변환
+```
+
++ [script9.html](script9.html)
+```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 기본 내장 함수 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		var word, num;
+		
+		word = "3 * 5";	//문자열
+		document.write("typof(word) : " + typeof(word) + "<BR>");
+		
+		num = 3 * 5;	//숫자형
+		document.write("typof(num) : " + typeof(num) + "<BR>");
+		
+		// eval(표현식)
+		result = eval(word);  //word의 문자열표현식을 실행시켜라
+		document.write("typeof(result) : " + typeof(result) + " " + result+"<BR>");
+
+		eval("var result2 = 15");  // var result2 = 15;와 동일한 효과
+		document.write("typeof(result2) : " + typeof(result2) + " " + result2+"<BR>");
+		document.write("<HR>");
+
+		
+		// 자료형 변환함수
+		var num1, num2, num3, num4;
+		num1 = "15.5" + 15.3;		// "15.515.3" 문자열 + 숫자 ==> 문자열
+		document.write("num1 : " + num1 +"<BR>");
+		//parseFloat() 를 사용하여 숫자문자열을 숫자로 형변환시킨다.
+		num2 = parseFloat("15.5") + 15.3;
+		document.write("num2 : " + num2+"<BR>");
+		num3 = parseFloat("'15.5' + 15.3"); //parseFloat("15.515.3")
+		//num3 = parseFloat(".1z5.a5p");  //<----표현됨
+		//숫자+문자 ==> Ok ............ 문자+숫자만 ==> Error
+		document.write("num3 : " + num3 + " typeof(num3): " + typeof(num3) + "<BR>");
+		document.write(parseFloat("AB5") + "<BR>");
+		document.write("<HR>");
+		//parseInt() 정수형은 진법을 지정할 수 있다.
+		//  15(8)
+        //  001101   ==> 8+4+1	
+		//  15(16)
+		//  00010101  ==>  16 + 4 + 1
+		num1 = parseInt("15" ,8); //8진수 문자열 "15" 를 10진수로 표현
+		num2 = parseInt("15", 10); //10진수 문자열 "15" 를 10진수로 표현
+		num3 = parseInt("15", 16); //16진수 문자열 "15" 를 10진수로 표현
+		document.write("num1 : " + num1 + "<BR>");  // 13
+		document.write("num2 : " + num2 + "<BR>");  // 15
+		document.write("num3 : " + num3 + "<BR>");  // 21 
+		num4 = parseInt("20", 10) * 5;
+		document.write("num4 : " + num4 + "<BR>");  // 100 
+		document.write( parseInt("15.23") + "<BR>");  // 15 
+		document.write( parseInt("AB5") + "<BR>");  // NaN
+		document.write("<HR>");
+		num1 = "$"; //36   16진수로 표현 24
+		num2 = "&"; //38                 26
+		num3 = "+"; //43                 2B 적용안됨(사칙연산기호 제외)
+		num4 = " "; //32                 20
+		num5 = "a"; //97                 61 적용안됨(문자는 제외)
+		//escape() 함수를 이용하여 ascii 코드값을 얻는다.
+		document.write(escape(num1) + "<BR>");		// %24
+		document.write(escape(num2) + "<BR>");		// %26
+		document.write(escape(num3) + "<BR>");		//  +
+		document.write(escape(num4) + "<BR>");		// %20	
+		document.write(escape(num5) + "<BR>");		//  a
+		document.write("<HR>");
+		// isNaN() 숫자자료형이 아님면 참, 숫자자료형이면 거짓
+		num1 = "argus10";
+		num2 = 400;
+		num6 = null;
+		document.write(isNaN(num1) + "<BR>");	// true
+		document.write(isNaN(num2) + "<BR>");   // false
+		document.write(typeof num1  + "<BR>");   // string
+		document.write(typeof num2  + "<BR>");   // number
+		document.write(typeof num6  + "<BR>");   // object
+		document.write(typeof true  + "<BR>");   // boolean
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
+
+```
+
+
+
++ [script10.html](script10.html)
+```javascript
+```
+
+
+```javascript
+```
+
 #### 4. 함수
 #### 5. 객체
 ####

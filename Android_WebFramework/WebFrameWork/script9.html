@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 기본 내장 함수 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		var word, num;
+		
+		word = "3 * 5";	//문자열
+		document.write("typof(word) : " + typeof(word) + "<BR>");
+		
+		num = 3 * 5;	//숫자형
+		document.write("typof(num) : " + typeof(num) + "<BR>");
+		
+		// eval(표현식)
+		result = eval(word);  //word의 문자열표현식을 실행시켜라
+		document.write("typeof(result) : " + typeof(result) + " " + result+"<BR>");
+
+		eval("var result2 = 15");  // var result2 = 15;와 동일한 효과
+		document.write("typeof(result2) : " + typeof(result2) + " " + result2+"<BR>");
+		document.write("<HR>");
+
+		
+		// 자료형 변환함수
+		var num1, num2, num3, num4;
+		num1 = "15.5" + 15.3;		// "15.515.3" 문자열 + 숫자 ==> 문자열
+		document.write("num1 : " + num1 +"<BR>");
+		//parseFloat() 를 사용하여 숫자문자열을 숫자로 형변환시킨다.
+		num2 = parseFloat("15.5") + 15.3;
+		document.write("num2 : " + num2+"<BR>");
+		num3 = parseFloat("'15.5' + 15.3"); //parseFloat("15.515.3")
+		//num3 = parseFloat(".1z5.a5p");  //<----표현됨
+		//숫자+문자 ==> Ok ............ 문자+숫자만 ==> Error
+		document.write("num3 : " + num3 + " typeof(num3): " + typeof(num3) + "<BR>");
+		document.write(parseFloat("AB5") + "<BR>");
+		document.write("<HR>");
+		//parseInt() 정수형은 진법을 지정할 수 있다.
+		//  15(8)
+        //  001101   ==> 8+4+1	
+		//  15(16)
+		//  00010101  ==>  16 + 4 + 1
+		num1 = parseInt("15" ,8); //8진수 문자열 "15" 를 10진수로 표현
+		num2 = parseInt("15", 10); //10진수 문자열 "15" 를 10진수로 표현
+		num3 = parseInt("15", 16); //16진수 문자열 "15" 를 10진수로 표현
+		document.write("num1 : " + num1 + "<BR>");  // 13
+		document.write("num2 : " + num2 + "<BR>");  // 15
+		document.write("num3 : " + num3 + "<BR>");  // 21 
+		num4 = parseInt("20", 10) * 5;
+		document.write("num4 : " + num4 + "<BR>");  // 100 
+		document.write( parseInt("15.23") + "<BR>");  // 15 
+		document.write( parseInt("AB5") + "<BR>");  // NaN
+		document.write("<HR>");
+		num1 = "$"; //36   16진수로 표현 24
+		num2 = "&"; //38                 26
+		num3 = "+"; //43                 2B 적용안됨(사칙연산기호 제외)
+		num4 = " "; //32                 20
+		num5 = "a"; //97                 61 적용안됨(문자는 제외)
+		//escape() 함수를 이용하여 ascii 코드값을 얻는다.
+		document.write(escape(num1) + "<BR>");		// %24
+		document.write(escape(num2) + "<BR>");		// %26
+		document.write(escape(num3) + "<BR>");		//  +
+		document.write(escape(num4) + "<BR>");		// %20	
+		document.write(escape(num5) + "<BR>");		//  a
+		document.write("<HR>");
+		// isNaN() 숫자자료형이 아님면 참, 숫자자료형이면 거짓
+		num1 = "argus10";
+		num2 = 400;
+		num6 = null;
+		document.write(isNaN(num1) + "<BR>");	// true
+		document.write(isNaN(num2) + "<BR>");   // false
+		document.write(typeof num1  + "<BR>");   // string
+		document.write(typeof num2  + "<BR>");   // number
+		document.write(typeof num6  + "<BR>");   // object
+		document.write(typeof true  + "<BR>");   // boolean
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>

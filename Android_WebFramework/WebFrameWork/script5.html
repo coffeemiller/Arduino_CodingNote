@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 자바스크립트의 자료형 </TITLE>
+ </HEAD>
+	 <SCRIPT LANGUAGE="JavaScript">
+		function testFunction(){
+		}
+
+		// typeof() 함수를 사용하여 자료형을 판단할 수 있다.
+		// -- 기본자료형
+		// -- number  : 정수, 실수
+		// -- string  : 문자열
+		// -- boolean : 논리값(true,false)
+		var age = 20;
+		var str = "전주정보문화진흥원";
+		var weight = 72.8;
+		var flag = true;
+		var test1;
+
+		// -- 객체형 : object
+		// -- 배열
+		// -- 내장객체(Date, String, ...)
+		
+		// 상태(인스턴스변수) ->프로퍼티(property, attribute):속성 
+		// 행위(메서드)       ->함수,메서드
+		
+		var test2 = null;
+		var arr = [10,20,30,40,50];	// 배열
+		var arr2 = new Array(10,20,30,40,50);
+		
+		var today = new Date();
+		var myName = new String("홍길동");
+
+		document.write( typeof(10) + "<BR>");
+		document.write( typeof(age)+ "<BR>");
+		document.write( typeof(str)+ "<BR>");
+		document.write( typeof(weight)+ "<BR>");
+		document.write( typeof(flag)+ "<BR>");
+		document.write( typeof(test1)+ "<BR>");
+		document.write("<HR>");
+		document.write( typeof(test2)+ "<BR>");
+		document.write( typeof(arr)+ "<BR>");
+		// 함수명도 자료형으로 나타낸다 : function
+		document.write( typeof(testFunction)+ "<BR>");
+		document.write( typeof(today)+ "<BR>");
+		document.write( typeof(myName)+ "<BR>");
+		document.write("<hr>");
+		
+		document.write( arr[0] + " " + arr[2] + " " + arr[4] + "<BR>");
+
+		var arr2 = [10, "홍길동", true, 3.14, new Date()];
+		for(var i=0; i<arr2.length; i++){
+			document.write(arr2[i] + "<BR>");
+		}
+	 </SCRIPT>
+
+ <BODY>
+  
+ </BODY>
+</HTML>

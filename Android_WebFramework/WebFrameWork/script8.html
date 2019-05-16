@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> window객체의 3가지 대화상자 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		var age;
+		// 입력을 받을수 있는 대화상자
+		age = window.prompt("당신의 나이는?", "나이 입력");
+		document.write("age : " + age + " typeof(age): " + typeof(age) + "<BR>");
+		intage = age * 3; // age가 숫자문자열이면 숫자형으로 형변환을 
+						  // 수행한후 곱하기를 수행함
+						  // age가 숫자문자열이 아니면 연산을 수행하지 않고
+						  // NaN 이라는 값을 intage에 저장한다.
+		document.write("intage : " + intage + " typeof(intage): " + typeof(intage));
+		
+		
+		// 알려주기만 하는 대화상자
+		window.alert("나이 : " + age );  // "28", "2i"
+
+		// 사용자의 확인을 요구하는 대화상자(확인-->true, 취소-->false);
+		isOk = window.confirm("모든 내용이 맞습니까?");
+		if (isOk){
+			window.alert("확인 되었습니다.");
+		}else{
+			window.alert("취소 되었습니다.");
+		}
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
