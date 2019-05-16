@@ -2613,6 +2613,15 @@ window.navigator   :  navigator 개체
   + 3) window.confirm() 사용자의 선택 -- 확인/취소
 
 
++ 참고)JavaScript실행시 오류가 발생할 수 있다.
+  + 기본적으로는 오류를 무시하고 실행하도록 웹브라우저에 설정되어 있다. 설정을 변경하면 오류내용을 확인할 수 있다.
+  + 1) 인터넷 익스프롤러 : 설정메뉴/인터넷옵션/고급/스크립트 디버깅사용안함(체크해지)
+  + 2) 크롬 웹브라우저 : 기본기능에서는 제공하지 않음
+    + 1) F12키를 눌러서 오류를 확인
+    + 2) 확장프로그램을 사용하여 확인
+
+
+
 + [script8.html](script8.html)
 ```javascript
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -2742,6 +2751,10 @@ window.navigator   :  navigator 개체
 </HTML>
 
 ```
+
++ [JavaScript에서 쓰이는 `==`, `===`, `if()`에 관한 정리표](https://dorey.github.io/JavaScript-Equality-Table/)
+  
++ JavaScript에서 동동비교시에는 `===`사용하자!!!
 
 
 
