@@ -3703,20 +3703,471 @@ window.navigator   :  navigator 개체
 
 
 #### 3. 브라우저 내장객체
++ 웹브라우저 html문서를 읽기시작할때 자동으로 만들어지는 객체들
+```
+window
+	속성 - 단일값
+			 - 객체
+			 		document
+					location
+					history
+					event
+					screen
+					navigator
+			 - 객체배열(컬렉션)
+					frames
+			 - 이벤트속성(자바실행코드 혹은 함수명)
+			 		omXXX
+					....
+
+	메서드
+		windows.alert()
+		windows.prompt()
+		windows.confirm()
+		...
+```
+
+
 
 ###### window 객체
 ```
-  1) 자바스크립트에서는 함수를 변수에 대입할수 있다.
-	2) function 함수명() {
-		실행코드
+  1) open() : 새로운 탭을 만들거나 독자적인 창을 만들때
+	2)
+	3) moveBy(xStep, yStep), moveTo(x,y)
+```
+
++ [1_winsize.htm](browser/window/1_winsize.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>브라우저 화면의 크기는?</TITLE>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=EUC-KR">
+</HEAD>
+<BODY BACKGROUND="bg24.gif">
+<BR><BR>
+	<!-- window 개체 : 최상위 객체이다.
+	           property - classes
+			            - closed
+						- defaultStatus
+					*   - document
+					*	- event
+					*	- frames
+					*	- history
+						- location
+						- length
+						- name
+						- opener
+						- parent
+						- self
+						- screen
+						- status
+						- top
+			  method - open()
+			         - close();
+					 - resizeby()
+					 .....
+	-->
+	<SCRIPT LANGUAGE="Javascript">
+	document.write("현재 열려있는 웹브라우저의 현재 크기정보<br><br>")
+	document.write("■ 현재 화면의 바깥쪽 높이 : " + window.outerHeight + "<BR><BR>")
+	document.write("■ 현재 화면의 바깥쪽 너비 : " + window.outerWidth + "<BR><BR>")
+	document.write("■ 현재 화면의 안쪽 높이 : " + window.innerHeight + "<BR><BR>")
+	document.write("■ 현재 화면의 안쪽 너비 : " + window.innerWidth + "<BR><BR><br><br>")
+	document.write("<hr>");
+	document.write("웹브라우저와 상관없이 화면의 해상도 정보<br><br>")
+	document.write("■ 현재 화면의 바깥쪽 높이 : " + screen.height  + "<BR><BR>")
+	document.write("■ 현재 화면의 바깥쪽 너비 : " + screen.width + "<BR><BR>")
+	document.write("■ 현재 화면의 안쪽 높이 : " + screen.availHeight + "<BR><BR>")
+	document.write("■ 현재 화면의 안쪽 너비 : " + screen.availWidth + "<BR><BR>")
+	</SCRIPT>
+</BODY>
+</HTML> 
+```
+
++ [2_status.htm](browser/window/2_status.htm)
+```javascript
+<HTML>
+	<HEAD>
+		<TITLE>환영합니다</TITLE>
+		<SCRIPT LANGUAGE="Javascript">
+			function myLoad() {
+				//window.defaultStatus = "4월 8일 한주의 시작일입니다."
+				window.status = "오늘은 5월 17일 입니다....";
+			}
+		</SCRIPT>
+	</HEAD>
+	
+	<BODY BACKGROUND="bg3.gif" onLoad="myLoad()">
+		<CENTER>
+			<IMG SRC="lee2.gif">
+		</CENTER>
+		<INPUT type=button value="마우스를 올리고 상태바를 보라" onMouseOver="window.status='상태 메세지'" onMouseOut="window.status=''">
+		<BR>
+		<BR>
+	</BODY>
+</HTML>
+
+
+<!-- 또는 onLoad를 아래와 같이 할 수 있다. -->
+
+
+<HTML>
+	<HEAD>
+		<TITLE>환영합니다</TITLE>
+		<SCRIPT LANGUAGE="Javascript">
+			function myLoad() {
+				//window.defaultStatus = "4월 8일 한주의 시작일입니다."
+				window.status = "오늘은 5월 17일 입니다....";
+			}
+			
+			//윈도우 객체의 이벤트속성 onLoad에 함수명을 대입하면
+			//body태그의 onLoad속성에 코드를 작성한 것과 동일하게 동작한다.
+			window.onload = myLoad;
+		</SCRIPT>
+	</HEAD>
+	<!-- onLoad="myLoad()" -->
+	<BODY BACKGROUND="bg3.gif" >
+		<CENTER>
+			<IMG SRC="lee2.gif">
+		</CENTER>
+		<INPUT type=button value="마우스를 올리고 상태바를 보라" onMouseOver="window.status='상태 메세지'" onMouseOut="window.status=''">
+		<BR>
+		<BR>
+	</BODY>
+</HTML>
+
+```
+
+
+
+
+##### open()
+
++ 3_poem1.htm
+```javascript
+<HEAD>
+	<meta charset="EUC-KR" />
+	<TITLE>▦ 친구에게 ▦</TITLE>
+</HEAD>
+
+<BODY onLoad="self.focus()">
+	<CENTER><IMG SRC="poem1.gif"><BR><BR></CENTER>
+</BODY>
+</HTML> 
+```
+
++ 3_pop1.htm
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>환영합니다</TITLE>
+</HEAD>
+	
+<BODY BACKGROUND="bg3.gif">
+<!-- 
+	<SCRIPT LANGUAGE="Javascript">
+	   //window.open("팝업창에표시할화일이름","윈도우 이름","윈도우의스타일")
+	   //3번째 인자에서 윈도우의 스타일을 지정하지 않으면 새로운탭으로 오픈된다.
+	   window.open("3_poem1.htm", "", "")  
+	</SCRIPT>
+-->
+	
+	<script type="text/javascript">
+		function userOpen() {
+			window.open("3_poem1.htm","","")
 		}
-		위처럼 함수를 정의한다.
-		또한 new Function() 표현을 사용하여 간단한 함수를 정의할수도 있다.
-	3) 함수를 사용하여 사용자 정의 객체를 만들수 있다.
-		Java언어처럼 클래스를 만들고 ==> 객체를 생성
+	</script>
+	
+	<CENTER><IMG SRC="lee2.gif"></CENTER>
+	<input type="button" value="새탭 만들기" onclick="userOpen()">
+	<BR><BR>
+</BODY>
+</HTML> 
 ```
 
 
++ 4_pop2.htm
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>이벤트 핸들러와 팝업 창</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg13.jpg">
+	<BR><BR>
+	img태그의 onMouseOver 이벤트속성을 이용하여 마우스가 이미지위에 올라오면 작동하는 코드<br>
+	<IMG SRC="flow011.gif" onMouseOver="window.open('3_poem1.htm', '','')">
+	
+	<BR><BR>
+	문자 링크를 클릭하면 윈도우 open<br> 
+	<A HREF="#" onClick="window.open('4_poem2.htm', '','')">그런 사람이 있었습니다</A>
+	
+	<BR><BR>	
+	<FORM>
+		<INPUT TYPE="button" VALUE="친구에게" onClick="window.open('3_poem1.htm', '','')">
+	</FORM>
+</BODY> 
+</HTML>
+```
+
+
++ 5_pop3.htm
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>이벤트 핸들러와 팝업 창</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg13.jpg">
+	<BR><BR>
+	<IMG SRC="flow011.gif" onMouseOver="javascript:window.open('3_poem1.htm', 'pop1','')"> 
+	<BR><BR>
+	<A HREF="#" onClick="javascript:window.open('4_poem2.htm', 'pop2','')">그런 사람이 있었습니다</A>
+	<BR><BR>
+	<FORM><INPUT TYPE="button" VALUE="친구에게" onClick="javascript:window.open('3_poem1.htm', 'pop3','')"> </FORM>
+</BODY>
+</HTML> 
+```
+
+
+
++ 6_popwin.htm (독립된 오픈창)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>팝업 창을 내 스타일대로</TITLE>
+
+	<SCRIPT LANGUAGE="Javascript">
+	  function popupWin(fName, winName) {
+		 //위치와 크기(x,y,w,h)
+		 //         left,top,width,height
+	     window.open(fName, winName, "left=300,top=200,width=400, height=500, top status=1, menubar=0, location=0, directiories=0, scrollbars=0")
+	  }
+	</SCRIPT>
+</HEAD>
+<BODY BACKGROUND="bg2.gif">
+	<BR><BR>
+	<IMG SRC="flow011.gif" onMouseOver="popupWin('3_poem1.htm', 'pop1')"> 
+	<BR><BR>
+	<A HREF="#" onClick="popupWin('4_poem2.htm', 'pop2')">그런 사람이 있었습니다</A>
+	<BR><BR>
+	<FORM><INPUT TYPE="button" VALUE="친구에게" onClick="popupWin('3_poem1.htm', 'pop3')"> </FORM>
+</BODY>
+</HTML> 
+```
+
+
+
+
++ 7_center.htm
+```javascript
+<HTML>
+<HEAD>
+	<meta charset="EUC-KR" />
+	<TITLE>팝업 창을 화면 가운데로</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+	function openWin(fName)	{
+		var wName = "pop2";
+		// 생성할 윈도우의 폭과 높이
+		var winW = 230;
+		var winH = 300;
+		
+		//현재 화면 해상도의 폭과 높이와 윈도우의 폭과높이를 이용하여 x(newWinW),y좌표(newWinH) 계산
+		var newWinW = (screen.width - winW) / 2;
+		var newWinH = (screen.height - winH) / 2;
+		var options = 'width=' + winW + ', height=' + winH + ', left=' + newWinW + ', top = ' + newWinH;
+		window.open(fName, wName, options);
+	}
+	</SCRIPT>
+</HEAD>
+<BODY BACKGROUND="xmas1.gif">
+	<BR><BR>
+	<CENTER>
+	<FORM>
+		<INPUT TYPE="button" VALUE="기본 위치에 열기" onClick="window.open('7_model3.htm', 'pop3', 'width=245, height=305')"> 
+		<BR><BR>
+		<INPUT TYPE="button" VALUE="화면 가운데 열기" onClick="openWin('7_model3.htm')"> 
+	</FORM>
+	</CENTER>
+</BODY>
+</HTML> 
+
+```
+
+
+
+
++ 8_fullscreen.htm
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>전체 화면으로 보여주세요</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+		function fullScreen(fName)	{
+			window.open(fName, '', 'fullscreen=yes');
+		}
+
+		function channelMode(fName)	{
+			window.open(fName, '', 'channelmode=yes')
+		}
+	</SCRIPT>
+</HEAD>
+<BODY>
+	<BR><BR>
+	<CENTER>
+	<H2>※ 주의하세요 ※</H2>
+	<BR>전체 화면 창을 닫으려면<BR>
+	화면 오른쪽 아래의 [닫기] 버튼을 클릭하거나<BR>
+	[Alt]+[F4]를 누르세요 <BR><BR>
+	<FORM>
+	   <INPUT TYPE="button" VALUE="전체 화면으로 열기" onClick="fullScreen('8_card1.htm')">
+		<BR><BR>
+	   <INPUT TYPE="button" VALUE="채널 모드로 열기" onClick="channelMode('8_card2.htm')">
+	</FORM>
+	</CENTER> 
+</BODY>
+</HTML>
+```
+
+
+
+
+
+
++ 9_modified-poem1.htm
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>▦ 친구에게 ▦</TITLE>
+</HEAD>
+<BODY onLoad="self.focus()">
+	<CENTER><IMG SRC="poem1.gif">
+	<BR><BR>
+	<FORM>
+	<INPUT TYPE="button" VALUE="창 닫기" onClick="javascript:window.close()">
+	</FORM>
+	</CENTER>
+</BODY>
+</HTML> 
+```
+
+
+
+
+
++ 10_popclose.htm
+```javascript
+<HTML>
+<HEAD>
+<TITLE>팝업 창은 내가 닫는다</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+	function openWin(fName)	{
+		// 아래의 myWindow 변수는 window객체를 가리키는 참조변수이고 
+		// 전역변수이다.
+		myWindow = window.open(fName, '', 'width=350, height=450, resizable=1');
+	}
+
+	function closeWin(){
+		myWindow.close();
+	}
+	</SCRIPT>
+</HEAD>
+<BODY BACKGROUND="xmas1.gif">
+<BR><BR>
+	<CENTER>
+	<FORM>
+	<INPUT TYPE="button" VALUE="팝업 창 열기" onClick="openWin('10_model.htm')"> <BR><BR>
+	<INPUT TYPE="button" VALUE="팝업 창 닫기" onClick="closeWin()"> 
+	</FORM>
+	</CENTER>
+</BODY>
+</HTML> 
+```
+
+
+
+
+
+##### moveBy(xStep, yStep), moveTo(x,y)
+
++ 11_movewin.htm
+```javascript
+<HTML>
+<HEAD>
+<TITLE>어라~ 움직이네</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+	function moveWin(id, size){
+	   switch(id) {
+		case "up" : window.moveBy(0, -size); break;
+		case "down" : window.moveBy(0, size); break;
+		case "left" : window.moveBy(-size, 0); break;
+		case "right" : window.moveBy(size, 0); break;
+	   }
+	}
+	</SCRIPT>
+</HEAD>
+<BODY>
+	<CENTER>
+	<FORM>
+	  <INPUT TYPE="button" VALUE="위로 10픽셀" onClick="moveWin('up', 10)"><BR>
+	  <INPUT TYPE="button" VALUE="왼쪽으로 20픽셀" onClick="moveWin('left', 20)">&nbsp;&nbsp;
+	  <INPUT TYPE="button" VALUE="오른쪽으로 20픽셀" onClick="moveWin('right', 20)"><BR>
+	  <INPUT TYPE="button" VALUE="아래로 10픽셀" onClick="moveWin('down', 10)">
+	</FORM>
+	<BR>
+	<IMG SRC="bin.jpg">
+	</CENTER>
+</BODY>
+</HTML> 
+```
+
+
+
+
+
+
++ 12_fixedwin.htm
+```javascript
+
+```
+
+
+
+
+
+
++ 6_popwin.htm
+```javascript
+
+```
+
+
+
+
++ 6_popwin.htm
+```javascript
+
+```
+
+
+
+
++ 6_popwin.htm
+```javascript
+
+```
+
+
+
++ 6_popwin.htm
+```javascript
+
+```
+
+
+###### window.document 객체
++ [1_winsize.htm](browser/window/1_winsize.htm)
+```
+  1) 
+```
 
 
 ```javascript
@@ -3728,6 +4179,22 @@ window.navigator   :  navigator 개체
 
 
 
+
+
+
+
+###### window.location 객체
+```
+  3) 
+```
+
+
+```javascript
+```
+
+
+```javascript
+```
 
 
 
