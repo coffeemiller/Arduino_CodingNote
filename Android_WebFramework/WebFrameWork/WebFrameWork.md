@@ -3355,19 +3355,140 @@ window.navigator   :  navigator 개체
 
 + [date1.html](date1.html)
 ```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 날짜 객체 -- Date </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		var now = new Date(); 
+
+		var nowHour = now.getHours();
+		var ampm;
+
+		if(nowHour >=7 && nowHour <13){
+			ampm = "오전";
+		}else if(nowHour >=13 && nowHour <19){
+			ampm = "오후";
+			nowHour = nowHour - 12;
+		}else if(nowHour >=19 && nowHour <24){
+			ampm = "저녁";
+			nowHour = nowHour - 12;
+		}else{
+			ampm = "새벽";
+		}
+
+		document.write("<CENTER><B><FONT size=4 color=blue>오늘은 ");
+		document.write((now.getYear() + 1900) + "년 ");
+		document.write((now.getMonth()+1) + "월 ");
+		document.write(now.getDate() + "일 이고<BR> ");
+		document.write("현재 시간은 " + ampm);
+		document.write(nowHour + "시 ");
+		document.write(now.getMinutes() + "분 ");
+		document.write(now.getSeconds() + "초 입니다.</FONT></B></CENTER> ");
+		
+		//--------------------------------------------------------------
+		//날짜 혹은 시간단위의 연산이 가능하다.
+		var now = new Date();
+		var firstDay = new Date(1987,10,15,0,0,0);
+
+		
+		toNow = now.getTime();
+		toFirst = firstDay.getTime();
+		document.write("<HR>");
+		document.write("toNow : " + toNow + "<BR>");
+		document.write("toFirst : " + toFirst + "<BR>");
+		
+		pass = (toNow - toFirst) / (1000*60*60*24);
+		pass = Math.round(pass);
+		document.write("그 사람과 만난지 오늘로 " + pass + " 일째입니다.<BR>");
+		document.write("그 사람과 만난지 오늘로 " + Math.floor(pass/365) + "년, "+ pass%365 + " 일째입니다.<BR>");
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>
+
 ```
 
 
 
 + [date2.html](date2.html)
 ```javascript
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>요일구하기</title>
+</head>
+<body>
+	<SCRIPT>
+		var weekstr = '일월화수목금토'; // 요일 스트링
+		now = new Date(); // 현재시간 가져오기
+		year = now.getYear()+1900; // 년도 가져오기
+		month = now.getMonth(); // 월 가져오기 (+1)
+		date = now.getDate(); // 날짜 가져오기
+		hour = now.getHours(); // 시간 가져오기
+		min = now.getMinutes(); // 분 가져오기
+		sec = now.getSeconds(); // 초 가져오기
+		mils = now.getMilliseconds(); // 밀리초 가져오기
+		wkday = now.getDay(); // 요일수치 가져오기 0=일, 1=월,...4=목, 5=금
+		
+		document.write(year + '년 ' + (month + 1) + '월 ' + date + '일('
+				+ weekstr.substr(wkday, 1) + ') ');
+		document. write(hour + '시 ' + min + '분 ' + sec + '초:' + mils + 'ms'); // 스트링으로 결합하여 출력하기
+	</SCRIPT>
+</body>
+</html>
 ```
 
 
 
-
++ [date3.html](date3.html)
 ```javascript
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>일자 계산하기</title>
+</head>
+<body>
+	<SCRIPT>
+		var weekstr = '일월화수목금토'; // 요일 스트링
+		daygap = 2000; // 설정된 일자 차이
+		
+		now = newDay = new Date(); // 현재시간 가져오기
+		
+		//2000일 이후의 날짜로 변경
+		newDay.setDate(now.getDate() + daygap); // 현재 일자에서 날짜를 가져다 간격일수 만큼 더해서 새로운 일자에 넣음
+		newyy = newDay.getYear()+1900; // 새로운 일자에서 년도 가져오기
+		newmm = newDay.getMonth() + 1; // 새로운 일자에서 월 가져오기 (+1)
+		newdd = newDay.getDate();// 새로운 일자에서 날짜 가져오기
+		newww = weekstr.substr(newDay.getDay(), 1); // 요일수치 가져와서(0=일, 1=월,...) 해당 스트링으로 환산
+		document.write('현재부터 ' + daygap + '일 후는' + newyy + '년 ' + newmm + '월 '
+				+ newdd + '일(' + newww + '요일)<BR>');
+		// 스트링으로 결합하여 출력하기
+	</SCRIPT>
+</body>
+</html>
 ```
+
+
+
+
+
+
+
+###### Math 내장객체
+```
+  3) 수학관련 기능을 제공하는 내장객체
+			Math ==> 객체를 생성하지 않고 Math.속성
+              Math.메서드() 의 표현을 사용한다.
+```
+
+
+
 
 
 
