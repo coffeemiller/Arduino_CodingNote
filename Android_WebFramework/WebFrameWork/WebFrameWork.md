@@ -3113,7 +3113,78 @@ window.navigator   :  navigator 개체
 ### [2019-05-17]
 
 #### 1. Review
-#### 2. FORM 태그
+#### 2. 객체
++ String 내장객체
+```
+  0) var str = "jica";   typeof(str)  ==> string(기본형)
+	   var str2 = new String('jica');   typeof(str)  ==> object(객체형)
+		실제사용시는 str, str2 모두 객체로 상요되므로 속성이나 메서드를 모두 적용할수 있다.
+
+		속성 : length 문자열의 길이
+		메서드 : 
+			1) 글꼴관련메서드
+			2) 링크관련메서드
+			3) 문자열 조작관련 메서드
+```
+
++ [string1.htm](string1.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>String 객체의 length 프로퍼티</TITLE>
+</HEAD>
+
+<BODY BACKGROUND="bg29.gif">
+	<BR><BR>
+
+	<SCRIPT LANGUAGE="Javascript">
+	//아래의 특수한 형태의 주석은 JavaScript가 지원되지 않는 웹브라우저에서는 
+	//JavaScript 코드를 주석으로 인식하게하는 표현이다.(예전방식)
+	<!--
+	//-->
+
+	
+	<!--
+	str = "전주"; 
+	str2 = new String("정보문화산업진흥원");
+	document.write("typeof(str) : " + typeof(str) + "<br>");
+	document.write("typeof(str2) : " + typeof(str2) + "<br>");
+	document.write("<hr>");
+
+	do{
+		yourText = window.prompt("4자 이상 8자 이하로 텍스트를 입력하세요. (한글가능) : ", "안녕하세요?");
+		len = yourText.length;    
+	} while(len <4 || len > 9);
+
+	document.write("<CENTER><IMG SRC=girl.gif>")
+	document.write("<BR><BR>")
+	document.write("입력하신 텍스트는 <FONT COLOR=blue SIZE=+1><B>" + yourText + "</B></FONT>이고 <BR><BR>")
+	document.write("텍스트의 길이는 <FONT COLOR=blue SIZE=+1><B>" + len + "</B></FONT>입니다.</CENTER>")
+	
+	var title = "JICA 전주 안드로이드";
+	var title2 = new String("JICA 전주 안드로이드");
+	document.write("title.length ==>" + title.length + "<br>");
+	document.write("title2.length ==>" + title2.length + "<br>");
+	//-->
+	</SCRIPT>
+	<hr>
+	String형이나 String객체 모두 속성과 메서드를 사용할 수 있다.<br>
+	length속성은 문자열의 길이를 알려주는데 한글, 영문 상관없이 한글자를 1로 취급한다.
+
+</BODY>
+</HTML> 
+```
+
+
+```javascript
+```
+
+
+```javascript
+```
+
+
+
 
 #### 5. 변수
 
@@ -3132,9 +3203,6 @@ window.navigator   :  navigator 개체
 
 ```javascript
 ```
-#### 6. 제어문
-#### 7. 함수
-#### 8. 객체
 ####
 ####
 ####
