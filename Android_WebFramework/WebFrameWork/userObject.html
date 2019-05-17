@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> 사용자 정의 객체 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		//아래의 코드는 평범한 함수를 나타내는 용도가 아니라
+		//Java언어에서 클래스를 만드는 것과 같은 역할의 코드이다.
+		function student(name, age, gender)
+		{
+			// Java와 같은 프로그램언어에서 클래스를 만들때
+			// 멤버변수를 선언하는 역활
+			this.name = name;
+			this.age = age;
+			this.gender = gender;
+			
+			// 멤버변수에 함수명을 대입하면
+			// 아래의 display가 메서드 역활
+			this.display = dispInfo;  //함수명을 대입
+		}
+
+		function dispInfo()
+		{
+			var result = "";
+			result += this.name +" 은 " + this.age + " 세 입니다<BR>";
+			result += "성별은 " + this.gender + " 입니다.<BR>";
+			document.write(result);
+		}
+		//-----------------------------------------------------------
+		//위까지가 클래스를 만드는 개념
+		
+		//객체생성		
+		var student1 = new student("홍길동", 25, "남자");
+		var student2 = new student("신윤복", 30, "남자");
+		
+		document.write("<HR>");
+		
+		//멤버변수 즉, property사용
+		var message = "";
+        message = student1.name +" 은 " + student1.age + " 세 입니다"
+		window.alert(message);
+        
+        //메서드 호출
+		student1.display();
+		student2.display();
+        document.write("<HR>");
+		
+        //특이사항으로 실행중 멤버변수(property) 추가
+		student1.avg = 95;
+		window.alert(student1.avg);
+		document.write("평균이 추가되었습니다 : "+student1.avg);
+		document.write("<HR>");
+
+	
+	</SCRIPT>
+
+</HEAD>
+
+<BODY>
+
+</BODY>
+</HTML>

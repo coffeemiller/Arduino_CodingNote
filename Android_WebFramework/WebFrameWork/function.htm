@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<TITLE>Function 객체</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg27.gif">
+	<SCRIPT LANGUAGE="Javascript">
+	
+	//함수정의 방법1)
+	//function average(num1, num2)
+	//{
+	//	return ((num1+num2)/2);
+	//}
+
+	//함수정의 방법2)
+	average = new Function("num1", "num2", "return((num1+num2)/2)" );
+	document.write("typeof(average) : " + typeof(average) + " <BR>");
+	document.write("Function 객체를 사용해서 20과 30의 평균을 구하면<BR> ")
+	document.write(average(20, 30) + "입니다.")
+	document.write("<hr>")
+	
+	//함수명을 변수에 대입했다.
+	var myFuntion = average;
+	document.write(myFuntion(200,300) + "입니다.")
+	
+	</SCRIPT>
+</BODY>
+</HTML>

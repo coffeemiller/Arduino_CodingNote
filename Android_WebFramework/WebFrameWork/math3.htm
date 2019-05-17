@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+<TITLE>배열의 length 속성</TITLE>
+</HEAD>
+<BODY BGCOLOR="#000000" TEXT="#FFFFFF">
+	<SCRIPT LANGUAGE="Javascript">
+		var myImage = new Array();
+
+		myImage[0] = "harry1.jpg";
+		myImage[1] = "harry2.jpg";
+		myImage[2] = "harry3.jpg";
+		myImage[3] = "harry4.jpg";
+		myImage[4] = "harry5.jpg";
+		myImage[5] = "harry6.jpg";
+
+		var num = myImage.length;  //6
+		document.write("난수값 :"+Math.random()+"<br>");
+		
+		var imgSrc = Math.floor(Math.random() * num);  //0~5의 값
+
+		document.write("<CENTER><IMG SRC=" + myImage[imgSrc] + "></CENTER>")
+	</SCRIPT>
+</BODY>
+</HTML>

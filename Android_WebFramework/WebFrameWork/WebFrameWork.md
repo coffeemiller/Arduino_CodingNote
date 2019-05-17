@@ -3113,8 +3113,9 @@ window.navigator   :  navigator 개체
 ### [2019-05-17]
 
 #### 1. Review
-#### 2. 객체
-##### String 내장객체
+
+#### 2. core 내장객체(어제에 이어서...)
+##### String 객체
 ```
 문자열 리터럴값은 '',"" 내부에 표현한다.
 
@@ -3331,27 +3332,12 @@ window.navigator   :  navigator 개체
 
 
 
-###### Date 내장객체
+###### Date 객체
 ```
   1) Date
 		today = new Date();
 ```
 
-+ [date1.html](date1.html)
-```javascript
-
-```
-
-
-
-
-
-###### Math 내장객체
-```
-  2) 수학관련 기능을 제공하는 내장객체
-			Math ==> 객체를 생성하지 않고 Math.속성
-              Math.메서드() 의 표현을 사용한다.
-```
 
 + [date1.html](date1.html)
 ```javascript
@@ -3478,21 +3464,271 @@ window.navigator   :  navigator 개체
 
 
 
-
-
-###### Math 내장객체
+###### Math 객체
 ```
-  3) 수학관련 기능을 제공하는 내장객체
+  2) 수학관련 기능을 제공하는 내장객체
 			Math ==> 객체를 생성하지 않고 Math.속성
               Math.메서드() 의 표현을 사용한다.
 ```
 
 
++ [math1.htm](math1.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>Math 객체의 프로퍼티</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ECD8F0">
+	<IMG SRc="face06.gif"><BR><BR>
+	<SCRIPT LANGUAGE="Javascript">
+	
+	document.write("원주율(π)의 값은 " + Math.PI + "<BR><BR>")
+	document.write("log2의 값은 " + Math.LN2 + "<BR><BR>")
+	document.write("log10의 값은 " + Math.LN10 + "<BR><BR>")
+	document.write("√2의 값은 " + Math.SQRT2)
+	
+	</SCRIPT>
+</BODY>
+</HTML>  
+```
+
+
++ [math2.htm](math2.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>Math 객체의 메서드</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg23.gif">
+	<IMG SRC="cartoon.gif">
+	<BR><BR>
+	<SCRIPT LANGUAGE="Javascript">
+	
+	var x = -20;
+	var y = 100;
+	var z = 32.75;
+
+	document.write(x + "의 절대값은 " + Math.abs(x) + "입니다. <BR><BR>");
+	document.write(z + "를 반올림하면 " + Math.round(z) + "이고 <BR>");
+	document.write("아예 소수점 이하를 버리면 " + Math.floor(z) + "입니다.<BR><BR>");
+	document.write(x + "와 " + y + "중 큰 값은 " + Math.max(x, y) + "입니다. <BR><BR>");
+
+	</SCRIPT>
+</BODY>
+</HTML> 
+```
+
+
++ [math3.htm](math3.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>배열의 length 속성</TITLE>
+</HEAD>
+<BODY BGCOLOR="#000000" TEXT="#FFFFFF">
+	<SCRIPT LANGUAGE="Javascript">
+		var myImage = new Array();
+
+		myImage[0] = "harry1.jpg";
+		myImage[1] = "harry2.jpg";
+		myImage[2] = "harry3.jpg";
+		myImage[3] = "harry4.jpg";
+		myImage[4] = "harry5.jpg";
+		myImage[5] = "harry6.jpg";
+
+		var num = myImage.length;
+		var imgSrc = Math.floor(Math.random() * num);
+
+		document.write("<CENTER><IMG SRC=" + myImage[imgSrc] + "></CENTER>")
+	</SCRIPT>
+</BODY>
+</HTML>
+
+```
 
 
 
 
-#### 5. 변수
+
+###### Number 객체
+```
+  3) 숫자형 Number
+```
+
++ [number2.htm](number2.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>Number 객체</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg23.gif">
+	<BR><BR>
+	<SCRIPT LANGUAGE="Javascript">
+	
+
+	var x = "2012"
+	var y = "한일 월드컵"
+	var num1 = new Number(2012);
+	var num2 = new Number("2012");
+    
+	nextWorldCup = Number(x) + 4
+	nnextWorldCup = nextWorldCup + 4
+	result = parseInt(y)
+
+	document.write("다음 월드컵은 " + nextWorldCup + "년에 열립니다.<BR><BR>")
+	document.write("다음다음 월드컵은 " + nnextWorldCup + "년에 열립니다.<BR><BR>")
+	document.write("자바스크립트에서 표현할 수 있는 가장 큰 수는 " + Number.MAX_VALUE + "이고 <BR><BR>")
+	document.write(result)
+	
+	</SCRIPT>
+<BR><BR>
+<IMG SRC="bar.gif">
+</BODY>
+</HTML> 
+```
+
+
+###### Function 객체
+```
+  1) 자바스크립트에서는 함수를 변수에 대입할수 있다.
+	2) function 함수명() {
+		실행코드
+		}
+		위처럼 함수를 정의한다.
+		또한 new Function() 표현을 사용하여 간단한 함수를 정의할수도 있다.
+	3) 함수를 사용하여 사용자 정의 객체를 만들수 있다.
+		Java언어처럼 클래스를 만들고 ==> 객체를 생성
+```
+
+
++ [function.htm](function.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>Function 객체</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg27.gif">
+	<SCRIPT LANGUAGE="Javascript">
+	
+	//함수정의 방법1)
+	//function average(num1, num2)
+	//{
+	//	return ((num1+num2)/2);
+	//}
+
+	//함수정의 방법2)
+	average = new Function("num1", "num2", "return((num1+num2)/2)" );
+	document.write("typeof(average) : " + typeof(average) + " <BR>");
+	document.write("Function 객체를 사용해서 20과 30의 평균을 구하면<BR> ")
+	document.write(average(20, 30) + "입니다.")
+	document.write("<hr>")
+	
+	//함수명을 변수에 대입했다.
+	var myFuntion = average;
+	document.write(myFuntion(200,300) + "입니다.")
+	
+	</SCRIPT>
+</BODY>
+</HTML>
+```
+
+
+
++ [userObject.html](userObject.html)
+```javascript
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> 사용자 정의 객체 </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		//아래의 코드는 평범한 함수를 나타내는 용도가 아니라
+		//Java언어에서 클래스를 만드는 것과 같은 역할의 코드이다.
+		function student(name, age, gender)
+		{
+			// Java와 같은 프로그램언어에서 클래스를 만들때
+			// 멤버변수를 선언하는 역활
+			this.name = name;
+			this.age = age;
+			this.gender = gender;
+			
+			// 멤버변수에 함수명을 대입하면
+			// 아래의 display가 메서드 역활
+			this.display = dispInfo;  //함수명을 대입
+		}
+
+		function dispInfo()
+		{
+			var result = "";
+			result += this.name +" 은 " + this.age + " 세 입니다<BR>";
+			result += "성별은 " + this.gender + " 입니다.<BR>";
+			document.write(result);
+		}
+		//-----------------------------------------------------------
+		//위까지가 클래스를 만드는 개념
+		
+		//객체생성		
+		var student1 = new student("홍길동", 25, "남자");
+		var student2 = new student("신윤복", 30, "남자");
+		
+		document.write("<HR>");
+		
+		//멤버변수 즉, property사용
+		var message = "";
+        message = student1.name +" 은 " + student1.age + " 세 입니다"
+		window.alert(message);
+        
+        //메서드 호출
+		student1.display();
+		student2.display();
+        document.write("<HR>");
+		
+        //특이사항으로 실행중 멤버변수(property) 추가
+		student1.avg = 95;
+		window.alert(student1.avg);
+		document.write("평균이 추가되었습니다 : "+student1.avg);
+		document.write("<HR>");
+
+	
+	</SCRIPT>
+
+</HEAD>
+
+<BODY>
+
+</BODY>
+</HTML>
+
+```
+
+
+
+#### 3. 브라우저 내장객체
+
+###### window 객체
+```
+  1) 자바스크립트에서는 함수를 변수에 대입할수 있다.
+	2) function 함수명() {
+		실행코드
+		}
+		위처럼 함수를 정의한다.
+		또한 new Function() 표현을 사용하여 간단한 함수를 정의할수도 있다.
+	3) 함수를 사용하여 사용자 정의 객체를 만들수 있다.
+		Java언어처럼 클래스를 만들고 ==> 객체를 생성
+```
+
+
+
+
+```javascript
+```
+
+
+```javascript
+```
+
+
+
+
 
 
 ```javascript
