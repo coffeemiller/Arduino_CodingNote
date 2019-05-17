@@ -3732,8 +3732,11 @@ window
 ###### window 객체
 ```
   1) open() : 새로운 탭을 만들거나 독자적인 창을 만들때
-	2)
+	2) close() : 윈도우를 닫는다.
 	3) moveBy(xStep, yStep), moveTo(x,y)
+		 resizeTo(폭,넓이)
+	4) 타이머식별자 = setTimeOut(함수명,시간간격) --> 지정된 시간 간격후에 특정메서드를 실행시키도록 설정
+     clearTimeout(타이머식별자)
 ```
 
 + [1_winsize.htm](browser/window/1_winsize.htm)
@@ -4100,6 +4103,7 @@ window
 		case "down" : window.moveBy(0, size); break;
 		case "left" : window.moveBy(-size, 0); break;
 		case "right" : window.moveBy(size, 0); break;
+		case "to" : window.moveTo(300,400); break;
 	   }
 	}
 	</SCRIPT>
@@ -4110,7 +4114,9 @@ window
 	  <INPUT TYPE="button" VALUE="위로 10픽셀" onClick="moveWin('up', 10)"><BR>
 	  <INPUT TYPE="button" VALUE="왼쪽으로 20픽셀" onClick="moveWin('left', 20)">&nbsp;&nbsp;
 	  <INPUT TYPE="button" VALUE="오른쪽으로 20픽셀" onClick="moveWin('right', 20)"><BR>
-	  <INPUT TYPE="button" VALUE="아래로 10픽셀" onClick="moveWin('down', 10)">
+	  <INPUT TYPE="button" VALUE="아래로 10픽셀" onClick="moveWin('down', 10)"><br>
+	  <hr>
+	  <INPUT TYPE="button" VALUE="300,400으로 이동" onClick="moveWin('to', 10)">
 	</FORM>
 	<BR>
 	<IMG SRC="bin.jpg">
@@ -4122,45 +4128,147 @@ window
 
 
 
-
-
 + 12_fixedwin.htm
 ```javascript
+<HTML>
+<HEAD>
+	<TITLE>언제나 같은 크기로 열립니다</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+	function fixedWin()
+	{
+	  window.moveTo(0,0)
+	  window.resizeTo(490, 630)
+	}
 
+	</SCRIPT>
+</HEAD>
+<BODY onLoad="fixedWin()">
+	<CENTER><IMG SRC="fruit.jpg"></CENTER>
+</BODY>
+</HTML>  
 ```
 
 
 
 
-
-
-+ 6_popwin.htm
++ 13_noresize.htm
 ```javascript
-
+<HTML>
+<HEAD>
+	<TITLE>언제나 같은 크기로 열립니다</TITLE>
+</HEAD>
+<BODY onLoad="window.resizeTo(490, 630)" onresize="window.resizeTo(490, 630)">
+	<CENTER>
+	<IMG SRC="fruit.jpg">
+	</CENTER>
+</BODY>
+</HTML> 
 ```
 
 
 
 
-+ 6_popwin.htm
++ 14_resizewin.htm
 ```javascript
-
+<HTML>
+<HEAD>
+<TITLE>어라~ 움직이네</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+	function expandWin(){
+		  speedx = 10
+		  speedy = 10
+		  
+		  //현재 화면 해상도만큼 폭,높이값 지정
+		  winHeight = screen.availHeight
+		  winWidth = screen.availWidth
+		  
+		  window.moveTo(0,0)
+		  for (x=1; x<winWidth; x+=speedx)
+			window.resizeTo(x, 1)
+		  for (y=1; y<winHeight; y+= speedy)
+			window.resizeTo(x, y)
+			
+		  window.resizeTo(screen.availWidth, screen.availHeight)
+	}
+	</SCRIPT>
+</HEAD>
+<BODY>
+<CENTER>
+<FORM>
+  <INPUT TYPE="button" VALUE="클릭해 보세요" onClick="expandWin()">
+</FORM>
+<BR>
+<IMG SRC="movie01.jpg">
+</CENTER> 
+</BODY>
+</HTML> 
 ```
 
 
 
 
-+ 6_popwin.htm
++ 15_perfive.htm
 ```javascript
-
+<HTML>
+<HEAD>
+	<TITLE>setTimeout() 메서드와 clearTimeout() 메서드</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+		function displayAlert()	{
+		  window.alert("이 창은 5초마다 나타납니다.")
+		  //타이머 설정(5초후에 수행할 기능을 설정)
+		  timerID = setTimeout("displayAlert()",5000)
+		}
+	</SCRIPT>
+</HEAD>
+<BODY BACKGROUND="bg29.gif">
+<FORM>
+	[시작] 버튼을 클릭하면 5초마다 경고 창이 나타납니다.<BR>
+	멈추고 싶다면 [멈춤] 버튼을 클릭하세요.<BR><BR>
+	<INPUT TYPE="button" VALUE="시작" onClick="displayAlert()">
+	<INPUT TYPE="button" VALUE="멈춤" onClick="clearTimeout(timerID)">
+</FORM>
+</BODY>
+</HTML>
 ```
 
 
+###### setTimeOut() 
 
-+ 6_popwin.htm
++ 16_perfive.htm
 ```javascript
-
+<HTML>
+<HEAD>
+	<TITLE>setTimeout() 메서드와 clearTimeout() 메서드</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+		function displayAlert()	{
+		  window.alert("이 창은 5초마다 나타납니다.")
+		  //타이머 설정(5초후에 수행할 기능을 설정)
+		  timerID = setTimeout("displayAlert()",5000)
+		}
+	</SCRIPT>
+</HEAD>
+<BODY BACKGROUND="bg29.gif">
+<FORM>
+	[시작] 버튼을 클릭하면 5초마다 경고 창이 나타납니다.<BR>
+	멈추고 싶다면 [멈춤] 버튼을 클릭하세요.<BR><BR>
+	<INPUT TYPE="button" VALUE="시작" onClick="displayAlert()">
+	<INPUT TYPE="button" VALUE="멈춤" onClick="clearTimeout(timerID)">
+</FORM>
+</BODY>
+</HTML>
 ```
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+### [2019-05-20]
+
+#### 1. Review
 
 
 ###### window.document 객체
@@ -4212,9 +4320,19 @@ window
 
 ```javascript
 ```
-####
-####
-####
-####
+
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+### [2019-05-20]
+
+#### 1. Review
+
 #### 4. 실습
 #### 5. Summary / Close
