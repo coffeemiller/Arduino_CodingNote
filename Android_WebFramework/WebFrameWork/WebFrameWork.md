@@ -3114,17 +3114,25 @@ window.navigator   :  navigator 개체
 
 #### 1. Review
 #### 2. 객체
-+ String 내장객체
+##### String 내장객체
 ```
+문자열 리터럴값은 '',"" 내부에 표현한다.
+
   0) var str = "jica";   typeof(str)  ==> string(기본형)
 	   var str2 = new String('jica');   typeof(str)  ==> object(객체형)
 		실제사용시는 str, str2 모두 객체로 상요되므로 속성이나 메서드를 모두 적용할수 있다.
 
 		속성 : length 문자열의 길이
 		메서드 : 
-			1) 글꼴관련메서드
+			1) 글꼴관련메서드 <font> <b> <i>... ==> 메서드로 제공
 			2) 링크관련메서드
-			3) 문자열 조작관련 메서드
+				html태그중 <a href = "url"> 글자나 이미지태그 </a>
+									 <a name = "top"></a> ==> 한화면의 내용이 많을때 위치를 지정하여 사용
+									 <a href = "#top>처음으로</a>
+									 				==> anchor()메서드
+				문자열.link
+			3) 문자열 조작 메서드
+			4) 문자열 조작관련 메서드
 ```
 
 + [string1.htm](string1.htm)
@@ -3143,7 +3151,7 @@ window.navigator   :  navigator 개체
 	<!--
 	//-->
 
-	
+
 	<!--
 	str = "전주"; 
 	str2 = new String("정보문화산업진흥원");
@@ -3176,13 +3184,190 @@ window.navigator   :  navigator 개체
 ```
 
 
++ [string2.htm](string2.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>String 객체의 글꼴 관련 메서드</TITLE>
+</HEAD>
+<BODY>
+	<SCRIPT LANGUAGE="Javascript">
+	
+	myText = "전주정보문화산업진흥원"
+	
+	document.write("<CENTER>원래 텍스트 : " + myText + "</CENTER><BR>")
+	
+	document.write("fontcolor(\"red\")를 적용하면 : " + myText.fontcolor("red") + "<BR>")
+	document.write("fontsize(1)를 적용하면 : " +myText.fontsize(1) + "<BR>")
+	document.write("fontsize(5)를 적용하면 : " +myText.fontsize(5) + "<BR>")
+	document.write("bold()를 적용하면 : " +myText.bold() + "<BR>")
+	document.write("italics()를 적용하면 : " +myText.italics() + "<BR>")
+	document.write("fixed()를 적용하면 : " +myText.fixed() + "<BR>")
+	document.write("strike()를 적용하면 : " +myText.strike() + "<BR>")
+	document.write("sup()와 sub()를 적용하면 : " +myText.sup() + "/" + myText.sub() + "<BR>")
+	document.write("big()를 적용하면 : " +myText.big()+"<BR>")
+	document.write("small()를 적용하면 : " +myText.small()+"<BR>")
+	document.write("blink()를 적용하면 : " +myText.blink())
+	
+	</SCRIPT>
+
+</BODY>
+</HTML> 
+```
+
+
++ [link.html](link.html)
+
+
++ [string3.htm](string3.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>String 객체의 링크 관련 메서드</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg32.jpg">
+	<H2>내맘대로 뽑은 추천 도서</H2>
+	<BR><BR>
+	<SCRIPT LANGUAGE="Javascript">
+	//아래코드의 특이점 --> 한명령어가 끝났을때 세미콜론(;)을 사용하지 않았다.
+	var store1 = "교보문고"
+	store1.anchor("top")
+	//store1이 출력되는 위치를 top이라는 명칭으로 지정
+	//교보문고 <a name="top"></>
+	var store2 = "영풍문고"
+	var store3 = "예스24"
+
+	var book = new Array()
+	book[0] = "◎ 모리와 함께 한 화요일"
+	book[1] = "◎ 틱낫한의 평화로움"
+	book[2] = "◎ 한강(1~10)"
+	book[3] = "◎ 김수영 평전"
+	book[4] = "◎ 셜록 홈즈 전집"
+	book[5] = "◎ 더불어 숲"
+
+	document.write(store1.link("http://www.kyobobook.co.kr") + " | ")
+	//위의 코드는 아래의 html태그와 동일하다
+	//<a href="http://www.kyobobook.co.kr">교보문고</a>
+	
+	document.write(store2.link("http://www.ypbooks.co.kr") + " | ")
+	document.write(store3.link("http://www.yes24.com"))
+	document.write("<HR>")
+	document.write("<IMG SRC=book.gif><BR><BR>")
+	for (i=0; i<6; i++)
+	{
+		document.write("<FONT COLOR=blue><B>" + book[i]+"</B></FONT><BR><BR>")
+	}
+	document.write("<BR><BR>")
+	var goToTop = "맨 위로"
+	document.write(goToTop.link("#top"))
+	
+	</SCRIPT>
+	
+</BODY>
+</HTML> 
+```
+
+
+
+
++ [string4.htm](string4.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>String 객체의 문자열 관련 메서드</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg20.gif">
+	<IMG SRC="sky.jpg">
+	<BR><BR>
+	<SCRIPT LANGUAGE="Javascript">
+	
+		var subject = "태양처럼 뜨거운, 바람처럼 자유로운 영혼의 종마"
+
+		document.write(subject.bold()+"<BR><BR>");
+		
+		//문자열 조작 메서드 사용법
+		myChar1 = subject.charAt(5);
+		document.write("charAt(5)의 값은 <FONT COLOR=red>" + myChar1+"</FONT><BR><BR>");
+
+		document.write("indexOf(\"처럼\")의 값은 <FONT COLOR=red>" + subject.indexOf("처럼") + "</FONT><BR><BR>");
+
+		document.write("indexOf(\"처럼\", 5)의 값은 <FONT COLOR=red>" + subject.indexOf("처럼", 5) + "</FONT><BR><BR>");
+
+		document.write("lastIndexOf(\"운\")의 값은 <FONT COLOR=red>" + subject.lastIndexOf("운") + "</FONT>");
+	
+	</SCRIPT>
+</BODY>
+</HTML> 
+```
+
+
+
+
++ [string5.htm](string5.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>String 객체의 문자열 관련 메서드</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg20.gif">
+<IMG SRC="sky2.jpg">
+<BR><BR>
+	<SCRIPT LANGUAGE="Javascript">
+	
+	var subject = "태양처럼 뜨거운, 바람처럼 자유로운 영혼의 종마";
+
+	document.write(subject.bold()+"<BR><BR>");
+
+	document.write("slice(5, 20)의 값은 <FONT COLOR=red>" + subject.slice(5,20) + "</FONT><BR><BR>");
+
+	document.write("substring(10, 23)의 값은 <FONT COLOR=red>" + subject.substring(10,23) + "</FONT><BR><BR>");
+
+	document.write("substr(10, 13)의 값은 <FONT COLOR=red>" + subject.substr(10,13) + "</FONT>이므로 substring(10,23)일 때와 같군요.")
+	
+	</SCRIPT>
+</BODY>
+</HTML> 
+```
+
+
+
+###### Date 내장객체
+```
+  1) Date
+		today = new Date();
+```
+
++ [date1.html](date1.html)
+```javascript
+
+```
+
+
+
+
+
+###### Math 내장객체
+```
+  2) 수학관련 기능을 제공하는 내장객체
+			Math ==> 객체를 생성하지 않고 Math.속성
+              Math.메서드() 의 표현을 사용한다.
+```
+
++ [date1.html](date1.html)
 ```javascript
 ```
 
 
+
++ [date2.html](date2.html)
 ```javascript
 ```
 
+
+
+
+```javascript
+```
 
 
 

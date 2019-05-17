@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>요일구하기</title>
+</head>
+<body>
+	<SCRIPT>
+		var weekstr = '일월화수목금토'; // 요일 스트링
+		now = new Date(); // 현재시간 가져오기
+		year = now.getYear()+1900; // 년도 가져오기
+		month = now.getMonth(); // 월 가져오기 (+1)
+		date = now.getDate(); // 날짜 가져오기
+		hour = now.getHours(); // 시간 가져오기
+		min = now.getMinutes(); // 분 가져오기
+		sec = now.getSeconds(); // 초 가져오기
+		mils = now.getMilliseconds(); // 밀리초 가져오기
+		wkday = now.getDay(); // 요일수치 가져오기 0=일, 1=월,...4=목, 5=금
+		
+		document.write(year + '년 ' + (month + 1) + '월 ' + date + '일('
+				+ weekstr.substr(wkday, 1) + ') ');
+		document. write(hour + '시 ' + min + '분 ' + sec + '초:' + mils + 'ms'); // 스트링으로 결합하여 출력하기
+	</SCRIPT>
+</body>
+</html>

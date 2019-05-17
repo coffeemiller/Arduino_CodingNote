@@ -1,0 +1,26 @@
+<HTML>
+<HEAD>
+	<TITLE>String 객체의 문자열 관련 메서드</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg20.gif">
+	<IMG SRC="sky.jpg">
+	<BR><BR>
+	<SCRIPT LANGUAGE="Javascript">
+	
+		var subject = "태양처럼 뜨거운, 바람처럼 자유로운 영혼의 종마"
+
+		document.write(subject.bold()+"<BR><BR>");
+		
+		//문자열 조작 메서드 사용법
+		myChar1 = subject.charAt(5);
+		document.write("charAt(5)의 값은 <FONT COLOR=red>" + myChar1+"</FONT><BR><BR>");
+
+		document.write("indexOf(\"처럼\")의 값은 <FONT COLOR=red>" + subject.indexOf("처럼") + "</FONT><BR><BR>");
+
+		document.write("indexOf(\"처럼\", 5)의 값은 <FONT COLOR=red>" + subject.indexOf("처럼", 5) + "</FONT><BR><BR>");
+
+		document.write("lastIndexOf(\"운\")의 값은 <FONT COLOR=red>" + subject.lastIndexOf("운") + "</FONT>");
+	
+	</SCRIPT>
+</BODY>
+</HTML> 

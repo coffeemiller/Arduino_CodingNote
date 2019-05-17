@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 날짜 객체 -- Date </TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+		var now = new Date(); 
+
+		var nowHour = now.getHours();
+		var ampm;
+
+		if(nowHour >=7 && nowHour <13){
+			ampm = "오전";
+		}else if(nowHour >=13 && nowHour <19){
+			ampm = "오후";
+			nowHour = nowHour - 12;
+		}else if(nowHour >=19 && nowHour <24){
+			ampm = "저녁";
+			nowHour = nowHour - 12;
+		}else{
+			ampm = "새벽";
+		}
+
+		document.write("<CENTER><B><FONT size=4 color=blue>오늘은 ");
+		document.write((now.getYear() + 1900) + "년 ");
+		document.write((now.getMonth()+1) + "월 ");
+		document.write(now.getDate() + "일 이고<BR> ");
+		document.write("현재 시간은 " + ampm);
+		document.write(nowHour + "시 ");
+		document.write(now.getMinutes() + "분 ");
+		document.write(now.getSeconds() + "초 입니다.</FONT></B></CENTER> ");
+		
+		//--------------------------------------------------------------
+		//날짜 혹은 시간단위의 연산이 가능하다.
+		var now = new Date();
+		var firstDay = new Date(1987,10,15,0,0,0);
+
+		
+		toNow = now.getTime();
+		toFirst = firstDay.getTime();
+		document.write("<HR>");
+		document.write("toNow : " + toNow + "<BR>");
+		document.write("toFirst : " + toFirst + "<BR>");
+		
+		pass = (toNow - toFirst) / (1000*60*60*24);
+		pass = Math.round(pass);
+		document.write("그 사람과 만난지 오늘로 " + pass + " 일째입니다.<BR>");
+		document.write("그 사람과 만난지 오늘로 " + Math.floor(pass/365) + "년, "+ pass%365 + " 일째입니다.<BR>");
+	</SCRIPT>
+ </HEAD>
+
+ <BODY>
+  
+ </BODY>
+</HTML>

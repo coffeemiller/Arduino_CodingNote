@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>String 객체의 링크 관련 메서드</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg32.jpg">
+	<H2>내맘대로 뽑은 추천 도서</H2>
+	<BR><BR>
+	<SCRIPT LANGUAGE="Javascript">
+	//아래코드의 특이점 --> 한명령어가 끝났을때 세미콜론(;)을 사용하지 않았다.
+	var store1 = "교보문고"
+	store1.anchor("top")
+	//store1이 출력되는 위치를 top이라는 명칭으로 지정
+	//교보문고 <a name="top"></>
+	var store2 = "영풍문고"
+	var store3 = "예스24"
+
+	var book = new Array()
+	book[0] = "◎ 모리와 함께 한 화요일"
+	book[1] = "◎ 틱낫한의 평화로움"
+	book[2] = "◎ 한강(1~10)"
+	book[3] = "◎ 김수영 평전"
+	book[4] = "◎ 셜록 홈즈 전집"
+	book[5] = "◎ 더불어 숲"
+
+	document.write(store1.link("http://www.kyobobook.co.kr") + " | ")
+	//위의 코드는 아래의 html태그와 동일하다
+	//<a href="http://www.kyobobook.co.kr">교보문고</a>
+	
+	document.write(store2.link("http://www.ypbooks.co.kr") + " | ")
+	document.write(store3.link("http://www.yes24.com"))
+	document.write("<HR>")
+	document.write("<IMG SRC=book.gif><BR><BR>")
+	for (i=0; i<6; i++)
+	{
+		document.write("<FONT COLOR=blue><B>" + book[i]+"</B></FONT><BR><BR>")
+	}
+	document.write("<BR><BR>")
+	var goToTop = "맨 위로"
+	document.write(goToTop.link("#top"))
+	
+	</SCRIPT>
+	
+</BODY>
+</HTML> 

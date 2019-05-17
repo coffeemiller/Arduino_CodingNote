@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>일자 계산하기</title>
+</head>
+<body>
+	<SCRIPT>
+		var weekstr = '일월화수목금토'; // 요일 스트링
+		daygap = 2000; // 설정된 일자 차이
+		
+		now = newDay = new Date(); // 현재시간 가져오기
+		
+		//2000일 이후의 날짜로 변경
+		newDay.setDate(now.getDate() + daygap); // 현재 일자에서 날짜를 가져다 간격일수 만큼 더해서 새로운 일자에 넣음
+		newyy = newDay.getYear()+1900; // 새로운 일자에서 년도 가져오기
+		newmm = newDay.getMonth() + 1; // 새로운 일자에서 월 가져오기 (+1)
+		newdd = newDay.getDate();// 새로운 일자에서 날짜 가져오기
+		newww = weekstr.substr(newDay.getDay(), 1); // 요일수치 가져와서(0=일, 1=월,...) 해당 스트링으로 환산
+		document.write('현재부터 ' + daygap + '일 후는' + newyy + '년 ' + newmm + '월 '
+				+ newdd + '일(' + newww + '요일)<BR>');
+		// 스트링으로 결합하여 출력하기
+	</SCRIPT>
+</body>
+</html>
