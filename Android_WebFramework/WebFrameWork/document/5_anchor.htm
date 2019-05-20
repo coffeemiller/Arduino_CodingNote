@@ -1,0 +1,56 @@
+<HTML>
+<HEAD>
+	<TITLE> anchor 객체 </TITLE>
+</HEAD>
+<BODY BGCOLOR="#EBEBFD">
+	<A NAME="top"></A>
+	<BR>
+	[<A HREF="#music1">비오는 압구정</A>]&nbsp;&nbsp;[<A HREF="#music2">점점</A>]&nbsp;&nbsp;[<A HREF="#music3">떠나지마
+	</A>]
+	<HR>
+	<A NAME="music1"></A>
+	<H3>비오는 압구정</H3>
+	<FONT COLOR="blue">
+	비오는 압구정 골목길에서 <BR>
+	그댈 기다리다가 <BR>
+	나 혼자 술에 취한 밤 <BR>
+	혹시나 그댈 마주칠까봐 두 시간 지나도록 <BR>
+	마냥 기다리네 <BR>
+	~ 중략 ~ </FONT><BR>
+	<A HREF="#top">맨 위로</A>
+	<BR><BR>
+	<A NAME="music2"></A>
+	<H3>점점</H3>
+	<FONT COLOR="blue"> 
+	점점 넌 멀어지나봐 웃고 있는 날 봐 <BR>
+	때론 며칠씩 편하게 지내 <BR>
+	점점 널 잊는 것 같아 먼일처럼<BR> <BR>
+	점점 넌 떠나가나 봐 하루는 미치고 <BR>
+	다음 날이면 괜찮아졌어 <BR>
+	다만 슬픔에 익숙해질 뿐인걸<BR>
+	~ 중략 ~ </FONT><BR>
+	<A HREF="#top">맨 위로</A>
+	<BR><BR>
+	<A NAME="music3"></A>
+	<H3>떠나지마</H3>
+	<FONT COLOR="blue">
+	뭐라고 말을 하나 그 사람을 위해서 <BR>
+	어떻게 달래주나 울고 있는 너에게<BR>
+	그렇게 눈물지면 내 마음 아프잖아<BR>
+	하고픈 말은 많은데 건넬 수가 없잖아<BR>
+	~ 중략 ~</FONT><BR>
+	<A HREF="#top">맨 위로</A>
+	
+	<BR><BR>
+	<HR>
+	
+	<SCRIPT LANGUAGE="Javascript">
+	//html태그가 객체로 만들어져 document객체의 속성에 해당정보가 저장되어 있다.
+	num = document.anchors.length
+	document.write("이 문서에는 모두 " + document.anchors.length + "개의 앵커가 있습니다.<BR><BR>")
+	for (i=0; i<num; i++){
+		document.write("<B>anchors[" + i + "] :</B> " + document.anchors[i].name + "<BR>")
+	}
+	</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,18 @@
+<HTML>
+<HEAD>
+	<TITLE>location 객체 활용하기</TITLE>
+	<SCRIPT LANGUAGE="Javascript"> 
+	function loadURL(url){ 
+	  //window.creator.location=url 
+	  window.opener.location=url;
+	  window.close();
+	} 
+	</SCRIPT> 
+</HEAD>
+<BODY>
+	<CENTER> 
+	<A HREF="magazine1.htm" onClick="loadURL(this.href)"> 잡지 표지 그림 </A> 
+	</CENTER>
+</BODY>
+</HTML> 
+ 

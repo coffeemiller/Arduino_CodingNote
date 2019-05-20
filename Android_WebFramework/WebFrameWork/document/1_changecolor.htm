@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>배경색과 글자색 바꾸기</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+	<SCRIPT language="Javascript">
+	function changeBackground(hexNumber) {
+	 document.bgColor=hexNumber;
+	}
+
+	function changeText(hexNumber) {
+	  document.fgColor=hexNumber;
+	  //background.redBtn.value
+	  //document.forms[0].redBtn.value
+	  //document.getByElementName("background").redBtn.value
+	}
+	</SCRIPT> 
+<CENTER>
+배경색이 바뀌면 글자색도 거기에 맞춰 바뀌어야겠죠?
+<BR>
+<FORM method="post" name="background">
+  <INPUT type="button" value="red" onclick="changeBackground('#CC0000');changeText('#FFFFFF')">
+  <INPUT type="button" value="green" onclick="changeBackground('#006600');changeText('#FFFFFF')">
+  <INPUT type="button" value="yellow" onclick="changeBackground('#FFFF99');changeText('#0000FF')">
+  <INPUT type="button" value="white" onclick="changeBackground('#FFFFFF');changeText('#000000')">
+  <INPUT type="button" value="black" onclick="changeBackground('#000000');changeText('#FFFFFF')";>
+  <INPUT type="button" value="blue" onclick="changeBackground('#0000FF');changeText('#FFFF00')">
+</FORM>
+<BR><BR>
+<IMG SRC="doggy.gif">
+</CENTER> 
+</BODY>
+</HTML>

@@ -1,0 +1,18 @@
+<HTML>
+<HEAD>
+<TITLE>location 객체 활용하기</TITLE>
+<SCRIPT>
+	//팝업창을 띄운다. 그리고 새로만들어진 팝업창을 참조할수 있는 window객체변수를
+	//newWin으로 설정했다.
+	newWin = window.open("2_popup.htm","","width=485,height=70");
+	
+	//팝업창을 가리키는 참조변수의 속성값에 현재 윈도우가 팝업창을 만든 윈도우라고 설정한다.
+	newWin.creator = this; 
+</SCRIPT> 
+</HEAD>
+<BODY BACKGROUND="bg30.gif">
+	<CENTER>
+	<H1> 이 창은 팝업 창을 호출한 메인 화면입니다 </H1>
+	</CENTER>
+</BODY>
+</HTML>

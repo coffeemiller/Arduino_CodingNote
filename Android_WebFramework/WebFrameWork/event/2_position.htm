@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+	<TITLE> 현재 마우스 커서의 좌표는? </TITLE>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=euc-kr">
+	<SCRIPT LANGUAGE="Javascript">
+	function mouseDown() {
+		  var x = window.event.x;
+		  var y = window.event.y;
+		  window.status = "x : " + x + ", y : " + y;
+		  //window.defaultStatus = "x : " + x + ", y : " + y;
+		  return true;
+	}
+	document.disable_window_status_change = true;
+	// document의 멤버변수 즉, property를 이용하여 
+	// 마우스 이벤트 핸들러를 사용한다.
+	document.onmousedown = mouseDown;
+	document.onmousemove = mouseDown;
+	//if(!ie) document.captureEvents(Event.MOUSEDOWN);
+	//-->
+	</SCRIPT>
+</HEAD>
+<BODY BACKGROUND="window.jpg">
+ <INPUT type=button value="마우스를 올리고 상태바를 보라" onMouseOver="window.defaultStatus='디폴트 상태바 메세지'" onMouseOut="window.defaultStatus=''">
+</BODY>
+</HTML> 

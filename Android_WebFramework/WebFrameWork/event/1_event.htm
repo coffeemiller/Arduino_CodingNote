@@ -1,0 +1,24 @@
+<HTML>
+<HEAD>
+	<TITLE>아무 키나 눌러보세요 :: 익스플로러 전용 ::</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg12.jpg">
+	<SCRIPT LANGUAGE="Javascript">
+	function keyDown() {
+	  var key = window.event.keyCode;  // 65
+	  var realKey = String.fromCharCode(key) // 'A'
+
+	  alert("누른 키 : " + realKey + "\n코드 값 : " + key)
+	}
+	
+	// 웹브라우저 내장객체인 window.document.onkeydown이라는 
+	// 멤버변수 즉, property가 있다.
+	// 이곳에 함수를 지정해주면 키를 누를때마다 자동으로 해당함수가
+	// 호출된다.
+	document.onkeydown = keyDown
+	//-->
+	</SCRIPT>
+	<H2>키보드에서 아무 키나 눌러보세요</H2>
+	
+</BODY>
+</HTML>

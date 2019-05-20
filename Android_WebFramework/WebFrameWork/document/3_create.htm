@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+	<TITLE>자바스크립트로 웹 문서 만들기</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+	<IMG SRC="facemark.gif"><BR><BR>
+	[만들기] 버튼을 클릭하면 새 브라우저 창이 열리고 문서가 만들어지며 <BR>
+	[닫기] 버튼을 클릭하면 새 브라우저 창의 문서가 지워지면서 닫힙니다.<BR><BR>
+
+	<SCRIPT LANGUAGE="Javascript">
+	//비어있는 윈도우가 만들어진다.
+	//함수내부의 표현이 아니므로 생성된 윈도우를 참조하는 변수 special은 전역변수로 작동.
+	special = window.open("", "", "width=350, height=500")
+   
+	function newOpen(){  
+	   special = window.open("", "", "width=350, height=500")
+	   special.document.open()
+	   special.document.bgColor = "purple"
+	   special.document.fgColor = "white"
+	   special.document.write("<B>자바스크립트로 만드는 문서입니다</B><BR><BR>")
+	   special.document.write("<IMG SRC=tree.jpg>")
+	   special.document.write("<FORM><INPUT TYPE='button' VALUE='닫기' onClick='window.close()'></FORM>")
+
+	}
+
+	function newClear(){
+	  special.document.open()
+	  special.document.clear()
+	   //special.clear()
+	}
+
+	function newClose(){
+	   special.close()
+	}
+	</SCRIPT>
+	<FORM>
+		<INPUT TYPE="button" VALUE="만들기" onClick="newOpen()">&nbsp;&nbsp;
+		<INPUT TYPE="button" VALUE="지우기" onClick="newClear()">&nbsp;&nbsp;
+		<INPUT TYPE="button" VALUE="닫기" onClick="newClose()">
+	</FORM>
+	
+</BODY>
+</HTML>

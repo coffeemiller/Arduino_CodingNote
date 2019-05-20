@@ -1,0 +1,26 @@
+<HTML>
+<HEAD>
+	<TITLE>문서 정보 바꾸기</TITLE>
+</HEAD>
+<BODY BGCOLOR="#000000" TEXT="#FFFFFF">
+	<H2> 현재 문서의 정보 </H2>
+	<SCRIPT LANGUAGE="Javascript">
+	   document.write("<B> 문서의 최종 수정일 : </B> " + document.lastModified + "<BR><BR>")
+	   document.write("<B> 문서의 현재 주소  : </B> " + document.URL + "<BR><BR>")
+	   document.write("<B> 문서의 제목 : </B>" + document.title + "<BR><BR>")
+	   
+	   function changeURL(url){
+		   //document.URL = url;  // 도움말 문서와 달리 작동하지 않음
+		   location.href = url;
+	   }
+	</SCRIPT>
+	<FORM method="post" name="background">
+	  <INPUT type="button" value="길벗 홈페이지로 가기" onclick="document.location ='http://www.gilbut.co.kr'">
+	  <INPUT type="button" value="길벗 홈페이지로 가기2" onclick="changeURL('http://www.gilbut.co.kr')">	  
+	  <INPUT type="button" value="문서 제목 좀 바꿔봐~" onclick="document.title = '▒거의다 끝났어요. 졸지마삼~  ▒'"> 
+	</FORM>
+	<BR><BR>
+	<IMG SRC="rose.gif">
+	</CENTER>
+</BODY> 
+</HTML> 

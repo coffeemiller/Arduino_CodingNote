@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<HTML>
+<HEAD>
+	<TITLE>지금 몇 시죠?</TITLE>
+</HEAD>
+<BODY>
+<CENTER> 
+	<FORM>
+		<INPUT TYPE="button" VALUE="지금 몇 시죠?" onClick="javascript:location.reload()">
+		<BR>
+	</FORM>
+	<SCRIPT LANGUAGE="Javascript">
+	  var now = new Date()
+	  var display = now.toLocaleString()
+
+	  document.write("<FONT COLOR=red>" + display + "</FONT>")
+	</SCRIPT>
+	<BR><BR>
+	<IMG SRC="clock.gif">
+</CENTER>
+</BODY>
+</HTML> 

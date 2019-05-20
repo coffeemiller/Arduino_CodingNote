@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+	<TITLE>브라우저 자가 진단 </TITLE>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=euc-kr">
+</HEAD>
+<BODY BACKGROUND="bg30.gif">
+	<SCRIPT LANGUAGE="Javascript">
+	<!--
+
+	java = navigator.javaEnabled()
+	taint = navigator.taintEnabled()
+
+	document.write("<CENTER>")
+
+	if(java) {
+		document.write("<B> 자바를 사용할 수 있는 브라우저입니다. </B>");
+	}else{
+		document.write("<B> 자바는 사용할 수 없어요. </B>");
+	}
+
+	document.write("<BR><BR><HR><BR><BR>")
+
+	if(taint) document.write("<B><FONT COLOR=red> 브라우저에 이상이 있습니다 </FONT></B>")
+	else document.write("<B> 브라우저가 정상적으로 동작 중이네요 </B>")
+
+	//-->
+</SCRIPT>
+</BODY>
+</HTML> 

@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<HTML>
+<HEAD>
+	<TITLE> link 객체 </TITLE>
+</HEAD>
+<BODY BACKGROUND="bg33.gif">
+	<CENTER>
+	<BR><BR>
+	<A HREF="7_image.htm" TARGET="_blank"><IMG SRC="dawn.jpg" BORDER="0"></A>
+	<BR><BR>
+	<A HREF="http://www.daum.net" TARGET="_self"> 다음(daum.net) 사이트로 </A>
+	<BR><HR>
+	<SCRIPT LANGUAGE="Javascript">
+	  num = document.links.length
+	  document.write("이 문서에는 모두 " + num + "개의 링크가 있습니다.<BR><BR>")
+
+	  for (i = 0; i < num; i++) {
+		 document.write("links[" + i + "]의 href는 " + document.links[i].href )
+		 document.write("<BR>")
+		 document.write("links[" + i + "]의 target은 " + document.links[i].target)
+		 document.write("<BR><BR>")
+	  }
+
+	</SCRIPT>
+	</CENTER>
+</BODY> 
+</HTML>

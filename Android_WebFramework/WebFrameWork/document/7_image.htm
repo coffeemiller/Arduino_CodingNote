@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<HTML>
+<HEAD>
+<TITLE> images 객체 </TITLE>
+</HEAD>
+<BODY BGCOLOR="#DDE168">
+<BR><BR>
+<TABLE WIDTH="620">
+  <TR>
+    <TD WIDTH="300">
+       <IMG SRC="dawn.jpg" WIDTH="300" HEIGHT="198" ALIGN="left" BORDER="0" NAME="img1">
+    </TD>
+    <TD WIDTH="20">&nbsp;</TD>
+    <TD WIDTH="300">
+       <IMG SRC="tree2.jpg" WIDTH="300" HEIGHT="213" ALIGN="RIGHT" id="id명" BORDER="1" NAME="img2">
+    </TD>
+  </TR>
+  <TR COLSPAN="3">
+    <SCRIPT LANGUAGE="Javascript">
+    //getElementsByName("img2");
+    //getElementsById("id명");
+    //getElementsByTagName("태그명");
+    
+    num = document.images.length
+    document.write("이 문서에는 모두 " + num + "개의 이미지가 있습니다.<BR><BR>")
+
+    for (i = 0; i < num; i++) {
+       document.write("<B>images[" + i + "]</B><BR>")
+       document.write(" &nbsp;&nbsp;&nbsp;SRC : "+ document.images[i].src+"<br>")
+       document.write(" &nbsp;&nbsp;&nbsp;WIDTH : " + document.images[i].width)
+       document.write(" &nbsp;&nbsp;&nbsp; HEIGHT : "+ document.images[i].height + "<BR>")
+       document.write(" &nbsp;&nbsp;&nbsp;BORDER : "+ document.images[i].border)
+       document.write(" &nbsp;&nbsp;&nbsp;NAME : " + document.images[i].name)
+       document.write(" &nbsp;&nbsp;&nbsp;ALIGN : " + document.images[i].align)
+       document.write("<BR><BR>")
+    }
+    //-->
+    </SCRIPT>
+  </TR>
+</TABLE>
+</BODY>
+</HTML>

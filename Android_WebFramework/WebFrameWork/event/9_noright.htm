@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+<TITLE>오른쪽 단추는 안 돼요~</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=euc-kr">
+</HEAD>
+<BODY>
+<SCRIPT LANGUAGE="Javascript">
+
+ie = (document.all) ? 1 : 0
+
+function noRight(e)
+{
+	//마우스가 눌리워졌을때 호출되었으므로
+    if (event.button == 2 || event.button == 1+2 || event.button == 2+1)
+       alert("오른쪽 단추는 사용할 수 없습니다")
+}
+
+document.onmousedown = noRight;
+
+//-->
+</SCRIPT>
+<CENTER>
+<H2>이미지를 저장할 수 있을까요?</H2>
+<IMG SRC="iamsam.jpg">
+</CENTER>
+</BODY>
+</HTML>  

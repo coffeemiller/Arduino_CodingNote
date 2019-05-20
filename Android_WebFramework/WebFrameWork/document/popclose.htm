@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>팝업 창은 내가 닫는다</TITLE>
+	<SCRIPT LANGUAGE="Javascript">
+	<!--
+	function openWin(fName)
+	{
+		// 아래의 myWindow 변수는 window객체를 가리키는 참조변수이고 
+		// 전역변수이다.
+		myWindow = window.open(fName, '', 'width=350, height=450, resizable=1');
+	}
+
+	function closeWin()
+	{
+		myWindow.close();
+	}
+	//-->
+	</SCRIPT>
+</HEAD>
+<BODY BACKGROUND="xmas1.gif">
+<BR><BR>
+	<CENTER>
+	<FORM>
+	<INPUT TYPE="button" VALUE="팝업 창 열기" onClick="openWin('3_create.htm')"> <BR><BR>
+	<INPUT TYPE="button" VALUE="팝업 창 닫기" onClick="closeWin()"> 
+	</FORM>
+	</CENTER>
+</BODY>
+</HTML> 
