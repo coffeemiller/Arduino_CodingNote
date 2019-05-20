@@ -4716,7 +4716,7 @@ window
 ```
   window.history ==> 방문한 url정보를 관리
 
-	웹브라우저 자체의 버튼을 사용할 수도 있지만, 웹컨텐츠 성격상 사용자에 의해 이전, 다음, 홈 등으로 이동하는 것은 자체적으로 해결하고 싶을때 history 객체의 정보를 이요할 수 있다. 
+	웹브라우저 자체의 버튼을 사용할 수도 있지만, 웹컨텐츠 성격상 사용자에 의해 이전, 다음, 홈 등으로 이동하는 것은 자체적으로 해결하고 싶을때 history 객체의 정보를 이용할 수 있다. 
 
 	history.back()
 				 .forward()
@@ -5102,7 +5102,8 @@ document.onmousedown = noRight;
 #### 3. Servlet 객체
 ```
 client                   웹서버(Tomcat-웹컨테이너)
-					최초요청
+
+					최초요청       0) 요청정보를 해석했을때 존재하지 않고 웹컴포넌트
 A ---------request-----> 1) 서블릿객체가 메모리에 있는지 검사.
 												 2) 서블릿객체 생성 - 생성자, 초기화작업수행
 												 ====쓰레드처리===================================
@@ -5138,15 +5139,62 @@ UserServlet
 ```
 
 
-#### 4. 데이터 전송( Data)
-#### 5. Get방식 / Post방식
++ 서블릿 작성시 지켜야할 작업순서
+	1) HttpServlet을 상속받는다.
+	2) 요청방식에 따라 작동할 doGet(), doPost() 메서드를 재정의 한다.
+	3) 작성한 서블릿이 웹서버에서 올바르게 인식되려면 2가지 방법중 1가지를 사용하여 설정한다.
+   	1) WebSerbvle Anotation 사용(요즘 자주 사용하는 방식)
+   	2) web.xml에 서블릿을 등록(예전 방식)
+	```html
+	<!-- web.xml -->
+	<servlet>
+		<servlet-name>GetData</servlet-name>
+		<servlet-class>com.jica.chap02.GetData</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetData</servlet-name>
+		<url-pattern>/GetData</url-pattern>
+	</servlet-mapping>
+	``` 
+  1) 서블릿을 웹서버에 추가했을때는 반드시 웹서버를 다시 켜야 한다.(html,jsp는 상관X)
+	4) 서브릿에 인스턴스 멤버변수를 추가하면 여러 요청에서 공유하게 된다.
+
+
+
++ 요청방식
+  1) get방식
+    - <form action="http://localhost:8088/chap02/GetData" method="get">
+      - 다양한 내부 태그
+    - 주소표시줄에 url입력후 엔터
+    - <a href="url">
+	2) post방식
+   	- <form action="url" >
+
+
++ 만일 요청 url의 정보에 부합하는 웹컴퍼넌트(HTML,서블릿/JSP)가 없다면, 웹서버는 404번 응답코드를 보낸다(잘못된 요청).
++ 동적웹컴퍼넌트 즉, 서블릿을 호출했을때 get,post방식의 요청에 부합되는 메서드가 없을때, 405번 응답코드를 보낸다.
+
++ 서버로의 요청에 이상이 없이 정상처리를 했다면 200번 응답코드를 보낸다.(정상)
+  + 만약 요청에 대한 응답코드가 500번대 숫자이면, 서버내부에서의 코딩에러이므로 프로그래머잘못.
+
++ 서블릿의 응답 html에서 한글코드가 깨질때 Server의 server.xml내용을 변경
+  + CONNECTOR부분에 URIEncoding="EUC-KR" 추가....
+
++ 서블릿 소스를 고쳤을때 서버에서 고친내용을 자동참조할수 있도록 설정(Ccndtext.xml)
+  + <Context reloadable="true">로 변경....
+
+
+
+##### [오늘의 과제]
++ 오늘 서블릿 학습내용 복슴
++ 교재 2장 97page까지 읽어보기
++ JavaScript의 예제중 browser/form1.... /form2의 내용을 실행시켜보고 이해해 보기
 
 
 
 
-
-#### 6. 실습
-#### 7. Summary / Close
+#### 4. 실습
+#### 5. Summary / Close
 
 
 
@@ -5156,6 +5204,10 @@ UserServlet
 ### [2019-05-20]
 
 #### 1. Review
+
+
+#### 4. 데이터 전송( Data)
+#### 5. Get방식 / Post방식
 
 #### 4. 실습
 #### 5. Summary / Close
