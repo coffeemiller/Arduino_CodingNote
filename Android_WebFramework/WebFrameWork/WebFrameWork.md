@@ -4269,6 +4269,63 @@ window
 ### [2019-05-20]
 
 #### 1. Review
+```
+  window.속성
+				.메서드()
+
+				.location
+				.history
+				.event
+				.stream
+				.navigator
+```
+
+#### 2. 브라우저 객체
+
+###### window.document 객체
++ html태그를 읽어서 객체로 변화시켜 정보를 유지한다.(DOM)
+```
+	document.속성
+					.all
+					.anchors  <a name="top" >  (컬렉션 속성=배열)
+					.forms    <form>...</form>
+					.links    <a href="url"> </a>  (컬렉션 속성=배열)
+					....
+	
+	document.메서드()
+  1) 
+```
+
++ [1_changecolor.htm](browser/window/1_winsize.htm)
+```javascript
+```
+
+
+```javascript
+```
+
+
+
+###### window.location 객체
+```
+  1) 
+```
+
+
+```javascript
+```
+
+
+```javascript
+```
+
+
+
+```javascript
+```
+
+
+
 
 
 ###### window.document 객체
@@ -4287,13 +4344,9 @@ window
 
 
 
-
-
-
-
 ###### window.location 객체
 ```
-  3) 
+  1) 
 ```
 
 
@@ -4309,7 +4362,6 @@ window
 ```javascript
 ```
 
-
 ```javascript
 ```
 
@@ -4320,10 +4372,16 @@ window
 
 ```javascript
 ```
+#### 3. Servlet 객체
+#### 4. 데이터 전송( Data)
+#### 5. Get방식 / Post방식
 
 
-#### 4. 실습
-#### 5. Summary / Close
+
+
+
+#### 6. 실습
+#### 7. Summary / Close
 
 
 
