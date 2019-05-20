@@ -4888,7 +4888,7 @@ function isBrowserCheck(){
 ```
 	window.event ==> 웹브라우저에서 사용자에 의해 어떠한 행위가 발생하면
 		(키보드, 마우스) 그 정보를 저장하여 가지고 있다.
-  
+  이벤트 ==> 사용자 행위 + 내부적으로 약속된 것.
 ```
 
 + [1_event.htm](browser/event/1_event.htm)
@@ -4920,49 +4920,185 @@ function isBrowserCheck(){
 ```
 
 
-+ [1_event.htm](browser/event/1_event.htm)
+
+
++ [2_position.htm](browser/event/2_position.htm)
 ```javascript
+<HTML>
+<HEAD>
+	<TITLE> 현재 마우스 커서의 좌표는? </TITLE>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=euc-kr">
+	<SCRIPT LANGUAGE="Javascript">
+	function mouseDown() {
+		  var x = window.event.x;
+		  var y = window.event.y;
+		  window.status = "x : " + x + ", y : " + y;
+		  //window.defaultStatus = "x : " + x + ", y : " + y;
+		  return true;
+	}
+	document.disable_window_status_change = true;
+	// document의 멤버변수 즉, property를 이용하여 
+	// 마우스 이벤트 핸들러를 사용한다.
+	document.onmousedown = mouseDown;
+	document.onmousemove = mouseDown;
+	//if(!ie) document.captureEvents(Event.MOUSEDOWN);
+	//-->
+	</SCRIPT>
+</HEAD>
+<BODY BACKGROUND="window.jpg">
+ <INPUT type=button value="마우스를 올리고 상태바를 보라" onMouseOver="window.defaultStatus='디폴트 상태바 메세지'" onMouseOut="window.defaultStatus=''">
+</BODY>
+</HTML> 
 ```
 
 
-+ [1_event.htm](browser/event/1_event.htm)
+
++ [3_load.html](browser/event/3_load.html)
 ```javascript
+<html>
+    <head>
+	<script language="javascript">
+		function Start()    {
+				window.alert("OnLoad Event 발생\n반갑습니다");
+			}
+	</script>
+    </head>
+<body OnLoad="Start()">
+	본문 내용..
+</body>
+</html>
 ```
 
 
-+ [1_event.htm](browser/event/1_event.htm)
++ [4_unload.html](browser/event/4_unload.html)
 ```javascript
+<html>
+<head>
+	<script language="javascript">
+		function End()    {
+				alert("OnUnLoad Event 발생\n 안녕히가세요.");
+		}
+	</script>
+</head>
+<body OnUnLoad="End()">
+	본문 내용..
+</body>
+</html>
 ```
 
 
-+ [1_event.htm](browser/event/1_event.htm)
++ [5_keydown.html](browser/event/5_keydown.html)
 ```javascript
+<html>
+<head>
+	<script language="javascript">
+	function KeyDown() 
+	{
+			alert("OnKeyDown Event 발생");
+	}
+	</script>
+</head>
+	<body>
+		<input type="text" OnKeyDown="KeyDown()">
+	</body>
+</html>
 ```
 
 
-+ [1_event.htm](browser/event/1_event.htm)
++ [6_change.html](browser/event/6_change.html)
 ```javascript
+<html>
+    <head>
+	<script language="javascript">
+		function Change()   {
+			alert("OnChange Event 발생");
+			// ? 작동하지 않음
+		}
+	</script>
+    </head>
+<body>
+<input type="text" value = "홍길동" onChange="Change();">
+</body>
+</html>
 ```
 
 
+
++ [7_mousedown.html](browser/event/7_mousedown.html)
 ```javascript
+<html>
+    <head>
+	<script language="javascript">
+    function PictureClick()   
+	{
+	        alert("OnMouseDown Event 발생");
+	}
+	</script>
+    </head>
+<body>
+	<img src="http://us.i1.yimg.com/us.yimg.com/i/ww/beta/y3.gif" OnMouseDown="PictureClick()">
+</body>
+</html>
 ```
 
 
 
++ [8_mouseover.html](browser/event/8_mouseover.html)
 ```javascript
+<html>
+    <head>
+<script language="javascript">
+    function PictureOver()    {
+	        alert("OnMouseOver Event 발생");
+	    }
+</script>
+    </head>
+<body>
+<img src="http://us.i1.yimg.com/us.yimg.com/i/ww/beta/y3.gif" 
+OnMouseOver ="PictureOver()">
+</body>
+</html>
 ```
 
+
++ [9_noright.htm](browser/event/9_noright.htm)
 ```javascript
+<HTML>
+<HEAD>
+<TITLE>오른쪽 단추는 안 돼요~</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=euc-kr">
+</HEAD>
+<BODY>
+<SCRIPT LANGUAGE="Javascript">
+
+ie = (document.all) ? 1 : 0
+
+function noRight(e)
+{
+	//마우스가 눌리워졌을때 호출되었으므로
+  if (event.button == 2 || event.button == 1+2 || event.button == 2+1)
+    alert("오른쪽 단추는 사용할 수 없습니다")
+}
+
+document.onmousedown = noRight;
+
+//-->
+</SCRIPT>
+<CENTER>
+<H2>이미지를 저장할 수 있을까요?</H2>
+<IMG SRC="iamsam.jpg">
+</CENTER>
+</BODY>
+</HTML>  
 ```
 
+###### 오후부터는 Servlet학습을 시작합니다. 이때 form 태그로 입력한 내용을 서버로 전성하여 서버에서 치라하는 내용에 집중하여 학습한다.
 
-```javascript
-```
+###### 지금 예제로 준비한 browser/form1, form2의 예제들은 서버로 전송하기 전 유효한 데이터를 검증하는 javascript 코드이다. 이도 참고로 학습해 두면 도움이 된다.
 
 
-```javascript
-```
+
+
 #### 3. Servlet 객체
 #### 4. 데이터 전송( Data)
 #### 5. Get방식 / Post방식
