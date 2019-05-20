@@ -4284,72 +4284,663 @@ window
 
 ###### window.document 객체
 + html태그를 읽어서 객체로 변화시켜 정보를 유지한다.(DOM)
+
++ 내부의 객체들을 이요하는 방법
+	1) 속성들을 사용
+	2) 태그의 name속성 ==> 객체명
+	3) document객체의 메서드로 검색
+   	getElementById()
+		getElementByName()
+		getElementByTagName()
+		createElement()
+
 ```
 	document.속성
 					.all
 					.anchors  <a name="top" >  (컬렉션 속성=배열)
-					.forms    <form>...</form>
+					.forms    <form id="식별자명" name="inputForm">...</form>
 					.links    <a href="url"> </a>  (컬렉션 속성=배열)
+					.images   <img   >
 					....
 	
 	document.메서드()
-  1) 
+	-------------------------
+
+	document.bgColor
+					.fgColor
+					.title
+					.url ==> window.location
+
 ```
 
-+ [1_changecolor.htm](browser/window/1_winsize.htm)
++ [1_changecolor.htm](browser/document/1_changecolor.htm)
 ```javascript
+<HTML>
+<HEAD>
+<TITLE>배경색과 글자색 바꾸기</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+	<SCRIPT language="Javascript">
+	function changeBackground(hexNumber) {
+	 document.bgColor=hexNumber;
+	}
+
+	function changeText(hexNumber) {
+	  document.fgColor=hexNumber;
+	}
+	</SCRIPT> 
+<CENTER>
+배경색이 바뀌면 글자색도 거기에 맞춰 바뀌어야겠죠?
+<BR>
+<FORM method="post" name="background">
+  <INPUT type="button" value="red" onclick="changeBackground('#CC0000');changeText('#FFFFFF')">
+  <INPUT type="button" value="green" onclick="changeBackground('#006600');changeText('#FFFFFF')">
+  <INPUT type="button" value="yellow" onclick="changeBackground('#FFFF99');changeText('#0000FF')">
+  <INPUT type="button" value="white" onclick="changeBackground('#FFFFFF');changeText('#000000')">
+  <INPUT type="button" value="black" onclick="changeBackground('#000000');changeText('#FFFFFF')";>
+  <INPUT type="button" value="blue" onclick="changeBackground('#0000FF');changeText('#FFFF00')">
+</FORM>
+<BR><BR>
+<IMG SRC="doggy.gif">
+</CENTER> 
+</BODY>
+</HTML>
 ```
 
 
++ [2_changeinfo.htm](browser/document/2_changeinfo.htm)
 ```javascript
+<HTML>
+<HEAD>
+	<TITLE>문서 정보 바꾸기</TITLE>
+</HEAD>
+<BODY BGCOLOR="#000000" TEXT="#FFFFFF">
+	<H2> 현재 문서의 정보 </H2>
+	<SCRIPT LANGUAGE="Javascript">
+	   document.write("<B> 문서의 최종 수정일 : </B> " + document.lastModified + "<BR><BR>")
+	   document.write("<B> 문서의 현재 주소  : </B> " + document.URL + "<BR><BR>")
+	   document.write("<B> 문서의 제목 : </B>" + document.title + "<BR><BR>")
+	   
+	   function changeURL(url){
+		   //document.URL = url;  // 도움말 문서와 달리 작동하지 않음
+		   location.href = url;
+	   }
+	</SCRIPT>
+	<FORM method="post" name="background">
+	  <INPUT type="button" value="길벗 홈페이지로 가기" onclick="document.location ='http://www.gilbut.co.kr'">
+	  <INPUT type="button" value="길벗 홈페이지로 가기2" onclick="changeURL('http://www.gilbut.co.kr')">	  
+	  <INPUT type="button" value="문서 제목 좀 바꿔봐~" onclick="document.title = '▒거의다 끝났어요. 졸지마삼~  ▒'"> 
+	</FORM>
+	<BR><BR>
+	<IMG SRC="rose.gif">
+	</CENTER>
+</BODY> 
+</HTML> 
 ```
+
+
++ [3_create.htm](browser/document/3_create.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>자바스크립트로 웹 문서 만들기</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+	<IMG SRC="facemark.gif"><BR><BR>
+	[만들기] 버튼을 클릭하면 새 브라우저 창이 열리고 문서가 만들어지며 <BR>
+	[닫기] 버튼을 클릭하면 새 브라우저 창의 문서가 지워지면서 닫힙니다.<BR><BR>
+
+	<SCRIPT LANGUAGE="Javascript">
+	//비어있는 윈도우가 만들어진다.
+	//함수내부의 표현이 아니므로 생성된 윈도우를 참조하는 변수 special은 전역변수로 작동.
+	special = window.open("", "", "width=350, height=500")
+   
+	function newOpen(){  
+	   special = window.open("", "", "width=350, height=500")
+	   special.document.open()
+	   special.document.bgColor = "purple"
+	   special.document.fgColor = "white"
+	   special.document.write("<B>자바스크립트로 만드는 문서입니다</B><BR><BR>")
+	   special.document.write("<IMG SRC=tree.jpg>")
+	   special.document.write("<FORM><INPUT TYPE='button' VALUE='닫기' onClick='window.close()'></FORM>")
+
+	}
+
+	function newClear(){
+	  special.document.open()
+	  special.document.clear()
+	   //special.clear()
+	}
+
+	function newClose(){
+	   special.close()
+	}
+	</SCRIPT>
+	<FORM>
+		<INPUT TYPE="button" VALUE="만들기" onClick="newOpen()">&nbsp;&nbsp;
+		<INPUT TYPE="button" VALUE="지우기" onClick="newClear()">&nbsp;&nbsp;
+		<INPUT TYPE="button" VALUE="닫기" onClick="newClose()">
+	</FORM>
+	
+</BODY>
+</HTML>
+
+```
+
+
++ [4_write.htm](browser/document/4_write.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>write()와 writeln()</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg25.jpg">
+	<BR><BR>
+	<CENTER>
+	<SCRIPT Language="Javascript">
+		  document.write("Whose Baby ")
+		  document.write("Am I?")
+		  document.writeln("<IMG SRC='animal.gif'>")
+	</SCRIPT>
+	<PRE>
+		<SCRIPT Language="Javascript">
+		  document.writeln("<FONT COLOR='blue'><B>I am")
+		  document.writeln("Elephant's")
+		  document.writeln("Baby.</B></FONT>")
+		</SCRIPT>
+	</PRE> 
+	</CENTER>
+</BODY>
+</HTML>
+```
+
+
++ [5_anchor.htm](browser/document/5_anchor.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE> anchor 객체 </TITLE>
+</HEAD>
+<BODY BGCOLOR="#EBEBFD">
+	<A NAME="top"></A>
+	<BR>
+	[<A HREF="#music1">비오는 압구정</A>]&nbsp;&nbsp;[<A HREF="#music2">점점</A>]&nbsp;&nbsp;[<A HREF="#music3">떠나지마
+	</A>]
+	<HR>
+	<A NAME="music1"></A>
+	<H3>비오는 압구정</H3>
+	<FONT COLOR="blue">
+	비오는 압구정 골목길에서 <BR>
+	그댈 기다리다가 <BR>
+	나 혼자 술에 취한 밤 <BR>
+	혹시나 그댈 마주칠까봐 두 시간 지나도록 <BR>
+	마냥 기다리네 <BR>
+	~ 중략 ~ </FONT><BR>
+	<A HREF="#top">맨 위로</A>
+	<BR><BR>
+	<A NAME="music2"></A>
+	<H3>점점</H3>
+	<FONT COLOR="blue"> 
+	점점 넌 멀어지나봐 웃고 있는 날 봐 <BR>
+	때론 며칠씩 편하게 지내 <BR>
+	점점 널 잊는 것 같아 먼일처럼<BR> <BR>
+	점점 넌 떠나가나 봐 하루는 미치고 <BR>
+	다음 날이면 괜찮아졌어 <BR>
+	다만 슬픔에 익숙해질 뿐인걸<BR>
+	~ 중략 ~ </FONT><BR>
+	<A HREF="#top">맨 위로</A>
+	<BR><BR>
+	<A NAME="music3"></A>
+	<H3>떠나지마</H3>
+	<FONT COLOR="blue">
+	뭐라고 말을 하나 그 사람을 위해서 <BR>
+	어떻게 달래주나 울고 있는 너에게<BR>
+	그렇게 눈물지면 내 마음 아프잖아<BR>
+	하고픈 말은 많은데 건넬 수가 없잖아<BR>
+	~ 중략 ~</FONT><BR>
+	<A HREF="#top">맨 위로</A>
+	
+	<BR><BR>
+	<HR>
+	
+	<SCRIPT LANGUAGE="Javascript">
+	//html태그가 객체로 만들어져 document객체의 속성에 해당정보가 저장되어 있다.
+	  num = document.anchors.length
+	  document.write("이 문서에는 모두 " + document.anchors.length + "개의 앵커가 있습니다.<BR><BR>")
+	  for (i=0; i<num; i++){
+		document.write("<B>anchors[" + i + "] :</B> " + document.anchors[i].name + "<BR>")
+	  }
+	</SCRIPT>
+</BODY>
+</HTML>
+```
+
++ [6_link.htm](browser/document/6_link.htm)
+```javascript
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<HTML>
+<HEAD>
+	<TITLE> link 객체 </TITLE>
+</HEAD>
+<BODY BACKGROUND="bg33.gif">
+	<CENTER>
+	<BR><BR>
+	<A HREF="7_image.htm" TARGET="_blank"><IMG SRC="dawn.jpg" BORDER="0"></A>
+	<BR><BR>
+	<A HREF="http://www.daum.net" TARGET="_self"> 다음(daum.net) 사이트로 </A>
+	<BR><HR>
+	<SCRIPT LANGUAGE="Javascript">
+	  num = document.links.length
+	  document.write("이 문서에는 모두 " + num + "개의 링크가 있습니다.<BR><BR>")
+
+	  for (i = 0; i < num; i++) {
+		 document.write("links[" + i + "]의 href는 " + document.links[i].href )
+		 document.write("<BR>")
+		 document.write("links[" + i + "]의 target은 " + document.links[i].target)
+		 document.write("<BR><BR>")
+	  }
+
+	</SCRIPT>
+	</CENTER>
+</BODY> 
+</HTML>
+```
+
+
+
++ [7_image.htm](browser/document/7_image.htm)
+```javascript
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<HTML>
+<HEAD>
+<TITLE> images 객체 </TITLE>
+</HEAD>
+<BODY BGCOLOR="#DDE168">
+<BR><BR>
+<TABLE WIDTH="620">
+  <TR>
+    <TD WIDTH="300">
+       <IMG SRC="dawn.jpg" WIDTH="300" HEIGHT="198" ALIGN="left" BORDER="0" NAME="img1">
+    </TD>
+    <TD WIDTH="20">&nbsp;</TD>
+    <TD WIDTH="300">
+       <IMG SRC="tree2.jpg" WIDTH="300" HEIGHT="213" ALIGN="RIGHT" id="id명" BORDER="1" NAME="img2">
+    </TD>
+  </TR>
+  <TR COLSPAN="3">
+    <SCRIPT LANGUAGE="Javascript">
+    //getElementsByName("img2");
+    //getElementsById("id명");
+    //getElementsByTagName("태그명");
+    
+    num = document.images.length
+    document.write("이 문서에는 모두 " + num + "개의 이미지가 있습니다.<BR><BR>")
+
+    for (i = 0; i < num; i++) {
+       document.write("<B>images[" + i + "]</B><BR>")
+       document.write(" &nbsp;&nbsp;&nbsp;SRC : "+ document.images[i].src+"<br>")
+       document.write(" &nbsp;&nbsp;&nbsp;WIDTH : " + document.images[i].width)
+       document.write(" &nbsp;&nbsp;&nbsp; HEIGHT : "+ document.images[i].height + "<BR>")
+       document.write(" &nbsp;&nbsp;&nbsp;BORDER : "+ document.images[i].border)
+       document.write(" &nbsp;&nbsp;&nbsp;NAME : " + document.images[i].name)
+       document.write(" &nbsp;&nbsp;&nbsp;ALIGN : " + document.images[i].align)
+       document.write("<BR><BR>")
+    }
+    //-->
+    </SCRIPT>
+  </TR>
+</TABLE>
+</BODY>
+</HTML>
+```
+
 
 
 
 ###### window.location 객체
++ 주소표시줄 즉, url을 입력하는 영역
 ```
-  1) 
+  다른표현 window.document.location
+
+	location.href 속성
+	location.reload()
+```
+
++ [2_main.htm](browser/location/2_main.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>location 객체 활용하기</TITLE>
+<SCRIPT>
+	//팝업창을 띄운다. 그리고 새로만들어진 팝업창을 참조할수 있는 window객체변수를
+	//newWin으로 설정했다.
+	newWin = window.open("2_popup.htm","","width=485,height=70");
+	
+	//팝업창을 가리키는 참조변수의 속성값에 현재 윈도우가 팝업창을 만든 윈도우라고 설정한다.
+	newWin.creator = this; 
+</SCRIPT> 
+</HEAD>
+<BODY BACKGROUND="bg30.gif">
+	<CENTER>
+	<H1> 이 창은 팝업 창을 호출한 메인 화면입니다 </H1>
+	</CENTER>
+</BODY>
+</HTML>
 ```
 
 
++ [2_popup.htm](browser/location/2_popup.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>location 객체 활용하기</TITLE>
+	<SCRIPT LANGUAGE="Javascript"> 
+	function loadURL(url){ 
+	  //window.creator.location=url 
+	  window.opener.location=url;
+	  window.close();
+	} 
+	</SCRIPT> 
+</HEAD>
+<BODY>
+	<CENTER> 
+	<A HREF="magazine1.htm" onClick="loadURL(this.href)"> 잡지 표지 그림 </A> 
+	</CENTER>
+</BODY>
+</HTML> 
+```
+
+
+
++ [4_reload.htm](browser/location/4_reload.htm)
+```javascript
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<HTML>
+<HEAD>
+	<TITLE>지금 몇 시죠?</TITLE>
+</HEAD>
+<BODY>
+<CENTER> 
+	<FORM>
+		<INPUT TYPE="button" VALUE="지금 몇 시죠?" onClick="javascript:location.reload()">
+		<BR>
+	</FORM>
+	<SCRIPT LANGUAGE="Javascript">
+	  var now = new Date()
+	  var display = now.toLocaleString()
+
+	  document.write("<FONT COLOR=red>" + display + "</FONT>")
+	</SCRIPT>
+	<BR><BR>
+	<IMG SRC="clock.gif">
+</CENTER>
+</BODY>
+</HTML> 
+```
+
+
++ [location.html](browser/location/location.html)
+```javascript
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>Insert title here</title>
+</head>
+<body>
+	location내장객체는 window.location이다.<br>
+	현재 웹브라우저에서 보여주는 주소를 관리한다.<br>
+	
+	<script>
+	document.write("<span>location.href : </span>" + location.href+"<br><br>")
+	document.write("<span>location.host : </span>" + location.host+"<br><br>")
+	document.write("<span>location.hostname : </span>" + location.hostname + "<br><br>")
+	document.write("<span>location.port : </span>" + location.port + "<br><br>")
+	document.write("<span>location.pathname : </span>" + location.pathname + "<br><br>")
+	document.write("<span>location.protocol : </span>" + location.protocol)
+	</script>
+</body>
+</html>
+```
+
+
+
+
+
+
+###### window.history 객체
++ 방문한 url정보를 관리
+```
+  window.history ==> 방문한 url정보를 관리
+
+	웹브라우저 자체의 버튼을 사용할 수도 있지만, 웹컨텐츠 성격상 사용자에 의해 이전, 다음, 홈 등으로 이동하는 것은 자체적으로 해결하고 싶을때 history 객체의 정보를 이요할 수 있다. 
+
+	history.back()
+				 .forward()
+				 .go()
+				 .length 속성
+```
+
+
++ [first.htm](browser/history/first.htm)
+```javascript
+<HTML>
+	<HEAD>
+		<TITLE>history 객체</TITLE>
+	</HEAD>
+	<BODY BACKGROUND="bg23.gif">
+		<CENTER>
+		<H2> 첫 번째 페이지입니다 </H2>
+		<A HREF="second.htm"><IMG src="ani01.gif" BORDER=0></A>
+		</CENER>
+	</BODY>
+</HTML>
+```
+
+
++ [second.htm](browser/history/second.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>history 객체</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg24.gif">
+<CENTER>
+<H2> 두 번째 페이지입니다 </H2>
+<A HREF="third.htm"><IMG SRc="ani02.gif" BORDER=0></A>
+</CENER>
+</BODY>
+</HTML>
+```
+
++ [third.htm](browser/history/third.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>history 객체</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg17.gif">
+<CENTER>
+<H2> 세 번째 페이지입니다 </H2>
+<A HREF="fourth.htm"><IMG SRc="ani03.gif" BORDER=0></A>
+<BR><BR>
+<A HREF="javascript:history.back()"><IMG SRC="back.gif"></A>
+&nbsp;&nbsp;&nbsp;
+<A HREF="javascript:history.go(1)"><IMG SRC="home.gif"></A>
+&nbsp;&nbsp;&nbsp;
+<A HREF="javascript:history.forward()"><IMG SRC="next.gif"></A>
+<BR><BR>
+</CENER>
+</BODY>
+</HTML> 
+```
+
+
++ [fourth.htm](browser/history/fourth.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>history 객체</TITLE>
+</HEAD>
+<BODY>
+<CENTER>
+<H2> 네 번째 페이지입니다 </H2>
+<IMG SRc="ani04.gif" BORDER=0>
+<BR><BR>
+<A HREF="javascript:history.back()"><IMG SRC="back.gif"></A>
+&nbsp;&nbsp;&nbsp;
+<A HREF="javascript:history.go(-3)"><IMG SRC="home.gif"></A>
+&nbsp;&nbsp;&nbsp;
+<A HREF="javascript:history.forward(-1)"><IMG SRC="next.gif"></A>
+</CENER>
+</BODY>
+</HTML>
+```
+
+
+
+
+
+
+###### window.navigator 객체
+```
+  window.navigator ==> 현재 웹브라우저의 정보를 관리하는 객체
+
+	javaScript에서도 필요할때 사용할 수 있고, 서버로 요청정보를 보낼때 내부적으로 요청헤더에 정보가 담겨서 전달된다.
+```
+
++ [navigator.htm](browser/window/navigator.htm)
+```javascript
+<HTML>
+<HEAD>
+<TITLE>브라우저 정보 캐내기</TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=euc-kr">
+
+
+
+
+</HEAD>
+<BODY BACKGROUND="bg30.gif">
+
+
+<script type="text/javascript">
+//접속 브라우저를 확인합니다(html5 지원하지 않을 경우 경고문을 출력하기 위해 사용)
+function isBrowserCheck(){ 
+	var agt = navigator.userAgent.toLowerCase();
+	if (agt.indexOf("chrome") != -1) return 'Chrome';
+	if (agt.indexOf("opera") != -1) return 'Opera';
+	if (agt.indexOf("staroffice") != -1) return 'Star Office';
+	if (agt.indexOf("webtv") != -1) return 'WebTV';
+	if (agt.indexOf("beonex") != -1) return 'Beonex';
+	if (agt.indexOf("chimera") != -1) return 'Chimera';
+	if (agt.indexOf("netpositive") != -1) return 'NetPositive';
+	if (agt.indexOf("phoenix") != -1) return 'Phoenix';
+	if (agt.indexOf("firefox") != -1) return 'Firefox';
+	if (agt.indexOf("safari") != -1) return 'Safari';
+	if (agt.indexOf("skipstone") != -1) return 'SkipStone';
+	if (agt.indexOf("netscape") != -1) return 'Netscape';
+	if (agt.indexOf("mozilla/5.0") != -1) return 'Mozilla';
+	if (agt.indexOf("msie") != -1) {
+		// 익스플로러 일 경우 
+		var rv = -1; 
+		if (navigator.appName == 'Microsoft Internet Explorer') {
+			var ua = navigator.userAgent; 
+			var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+			if (re.exec(ua) != null) rv = parseFloat(RegExp.$1);
+		}
+		return 'Internet Explorer '+rv;
+	}
+}
+</script>
+
+<--script>
+ if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
+		var rv = 0; var ua = navigator.userAgent;
+		var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+		if (re.exec(ua) != null) rv = parseFloat(RegExp.$1);
+		if (rv != 0 && rv <= 8) {
+			alert("Internet Explorer 10 부터 지원합니다.\n Internet Explorer를 업그레이드 해주세요.");
+		}
+	}
+<--/script>
+
+
+<SCRIPT LANGUAGE="Javascript">
+ document.write(isBrowserCheck()+"<br><br><br><br><br><br><br><br><br><br><br><br>");
+ 
+ document.write("<B> 브라우저 코드명 : </B>", navigator.appCodeName + "<BR><BR>")
+ document.write("<B> 브라우저 종류 : </B>", navigator.appName + "<BR><BR>")
+ document.write("<B> 브라우저 버전 : </B>", navigator.appVersion + "<BR><BR>")
+ document.write("<B> 브라우저  플랫폼 :  </B>", navigator.platform + "<BR><BR>")
+ document.write("<B> 브라우저  에이전트: </B>", navigator.userAgent )
+
+</SCRIPT>
+</BODY>
+</HTML> 
+```
+
+
+
+###### window.event 객체
+```
+	window.event ==> 웹브라우저에서 사용자에 의해 어떠한 행위가 발생하면
+		(키보드, 마우스) 그 정보를 저장하여 가지고 있다.
+  
+```
+
++ [1_event.htm](browser/event/1_event.htm)
+```javascript
+<HTML>
+<HEAD>
+	<TITLE>아무 키나 눌러보세요 :: 익스플로러 전용 ::</TITLE>
+</HEAD>
+<BODY BACKGROUND="bg12.jpg">
+	<SCRIPT LANGUAGE="Javascript">
+	function keyDown() {
+	  var key = window.event.keyCode;  // 65
+	  var realKey = String.fromCharCode(key) // 'A'
+
+	  alert("누른 키 : " + realKey + "\n코드 값 : " + key)
+	}
+	
+	// 웹브라우저 내장객체인 window.document.onkeydown이라는 
+	// 멤버변수 즉, property가 있다.
+	// 이곳에 함수를 지정해주면 키를 누를때마다 자동으로 해당함수가
+	// 호출된다.
+	document.onkeydown = keyDown
+	//-->
+	</SCRIPT>
+	<H2>키보드에서 아무 키나 눌러보세요</H2>
+	
+</BODY>
+</HTML>
+```
+
+
++ [1_event.htm](browser/event/1_event.htm)
 ```javascript
 ```
 
 
++ [1_event.htm](browser/event/1_event.htm)
 ```javascript
 ```
 
 
-
++ [1_event.htm](browser/event/1_event.htm)
 ```javascript
 ```
 
 
-
-
-
-###### window.document 객체
-+ [1_winsize.htm](browser/window/1_winsize.htm)
-```
-  1) 
-```
-
-
++ [1_event.htm](browser/event/1_event.htm)
 ```javascript
 ```
 
 
-```javascript
-```
-
-
-
-###### window.location 객체
-```
-  1) 
-```
-
-
++ [1_event.htm](browser/event/1_event.htm)
 ```javascript
 ```
 
