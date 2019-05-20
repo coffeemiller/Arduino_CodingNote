@@ -5183,7 +5183,7 @@ UserServlet
 + 서블릿 소스를 고쳤을때 서버에서 고친내용을 자동참조할수 있도록 설정(Ccndtext.xml)
   + <Context reloadable="true">로 변경....
 
-테스트용
+
 
 ##### [오늘의 과제]
 + 오늘 서블릿 학습내용 복슴

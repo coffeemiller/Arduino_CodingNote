@@ -1,0 +1,134 @@
+< 아나콘다 가상환경 설치 및 기본 설치 >
+$ conda create -n tf_kr python=3.6 numpy scipy matplotlib spyder pandas seaborn scikit-learn h5py jupyterlab pydotplus mkl-service libpython m2w64-toolchain  
+
+
+< TensorFlow 설치 >
+$ conda install -n tf_kr git graphviz
+$ pip install --ignore-installed --upgrade tensorflow
+
+
+< 딥러닝 라이브러리 및 Keras 설치 >
+$ git clone https://github.com/fchollet/keras.git
+$ cd keras
+$ python setup.py install
+
+
+
+<가상환경 확인하기>
+$ conda info --envs
+-----------------------------------------------------------------------------------------------
+# conda environments:
+
+tensorflow35               /home/leebaro/anaconda3/envs/tensorflow35
+keras_venv               /home/leebaro/anaconda3/envs/keras_venv
+root                  *  /home/leebaro/anaconda3
+-----------------------------------------------------------------------------------------------
+
+
+
+<가상환경 삭제하기>
+$ conda remove --name tensorflow35 --all
+-----------------------------------------------------------------------------------------------
+Package plan for package removal in environment /home/leebaro/anaconda3/envs/tensorflow35:
+
+The following packages will be REMOVED:
+-----------------------------------------------------------------------------------------------
+
+
+
+
+done
+#
+# To activate this environment, use
+#
+#     $ conda activate tf_kr
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+
+(base) C:\Users\coffeemiller>activate tf_kr
+
+(tf_kr) C:\Users\coffeemiller>pip install tensorflow
+Collecting tensorflow
+  Using cached https://files.pythonhosted.org/packages/7b/14/e4538c2bc3ae9f4ce6f6ce7ef1180da05abc4a617afba798268232b01d0d/tensorflow-1.13.1-cp37-cp37m-win_amd64.whl
+Collecting protobuf>=3.6.1 (from tensorflow)
+  Using cached https://files.pythonhosted.org/packages/34/ef/f020691889031a8e1d8cb20711daa43cfe999e0768ff6903c4bf70c2eecd/protobuf-3.7.1-cp37-cp37m-win_amd64.whl
+Requirement already satisfied: six>=1.10.0 in c:\anaconda3\envs\tf_kr\lib\site-packages (from tensorflow) (1.12.0)
+Collecting keras-applications>=1.0.6 (from tensorflow)
+  Using cached https://files.pythonhosted.org/packages/90/85/64c82949765cfb246bbdaf5aca2d55f400f792655927a017710a78445def/Keras_Applications-1.0.7-py2.py3-none-any.whl
+Collecting termcolor>=1.1.0 (from tensorflow)
+Requirement already satisfied: wheel>=0.26 in c:\anaconda3\envs\tf_kr\lib\site-packages (from tensorflow) (0.33.4)
+Collecting astor>=0.6.0 (from tensorflow)
+  Using cached https://files.pythonhosted.org/packages/35/6b/11530768cac581a12952a2aad00e1526b89d242d0b9f59534ef6e6a1752f/astor-0.7.1-py2.py3-none-any.whl
+Requirement already satisfied: numpy>=1.13.3 in c:\anaconda3\envs\tf_kr\lib\site-packages (from tensorflow) (1.16.3)
+Collecting gast>=0.2.0 (from tensorflow)
+Collecting tensorboard<1.14.0,>=1.13.0 (from tensorflow)
+  Using cached https://files.pythonhosted.org/packages/0f/39/bdd75b08a6fba41f098b6cb091b9e8c7a80e1b4d679a581a0ccd17b10373/tensorboard-1.13.1-py3-none-any.whl
+Collecting absl-py>=0.1.6 (from tensorflow)
+Collecting keras-preprocessing>=1.0.5 (from tensorflow)
+  Using cached https://files.pythonhosted.org/packages/c0/bf/0315ef6a9fd3fc2346e85b0ff1f5f83ca17073f2c31ac719ab2e4da0d4a3/Keras_Preprocessing-1.0.9-py2.py3-none-any.whl
+Collecting grpcio>=1.8.6 (from tensorflow)
+  Using cached https://files.pythonhosted.org/packages/2a/22/bd327063dd0bdf9d8d640b3185b760707842160e69df909db3fcaab5b758/grpcio-1.20.1-cp37-cp37m-win_amd64.whl
+Collecting tensorflow-estimator<1.14.0rc0,>=1.13.0 (from tensorflow)
+  Using cached https://files.pythonhosted.org/packages/bb/48/13f49fc3fa0fdf916aa1419013bb8f2ad09674c275b4046d5ee669a46873/tensorflow_estimator-1.13.0-py2.py3-none-any.whl
+Requirement already satisfied: setuptools in c:\anaconda3\envs\tf_kr\lib\site-packages (from protobuf>=3.6.1->tensorflow) (41.0.1)
+Requirement already satisfied: h5py in c:\anaconda3\envs\tf_kr\lib\site-packages (from keras-applications>=1.0.6->tensorflow) (2.9.0)
+Collecting markdown>=2.6.8 (from tensorboard<1.14.0,>=1.13.0->tensorflow)
+  Using cached https://files.pythonhosted.org/packages/f5/e4/d8c18f2555add57ff21bf25af36d827145896a07607486cc79a2aea641af/Markdown-3.1-py2.py3-none-any.whl
+Collecting werkzeug>=0.11.15 (from tensorboard<1.14.0,>=1.13.0->tensorflow)
+  Using cached https://files.pythonhosted.org/packages/9f/57/92a497e38161ce40606c27a86759c6b92dd34fcdb33f64171ec559257c02/Werkzeug-0.15.4-py2.py3-none-any.whl
+Collecting mock>=2.0.0 (from tensorflow-estimator<1.14.0rc0,>=1.13.0->tensorflow)
+  Using cached https://files.pythonhosted.org/packages/05/d2/f94e68be6b17f46d2c353564da56e6fb89ef09faeeff3313a046cb810ca9/mock-3.0.5-py2.py3-none-any.whl
+Installing collected packages: protobuf, keras-applications, termcolor, astor, gast, grpcio, markdown, absl-py, werkzeug, tensorboard, keras-preprocessing, mock, tensorflow-estimator, tensorflow
+Successfully installed absl-py-0.7.1 astor-0.7.1 gast-0.2.2 grpcio-1.20.1 keras-applications-1.0.7 keras-preprocessing-1.0.9 markdown-3.1 mock-3.0.5 protobuf-3.7.1 tensorboard-1.13.1 tensorflow-1.13.1 tensorflow-estimator-1.13.0 termcolor-1.1.0 werkzeug-0.15.4
+
+(tf_kr) C:\Users\coffeemiller>python
+Python 3.7.3 (default, Apr 24 2019, 15:29:51) [MSC v.1915 64 bit (AMD64)] :: Anaconda, Inc. on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import tensorflow
+Traceback (most recent call last):
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\python\pywrap_tensorflow.py", line 58, in <module>
+    from tensorflow.python.pywrap_tensorflow_internal import *
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py", line 28, in <module>
+    _pywrap_tensorflow_internal = swig_import_helper()
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py", line 24, in swig_import_helper
+    _mod = imp.load_module('_pywrap_tensorflow_internal', fp, pathname, description)
+  File "C:\Anaconda3\envs\tf_kr\lib\imp.py", line 242, in load_module
+    return load_dynamic(name, filename, file)
+  File "C:\Anaconda3\envs\tf_kr\lib\imp.py", line 342, in load_dynamic
+    return _load(spec)
+ImportError: DLL load failed: DLL 초기화 루틴을 실행할 수 없습니다.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\__init__.py", line 24, in <module>
+    from tensorflow.python import pywrap_tensorflow  # pylint: disable=unused-import
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\python\__init__.py", line 49, in <module>
+    from tensorflow.python import pywrap_tensorflow
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\python\pywrap_tensorflow.py", line 74, in <module>
+    raise ImportError(msg)
+ImportError: Traceback (most recent call last):
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\python\pywrap_tensorflow.py", line 58, in <module>
+    from tensorflow.python.pywrap_tensorflow_internal import *
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py", line 28, in <module>
+    _pywrap_tensorflow_internal = swig_import_helper()
+  File "C:\Anaconda3\envs\tf_kr\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py", line 24, in swig_import_helper
+    _mod = imp.load_module('_pywrap_tensorflow_internal', fp, pathname, description)
+  File "C:\Anaconda3\envs\tf_kr\lib\imp.py", line 242, in load_module
+    return load_dynamic(name, filename, file)
+  File "C:\Anaconda3\envs\tf_kr\lib\imp.py", line 342, in load_dynamic
+    return _load(spec)
+ImportError: DLL load failed: DLL 초기화 루틴을 실행할 수 없습니다.
+
+
+Failed to load the native TensorFlow runtime.
+
+See https://www.tensorflow.org/install/errors
+
+for some common reasons and solutions.  Include the entire stack trace
+above this error message when asking for help.
+>>>
