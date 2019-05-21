@@ -5224,14 +5224,125 @@ UserServlet
 
 
 + 서블릿에서 요청정보 해석
-  + 1) 파라메터명으로 전달되는 값이 1개일때
+  1) 파라메터명으로 전달되는 값이 1개일때
     + `String 변수명 = request.getParameter("파라메터명");`
-  + 2) 파라메터명으로 전달되는 값이 여러개 일때
+  2) 파라메터명으로 전달되는 값이 여러개 일때
     + `String 배열명[] = request.getParameterValues("파라메터명");`
+  3) 파라메터명을 모를때
+    + 1) 파라메터명 구하기
+      + `Enumeration en = request.getParameterNames();`
+      + java.util 패키지에서 컬렉션클래스(ArrayList, Stack, HashMap)
+      + 전체요소를 1회 순회할수있도록 제공되는 클래스 ==> Iterator
+      + Iterator이전에 사용했던 클래스 ==> Enumeration
+      ```java
+       while(en.hasMoreElement()){
+				 String name = en.nextElement();
+				 String value = request.getParameter(name);
+			 }
+      ```
 
+
++ MultiCheck.java
+```java
+package com.jica.chap02;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet(description = "다중선택데이터전송 연습", urlPatterns = { "/MultiCheck" })
+public class MultiCheck extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	public MultiCheck() {
+		super();
+		System.out.println("MultiCheck()! 생성자는 최초요청시 한번만 작동한다.");
+	}
+
+	@Override
+	public void init() throws ServletException {
+		System.out.println("init()! 초기화 기능이 필요하다면 여기에 코드를 작성합니다.");
+	}
+
+	@Override
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		System.out.println("service( , )! 요청이 오면 동작합니다.");
+		String method = request.getMethod(); // "get","post"
+		System.out.println("요청방식에 따라 doGet()/doPost() 작동합니다.");
+
+		System.out.println("현재의 요청방식 : " + method);
+		/*
+		 * if (method.equals("GET")) { doGet(request,response); } else if
+		 * (method.equals("POST")) { doPost(request,response); }
+		 */
+
+		super.service(request, response);
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		System.out.println("doGet( , )! 작동함!");
+		process(request, response);
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		System.out.println("doPost( , )! 작동함!");
+		process(request, response);
+	}
+
+	public void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("process( , )! 작동함!");
+		// 1) 응답 기본 준비 -- 작업결과를 html로 작성하기위한 준비
+		response.setContentType("text/html;charset=EUC-KR");
+		PrintWriter out = response.getWriter();
+
+		// 2) 요청 부가정보 해석 / 응답
+		request.setCharacterEncoding("EUC-KR");
+		out.println("<html>");
+		out.println("<head><title></title> 다중선택 </head>");
+		out.println("<body>");
+		out.println("<center><h2>다중선택 테스트입니다.</h2></center>");
+		out.println("<hr>");
+
+		// 요청파라메터로 전송되는 값이 여러개인 경우
+		String languages[] = request.getParameterValues("language");
+		if (languages != null) {
+			out.println("선택하신 언어는 다음과 같습니다.<br>");
+			for (int i = 0; i < languages.length; i++) {
+				out.println("<li> " + languages[i]);
+			}
+		} else {
+			out.println("선택하신 언어가 없습니다.");
+		}
+
+		out.println("<br><br><a href='MultiCheck.html'>뒤로</a>");
+		out.println("</body>");
+		out.println("</html>");
+		out.flush();
+	}
+
+	@Override
+	public void destroy() {
+		System.out.println("destroy( , )! 서블릿객체가 소멸될때 동작합니다.");
+	}
+
+}
+
+```
 
 
 #### 3. Http(get/post)
++ http 프로토콜에서 get/post 방식에서 서버로 전달되는 요청정보의 상세 구조
+
+
 #### 4. 서블릿관련 주요클래스
 #### 5. 실습
 #### 6. Summary / Close
