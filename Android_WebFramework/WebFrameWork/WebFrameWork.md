@@ -5204,8 +5204,34 @@ UserServlet
 ### [2019-05-21]
 
 #### 1. Review
+
 #### 2. Form Data 전송
-#### 3. Htt(get/post)
+```
+<form>
+	다양한 내부태그에 데이터를 입력
+	<imput type="text">
+	<imput type="checkbox" name="os">
+</form>
+```
+
++ 서블릿이 작동하는 순서
+  1) 생성 - 생성자
+  2) 초기화 - init()
+  3) 요청 - service( , ) ----get방식----> doGet( , )
+											 	 ----post방식---> doPost( , )
+  4) 마무리 - destroy()
+  5) 객체소멸
+
+
++ 서블릿에서 요청정보 해석
+  + 1) 파라메터명으로 전달되는 값이 1개일때
+    + `String 변수명 = request.getParameter("파라메터명");`
+  + 2) 파라메터명으로 전달되는 값이 여러개 일때
+    + `String 배열명[] = request.getParameterValues("파라메터명");`
+
+
+
+#### 3. Http(get/post)
 #### 4. 서블릿관련 주요클래스
 #### 5. 실습
 #### 6. Summary / Close
