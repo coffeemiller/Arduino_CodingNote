@@ -5335,12 +5335,53 @@ public class MultiCheck extends HttpServlet {
 	}
 
 }
-
 ```
 
 
 #### 3. Http(get/post)
 + http 프로토콜에서 get/post 방식에서 서버로 전달되는 요청정보의 상세 구조
+```
+client                                                                     servlet
+       ------------------------------request------------------------------>
+			GET http://localhost:8088/chap02/GetData?name=JICA&addr=JEONJU http1.1</nr>
+			헤더명:헤더값</nr>
+				...
+				...
+			헤더명:헤더값</nr>
+			</nr>
+						<-----------------------Entity body 부분이 없음
+---------------------------------------------------------------------------------------
+			POST http://localhost:8088/chap02/GetData http1.1</nr>
+			헤더명:헤더값</nr>
+				...
+				...
+			헤더명:헤더값</nr>
+			</nr>
+			name=JICA&addr=JEONJU........Entity body (<==Post방식일때만)
+																좀더확장하면 이곳에 파일내용을 담아서 전송할수도 있다.
+																<form method="post" enctype="multipart/form-data">
+
+웹서버는 위처럼 전송된 데이터를 분석하여 HttpServletRequest객체를 만들어서
+정보(첫번째인자)를 저장하고, 또한 응답을 위한 HttpServletResponse객체를
+생성한 후(두번째인자)....  service(첫번째인자, 두번째인자)메서드 호출한다.
+```
+
+```
+client                                                          server
+																													모든 기능수행후 응답하는내용
+																													즉, PrintWriter out =
+																													out.setXXX(정보설정)
+																													out.println("html태그")
+																													...
+				<------------------response----------------------
+					HTTP 1.1 200 정상</nr>
+					헤더명:헤더값</nr>
+					...</nr>
+					...</nr>
+					</nr>
+					응답 html문서내용 <== Entity body(웹브라우저에 의해 해석되어 화면에 보여지는내용)
+```
+![응답시 상태 코드값](img/http.jpg "응답시 상태 코드값")
 
 
 #### 4. 서블릿관련 주요클래스
