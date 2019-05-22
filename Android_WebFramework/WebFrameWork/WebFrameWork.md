@@ -5455,11 +5455,125 @@ client                                                          server
 </HTML>
 ```
 
+###### 서블릿/JSP의 제어흐름
++ 클라이언트가 요청했을때 최종 응답이 오기까지의 흐름제어를 의미한다.
+```
+client(웹브라우저)                웹서버(tomcat)
+
+1) 기본 흐름 
+          ------request------>  서블릿
+          <-----response-----
+          
+2) 잘못된 요청일때 
+   - 존재하지 않는 웹페이지 (404 응답코드)
+   - 웹컴퍼넌트는 존재하는데 실행환경시 실행시킬수 없는 상태일때
+     (로그인한 사용자만 사용할수 있는 웹페이지를 로그인하지 않은 사용자가 요청했다)
+     redirect ==> 웹브라우저에게 다른 웹컴퍼넌트를 요청하도록 강제하는기능
+     
+         ------request-----> A 서블릿
+         <-----response----  response.sendRedirect("다른웹페이지");
+         ------------------>
+     웹브라우저가 자동으로
+     다른페이지를 요청한다.
+     
+3) 서버에서 최종응답을 주는동안 다른 웹컴펀넌트를 동작시킨다.
+				include ==> 웹페이지 모듈화 기능을 제공
+         ------request-----> A 서블릿 -----include--> B 서블릿
+         <-----response----         <------------   
+         
+
+				forward ==> 기능분리(Logic(서블릿)  ----> 결과보여주기(JSP))
+         ------request-----> A 서블릿 -----forward--> B 서블릿
+         <-----response--------------------------------|
+```
+
+##### [중요]
+```
+  웹서버에서 웹어플리케이션의 구성요소의 모든정보를 관리하는 객체가 있다.
+  ServletContext context이다.
+    참고) ServletContxt객체는 JSP에서 application객체로 불리워진다.
+    
+  제어흐름을 관리는 객체로   RequestDispatcher의 객체가 있다.      
+```
+
+
+
+
++ 서블릿에서 주요 클래스
+```
+1) Object        Servlet  ServletConfig Serilizable   
+ GenericServlet  
+ HttpServlet
+ ========================
+ <<interface>>
+   Servlet
+   ------------
+   init(ServletConfig)
+   destory()
+   service(ServletRequest,ServletResponse)
+   ...
+   
+
+ <<interface>>
+   ServletConfig
+   --------------  
+   getServletContext()
+   getInitParameter(String)
+   .... 
+   
+   GenericServlet
+   --------------
+   init(ServletConfig)
+   init()
+   destory()
+   service(ServletRequest,ServletResponse) 
+   getServletContext()
+   getServletConfig()
+   ...
+   
+   HttpServlet
+   ---------------
+   ...
+   service(HttpServletRequest, HttpServletResponse)
+   doGet(HttpServletRequest, HttpServletResponse)
+   doPost(HttpServletRequest, HttpServletResponse)
+   ...
+``` 
+```
+2) HttpServletRequest : 요청정보를 저장하는 객체
+   ...
+   setCharacterEncoding("euc-kr"); 
+   getParameter()
+   getParameterValues()
+   getParameterNames()
+   getContextPath() 
+```
+
 
 
 ##### 2.1. redirect
+```
+3) HttpServletResponse : 응답정보를 관리하는 객체
+   ...
+   setContentType("text/html;charset=euc-kr")
+   getWriter()
+   sendRedirect("url")--------------------|
+   setHeader("Location", visitUrl)| <-----|
+   sendError(응답코드) 
+```
+
+
 ##### 2.2. include
+```
+4) RequestDispatcher : 웹서버 내부에서 다른 웹컴퍼넌트를 호출할때 사용
+
+//호출되는 서블릿에 정보를 전달하고 싶다면 아래의 코드를 사용한다.
+		request.setAttribute("title","전주정보문화산업진흥원");	
+		rd.include(request, response);
+```
+
 ##### 2.3. forward
+
 
 #### 3. 초기화 파라메터
 
