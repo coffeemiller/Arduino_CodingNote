@@ -985,10 +985,12 @@ Network - Socket(TCP,UDP)
 ```
   MVC패턴적용(모델1)   
   -----request--------->서블릿작동(Logic처리)
-                           |
-                           |
+                           |request.setAttribute("key",값)
+                           |forward
                            V
  <-----response----------  JSP(Presentation-View처리)
+															request.getAttribute("key")
+															EL => ${}, JSTL <C: var
 ```
 
 #### 2. HTML(HyperText Markup Language)태그
@@ -5501,6 +5503,8 @@ client(웹브라우저)                웹서버(tomcat)
 
 + 서블릿에서 주요 클래스
 ```
+0) ServletContext
+		getRequestDi
 1) Object        Servlet  ServletConfig Serilizable   
  GenericServlet  
  HttpServlet
@@ -5563,23 +5567,37 @@ client(웹브라우저)                웹서버(tomcat)
 ```
 
 
+
 ##### 2.2. include
++ 다른 서블릿을 포함하여 작동시켜 값을 얻어 돌아온다.
 ```
 4) RequestDispatcher : 웹서버 내부에서 다른 웹컴퍼넌트를 호출할때 사용
 
-//호출되는 서블릿에 정보를 전달하고 싶다면 아래의 코드를 사용한다.
+		//호출되는 서블릿에 정보를 전달하고 싶다면 아래의 코드를 사용한다.
 		request.setAttribute("title","전주정보문화산업진흥원");	
 		rd.include(request, response);
+
+		//또는 다음의 한줄로 가능
+		RequestDispatcher rd = request.getRequestDispatcher("/Inservlet");
 ```
 
+
 ##### 2.3. forward
++ 다른 서블릿을 작동시켜 돌아오지 않는 값을 실행.(돌아오지 않음)
+```java
+		rd.forward(request, response);
+```
+
+##### [오늘의 과제]
++ 실습내용 복습
++ 회원가입폼 ==> html파일(유효성검사 추가)
++ 내일은 방명록 예제를 통해 Servlet에서 JDBC기능 사용하는 예제
++ file 다운로드/업로드
 
 
-#### 3. 초기화 파라메터
 
-#### 4. DAO 사용법
-#### 5. 실습
-#### 6. Summary / Close
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
@@ -5589,8 +5607,9 @@ client(웹브라우저)                웹서버(tomcat)
 ### [2019-05-23]
 
 #### 1. Review
+#### 3. 초기화 파라메터
 
-#### 4. 서블릿관련 주요클래스
+#### 4. DAO 사용법
 
 #### 4. 실습
 #### 5. Summary / Close
