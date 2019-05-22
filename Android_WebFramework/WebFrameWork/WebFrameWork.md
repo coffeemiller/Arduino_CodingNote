@@ -5399,8 +5399,11 @@ client                                                          server
 + 만일 서버로 전송된 데이터가 잘못된 데이터라면 서버에서 동작하는 동적 웹컴퍼넌트 즉, 서블릿이나 jsp에서의 비즈니스 로직이 수행되어도 잘못된 결과를 만날 수 밖에 없다. 이를 방지하기 위해 아래의 작업중 한가지를 꼭 작성해야 한다.
   1) 클라이언트 즉, 웹브라우저에서 데이터 전송전에 데이터 유효성 검사를 하거나,
      - JavaScript코드로 작성
+     - (1) VlaliData.html의 예제처럼 서버로 전송하기 직전에 일괄 유효성검사
+     - (2) 개별 태그의 이벤트 속성(onXXX)을 이용하여 입력시점에서 유효성검사
   2) 서버에서 데이터를 전송받고 비즈니스 로직을 수행하기 직전에 데이터 유효성 검사.
-     - Java프로그램
+     - Java프로그램 --- 별도의 유효성검사 클래스를 사용
+  
 	* 필요에 따라 두가지 방법을 혼용하기도 한다.
 
 
@@ -5426,8 +5429,33 @@ client                                                          server
 ### [2019-05-22]
 
 #### 1. Review
-
 #### 2. 제어이동
++ AdderInput.html
+```html
+<HTML>
+    <HEAD>
+        <META http-equiv="Content-Type" content="text/html;charset=euc-kr">
+        <TITLE>덧셈 프로그램 - 입력 화면</TITLE>
+    </HEAD>
+    <BODY>
+        <FORM ACTION=/chap02/adder>
+            첫 번째 수: <INPUT TYPE=TEXT NAME=NUM1><BR>
+            두 번째 수: <INPUT TYPE=TEXT NAME=NUM2><BR>
+            <INPUT TYPE=SUBMIT VALUE='더하기'>
+        </FORM>
+        <hr>
+        <pre>
+        서블릿을 호출하는 url mapping정보는 서버에서
+        1) web.xml
+        2) @WebServlet
+        의 설정내용에 따라 실제 싱행되는 코드는 다를 수 있다.
+        </pre>
+     
+    </BODY>
+</HTML>
+```
+
+
 
 ##### 2.1. redirect
 ##### 2.2. include
