@@ -5619,17 +5619,290 @@ client(웹브라우저)                웹서버(tomcat)
 									그래서 초기화 파라메터를 사용한다.
 ```
 
-+ 2. 초기화
++ 2. 초기화 파라메터를 설정하는 방법
+```
 	1) web.xml
 	2) @WebServlet(	description = "설명", 	urlPatterns = { "/InitParam" },	initParams = { })
 	3) @WebServlet(	description = "설명", 	urlPatterns = { "/InitParam" },	
    			initParams = {@WebInitParam(name = "db_id", value = "SCOTT", description = "계정명"), 
-				 						@WebInitParam(name = "db_pass", value = "TIGER", description = "계정암호")
-	4) 
+				 						@WebInitParam(name = "db_pass", value = "TIGER", description = "계정암호")}
+```
+
++ 3. 초기화 파라메터값을 읽어오는 방법
+```
+   HttpServlet의 
+   getInitParameter("파라메터명") 메서드 사용
+
+```
+
+
++ 4. 예제코드
++ InitParam.java
+```java
+package com.jica.basic;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+//@WebServlet(
+//		description = "초기파라메터 예제", 
+//		urlPatterns = { "/InitParam" }, 
+//		initParams = { 
+//				@WebInitParam(name = "db_id", value = "SCOTT", description = "계정명"), 
+//				@WebInitParam(name = "db_pass", value = "TIGER", description = "계정암호")
+//		})
+
+
+
+//@WebServlet(
+//		description = "초기파라메터 예제", 
+//		urlPatterns = { "/InitParam" }, 
+//		initParams = {})
+
+public class InitParam extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	private String db_id;
+	private String db_pass;
+    
+    public InitParam() {
+        super();
+        System.out.println("InitParam::InitParam()...");
+//        log("InitParam::InitParam()...");
+    }
+
+	
+	public void init() throws ServletException {
+		System.out.println("InitParam::Init()...");
+        log("InitParam::Init()...");
+        
+        //init()메서드가 서블릿객체 생성후 자동으로 호출되는
+        //초기화 전담 메서드이다.
+        db_id = getInitParameter("db_id");
+        db_pass = getInitParameter("db_pass");
+        
+        //JDBC Driver load 후 연결할때 db_id, db_pass를 사용할수 있다.
+        System.out.println("id : "+db_id+", pass : "+db_pass);
+        log("id : "+db_id+", pass : "+db_pass);        
+	}
+
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		System.out.println("InitParam::doGet()...");
+        log("InitParam::doGet()...");
+		
+		// 1) 응답 기본 준비 -- 작업결과를 html로 작성하기위한 준비
+		response.setContentType("text/html;charset=EUC-KR");
+		PrintWriter out = response.getWriter();
+		
+		// 2) 요청 파라메터값 얻기 
+		request.setCharacterEncoding("EUC-KR");
+//		String name = request.getParameter("db");
+//		String addr = request.getParameter("addr");
+		
+		// 3) 기능 수행 -- 비즈니스 로직 수행(필요하다면 DB관련 작업 포함)
+				
+		
+		// 4) 최종 결과를 html문서로 응답
+		out.println("<html>");
+		out.println("<head><title></title> 초기화 파라메터 연습 </head>");
+		out.println("<body>");
+		out.println("<center><h2>초기화 파라메터 연습</h2></center>");
+		out.println("@WebServlet() Anotation을 사용한 초기화 파라메터입니다..<br>");
+		out.println("<li> ID : "+db_id);
+		out.println("<li> Password : "+db_pass);
+		out.println("</body>");
+		out.println("</html>");
+	}
+}
+```
++ 위 코드에서 `@WebServlet`의 초기화 작업이 없었다면, `web.xml`을 수정해야한다.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>basic</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <servlet>
+    <servlet-name>InitParam</servlet-name>
+    <servlet-class>com.jica.basic.InitParam</servlet-class>
+    <init-param>
+      <param-name>db_id</param-name>
+      <param-value>SCOTT</param-value>
+    </init-param>
+    <init-param>
+      <param-name>db_pass</param-name>
+      <param-value>TIGER</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>InitParam</servlet-name>
+    <url-pattern>/InitParam</url-pattern>
+  </servlet-mapping>
+</web-app>
+```
+
+
+
++ InitParam2.java
+```java
+package com.jica.basic;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet(
+		description = "초기화파라메터 예제", 
+		urlPatterns = { "/InitParam2" }, 
+		initParams = { 
+				@WebInitParam(name = "file", value = "counter.dat", description = "최종 방문자수 저장파일")
+		})
+public class InitParam2 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	String fileName;  //이전까지의 최종 방문자수를 저장한 파일명
+	Long count = 0L;   //현재 방문자 카운트 변수
+    public InitParam2() {
+        super();
+        System.out.println("생성자와 init()메서드는 내부적으로 소스를 유지보수했을때 호출됩니다.");
+    }
+
+	
+	public void init(ServletConfig config) throws ServletException {
+		fileName = getInitParameter("file");
+		if (fileName != null) {
+			ServletContext sc = getServletContext();
+			fileName = sc.getRealPath(fileName);
+			
+			//디버깅용
+			System.out.println("file의 실제경로 : "+fileName);
+			
+			try {
+				DataInputStream dis = new DataInputStream(new FileInputStream(fileName));
+				System.out.println("이전까지의 방문자수를 파일에서 읽어옵니다.");
+				count = dis.readLong();
+				dis.close();				
+			} catch (FileNotFoundException e) {
+				System.out.println("최초로 서블릿이 동작한 것이므로 파일이 존재하지 않습니다.");
+				//e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+			}
+		}
+	}
+
+
+	
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("InitParam2::doGet()...");
+//        log("InitParam::doGet()...");
+		
+		// 1) 응답 기본 준비 -- 작업결과를 html로 작성하기위한 준비
+		response.setContentType("text/html;charset=EUC-KR");
+		PrintWriter out = response.getWriter();
+		
+		// 2) 요청 파라메터값 얻기 
+		request.setCharacterEncoding("EUC-KR");
+
+		
+		// 3) 기능 수행 -- 비즈니스 로직 수행(필요하다면 DB관련 작업 포함)
+		count++;
+		
+		// 4) 최종 결과를 html문서로 응답
+		out.println("<html>");
+		out.println("<head><title></title> 방문자 수 </head>");
+		out.println("<body>");
+		out.println("<center><h2>방문자수 </h2></center>");
+		out.println("당신은 현재 "+count+"번째 방문자입니다.<br>");
+		out.println("<hr>");
+		out.println("<br><br><a href='/basic/InitParam2'>재접속</a>");
+		out.println("</body>");
+		out.println("</html>");
+	}
+	
+	public void destroy() {
+		// 현재까지의 방문자수를 파일에 저장하자
+		System.out.println(fileName+" 에 지금까지의 방문자수를 저장합니다.");
+		if (fileName != null) {
+			try {
+				DataOutputStream dos = new DataOutputStream(new FileOutputStream(fileName));
+				dos.writeLong(count);
+				dos.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
+```
+
+
 
 
 #### 3. DAO 사용
++ 일반 Java Program에서 JDBC기능을 사용할때의 작업절차
+  - Java Project에서 build Path에서 외부라이브러리 추가
+    - C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar
+  - 실제 DB접근 작업코드
+    1) Oracle JDBC Driver load
+    2) Connection -- 로그인
+    3) Statement, PreparedStatement
+       1) SQL 실행 - SELECT, INSERT INTO, UPDATE SET, DELETE FROM
+    4) ResultSet
+    5) close
 
++ 서블릿에서 JDB기능을 사용할때
+  + 실제 DB접근 작업코드는 100% 동일
+  + 웹어플리케이션\WEB-INF\web.xml 
+  + 웹어플리케이션\WEB-INF\classes\컴파일된서블릿코드(*.class)
+  + 웹어플리케이션\WEB-INF\lib\ojdbc6.jar  <==달라진점
+     
+
+
++ 실습 - 방명록 작성과 읽기기능
+```
+       com.jica.gutestbook.GuestBookWrite.java
+                          .GuestBookWrite.java
+                           
+       guestbook\GuestBookWrite.html
+      
+            방명록은 저장할 테이블을 만들자 - guestbook
+```
 
 
 #### 4. 다운로드
