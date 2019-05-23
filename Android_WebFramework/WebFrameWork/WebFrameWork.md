@@ -5608,9 +5608,24 @@ client(웹브라우저)                웹서버(tomcat)
 
 #### 1. Review
 #### 2. 초기화 파라메터
++ 1. 서블릿클래스는 사용자가 만들지만 이를 이용하여 서블릿객체를 생성(인스턴스화)은 웹서버에 의해 이루어진다.
+```	
+	생성(인스턴스화)은 웹서버에 의해 이루어진다.
+	--(requst)--> 요청/해석/서블릿객체검색/ 없으면
+	   					이때 최초 호출이므로 생성
+							생성자 호출(인자가 없는 생성자만 호출)
+							----> 일반 클래스처럼
+								 	 필요한 정보를 생성자에 전달할수 
+									그래서 초기화 파라메터를 사용한다.
+```
 
-
-
++ 2. 초기화
+	1) web.xml
+	2) @WebServlet(	description = "설명", 	urlPatterns = { "/InitParam" },	initParams = { })
+	3) @WebServlet(	description = "설명", 	urlPatterns = { "/InitParam" },	
+   			initParams = {@WebInitParam(name = "db_id", value = "SCOTT", description = "계정명"), 
+				 						@WebInitParam(name = "db_pass", value = "TIGER", description = "계정암호")
+	4) 
 
 #### 3. DAO 사용
 #### 4. 다운로드
