@@ -5906,6 +5906,369 @@ public class InitParam2 extends HttpServlet {
 ```
 
 
++ GuestBookWrite.java
+```java
+package com.jica.guestbook;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet(description = "방명록 작성 서블릿", urlPatterns = { "/GuestBookWrite" })
+public class GuestBookWrite extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    //서블릿과 jdbc코드를 분리하지 않고 직접 코딩
+	
+	String db_connect = "jdbc:oracle:thin:@127.0.0.1:1521:XE";  //JDBC URL
+    String db_user = "SCOTT";
+    String db_passwd = "TIGER";	
+	
+	boolean isDebug = true;
+	
+    public GuestBookWrite() {
+        super();
+        if( isDebug){
+        	System.out.println("GuestBookWrite 서블릿 객체 생성됨...");
+        }
+    }
+
+	public void init(ServletConfig config) throws ServletException {
+        try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			if( isDebug){
+				System.out.println("OracleDriver가 정상 로드되어짐....");
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("OracleDriver 로드에서 예외발생....");
+			System.out.println("예외가 발생하면 lib 폴더에 ojdb6.jar를 복사하시오.");
+		}
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if( isDebug ){
+			System.out.println("GuestBookWrite의 doGet()....");
+		}
+		process(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if( isDebug ){
+			System.out.println("GuestBookWrite의 doPost()....");
+		}
+		process(request, response);
+	}
+
+	protected void process(HttpServletRequest request, 
+						   HttpServletResponse response)
+						throws ServletException, IOException {
+		
+		response.setContentType("text/html;charset=euc-kr");
+		request.setCharacterEncoding("euc-kr");
+		PrintWriter out = response.getWriter();
+		
+		// 요청객체에 저장되어 있는 데이타를 얻어온다.
+		String name = request.getParameter("name"); //파라메터가 없으면 "". "홍길동"
+		String email = request.getParameter("email"); //"hgd@daum.net"
+		String home = request.getParameter("home");   //"blog.daum.net/hgd 
+		String contents = request.getParameter("contents"); //"첫번째 방명록...."
+		
+		// 데이타를 이용한 처리를 수행한다(Business Logic 수행 - DB접근)
+		Connection connection = null;
+		Statement statement = null;
+		ResultSet resultSet = null;
+		
+		int n = 0;
+		try {
+			connection = DriverManager.getConnection( db_connect, db_user, db_passwd );
+			statement = connection.createStatement();
+			
+			// 현재 글번호 구하기
+			String sql = "SELECT * FROM guestbook ORDER BY num DESC";
+			if( isDebug){
+				System.out.println("실행 sql : " + sql);
+			}
+			resultSet = statement.executeQuery(sql);
+			int lastNum = 1;
+			if( resultSet.next()){
+				lastNum = resultSet.getInt("NUM") + 1;
+			}
+			
+			// 방명록에 데이타 저장
+			sql = "INSERT INTO guestbook VALUES(";
+			sql += lastNum 	+ ",'";
+			sql += name		+ "','";
+			sql += email 	+ "','";
+			sql += home 	+ "','";
+			sql += contents + "')";
+			
+			if( isDebug ){
+				System.out.println("실행 sql : " + sql);
+			}
+			
+			n = statement.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			if( isDebug ){
+				System.out.println("방명록 저장중 예외 발생!....");
+			}			
+		} finally{
+			try {
+				if(resultSet != null) resultSet.close();
+				if(statement != null) statement.close();
+				if(connection != null) connection.close();
+			}catch (SQLException e) {
+			}
+		}
+
+		// 최종 작업결과를 사용자에게 보여준다.
+		String htmlHead = "<html>\n";
+		htmlHead += "<head><title>방명록 쓰기 결과</title></head>\n";
+		
+		String htmlBody = "<body>\n";
+		if( n >= 1) {
+			htmlBody += "<center>감사합니다<br><br>\n";
+			htmlBody += "<a href='/basic/GuestBookRead'>방명록 읽기</a></center>\n";
+		}else{
+			htmlBody += "<center>저장에 실패했습니다.<br><br>\n";
+			htmlBody += "<a href='/basic/guestbook/GuestBookWrite.html'>방명록 쓰기</a></center>";			
+		}
+		htmlBody += "</body>\n</html>\n";
+		
+		out.println(htmlHead);
+		out.println(htmlBody);
+	}
+	
+}
+```
+
++ GuestBookRead.java
+```java
+package com.jica.guestbook;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet(description = "방명록 읽기 서블릿", urlPatterns = { "/GuestBookRead" })
+public class GuestBookRead extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    
+	String db_connect = "jdbc:oracle:thin:@127.0.0.1:1521:XE";  //JDBC URL
+    String db_user = "SCOTT";
+    String db_passwd = "TIGER";	
+    
+	//---------------------------------
+	Connection connection = null;
+	Statement statement = null;
+	ResultSet resultSet = null;    
+    //---------------------------------
+	int max = 3;		// 한 화면에 보여질 데이타 건수
+	
+	boolean isDebug = true; // 디버깅용 출력을 보여준다.
+	
+    public GuestBookRead() {
+        super();
+        if( isDebug){
+        	System.out.println("GuestBookRead 서블릿 객체 생성됨...");
+        }
+    }
+
+	public void init(ServletConfig config) throws ServletException {
+        try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			if( isDebug){
+				System.out.println("OracleDriver가 정상 로드되어짐....");
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("OracleDriver 로드에서 예외발생....");
+			System.out.println("예외가 발생하면 lib 폴더에 ojdb6.jar를 복사하시오.");
+		}
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		response.setContentType("text/html;charset=EUC-KR");
+		request.setCharacterEncoding("euc-kr");
+		PrintWriter out = response.getWriter();
+		
+		// 데이타를 이용한 처리를 수행한다(Business Logic 수행 - DB접근)
+		// 한 화면에 3건씩 데이타를 보여주자
+		
+		int lastNum = 0;
+		String sql = null;
+		try {
+			connection = DriverManager.getConnection( db_connect, db_user, db_passwd );
+			statement = connection.createStatement();
+			//select문을 사용하면 최대 3건의 결과만 ResultSet으로 만드시오
+			statement.setFetchSize(max);
+			statement.setMaxRows(max);
+			
+			// 현재 마지막 글번호 구하기
+			sql = "SELECT * FROM guestbook ORDER BY num DESC";
+			if( isDebug){
+				System.out.println("실행 sql : " + sql);
+			}
+			resultSet = statement.executeQuery(sql);
+			lastNum = 1;
+			if( resultSet.next()){
+				lastNum = resultSet.getInt("NUM");
+			}			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			if( isDebug){
+				System.out.println("방명록 저장중 예외 발생!....");
+			}			
+		} 
+		
+		// 현재요청화면의 시작글번호를 파라메터로 전달받아야 한다.
+		String start = request.getParameter("start");
+		// 보여지는 데이타는 최종에 작성한 데이타부터 보여주되 한 화면에 3건씩 나타난다.
+		// <방명록작성>
+		// 7번째글
+		// 6번째글
+		// 5번째글
+		// <다음>  /basic/GuestBookRead?start=5
+		
+		// <방명록작성>
+		// 4번째글
+		// 3번째글		
+		// 2번째글 
+		// <이전> /basic/GuestBookRead?start=7
+		
+		//----------------
+		// <방명록작성>
+		// 1번째글
+		// <이전> 
+		
+		if( start == null || start.length() <= 0){
+			// 요청파라메터 start가 없으면 가장 최신글부터 보여준다.
+			sql = "SELECT * FROM guestbook ";
+			sql += "ORDER BY num DESC";
+		}else{
+			// 요청파라메터 start가 있으면 start이전글을 보여준다.
+			sql = "SELECT * FROM guestbook WHERE num < " + start;
+			sql += " ORDER BY num DESC";
+		}
+		
+		if( isDebug){
+			System.out.println("실행 sql : " + sql);
+		}
+		
+		String htmlHead = null;
+		String htmlBody = null;
+		try{
+			resultSet = statement.executeQuery(sql);
+			
+			htmlHead = "<html>";
+			htmlHead += "<head>\n<title>방명록 읽기 화면</title>\n</head>\n";
+			
+			htmlBody = "<body>\n<center><h2>방명록</h2></center>\n";
+			htmlBody += "<a href='/basic/guestbook/GuestBookWrite.html'>방명록 작성</a>\n";
+			htmlBody += "<hr>\n";
+			htmlBody += "<table width=100%>\n";
+			
+			int last = -1;  // 보여지는 방명록의 글번호를 저장
+			int step = 0;	// 첫번째글, 두번째글, 세번째글
+			while(resultSet.next()){
+				step++;							// 1
+				last = resultSet.getInt("NUM"); // 1
+				
+				// 데이타를 가져와서 화면 구성을 한다.
+				String name = resultSet.getString("NAME");
+				String email = resultSet.getString("EMAIL");
+				String home = resultSet.getString("HOME");
+				String contents = resultSet.getString("CONTENTS");
+				
+				htmlBody += "<tr BGCOLOR=E7A068>\n";
+				htmlBody += "<td> 이름 : " + name + "</td>\n";
+
+				if( email != null && email.length() > 0){
+					htmlBody += "<td> E-Mail : " + email + "</td>\n";					
+				}else{
+					htmlBody += "<td> E-Mail : " + " " + "</td>\n";						
+				}
+				if( home != null && home.length() > 0){
+					htmlBody += "<td> 홈페이지 : " + home + "</td>\n";					
+				}else{
+					htmlBody += "<td> 홈페이지 : " + " " + "</td>\n";						
+				}
+				htmlBody += "</tr>\n";
+				htmlBody += "<tr\n>";
+				htmlBody += "<td colspan=3><pre>" + contents + "</pre></td>\n";
+				htmlBody += "</tr>\n";						
+			}
+			
+			htmlBody += "</table>\n";
+			htmlBody += "<hr>\n";
+			
+			
+			// 하단부의 링크 만들기 -- 수정요함!
+			String nextLink = "";
+			String prevLink = "";
+			// step <--1, last <--1, lastNum <-- 7(첫번째로 보여지는 글번호)
+			if(lastNum == (last+(max-1))){
+				nextLink = "<a href='/basic/GuestBookRead?start=" + last + "'>다음 페이지</a>";
+			}else if( lastNum > (last + (max-1)) && last != 1){
+				prevLink = "<a href='/basic/GuestBookRead?start=" + (last+max+step) + "'>이전 페이지</a>";
+				nextLink = "<a href='/basic/GuestBookRead?start=" + last + "'>다음 페이지</a>";			
+			}else{
+				prevLink = "<a href='/basic/GuestBookRead?start=" + (last+max+step) + "'>이전 페이지</a>";
+			}
+			
+			htmlBody += prevLink + "&nbsp;&nbsp;&nbsp;&nbsp;" + nextLink  +"\n";
+			htmlBody += "</body>\n</html>\n";
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			htmlBody += "서버 오류 입니다.\n";
+			htmlBody += "</body>\n</html>\n";			
+		}finally{
+			try {
+				if(resultSet != null) resultSet.close();
+				if(statement != null) statement.close();
+				if(connection != null) connection.close();
+			}catch (SQLException e) {
+			}
+		}
+
+		out.println(htmlHead);
+		out.println(htmlBody);
+	}	
+}
+```
+
++ 서블릿코드에서 db관련작업을 수행한 후 사용자에서 적절한 결과를 보여줄때 그 보여지는 내용을 html태그로 구성하는 작업이 복잡하다(혼용).
+  + DB관련 모든 작업은 DAO클래스를 만들어서 전담시키고 우리는 메서드를 호출하여 수행시키는 방법으로 단순화 시키기를 권장한다.
+  + 
+
 #### 4. 다운로드
 #### 5. 파일 업로드
 #### 6. 실습
