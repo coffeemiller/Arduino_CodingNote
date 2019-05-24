@@ -6303,7 +6303,477 @@ public class GuestBookRead extends HttpServlet {
 
 #### 1. Review
 
-#### 4. 서블릿관련 주요클래스
+#### 2. 다운로드
++ 이미지 다운로드
+  - 서버에 존재하는 이미지 혹은 서버에서 생성한 이미지를 클라이언트가 상요하게 하는 방법
+
+```
+참고) Java언어에서 이미지 종류
+	-	immutable 이미지(수정불가능한 이미지)
+	- mutable 이미지(수정가능한 이미지)
+			java.awt.image, java.awt.BufferedImage
+
+1) 서버에 jica_logo.png ==> <img src="jica_logo.png"> [서블릿에서 직접 읽어서 표현]
+2) 서버에 이미지가 존재하지 않을때.... 서블릿에서 이미지를 생성하여 표현
+																==> java.awt.Graphics / java.awt.Graphics2D
+			만들어진 이미지 객체를 이미지 파일포멧(*.png, *.jpg, *.gif, *.bmp...)으로 변환 후,
+			출력시킨다. [---> 그래프 작성 외부라이브러리(Acme.jar)]
+
+				Data 
+				(1) 직접만들기
+				(2) 외부 라이브러리
+
+
+		서버로 전송되는 Entity-body부분의 데이터구조가 완전히 다른 구조로 바뀌어 전송되므로 기존의 getParameter()과 같은 메서들르 상요하여 서버로 전송된 값을 얻을수가 없고 또한, 전송된 파일의 내용도 로직에서 추출하여 서버에 저장해야한다.
+
+		이러한 작업이 번거로우므로 외부라이브러리를 사용한다. ==>외부라이브러리(cos.jar)
+
+		파일업로드시 손쉽게 요청정보를 
+```
+
+
+
+#### 3. 업로드 (post / multipart-formdata)
++ 파일 내용을 전송하려면...
+  1. `method="post"`
+  2. `enctype="multipart/form-data"`
+
+```
+enctype을 생략하면 application/x-www-form-urlencoded 형태이다
+
+get방식의 요청으로는 input type='file'을 이용하여 서버로 전송하면
+화일명만 전송될뿐 화일내용은 전송되지 않는다.
+이유 ==> 화일내용은 그 전체내용을 전송해야 하므로 쿼리문자열에 화일명만 전송하고
+별도로 전송해야 하는데 Entity body가 없으므로 전송할수 없다.
+
+
+post방식으로 요청하면 서버로 전송되는 쿼리문자열이 Entity body에 전송될뿐
+여기서도 화일내용이 전송되지는 않는다.
+```
+
++ 위의 지정으로 Entity-body부분에 파일내용이 전송되기는 하지만, 기존에 전송되는 형식과 완전히 다른 형태로 데이터가 전송된다.
+  + 그래서 서블릿에서 getParameter()메서드가 올바르게 동작하지 못한다.
+
++ 웹브라우저 자체에서는 서버로 전송되는 데이터의 내용을 확인할 수 없다. 서버에서 확인!!
+
++ 파일 업로드시 손쉽게 요청정보를 해석해주는 multipartRequest클래스가 있다.
+  + 우리는 이것을 사용하자. ==> Multipart2.html, Multipart2.java
+
+
++ 그런데 수많은 사용자가 파일을 업로드 할 것이다. 이것을 관리하는 방법은
+  1) Java언어 File클래스를 사용하여 사용자마다 내부폴더를 만들어서 관리할수 있다.
+  2) 데이터베이스의 테이블내부에 데이터로 파일을 저장할수도 있다.
+
+
+
++ Multipart2.html
+```html
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+   <title>file Upload</title>
+</head>
+<body>
+	<center><h2>멀티파트 사용법2</h2></center>
+	<form method="post" action="/basic/Multipart2" 
+		 enctype="multipart/form-data">
+		  id : <input type="text" name="id"><br>
+		  화일1 : <input type="file" name="file_name1"><br>
+		  화일2 : <input type="file" name="file_name2"><br>		  		  
+		  <input type="submit" value="화일업로드">
+	</form>
+</body>
+</html>
+```
+
++ Multipart2.java
+```java
+package com.jica.multipart;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+// 외부 라이브러리 WEB-INF\lib\cos.jar
+// http://www.servlets.com
+import com.oreilly.servlet.MultipartRequest;
+
+@WebServlet(description = "화일 업로드 테스트2", urlPatterns = { "/Multipart2" })
+public class Multipart2 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		// 응답객체에 ContentType설정
+		response.setContentType("text/html;charset=EUC-KR");
+		// 출력 스트림 얻기
+		PrintWriter out = response.getWriter();		
+		// 요청객체의 정보를 얻어낼때 문자셋 설정
+		request.setCharacterEncoding("EUC-KR");
+		
+		// 업로드된 화일을 저장할 폴더(tmp폴더를 사용자가 만들었다) 구하기
+		ServletContext context = getServletContext();
+		String dir = context.getRealPath("/upload/"); 
+		
+		System.out.println("upload폴더의 실제 경로 : " + dir);
+		
+		// multipart/form-data의 데이타를 손쉽게 처리하기위해
+		// MultipartRequest객체를 생성한다.
+		// public MultipartRequest(javax.servlet.http.HttpServletRequest request,
+        //        java.lang.String saveDirectory,
+        //        int maxPostSize,
+        //        java.lang.String encoding)
+		
+		
+		MultipartRequest multi = 
+				new MultipartRequest(request, dir, 1024 * 1024 * 20, "EUC-KR"); 
+		//위의 코드를 실행시키자 마자 사용자가 전송한 화일 즉, jica_logo.pne, 3월20일차학습내용.txt화일이
+		//upload폴더에 저장된다.
+		
+		// 결과출력
+		out.println("<HTML>");
+		out.println("<HEAD><TITLE>Multipart 테스트2</TITLE></HEAD>");
+		out.println("<BODY>");
+		out.println("<CENTER><H2>Multipart 테스트2</H2></CENTER>");
+		out.println("<H3> Params </H3>" );
+		out.println("<pre>");
+		
+		//type="file"아닌 요청파라메터 값들 정보얻기
+		//String id = multi.getParameter("id");		
+		Enumeration<String> params = multi.getParameterNames();
+		while(params.hasMoreElements()){
+			String name = params.nextElement();
+			String value = multi.getParameter(name);
+			out.println(name + " = " + value);
+		}
+		out.println("</pre>");
+				
+		// 서버에 저장된 화일에 관련된 정보얻기
+		// <input type="file" name="file_name1"> 
+		out.println("<H3>업로드된 화일정보</H3>");
+		out.println("<pre>");
+		
+		Enumeration<String> files = multi.getFileNames();
+		while( files.hasMoreElements()){
+			String name = files.nextElement();				//파라메터이름  file_name2, file_name1
+			String fileName = multi.getFilesystemName(name);//화일이름      3월20일차학습내용.txt,jica_long.png
+			String type = multi.getContentType(name);		//문서종류      text/plain, image/png 
+			
+			out.println("파라메터명 : " + name);
+			out.println("파일 이름  : " + fileName);
+			out.println("파일 타입  : " + type);
+			
+			//서버에 전송되어 저장된 실제화일정보를 얻어내자
+			File f = multi.getFile(name);
+			if( f != null){
+				out.println("파일 크기 : " + f.length() + "<br><br>");
+			}			
+		}
+		
+		
+		out.println("<pre>");
+		out.println("</BODY>");
+		out.println("</HTML>");		
+		// post방식 요청일때 Entity Body를 직접 읽어보자
+		/*
+		out.println("<xmp>");
+		
+		ServletInputStream sis = request.getInputStream();
+		byte buffer[] = new byte[1024];
+		int readSize = -1;
+		while((readSize = sis.read(buffer, 0, 1024)) > 0){
+			out.println(new String(buffer, 0, readSize));
+		}
+		sis.close();
+		
+		out.println("</xmp>");
+		
+		out.println("</BODY>");
+		out.println("</HTML>");
+		out.close();
+		*/
+	}
+}
+```
+
+
+
++ Multipart3.html
+```html
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>서버에 사진저장하기(DB)</title>
+</head>
+<body>
+	<center><h2>멀티파트 사용법3 - Oracle DB에 사진저장</h2></center>
+	<form method="post" action="/basic/Multipart3" enctype="multipart/form-data">
+		id : <input type="text" name="id"><br>
+		사진 : <input type="file" name="photo"><br><br>
+		
+		<input type="submit" value="사진저장">
+		
+	</form>
+</body>
+</html>
+```
+
++ Multipart3.java
+```java
+package com.jica.multipart;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Enumeration;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.oreilly.servlet.MultipartRequest;
+
+@WebServlet(description = "Oracle DB에 사진 저장", urlPatterns = { "/Multipart3" })
+public class Multipart3 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	//-------------------------------------------------------
+	String db_connect = "jdbc:oracle:thin:@127.0.0.1:1521:XE";  //JDBC URL
+    String db_user = "SCOTT";
+    String db_passwd = "TIGER";	
+	//-------------------------------------------------------
+	
+    public void init() throws ServletException {
+        try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("OracleDriver가 정상 로드되어짐....");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("OracleDriver 로드에서 예외발생....");
+			System.out.println("예외가 발생하면 lib 폴더에 ojdb6.jar를 복사하시오.");
+		}
+	}
+    
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		// 응답객체에 ContentType설정
+		response.setContentType("text/html;charset=EUC-KR");
+		// 출력 스트림 얻기
+		PrintWriter out = response.getWriter();		
+		// 요청객체의 정보를 얻어낼때 문자셋 설정
+		request.setCharacterEncoding("EUC-KR");
+		
+		// 업로드된 화일을 저장할 폴더 구하기
+		ServletConfig config = getServletConfig();
+		ServletContext context = config.getServletContext();
+		// 아래의 photo폴더는 임시사진저장폴더 역할을 한다.
+		// 사진이 저장되면 해당 사진내용을 읽어서 테이블에 저장하자.
+		// 이후 필요없다면 photo폴더의 사진은 삭제해도 무방하다.
+		String dir = context.getRealPath("/photo");
+		System.out.println("photo의 실제 경로 : " + dir);
+		
+		// multipart/form-data의 데이타를 손쉽게 처리하기위해
+		// MultipartRequest객체를 생성한다.
+		MultipartRequest multi = 
+				new MultipartRequest(request, dir, 1024 * 1024 * 100, "EUC-KR"); 
+				
+		
+		// 사진을 전송한 회원의 ID값을 구함
+		String id = multi.getParameter("id");
+		
+		
+		//String file = multi.getParameter("photo"); 화일명만 가져온다.
+		
+		
+		//실제로 서버에 전송되어진 화일자체가 필요하다.
+		File f = multi.getFile("photo");
+		
+		// 결과출력
+		out.println("<HTML>");
+		out.println("<HEAD><TITLE>Multipart 테스트3</TITLE></HEAD>");
+		out.println("<BODY>");
+		out.println("<CENTER><H2>Multipart 테스트3(DB)</H2></CENTER>");
+		
+		//오라클 데이타베이스에 화일 저장				
+		Connection connection;
+		try {
+			connection = DriverManager.getConnection(db_connect, db_user, db_passwd);
+				//                                    
+			String sql = "INSERT INTO photobook VALUES(?,?)";
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ps.setString(1, id);		   					//'jica01'
+			
+			FileInputStream fis = new FileInputStream(f);   // 실제화일을 읽어서 그내용을 그대로 저장하는 코드 
+			ps.setBinaryStream(2, fis, f.length());
+			
+			ps.executeUpdate();
+			
+			fis.close();
+			ps.close();
+			connection.close();
+			
+			//photo폴더의 화일은 삭제하자.
+			f.delete();
+			
+			
+			//화일을 삭제
+			out.println("정상적으로 DB에 사진을 저장했습니다.<BR>");
+			out.println("<A href='/basic/ShowDBImageServlet?id=" + id + "'>사진보기</A>");
+		} catch (SQLException e) {
+			out.println("<pre>");
+			e.printStackTrace(out);
+			out.println("<pre>");
+		}
+		
+		out.println("</BODY>");
+		out.println("</HTML>");
+	}
+
+}
+```
+
++ ShowDBImageServlet.java
+```java
+package com.jica.multipart;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet(description = "Oracle DB에 사진 불러오기", urlPatterns = { "/ShowDBImageServlet" })
+public class ShowDBImageServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	//-------------------------------------------------------
+	String db_connect = "jdbc:oracle:thin:@127.0.0.1:1521:XE";  //JDBC URL
+    String db_user = "SCOTT";
+    String db_passwd = "TIGER";	
+	//-------------------------------------------------------
+	
+    public void init() throws ServletException {
+        try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("OracleDriver가 정상 로드되어짐....");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("OracleDriver 로드에서 예외발생....");
+			System.out.println("예외가 발생하면 lib 폴더에 ojdb6.jar를 복사하시오.");
+		}
+	}
+    
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request, response);	
+	}
+   
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		// 응답객체에 ContentType설정
+		response.setContentType("image/gif");
+		
+		String id = request.getParameter("id");
+		
+		//오라클 데이타베이스에 화일 저장				
+		Connection connection = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;	
+		
+		InputStream is = null;
+		ServletOutputStream sos = null;
+		try {
+			connection = DriverManager.getConnection(db_connect, db_user, db_passwd);
+				
+			String sql 
+				= "SELECT id, photo FROM photobook WHERE id = ?";
+			
+			ps = connection.prepareStatement(sql);
+			ps.setString(1, id);
+
+			rs = ps.executeQuery();
+			
+			if( rs != null && rs.next()){
+				String rid = rs.getString("id");
+				is = rs.getBinaryStream("photo");
+				// 응답객체에 출력하기 위한 스트림 얻기
+				sos = response.getOutputStream();
+				
+				int readData = 0;
+				byte buffer[] = new byte[1024*100];
+				while( (readData = is.read(buffer,0,1024*100)) > 0){
+					sos.write(buffer, 0, readData);
+				}
+			}else{
+				throw new Exception("사진이 없습니다.");
+			}
+			
+			sos.close();
+			is.close();
+			rs.close();
+			ps.close();
+			connection.close();
+	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+```
+
++ 쿠키와 세션(Cookie / HttpSession)
+  + 로그인, 로그아웃까지 남은 시간, 장바구니, 홈쇼핑(구매목록), ...
+  + 실제로 회원가입/로그인/로그인 안한 사용자와 로그인한 사용자
+
+
+
+
+#### 6. 실습
+#### 7. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+
+
+### [2019-05-27]
+
+#### 1. Review
+#### 4. Cookie
+
+#### 5. Session
 
 #### 4. 실습
 #### 5. Summary / Close
