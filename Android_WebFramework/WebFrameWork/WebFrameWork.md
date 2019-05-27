@@ -6771,6 +6771,958 @@ public class ShowDBImageServlet extends HttpServlet {
 ### [2019-05-27]
 
 #### 1. Review
+#### 2. 회원등록 처리
++ 회원등록처리의 과정
+```
+ client(웹브라우저)               server(Tomcat)
+ ---------------------------------------------------
+  
+ Regist.html
+   회원정보입력
+   1. 아이디 중복검사  ---------->  IdCheck.java
+                  <---------        회원정보테이블   
+   2. 주소입력
+            우편번호           -----------> ZipSearch.java              
+            상세주소           <----------        행정구역상의 우편번호(5,6만개--별도의 우편번호 테이블
+   
+   3. 클라이언트에서의 유효성검사
+   4. 회원정보등록    ------------> Regist.java
+                 <-----------       회원정보 테이블
+   --------------------------------------
+  Login.html   
+  (로그인 처리) -----------------> Login.java                    
+```
+
++ 참고) 소프트웨어설치시 내부폴더 bin의 용도
+  + 실행파일이 있는 장소
+  + `*.com`, `*.exe`, `*.dll`(동적링크라이브러리) <-- 실행시 참조된다.
+
+```
+1. 실습준비 - 회원정보 테이블 만들기(sql\create_members_table.sql)
+                       우편번호  테이블 만들기
+                   1) 테이블구조만들기(sql\create_post_table.sql)
+                   2) 외부에서 주어지는 대용량 우편번호테이타를 테이블에 추가하기
+                                  zipcode\화일을 참고하여 오라클의 sqllder.exe를 사용
+```
+
++ 유효성검사 방법
+	1) 클라이언트에서 서버에 접속하기 직전에 일괄적으로 검사
+	2) 사용자의 입력동작시점에서 개별적으로 유효성 검사
+	3) 클라이언트에서 유효성검사를 수행할수 없고 반드시 서버에서 수행해야하는 검사(별도 서블릿 작성)-아이디중복검사
+
+
++ Regist.html
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<SCRIPT LANGUAGE="JavaScript" SRC="check.js">
+	</SCRIPT>
+	
+	<SCRIPT>
+		// 클라이언트에서 유효성 검증하는 코드    
+		function chk(){
+			// 서버에 접속하지 않고 클라이언트 자체에서 유효성 검사
+			//       document.forms[0].id
+			if(!isID(RegistForm.id)){
+				window.alert("ID를 정확히 입력하세요");
+				return false;
+			}
+			
+			if( isNull(RegistForm.pass1)){
+				window.alert("암호 부분에 내용이 없습니다.");
+				return false;
+			}
+
+			if( !isSame(RegistForm.pass1, RegistForm.pass2)){
+				window.alert("암호가 일치하지 않습니다.");
+				return false;
+			}
+
+			if( !isZipCode(RegistForm.zip1, RegistForm.zip2)){
+				window.alert("우편번호를 검색해서 입력하세요.");
+				return false;			
+			}
+
+			if( !isAddr(RegistForm.addr)){
+				window.alert("우편번호 검색후 상세주소를 입력하세요.");
+				return false;	
+			}
+			return true;
+		}
+	   
+
+	    function checkNum(obj) {
+			max = 3;
+			selected = 0;
+			for(i=0; i<document.RegistForm.hobby.length; i++){
+				if( document.RegistForm.hobby[i].checked){
+					selected++;
+				}
+			}
+	        if (selected > max) {
+	           alert("관심 항목은 3개까지만 선택할 수 있습니다.");
+	           obj.checked= false;
+	        }
+	  }
+		
+		function idCheck(){
+			if( isNull(document.RegistForm.id)){
+				window.alert("ID를 입력하세요");
+				return;
+			}
+
+		    //var id = document.forms[0].id.value;
+			var id = document.RegistForm.id.value;
+			window.open("/basic/IdCheck?id="+id, "", "left=300 top=200 width=300 height=150");
+		}
+		
+		function zipCheck(){
+			window.open("/basic/member/ZipSearch.html", "", "left=300 top=200 width=600 height=500 scrollbars=yes");
+		}
+		
+	</SCRIPT>
+</HEAD>
+<BODY>
+	<CENTER>
+	<FORM name = "RegistForm" action="/basic/Regist" method="POST"
+		  onSubmit="return chk()">
+	<TABLE border="3" cellspacing="4" cellpadding="4" >
+	   <TR>
+	       <TD  colspan="4" align="center"><b><FONT size="5">회원가입</FONT></b></TD>
+	      
+	   </TR>
+	   <TR>
+			<TD><FONT size="3">※아이디</FONT></TD>
+			<TD colspan="2">
+				<input type = "text" name = "id" size="20">
+			</TD>
+	        <TD align="center">
+				<INPUT type="button" value="아이디중복검사" onClick="idCheck();">
+			</TD>
+	   </TR>
+	   <TR>
+	        <TD><FONT size="3">※비밀번호</FONT></TD>
+	        <TD>
+				<INPUT type = "password" name = "pass1"  size="20">
+			</TD>
+	        <TD><FONT size="3">※비밀번호확인</FONT></TD>
+			<TD>
+				<INPUT type = "password" name = "pass2" size="20" >
+			</TD>
+	   </TR>
+	   <TR>
+	        <TD><FONT size="3">※우편번호</FONT></TD>
+	        <TD colspan="2">
+				<INPUT type = "text" name = "zip1"  size="3" READONLY>-
+				<INPUT type = "text" name = "zip2" size="3" READONLY>
+			</TD>      
+	        <TD align="center">
+				<INPUT type="button" value="우편번호검색" onClick="zipCheck();">
+			</TD>
+		</TR>
+		<TR>
+	        <TD><FONT size="3">※주소</FONT></TD>
+	        <TD colspan="3">
+				<INPUT type = "text" name = "addr"  size="50">
+			</TD>
+		
+	    </TR>
+		<TR>
+	        <TD><FONT size="3">직 업</FONT></TD>
+	        <TD>
+			<SELECT name="job">
+				<OPTION value="백수">백    수
+				<OPTION value="회사원">회  사  원
+				<OPTION value="주부">주    부
+				<OPTION value="군인">군    인
+				<OPTION value="초딩">초    딩
+				<OPTION value="중딩">중    딩
+				<OPTION value="고딩">고    딩
+				<OPTION value="대딩">대    딩
+			</SELECT>	
+			</TD>
+	        <TD><FONT size="3">관심분야</FONT></td>
+			<TD>
+				<INPUT type="checkbox" name="attention" value="JSP">JSP
+				<INPUT type="checkbox" name="attention" value="ASP">ASP
+				<INPUT type="checkbox" name="attention" value="PHP">PHP
+			</TD>
+	   </TR>
+	
+	   <TR>
+	   <TD><FONT size="3">취미/특기</FONT></td>
+			<TD colspan="3">
+				<INPUT type="checkbox" name="hobby" value="시체놀이" onClick="checkNum(this)">시체놀이
+				<INPUT type="checkbox" name="hobby" value="코파기" onClick="checkNum(this)" >코파기
+				<INPUT type="checkbox" name="hobby" value="100일안씻기" onClick="checkNum(this)">100일안씻기
+				<INPUT type="checkbox" name="hobby" value="아이스케키" onClick="checkNum(this)">아이스케키
+				<INPUT type="checkbox" name="hobby" value="X침" onClick="checkNum(this)">X침
+				<INPUT type="checkbox" name="hobby" value="넘어지기" onClick="checkNum(this)">넘어지기
+			</TD>
+	   </TR>
+		<TR>
+	       <TD colspan="4"  align="center">
+				<INPUT type="submit" value=" 가 입 ">	
+				<INPUT type="reset" value=" 취 소 ">
+			</TD>
+	   </TR>
+	   </TR>
+	</TABLE>
+	</FORM>
+	</CENTER>
+</BODY>
+</HTML>
+```
+
+
++ Regist.java
+```java
+package com.jica.member;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+import java.io.*;
+import java.sql.*;
+
+@WebServlet(description = "가입하기", urlPatterns = { "/Regist1" })
+public class Regist extends HttpServlet
+{
+	private static final long serialVersionUID = 1L;
+	public void init(){
+		// JDBC 드라이버 로딩
+		try{
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		}catch(ClassNotFoundException e){
+			e.printStackTrace();
+		}
+	}
+
+	public void doGet(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		// 회원가입을 반드시 Post방식으로 접속해야 하므로
+		System.out.println("GET 방식의 가입요청!");
+		response.sendRedirect("/basic/member/Regist.html");
+	}
+
+	public void doPost(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		System.out.println("POST 방식의 가입요청!");
+		process(request, response);
+	}
+
+	public void process(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		// 요청정보의 문자 인코딩을 설정
+		request.setCharacterEncoding("euc-kr");
+		// 응답정보의 MIME 설정
+		response.setContentType("text/html;charset=euc-kr");
+		// 출력 스트림 얻기
+		PrintWriter out = response.getWriter();
+
+		// 응답정보 얻기
+		String id = request.getParameter("id");
+		String pass1 = request.getParameter("pass1");
+		String pass2 = request.getParameter("pass2");
+
+		// 서버에서 유효성 검사 예 -- 아래의 코드는 학습용으로 복습하라는 뜻이고 동작하지는 않는다.
+		//--------------------------------------------------------------------
+		if( id == null || id.equals("")){
+			response.sendRedirect("/basic/member/Regist.html");
+			return;
+		}
+
+		if( pass1 == null || pass1.equals("") || !pass1.equals(pass2)){
+			String path = request.getContextPath();
+			response.setHeader("Location", path+"/Regist.html");
+			response.sendError(response.SC_MOVED_TEMPORARILY);
+			return;
+		}
+		//-------------------------------------------------------------------
+		//정상적인 가입요청이므로 나머지 정보 얻기
+		String zip1 = request.getParameter("zip1");
+		String zip2 = request.getParameter("zip2");		
+		
+		String zipCode = zip1 + "-" + zip2;
+						 
+		String addr = request.getParameter("addr"); // 사용자가 입력한 상세주소
+		String job = request.getParameter("job"); // "백수","회사원","주부","군인","초딩","중딩","고딩","대딩"	
+		
+		String attentions[] = request.getParameterValues("attention"); //"JSP","ASP","PHP"
+		String hobbys[] = request.getParameterValues("hobby"); //"시체놀이","코파기","100일안씻기","아이스케키","X침","넘어지기" 
+		
+
+		// 데이타베이스 관련 작업 --> 비지니스 로직
+		// 데이타베이스 접속
+		Connection connection = null;
+		Statement statement = null;
+		try{
+			String url  = "jdbc:oracle:thin:@127.0.0.1:1521:XE"; 
+			connection = DriverManager.getConnection(url, "SCOTT", "TIGER");
+			statement = connection.createStatement();
+		}catch( SQLException e){
+			e.printStackTrace();
+		}
+
+		// 데이타 베이스에 등록
+		String sql = "INSERT INTO members VALUES('";
+		sql += id + "','";
+		sql += pass1 + "','";
+		sql += zip1 + "','";
+		sql += zip2 + "','";
+		sql += addr + "',";
+
+		//서버로 전송된 데이타와 테이블에 저장된 데이타의 구조가 다르므로 알맞은 저장값으로 변경
+		int nJob = 0;  // 0      1        2     3     4    5      6     7
+		String jobs[] ={"백수", "회사원", "주부","군인","초딩","중딩","고딩","대딩"};
+
+		for(int i=0; i<jobs.length; i++){
+			if( job.equals(jobs[i])){
+				nJob = i;
+				break;
+			}
+		}
+
+		sql += nJob + ",'";
+
+		//                    attentions ==> {"JSP","PHP"}     
+
+		//          "JSP" "ASP" "PHP" 
+		int aTemp [] = {0, 0, 0};
+		//              1, 0, 1
+		String asTemp = "";//  "101"을 만든다.
+		if( attentions != null){
+			for(int i=0; i<attentions.length; i++){
+				if( attentions[i].equals("JSP")){
+					aTemp[0] = 1;
+				}else if(attentions[i].equals("ASP")){
+					aTemp[1] = 1;
+				}else if(attentions[i].equals("PHP")){
+					aTemp[2] = 1;
+				}
+			}
+		}
+		for(int i=0; i < 3; i++){
+			asTemp += ( aTemp[i] == 0 ) ? "0" : "1";
+		}
+		sql += asTemp + "','";
+
+		String hsTemp = "";
+		int hTemp[] = {0,0,0,0,0,0};
+		
+		if( hobbys != null){
+			for(int i=0; i<hobbys.length; i++){
+				if( hobbys[i].equals("시체놀이")){
+					hTemp[0] = 1;
+				}else if(hobbys[i].equals("코파기")){
+					hTemp[1] = 1;
+				}else if(hobbys[i].equals("100일안씻기")){
+					hTemp[2] = 1;
+				}else if(hobbys[i].equals("아이스케키")){
+					hTemp[3] = 1;
+				}else if(hobbys[i].equals("X침")){
+					hTemp[4] = 1;
+				}else if(hobbys[i].equals("넘어지기")){
+					hTemp[5] = 1;
+				}
+			}
+		}
+
+		for(int i=0; i < 6; i++){
+			hsTemp += ( hTemp[i] == 0 ) ? "0" : "1";
+		}
+		sql += hsTemp + "', SYSDATE)";
+
+		// 디버깅용
+		System.out.println("sql : " + sql);
+		
+		String result = "";
+		int n = 0;
+
+		try{
+			n = statement.executeUpdate(sql);
+		}catch(SQLException e){
+			System.out.println("회원등록에 실패했습니다.!");
+		}finally{
+			try{
+				statement.close(); statement = null;
+				connection.close(); connection = null;
+			}catch(SQLException e){
+			}
+			System.gc();
+		}
+		
+		// 회원 등록 결과 
+		out.println("<HTML><HEAD><TITLE>회원 등록 결과 </TITLE></HEAD>");
+		out.println("<BODY><CENTER><H2>");
+		if( n >= 1 ){
+			out.println("회원가입이 정상 처리되었습니다.</H2>");
+			out.println("<A HREF='/basic/member/Login.html'>로그인</A></CENTER>");
+		}else{
+			out.println("회원가입이 실패했습니다.</H2>");
+			out.println("<A HREF='/basic/member/Regist.html'>다시등록</A></CENTER>");
+		}
+		out.println("</CENTER></BODY></HTML>");
+	}
+}
+```
+
+
++ IdCheck.java
+```java
+package com.jica.member;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+import java.io.*;
+import java.sql.*;
+
+@WebServlet(description = "id 중복검사", urlPatterns = { "/IdCheck" })
+public class IdCheck extends HttpServlet
+{
+	private static final long serialVersionUID = 1L;
+	public void init(){
+		// JDBC 드라이버 로딩
+		try{
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		}catch(ClassNotFoundException e){
+			e.printStackTrace();
+		}
+	}
+
+	public void doGet(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		
+		System.out.println("GET 방식의 IdCheck요청!");
+		process(request,response);
+	}
+
+	public void doPost(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		System.out.println("POST 방식의 IdCheck요청!");
+		process(request, response);
+	}
+
+	public void process(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		
+		request.setCharacterEncoding("euc-kr");
+		response.setContentType("text/html;charset=euc-kr");
+		PrintWriter out = response.getWriter();
+
+		// 응답정보 얻기
+		String id = request.getParameter("id");
+
+		// 데이타베이스 관련 작업 --> 비지니스 로직
+		// 데이타베이스 접속
+		Connection connection = null;
+		Statement statement = null;
+		try{
+			String url  ="jdbc:oracle:thin:@127.0.0.1:1521:XE"; 
+			connection = DriverManager.getConnection(url, "SCOTT", "TIGER");
+			statement = connection.createStatement();
+		}catch( SQLException e){
+			e.printStackTrace();
+		}
+
+		// 데이타 베이스에서 id와 동일값이 있는지 여부를 검사한다.
+		String sql = "SELECT * FROM members WHERE id = '" + id + "'";
+
+		// 디버깅용
+		System.out.println("sql : " + sql);
+
+		ResultSet resultSet = null;
+		String result = "";
+
+		try{
+			resultSet = statement.executeQuery(sql);
+			if( resultSet.next() ){
+				//디버깅용
+				System.out.println(resultSet.getString("id") + " " + 
+								   resultSet.getString("pass"));
+				result = id + " 는 이미 사용중입니다.<BR>";
+			}else{
+				result = id + " 는 사용 가능한 ID입니다.<BR>";
+				result += "<A HREF='javascript:use()'>사용하기";
+			}
+		}catch(SQLException e){
+			System.out.println("id중복검사중 예외가 발생 했습니다.!");
+		}finally{
+			try{
+				resultSet.close(); resultSet = null;
+				statement.close(); statement = null;
+				connection.close(); connection = null;
+			}catch(SQLException e){
+			}
+			System.gc();
+		}
+		
+
+		// id중복검사 결과 
+		String htmlHead = "";
+		htmlHead += "<HTML>\n";
+		htmlHead += "<HEAD><TITLE>ID 중복 검사 </TITLE>\n";
+		htmlHead += " <SCRIPT LANGUAGE='JavaScript'>\n";
+		htmlHead += "	function use(){\n";
+		htmlHead += "		opener.document.RegistForm.id.value = '" + id + "'\n";
+		htmlHead += "		self.close()\n";
+		htmlHead += "	}\n";
+		htmlHead += " </SCRIPT>\n";
+		htmlHead += " </HEAD>\n";
+
+		String htmlBody = "<BODY>\n";
+		htmlBody += result + "<BR>\n";
+		
+		htmlBody += "<FORM METHOD=POST ACTION='/basic/IdCheck'>\n";
+		htmlBody += "   <INPUT TYPE='TEXT' NAME='id'>\n";
+		htmlBody += "   <INPUT TYPE='SUBMIT' VALUE='검색'>\n";
+		htmlBody += "</FORM>\n";
+		htmlBody += "</BODY>\n</HTML>\n";
+
+		out.println(htmlHead);
+		out.println(htmlBody);
+	}
+}
+```
+
++ check.js
+```js
+function isAddr(addr){
+	if( isNull(addr) || addr.value.length < 15){
+		return false;
+	}
+	return true;
+}
+
+function isZipCode(zip1, zip2){
+	if( zip1.value == "" || zip2.value == "" ||
+		zip1.value.length != 3 || zip2.value.length !=3 ||
+		!isNumber(zip1) || !isNumber(zip2)){
+		return false;
+	}
+	return true;
+}
+
+function isNull(obj, msg) {
+	if(obj.value == "") {
+		if(msg) {
+			alert(msg);
+		}
+		obj.focus();
+		return true;
+	}
+	return false;
+}
+
+function isNumber(obj) {
+	var str = obj.value;
+	if(str.length == 0)
+		return false;
+
+	for(var i=0; i < str.length; i++) {
+		if(!('0' <= str.charAt(i) && str.charAt(i) <= '9'))
+			return false;
+	}
+	return true;
+}
+
+function isSame(obj1, obj2) {
+	var str1 = obj1.value;
+	var str2 = obj2.value;
+	if(str1.length == 0 || str2.length == 0)
+		return false;
+
+	if(str1 == str2)
+		return true;
+	return false;
+}
+
+function isShort(obj, len, msg) {
+	var str = obj.value;
+	if(str.length < len) {
+		if(msg) {
+			alert(msg);
+		}
+		obj.focus();
+		obj.select();
+		return true;
+	}
+	return false;
+}
+
+function isAlphabet(obj) {
+	var str = obj.value;
+	if(str.length == 0)
+		return false;
+
+	str = str.toUpperCase();
+	for(var i=0; i < str.length; i++) {
+		if(!('A' <= str.charAt(i) && str.charAt(i) <= 'Z'))
+			return false;
+	}
+	return true;
+}
+
+function isAlphaNumeric(obj) {
+	var str = obj.value;
+	if(str.length == 0)
+		return false;
+
+	str = str.toUpperCase();
+	for(var i=0; i < str.length; i++) {
+		if(!(('A' <= str.charAt(i) && str.charAt(i) <= 'Z') ||
+			('0' <= str.charAt(i) && str.charAt(i) <= '9')))
+			return false;
+	}
+	return true;
+}
+
+function isID(obj) {
+	var str = obj.value;
+
+	if(str.length == 0)
+	{
+		return false;
+	}
+
+	str = str.toUpperCase();
+	for(var i=0; i < str.length; i++)
+	{
+		if(!(('A' <= str.charAt(i) && str.charAt(i) <= 'Z') ||('0' <= str.charAt(i) && str.charAt(i) <= '9') ||(str.charAt(i) == '_')))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+function isEmail(obj) {
+	var str = obj.value;
+	if(str == "")
+		return false;
+
+	var i = str.indexOf("@");
+	if(i < 0)
+		return false;
+
+	i = str.indexOf(".");
+	if(i < 0)
+		return false;
+
+	return true;
+}
+
+function isCardNumber(obj) {
+	var str = obj.value;
+	if(str.length != 16)
+		return false;
+
+	for(var i=0; i < 16; i++) {
+		if(!('0' <= str.charAt(i) && str.charAt(i) <= '9'))
+			return false;
+	}
+	return true;
+}
+
+function isSSN(front, back) {
+	var birthday = front.value;
+	var num = back.value;
+
+	if(birthday.length != 6) {
+		return false;
+	}
+	if(num.length != 7) {
+		return false;
+	}
+	var hap = 0;
+	for(var i=0; i < 6; i++) {
+		var temp = birthday.charAt(i) * (i+2);
+		hap += temp;
+	}
+
+	var n1 = num.charAt(0);
+	var n2 = num.charAt(1);
+	var n3 = num.charAt(2);
+	var n4 = num.charAt(3);
+	var n5 = num.charAt(4);
+	var n6 = num.charAt(5);
+	var n7 = num.charAt(6);
+
+	hap += n1*8+n2*9+n3*2+n4*3+n5*4+n6*5;
+	hap %= 11;
+	hap = 11 - hap;
+	hap %= 10;
+	if(hap != n7)
+		return false;
+	return true;
+}
+```
+
++ ZipSearch.html
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+ <HEAD>
+  <TITLE> 우편번호 검색 </TITLE>
+ </HEAD>
+
+ <BODY>
+  <CENTER><H2>우편번호 검색</H2>
+  <FORM METHOD=POST ACTION="/basic/ZipSearch">
+	<TABLE>
+	<TR>
+		<TD WIDTH=30%>동이름</TD>
+		<TD WIDTH=50%><INPUT TYPE="text" NAME="dong"></TD>
+		<TD><INPUT TYPE="submit" VALUE="검색"></TD>	
+	</TR>
+	</TABLE>
+  </FORM>
+  </CENTER>
+ </BODY>
+</HTML>
+```
+
++ ZipSearch.java
+```java
+package com.jica.member;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+import java.io.*;
+import java.sql.*;
+
+@WebServlet(description = "주소 찾기", urlPatterns = { "/ZipSearch" })
+public class ZipSearch extends HttpServlet
+{
+	private static final long serialVersionUID = 1L;
+	public void init(){
+		// JDBC 드라이버 로딩
+		try{
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+		}catch(ClassNotFoundException e){
+			e.printStackTrace();
+		}
+	}
+
+	public void doGet(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		// 회원가입을 반드시 Post방식으로 접속해야 하므로
+		System.out.println("GET 방식의 ZipSearch요청!");
+		process(request,response);
+	}
+
+	public void doPost(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		System.out.println("POST 방식의 ZipSearch요청!");
+		process(request, response);
+	}
+
+	public void process(HttpServletRequest request,
+                     HttpServletResponse response)
+              throws ServletException, java.io.IOException	{
+		
+		request.setCharacterEncoding("KSC5601");
+		response.setContentType("text/html;charset=KSC5601");
+		PrintWriter out = response.getWriter();
+
+		// 응답정보 얻기
+		String sDong = request.getParameter("dong"); // 중앙동
+
+		// 데이타베이스 관련 작업 --> 비지니스 로직
+		// 데이타베이스 접속
+		Connection connection = null;
+		Statement statement = null;
+		try{
+			String url  = "jdbc:oracle:thin:@127.0.0.1:1521:XE"; 
+			connection = DriverManager.getConnection(url, "SCOTT", "TIGER");
+			statement = connection.createStatement();
+		}catch( SQLException e){
+			e.printStackTrace();
+		}
+
+		// 데이타 베이스에서 동이름을 포함하고 있는지 질의.
+		String sql = "SELECT * FROM post WHERE dong LIKE '%" + sDong + "%'"; 
+
+		// 디버깅용
+		System.out.println("sql : " + sql);
+
+		ResultSet resultSet = null;
+		String result = "";
+		
+		String htmlHead = "";
+		String htmlBody = "<BODY>\n";
+		htmlBody += "<CENTER><H2>우편번호 검색</H2>\n";
+		htmlBody += "<FORM METHOD=POST ACTION='/basic/ZipSearch'>\n";
+		htmlBody += "<TABLE>\n";
+		htmlBody += "<TR>\n";
+		htmlBody += "	<TD WIDTH=30%>동이름</TD>\n";
+		htmlBody += "	<TD WIDTH=50%><INPUT TYPE='text' NAME='dong'></TD>\n";
+		htmlBody += "	<TD><INPUT TYPE='submit' VALUE='검색'></TD>\n";
+		htmlBody += "</TR>\n";
+		htmlBody += "</TABLE>\n";
+	    htmlBody += "</FORM>\n";
+	    htmlBody += "</CENTER>\n";
+	    
+		int count = 0;	    
+		try{
+			resultSet = statement.executeQuery(sql);
+
+			String zipcode = null;
+			String sido = null;
+			String gugun = null;
+			String dong = null;
+			String ri = null;
+			String st_bunji = null;
+			String end_bunji = null;
+			
+			htmlBody += "<CENTER><FORM NAME='ZipSelectForm'>\n";
+			htmlBody += "<TABLE>\n";
+
+			String value = "";
+			while(resultSet.next()){
+				count++;
+				zipcode = resultSet.getString("zipcode");
+				sido = resultSet.getString("sido");
+				gugun = resultSet.getString("gugun");
+				dong = resultSet.getString("dong");
+				ri = resultSet.getString("ri");
+				st_bunji = resultSet.getString("st_bunji");
+				end_bunji = resultSet.getString("end_bunji");
+
+				htmlBody += "<TR><TD>";
+				value = zipcode + " " + sido + " ";
+				if( gugun != null){
+					value += gugun + " ";
+				}
+
+				if( dong != null ){
+					value += dong + " ";
+				}
+
+				if( ri != null ){
+					value += ri + " ";
+				}
+
+				if( st_bunji != null ){
+					value += st_bunji ;
+					if( end_bunji != null ){
+						value += "~" + end_bunji;
+					}
+				}
+				
+				htmlBody += "<INPUT TYPE='RADIO' NAME='ADD' VALUE='" + value + "'><FONT SIZE=2>\n";
+				htmlBody += value + "</FONT>\n";
+				htmlBody += "</TD></TR>\n";
+			}
+
+			if( count == 0 ){
+				htmlBody += "<TR><TD>검색 자료가 없습니다.</TD></TR>\n";
+			}else{
+				htmlBody += "<TR><TD ALIGN=CENTER>\n";
+				htmlBody += "<INPUT TYPE=BUTTON NAME=OK VALUE='확인'\n";
+				htmlBody += " ONCLICK='javascript:use()'></TD></TR>\n";
+			}
+			htmlBody += "</TABLE></FORM></CENTER>\n";
+			htmlBody += "</BODY>\n";
+
+		}catch(SQLException e){
+			System.out.println("우편번호 검색중 예외가 발생 했습니다.!");
+		}finally{
+			try{
+				resultSet.close(); resultSet = null;
+				statement.close(); statement = null;
+				connection.close(); connection = null;
+			}catch(SQLException e){
+			}
+			System.gc();
+		}
+		
+		// 우편번호 검사 결과 
+		htmlHead += "<HTML><HEAD><TITLE> 우편번호 검색 </TITLE>\n";
+		if( count == 1){
+			htmlHead += "<SCRIPT LANGUAGE='JavaScript'>\n";
+			htmlHead += "function use(){\n";			
+			htmlHead += "   var zip1 = '', zip2 = '', addr = '';\n";
+			htmlHead += "	zip1 = document.ZipSelectForm.ADD.value.substring(0,3);\n";
+			htmlHead += "	zip2 = document.ZipSelectForm.ADD.value.substring(4,7);\n";
+			htmlHead += "	addr = document.ZipSelectForm.ADD.value.substring(8);\n";	
+			htmlHead += "   opener.document.RegistForm.zip1.value = zip1;\n";
+			htmlHead += "   opener.document.RegistForm.zip2.value = zip2;\n";
+			htmlHead += "   opener.document.RegistForm.addr.value = addr;\n";
+	
+			htmlHead += "   self.close();\n";
+			htmlHead += "}\n";
+			htmlHead += "</SCRIPT>\n";			
+		}else if( count > 1){
+			htmlHead += "<SCRIPT LANGUAGE='JavaScript'>\n";
+			htmlHead += "function use(){\n";		
+			htmlHead += "   var i;\n";
+			htmlHead += "   var pos = -1;\n";
+			htmlHead += "   for(i=0; i<document.ZipSelectForm.ADD.length; i++){\n";
+			htmlHead += "		if(document.ZipSelectForm.ADD[i].checked){\n";
+			htmlHead += "			pos = i;\n";
+			//htmlHead += "			window.alert(pos);\n";
+			htmlHead += "			break;\n";
+			htmlHead += "		}\n";
+			htmlHead += "   }\n";
+	
+			htmlHead += "   var zip1 = '', zip2 = '', addr = '';\n";
+			htmlHead += "   if(pos != -1){\n";
+			htmlHead += "		zip1 = document.ZipSelectForm.ADD[pos].value.substring(0,3);\n";
+			htmlHead += "		zip2 = document.ZipSelectForm.ADD[pos].value.substring(4,7);\n";
+			htmlHead += "		addr = document.ZipSelectForm.ADD[pos].value.substring(8);\n";
+			htmlHead += "   }\n";
+	
+			htmlHead += "   opener.document.RegistForm.zip1.value = zip1;\n";
+			htmlHead += "   opener.document.RegistForm.zip2.value = zip2;\n";
+			htmlHead += "   opener.document.RegistForm.addr.value = addr;\n";
+	
+			htmlHead += "   self.close();\n";
+			htmlHead += "}\n";
+			htmlHead += "</SCRIPT>\n";
+		}else{
+			
+		}
+		
+		htmlHead += "</HEAD>\n";
+
+		out.println(htmlHead);
+		out.println(htmlBody);
+	}
+}
+```
+
+
+
+#### 3. Cookie
+#### 4. Session
+#### 5. 실습
+#### 5. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+
+
+### [2019-05-28]
+
+#### 1. Review
 #### 4. Cookie
 
 #### 5. Session
