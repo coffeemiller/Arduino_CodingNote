@@ -7734,8 +7734,8 @@ public class ZipSearch extends HttpServlet
 
 
 
-
 #### 3. Cookie
+
 #### 4. Session
 #### 5. 실습
 #### 5. Summary / Close
@@ -7746,8 +7746,22 @@ public class ZipSearch extends HttpServlet
 -----------------------------------------------------------
 
 
-
 ### [2019-05-28]
+
+#### 1. Review
+#### 4. Cookie
+
+#### 5. Session
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-05-29]
 
 #### 1. Review
 #### 4. Cookie
