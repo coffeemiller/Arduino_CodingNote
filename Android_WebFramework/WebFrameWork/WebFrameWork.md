@@ -7707,6 +7707,29 @@ public class ZipSearch extends HttpServlet
 ```
 
 ```
+- IdCheck.java
+- ZipSearch.
+- Rigist.java
+=================> 개별적으로 jdbc관련 기능을 코딩(DAO를 사용하도록 개선)
+```
+
+```
+ WebContent/member2
+ com.jica.member2.*.java <=== DAO 사용예 참고
+                              -------------(개선)
+                              dao클래스가 여러개라면 공통기능을 추출하여
+                              DBUtils같은 클래스를 만들어서 사용할 수 도 있을것이다.
+                                static { 드라이버로드  }
+                                static Connection getConnection(){...}
+                                static void close(){...}
+                             ----------------------
+                                                      쿠키와 세션내용도 반영시켜서 Login처리를 완성해서
+                             로그인한 사용자만 GuestBookRead.java
+                            GuestBookWrite.java를 사용할수 있도록 해본다.
+                            ||
+                            VV
+                            WebContents\member3
+                            com.jica.member3 패키지에서 서블릿코드
 ```
 
 
