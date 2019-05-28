@@ -189,6 +189,136 @@ client  --------request------->  servlet
                                 ${ 키 }
 ```
 
++ Winneers.jsp
+```jsp
+<%@ page language="java" contentType="text/html; charset=EUC-KR" pageEncoding="EUC-KR"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>복권 당첨 번호</title>
+</head>
+<body>
+	전달된 배열 내용값은 ? ${ ARR }
+	<hr>
+	EL표현은 반복기능과 같은 제어기능이 없고 단지 값을 출력하기만 한다.<br>
+	그래서 태그를 이용해서 프로그램처럼 변수도 사용하고 제어문처리도 가능한<br>
+	외부태그라이브러리로 JSTL을 사용한다.
+	<hr>
+	참고) jstl을 사용하는 절차<br>
+	<li> 라이브러리를 lib폴더에 복사
+	<li> taglib지시어 사용
+	<li> jstl 태그 사용
+	<hr>
+	전달된 배열의 내용값들<br>
+	<c:forEach var="num" items="${ARR}">
+		${num} <BR>
+	</c:forEach>
+</body>
+</html>
+```
+
++ WinnerServlet.java
+```java
+package com.jica.brain3;
+
+import java.io.IOException;
+import java.util.Random;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet("/WinnerServlet")
+public class WinnerServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//로직처리의 결과값으로 배열이 만들어졌다고 가정
+		int arr[] = new int[5];
+		Random random = new Random();
+		for (int cnt = 0; cnt < arr.length; cnt++) {
+			arr[cnt] = random.nextInt(10000000);
+		}
+		request.setAttribute("ARR", arr);
+		RequestDispatcher rd = request.getRequestDispatcher("Winners.jsp");
+		rd.forward(request, response);
+	}
+}
+```
+
+
++ Hundred2.jsp
+```jsp
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+    pageEncoding="EUC-KR"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>Insert title here</title>
+</head>
+<body>
+	<%
+		int total = (int)request.getAttribute("total");
+		int value = (int)request.getAttribute("value");
+	%>
+	
+	1부터 1000까지의 합? <%= total %><br>
+	발생된 난수값 ?  <%= value %>
+	<hr>
+	1부터 1000까지의 합? ${ total }<br>
+	발생된 난수값 ? ${ value }
+</body>
+</html>
+```
+
++ HundredServlet.java
+```java
+package com.jica.brain3;
+
+import java.io.IOException;
+import java.util.Random;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet("/HundredServlet")
+public class HundredServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//여기서는 html태그로 결과를 만드는데 필요한 코드는 전혀 관심두지말고
+		//로직처리만 한다.
+		int total = 0;
+		for (int cnt = 0; cnt <= 1000; cnt++) {
+			total += cnt;
+		}
+		
+		Random random = new Random();
+		int value = random.nextInt(1000);
+		
+		RequestDispatcher rd = request.getRequestDispatcher("Hundred2.jsp");
+//		request.setAttribute("total", new Integer(total));
+		request.setAttribute("total", total);
+		request.setAttribute("value", value);
+		rd.forward(request,response);
+	}
+}
+```
+
+
+
 
 
 #### 4. Scripting element
@@ -209,8 +339,19 @@ client  --------request------->  servlet
     }
 
 2) 익스프레션-표현(expression)    <%= 자바변수  혹은 리턴값이 있는 메서드호출() %>
+    이때의 자바코드는 jsp가 서블릿으로 변환될때
+    _jspService(,){
+        ...
+        out.print(자바변수)
+        ...
+    }
+
 ------------------------------------------------
 3) 선언부(declaration)          <%! 멤버변수 혹은 메서드정의부작성 %>
+    jsp가 서블릿으로 변환될때
+    서블릿의 멤버변수 즉, 인스턴스변수를 선언하거나
+    메서드를 선언/정의할때 사용한다.
+
 
 ============================================================
 jsp페이지에 포함된 모든 html태그는 그대로 응답(출력된다.)
@@ -225,6 +366,73 @@ jsp페이지에 포함된 모든 html태그는 그대로 응답(출력된다.)
   	선언요소는 여기가 아니라 클래스의 멤버영역에 멤버변수와 메서드로 포함된다.
   }
 ```
+
+
++ TwoHundred.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>1부터 200까지의 합</TITLE></HEAD>
+    <BODY>
+        <%
+        	//스크립트렛 내부에서는 자바언어의 문법을 그대로 적용한다.
+            int total = 0;  //_jspService()메서드 내부의 지역변수
+            for (int cnt = 1; cnt <= 100; cnt++)
+                total += cnt;
+        %>
+        1부터 100까지의 합 = <%= total %> <BR>
+        <% 
+            for (int cnt = 101; cnt <= 200; cnt++)
+                total += cnt;
+        %>
+        1부터 200까지의 합 = <%= total %> <BR>
+        <%!
+        %>
+    </BODY>
+</HTML>
+
+<%!
+%>
+```
+
++ TwoPower.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>2의 거듭제곱</TITLE></HEAD>
+    <%!
+    	int total = 0;  //_jspService() 메서드 내부의 지역변수가 아니라
+    					// 현재 jsp페이지(서블릿)의 인스턴스 멤버변수가 된다.
+    %>
+    <BODY>
+        2 ^ 1 = <%= power(2, 1) %> <BR>
+        2 ^ 2 = <%= power(2, 2) %> <BR>
+        <%
+        	total += 500;
+        	out.println("현재까지 total의 값 : "+total+"<br>");
+        %>
+        2 ^ 3 = <%= power(2, 3) %> <BR>
+        2 ^ 4 = <%= power(2, 4) %> <BR>
+        2 ^ 5 = <%= power(2, 5) %> <BR>
+        <%
+        	total += 100;
+        	out.println("현재까지 total의 값 : "+total+"<br>");
+        	total += power(2,10);
+        	out.println("현재까지 total의 값 : "+total+"<br>");
+        %>
+    </BODY>
+</HTML>
+<%! 
+	//아래의 메서드도 클래스의 일반메서드가 된다.      
+    private int power(int base, int exponent) {
+        int result= 1;
+        for (int cnt = 0; cnt < exponent; cnt++)
+            result *= base;
+        return result;
+     } 
+%>
+```
+
 
 
 #### 5. 지시어
