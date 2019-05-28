@@ -14,6 +14,30 @@ brain3\*.html, *.js, *.jsp, 다양한 리소스(*.jpg, *.wav,...)  <== 내부폴
 
 + 1) hteml 태그
 + 2) jsp 태그
+```
+1) 자바코드와 관련된 태그 -- scriptting element
+<%  %>
+<%= %>
+<%! %>
+
+2) 지시어 -- directive element
+    jsp가 서블릿으로 변환될때 필요한 정보를 설정하는 태그
+<%@ page .... %>
+<%@ inclue ...%>
+<%@ taglib ...%>
+
+3) EL -- Expression Language
+    자바변수의 값을 손쉽게 출력하는 기능
+${ 표현식 }
+
+4) 액션태그와 JSTL
+<jsp: 
+<c:
+<fmt:
+``` 
+
+
+
    - 지시어 요소 - directive element (<%@ 속성=값,...  %>
 ```
      <%@page                  %>
@@ -106,9 +130,45 @@ brain3\*.html, *.js, *.jsp, 다양한 리소스(*.jpg, *.wav,...)  <== 내부폴
    1) 지역변수가 선언및 정의 ==> 내장객체
    2) JSP내부의 모든 HTML태그는 그대로 출력된다.
    3) 자바코드 즉, <% %>, <%= %>는 그대로 적용된다.
+   4) <%@ 지시어요소는 설정과 관련되어 적절한 자바코드로 변환된다.
+   5) 액션태그, EL, JSTL등도 자바코드의 특정메서드들도 호출하는 표현으로 모두 변환된다.
 ```
 
-
++ Hundred.jsp
+```jsp
+<%@ page import="java.util.Random"%>
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+    pageEncoding="EUC-KR"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+		<title>1부터 100까지의 합</title>
+	</head>
+	<body>
+		<%
+            //request객체를 자유롭게 사용가능.
+			String name = request.getParameter("addr");
+		
+			//이곳에 자바코드를 자유롭게 작성한다.
+			int total = 0;
+			for(int cnt=1; cnt<=100; cnt++){
+				total += cnt;
+			}
+			
+            //필요한 구문에 해당하는 import를 앞쪽에 배치
+			Random random = new Random();
+			int value = random.nextInt();
+		%>
+		1부터 100까지의 합계? <%= total %>
+		<hr>
+		<%
+			out.println("1부터 100까지의 합계 ? "+ total+"<br>");
+			out.println("발생된 난수값은 ? "+value);
+		%>
+	</body>
+</html>
+```
 
 
 #### 4. Scripting element
