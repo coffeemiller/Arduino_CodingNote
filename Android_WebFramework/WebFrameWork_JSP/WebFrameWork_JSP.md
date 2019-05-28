@@ -443,7 +443,156 @@ jsp페이지에 포함된 모든 html태그는 그대로 응답(출력된다.)
 + page
 + include
 + taglib
-#### 6. 내장객체
+
++ 지시어요소(directive element)
+    - jsp가 서블릿으로 변환될때 서블릿에 적용되는 설정정보를 작성하는 태그
+```
+다음 세가지 지시어 요소가 사용된다.
+----------------------------------------
+1)<%@ page 속성="값",.... %>
+2)<%@ include  속성="값",....%>
+3)<%@ taglib 속성="값",.... %>  ==> JSTL학습
+----------------------------------------
+```
+
+1. page지시어 속성
+```
+   contentType,import,buffer,autoFlush,isThreadSafe,session,
+   errorPage,isErrorPage,isELIgnored,info,extends,language,..
+   
+   1) contentType="text/html; charset=euc-kr"
+      ==> response.setContentType("text/html; charset=euc-kr");
+
+   2) import="패키지명.클래스"
+      ==> import 패키지명.클래스;
+      
+      import속성을 사용하지 않아도 자동으로 포함되는 내용
+      -----------------------
+      java.lang.*
+      javax.servlet.*;
+      javax.servlet.http.*;
+      javax.servlet.jsp.*;
+    import속성은 여러번 사용할수있는 유일한 구문이다.
+
+   3) buffer="4kb"
+        출력버퍼의 크기를 설정한다.
+```
+
+2. include지시어 : 정적인 포함(jsp--->서블릿으로 변환될때 소스를 그대로 복사하여 포함시킨다)
+```
+   <%@ include file="포함될파일" %>
+```
+
+3. taglib지시어는 외부 라이브러리를 특히 jstl에서 사용한다.
+```
+   <%@ taglib prefix="접두어" uri="uri" %>   
+```
+
+
++ JSP페이지에서 사용하는 주석 기호들
+```
+1) <!-- HTML 주석-->
+      jsp가 서블릿으로 바뀔때 그대로 응답내용에 출력된다.
+        단, 응답을 받은 웹브라우저에서 그대로 해석해서 화면에 보여줄때 주석이므로 처리하지 않는다.
+        
+   <%-- JSP주석 --%>   
+      jsp가 서블릿으로 바뀔때 그내용이 웹서버(웹컨테이너)에서 주석이므로 처리하지 않는다.  
+
+2) 스크립팅요소(<% %>, <%= %>, <%! %>)에서 주석 ==> Java Code이므로 Java언어의 주석을 그대로 사용
+   한라인 주석 : //
+   블럭 주석   : /*    */ 
+
+===============================================
+  jsp --------------> 서블릿
+Test.jsp           class Test_jsp extends HttpJspBase{
+
+<%@page             선언의 표현은 이자리에 멤버변수혹은 메서드형태로 나타난다.  
+   include
+   taglib  ... %>
+html태그                 jspInit(){}
+<% 스크립트렛 %>	    jspDestroy(){}
+<%= 익스프레션 %>		jspService(request, resoponse){
+<%! 선언부   %> 		  지역변수 선언및 생성
+					  지시어요소의 값이 자바코드로 변환되어 포함된다.
+					  out.write("html태그");
+					  ....  
+                            스크립트렛코드
+                            익스프레션코드==>out.print(변수)
+                    }
+
+```
+
+
+
+
+##### 정리
+
+1. 지시어 : <%@ 문서의 상단에서 지시할 내용 %>
+    - 지시어는 페이지의 속성, 정보 등을 선언 또는 지시하는 역할을 하는 부분으로 jsp파일의 최상단에 위치합니다.
+```jsp
+<%@ page
+    contentType="text/html;charset=UTF-8"
+    language="java"   // java외에 다른언어는 존재하지 않음. 안써도 됨.
+    import="java.util.Scanner"    // import는 여러개를 쓸 수 있음.
+    import="java.sql.*"
+    session="true"    // default가 true이고 false를 주면 세션 사용 않겠다는 뜻
+    buffer="8kb"      // default가 8kb이고 버퍼사이즈를 조정하는 속성
+    autoFlush="true"  // out.close()의 역할
+    info="jsp 페이지 연습"
+    errorPage="error.jsp"    // 에러페이지는 리다이렉션이 아닌 서버에서 바로 푸시하는 방식
+%>
+```
+
+
+2. 선언 : <%! 전역변수, 메소드 %>
+    - 스크립틀릿의 자바코드는 하나의 메소드이기 때문에 전역변수를 선언하거나(접근지정자 사용 X) 새로운 메소드를 선언할 수 없습니다. 때문에 이 선언부의 <%! 키워드를 이용해 코드를 분리하여 선언합니다.
+    - 선언부에 선언된 클래스변수와 멤버 메서드는 서블릿 코드로 변환되었을 때 클래스 최상단에 작성되는 것을 확인할 수 있습니다. 
+
+
+
+3. 식(표현) : <%= 클라이언트에 출력할 내용 %>
+    - jsp는 out이라는 내장객체를 이용해서 클라이언트에게 결과출력을 합니다. expression단은 이 out을 딱 한 번 사용한 것과 같습니다. 코드를 간결하게 만드는 효과를 가집니다. 코드를 딱 한 줄 사용하기 때문에 스크립틀릿과 달리 세미콜론(;)을 사용하면 안됩니다. (쓰면 에러)
+
+
+
+4. 스크립틀릿(scriptlet) : <% 순수 자바 코드 기술 %>
+    - 스크립틀릿은 완전한 자바코드로 서버단에서 처리되고 out객체나 <%= 요소를 통해서 결과만 출력합니다. 
+    - 따라서 브라우저를 통해 소스를 확인해 보면 java코드는 확인할 수 없습니다.
+```jsp
+<script>
+    var a = 10;    // javascript code
+    document.write("a: ", a);    // js 는 브라우저가 해석
+</script>
+<%
+    int b = 10;    // java code
+    out.println("b: " + b);    // jsp는 서버에서 해석
+%>
+<br>
+<%
+    /* jsp파일은 service 메소드를 오버라이딩한 하나의 메소드이다. */
+    //private String str = "";    // * err : jsp 는 전체가 하나의 메소드
+    String ir = "홍길동";    // 지역변수
+    out.println(ir + "의 홈페이지입니다.");
+%>
+<h1>제목 태그</h1>
+<h3>제목 태그</h3>
+<h6>제목 태그</h6>
+<%
+    for(int i = 1; i < 7; i++){
+        out.print("<h" + i + ">");
+        out.print("제목 태그(자바로 작성)");
+        out.println("</h" + i + ">");
+    }
+%>
+```
+    - HTML에 위와같이 삽입되는데 소스가 복잡해지고 길어지면 HTML문서를 읽는 것이 매우 어려워 집니다. 이 때 사용되는 것이 바로 빈즈입니다.
+
+
+5. 액션 태그 : <jsp: … />
+
+
+
+
 #### 7. 실습
 #### 8. Summary / Close
 
@@ -456,6 +605,7 @@ jsp페이지에 포함된 모든 html태그는 그대로 응답(출력된다.)
 
 #### 1. Review
 
+#### 6. 내장객체
 
 #### 4. 실습
 #### 5. Summary / Close
