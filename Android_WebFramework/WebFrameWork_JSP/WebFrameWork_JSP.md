@@ -16,9 +16,10 @@ brain3\*.html, *.js, *.jsp, 다양한 리소스(*.jpg, *.wav,...)  <== 내부폴
 + 2) jsp 태그
 ```
 1) 자바코드와 관련된 태그 -- scriptting element
-<%  %>
-<%= %>
-<%! %>
+<%  %>  스크립트렛(scriptlet)
+<%= %>  표현(expression)
+<%! %>  선언(declation)
+
 
 2) 지시어 -- directive element
     jsp가 서블릿으로 변환될때 필요한 정보를 설정하는 태그
@@ -26,12 +27,15 @@ brain3\*.html, *.js, *.jsp, 다양한 리소스(*.jpg, *.wav,...)  <== 내부폴
 <%@ inclue ...%>
 <%@ taglib ...%>
 
+
 3) EL -- Expression Language
     자바변수의 값을 손쉽게 출력하는 기능
 ${ 표현식 }
 
-4) 액션태그와 JSTL
+
+4) 표준액션태그와 외부액션태그(JSTL) ==> 태그의 구조가 xml문법형식을 따른다.
 <jsp: 
+
 <c:
 <fmt:
 ``` 
@@ -171,10 +175,58 @@ ${ 표현식 }
 ```
 
 
++ 향후 jsp의 학습이 마무리될 즈음 우리가 작성하는 서블릿과 jsp의 협업은 주로 다음의 형태를 가진다.
+```
+client  --------request------->  servlet
+                            (로직처리 -- 결과)
+                                  |request.setAttribute("키",값);
+                                  |forward(request,response)
+                                  |
+                                  V
+  <---------response---------- JSP페이지
+                        가급적이면 java코드가 없이 태그로만 작성을 권한다.
+                        EL, 표준액션태그, JSTL로만 작성
+                                ${ 키 }
+```
+
+
+
 #### 4. Scripting element
 + Script let
 + Expression
 + declation
+
+
++ 스크립팅요소(scripting elements)란 ?
+    - jsp페이지에 포함된 자바코드와 관련된 요소를 말한다.
+```
+1) 스크립트렛(scriptlet)         <% 자바코드  %>
+    이때의 자바코드는 jsp가 서블릿으로 변환될때
+    _jspService(,){
+        ...
+        자바코드
+        ...
+    }
+
+2) 익스프레션-표현(expression)    <%= 자바변수  혹은 리턴값이 있는 메서드호출() %>
+------------------------------------------------
+3) 선언부(declaration)          <%! 멤버변수 혹은 메서드정의부작성 %>
+
+============================================================
+jsp페이지에 포함된 모든 html태그는 그대로 응답(출력된다.)
+  jsp ---변환----> 서블릿
+  
+  jspService(HttpServletRequest request, HttpServletResponse response){
+  	지역변수 선언 및 생성               --------                     ---------
+  	------  ===================>+    jsp의 내장객체라고 부른다.
+  	html태그 출력
+  	스크립팅요소가 포함된다.
+  	익스프레션은 out.print()형태로 포함된다.
+  	선언요소는 여기가 아니라 클래스의 멤버영역에 멤버변수와 메서드로 포함된다.
+  }
+```
+
+
 #### 5. 지시어
 + `<%@` 
 + page
