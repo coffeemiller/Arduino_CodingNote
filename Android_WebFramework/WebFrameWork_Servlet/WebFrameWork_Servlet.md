@@ -2087,7 +2087,7 @@ a = "abc";    //ok
 		   window.screen
 		   window.navigator
        2) html화일의 내부 구성요소 즉, 태그들을 하나하나 읽으면서
-	      그 구성요소에 따라서 documnet객체의 내부 구성요소로
+	      그 구성요소에 따라서 documnet객체�� 내부 구성요소로
 		  해석되어 객체로 표현되어진다.
 		  DOM(Document Object Model) ==> 이진 Tree 구조
        3) 사용자의 행위에 따라 발생하는 이벤트 처리 코드를
@@ -6343,7 +6343,7 @@ enctype을 생략하면 application/x-www-form-urlencoded 형태이다
 
 get방식의 요청으로는 input type='file'을 이용하여 서버로 전송하면
 화일명만 전송될뿐 화일내용은 전송되지 않는다.
-이유 ==> 화일내용은 그 전체내용을 전송해야 하므로 쿼리문자열에 화일명만 전송하고
+이유 ==> 화일���용은 그 전체내용을 전송해야 하므로 쿼리문자열에 화일명만 전송하고
 별도로 전송해야 하는데 Entity body가 없으므로 전송할수 없다.
 
 
@@ -7879,58 +7879,8 @@ client                                    server
 세션객체.getAttribute("식별자");  
 ```
 
++ session에 시간을 주기!!
 ```
 session.setMaxInactiveInterval(시간값);
 ```
 
-#### 3. JSP 개요
-#### 4. Scripting element
-+ Script let
-+ Expression
-+ declation
-#### 5. 지시어
-+ `<%@` 
-+ page
-+ include
-+ taglib
-#### 6. 내장객체
-#### 7. 실습
-#### 8. Summary / Close
-
-
-
------------------------------------------------------------
-
-
-### [2019-05-29]
-
-#### 1. Review
-
-
-#### 4. 실습
-#### 5. Summary / Close
-
-
-
------------------------------------------------------------
-
-
-### [2019-05-30]
-
-#### 1. Review
-
-
-#### 4. 실습
-#### 5. Summary / Close
-
-
------------------------------------------------------------
-
-
-### [2019-05-31]
-
-#### 1. Review
-
-
-#### 4. 실습
-#### 5. Summary / Close
