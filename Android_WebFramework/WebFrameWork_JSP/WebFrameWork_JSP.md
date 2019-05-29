@@ -763,6 +763,11 @@ public void _jspService(final javax.servlet.http.HttpServletRequest request, fin
    _jspService()메서드의 인자값               Servlet에서의 클래스
    ------------------------------------------------------- 
    HttpServletRequest request                동일
+        <form태그로 클라이언트에서 입력데이터 서버로 전송할때(요청파라메터)...
+        get방식일때는 상관없지만 post방식일때는 반드시
+        request.getParameter()사용전에 request.setChraterEncoding()을 적용해야
+        한글이 깨지는 것을 방지할수 있다.
+
    HttpServletResponse response              동일
    
 
@@ -770,6 +775,7 @@ public void _jspService(final javax.servlet.http.HttpServletRequest request, fin
    _jspService()메서드의 지역변수
    --------------------------             
     JspWriter out;                           PrintWriter와 유사
+        jsp내부에서 자바코드의 결과값을 html태그로 출력할때 주로 사용
     ServletContext application;              동일
     ServletConfig config;                    동일   
     HttpSession session;                     동일(jsp에서는 기본으로 세션객체가 만들어짐==><%@page session="true" %>)
@@ -805,9 +811,46 @@ public void _jspService(final javax.servlet.http.HttpServletRequest request, fin
 
 
 
++ out 내장 객체(변수)
+    - jsp내부에서 자바코드의 결과값을 html태그로 출력할때 주로 사용
+
+
++ OneToTen_old.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>1부터 10까지 순서대로</TITLE></HEAD>
+    <BODY>
+        <H3>1부터 10까지 순서대로</H3>
+        <% for (int cnt = 1; cnt <= 10; cnt++) { %>
+            <%= cnt %> <BR>
+        <% } %>    
+    </BODY>
+</HTML>
+```
+
++ OneToTen.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>1부터 10까지 순서대로</TITLE></HEAD>
+    <BODY>
+        <H3>1부터 10까지 순서대로</H3>
+        <% 
+            for (int cnt = 1; cnt <= 10; cnt++)
+                out.println(cnt + "<BR>"); 
+        %>    
+    </BODY>
+</HTML>
+```
+
+
 #### 3. 쿠키와 세션
 
 #### 4. 예외처리
+
+##### [오늘의 과제]
+    - <form태그관련 서블릿 --> jsp 만들어보기!!
 
 #### 5. 실습
 #### 6. Summary / Close
