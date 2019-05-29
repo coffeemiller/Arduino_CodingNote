@@ -781,7 +781,12 @@ public void _jspService(final javax.servlet.http.HttpServletRequest request, fin
    --------------------------             
     JspWriter out;                           PrintWriter와 유사
         jsp내부에서 자바코드의 결과값을 html태그로 출력할때 주로 사용
+    
     ServletContext application;              동일
+        서블릿에서 아래의 sc와 같은 ServletContext객체를 JSP에서 application으로 작성.
+        ServletContext sc = getServletContext();
+        String path = sc.getRealPath("/photo");
+    
     ServletConfig config;                    동일   
     HttpSession session;                     동일(jsp에서는 기본으로 세션객체가 만들어짐==><%@page session="true" %>)
     Exception exception;                     동일(예외처리 코드 작성시 만들어짐 ==> <%@page errorPage="페이지" isErrorPage="true" %>
@@ -813,7 +818,6 @@ public void _jspService(final javax.servlet.http.HttpServletRequest request, fin
                                         -----include,forward-----------> *.jsp
        <------------------------forward---------------------------------- 
 ```
-
 
 
 + out 내장 객체(변수)
@@ -848,6 +852,59 @@ public void _jspService(final javax.servlet.http.HttpServletRequest request, fin
     </BODY>
 </HTML>
 ```
+
+
++ 참고) jsp내장객체중에서 정보교환을 수행할수 있는 내장객체
+    - setAttribute(), getAttribute(), removeAttribute()를 가진 내장객체
+```
+<scope를 가지는 내장객체>
+1) pageContext
+2) request
+3) session
+4) application -- 동일 웹어플리케이션 내부의 모든 동적웹컴퍼넌트에서 공유하는 정보를 설정/사용
+
+위 4개의 내장객체에 setAttribute()값을 설정했을때 그 값이 유지되는 범위를 JSP에서는 scope라고 부른다.
+```
+
+
++ 1. 단독으로 실행되는 자바 프로그램 - 스탠드얼론(standalone) 프로그램
++ 2. jsp에서 파일입출력도 Java의 프로그램과 동일하지만
+    - 실제 입출력파일의 경로는 달라진다. ==> application.getRealPath("파일명")
++ 3. jsp에서 파일에 내용을 저장하는 코드를 jsp로 작성했을때
+    - 결과를 받은 화면에서 웹페이지를 새로고침하면, 직전의 실행코드가 다시 작동하여 동일한 내용이 여러번 저장될 경우가 있다.
+    - 이를 개선하기 위해 response.sendRedirect를 사용할 수 있다.
+        1) 파일에 저장만하는 jsp페이지
+        2) 최종결과만 응답하는 jsp페이지
+```
+BBSInput_new.html  -------------------------->  BBSPost_new.jsp
+게시판글 입력                                 글내용을 파일로 저장
+                   <------------------------redirect(BBSPostResult.jsp)
+                   -------재요청------------> BBSPostResult.jsp
+새로고침(재요청으로) <----------------------- 최종결과응답
+```
+
+
++ 서블릿에서의 제어이동
+```
+1)   response.sendRedirect("url");
+  |- response.setHeader("Location","url")
+  |- response.sendError(304);
+   
+2)    --request------->A 서블릿  ---include---->B 서블릿 (공통기능)
+      <-response-------       <---------------
+      
+3)    --request------->A 서블릿  
+                          |
+                          | forward
+                          v
+      <-response-------B 서블릿(최종결과를 보여주는 페이지)
+      
+      참고) RequestDispatcher 객체를 얻어서 include/forward 시켰다.
+==============================================================
+ JSP에서도 동일한 기능을 사용해보자
+```
+
+
 
 
 #### 3. 쿠키와 세션
