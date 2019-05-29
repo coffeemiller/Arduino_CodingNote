@@ -450,7 +450,11 @@ jsp페이지에 포함된 모든 html태그는 그대로 응답(출력된다.)
 다음 세가지 지시어 요소가 사용된다.
 ----------------------------------------
 1)<%@ page 속성="값",.... %>
+    jsp페이지 전체에 적용되는 정보를 기술
+
 2)<%@ include  속성="값",....%>
+    jsp가 서블릿으로 변환될때 정적으로 외부파일내용 전체를 복사하여 소스를 포함시킨다.
+
 3)<%@ taglib 속성="값",.... %>  ==> JSTL학습
 ----------------------------------------
 ```
@@ -483,10 +487,52 @@ jsp페이지에 포함된 모든 html태그는 그대로 응답(출력된다.)
    <%@ include file="포함될파일" %>
 ```
 
-3. taglib지시어는 외부 라이브러리를 특히 jstl에서 사용한다.
+
++ Menu.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>오늘의 메뉴</TITLE></HEAD>
+    <BODY>
+        <H3>오늘의 메뉴</H3>
+        - 삼계탕 <BR>
+        - 돈까스 <BR>
+        - 튀김국수 <BR><BR>
+        <%@ include file="Today.jsp" %>
+        <hr>
+        <%--jsp주석
+        	include지시어는 jsp가 서블릿으로 바뀔때
+        	file속성에 지정된 파일내용 전체가 복사된다.
+        	이후, 서블릿 코드가 컴파일될때 동일변수(now객체)가 
+        	2번 선언되었으므로 error발생  
+        	<%@ include file="Today.jsp" %>
+         --%>
+    </BODY>
+</HTML>
+```
+
++ Today.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<% GregorianCalendar now = new GregorianCalendar(); %>
+<%= String.format("%TY년 %Tm월 %Td일", now, now, now) %>
+```
+
+
+
+
+
+
+3. taglib지시어는 외부 라이브러리를 사용할때
+    - 외부라이브러리 태그의 접두사(prefix속성)와 해당 태그에 적용되는 작성법을 기술한 dtd파일의 속성명(uri속성)을 지정한다. 우리는 jstl사용시 자세한 사용법을 학습.
 ```
    <%@ taglib prefix="접두어" uri="uri" %>   
 ```
+
+
+
+
 
 
 + JSP페이지에서 사용하는 주석 기호들
@@ -497,7 +543,44 @@ jsp페이지에 포함된 모든 html태그는 그대로 응답(출력된다.)
         
    <%-- JSP주석 --%>   
       jsp가 서블릿으로 바뀔때 그내용이 웹서버(웹컨테이너)에서 주석이므로 처리하지 않는다.  
+```
++ TenMultiply.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>1부터 10까지의 곱</TITLE></HEAD>
+    <!--
+    	HTML주석) JSP가 서블릿을 변환될때 포한되고 최종 클라이언트에 응답내용에도 포함된다.
+    	단, 웹브라우저에서 해석될때 반영되지 않으므로 화면에 보여지지는 않지만
+    	소스보기를 하면 보여진다.
+    	
+    	이것은 JSP에 의해 생성된 HTML문서입니다.  
+	 -->
+    <BODY>
+        <%-- JSP주석(xml문서에도 동일)
+        	JSP가 서블릿으로 코드변환시 반영하지 않는다.
+        	 
+        	다음은 데이터를 처리하는 스크립틀릿입니다.
+        --%>
+        <% 
+        	//스크립트렛의 내부는 자바코드를 작성하는 장소이므로
+        	//자바 주석기호를 그대로 사용한다.
+        	//스크립트렛의 모든 코드는 jsp가 서블릿으로 변환될때 반영되고
+        	//서버에서 이미 실행시킨 내용이므로 최종 사용자(client)에게는 공개되지 않는다.
+        	
+        	int result = 1;    // 곱을 저장할 변수
+        	/* 1부터 10까지 곱하는 반복문 */
+           	for (int cnt = 1; cnt <= 10; cnt++)
+            	result *= cnt;
+        %>
+        1부터 10까지 곱한 값은? <%= result %> 
+    </BODY>
+</HTML>
+```
 
+
+
+```
 2) 스크립팅요소(<% %>, <%= %>, <%! %>)에서 주석 ==> Java Code이므로 Java언어의 주석을 그대로 사용
    한라인 주석 : //
    블럭 주석   : /*    */ 
@@ -615,6 +698,20 @@ html태그                 jspInit(){}
 
 
 #### 2. 내장객체
++ 선언하거나 생성하지 않고도 jsp페이지에서 사용할수 있는 객체들
+
++ 내장객체(변수)명칭
+```
+    request
+    response
+    out
+    application ==> ServletContext sc = getServletContext();
+    page
+    pageConext
+    session
+    exception
+
+```
 
 #### 3. 쿠키와 세션
 
