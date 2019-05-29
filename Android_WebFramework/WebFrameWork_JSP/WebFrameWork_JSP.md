@@ -883,6 +883,73 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
 새로고침(재요청으로) <----------------------- 최종결과응답
 ```
 
++ BBSPost_new.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.io.*, java.util.Date"%>
+<%
+	//요청객체의 문자셋 설정
+    request.setCharacterEncoding("euc-kr");
+
+	//요청파라메터값 얻기
+    String name = request.getParameter("NAME");
+    String title = request.getParameter("TITLE");
+    String content = request.getParameter("CONTENT");
+    
+    //오늘 날짜 얻기
+    Date date = new Date();
+    //시간(파일명) 얻기
+    Long time = date.getTime();
+    
+    String filename = time + ".txt";
+    
+    //작업결과를 나타내는 변수
+    String result = null;
+    PrintWriter writer = null;
+    try {
+        String filePath = application.getRealPath("/WEB-INF/bbs/" + filename);
+        writer = new PrintWriter(filePath);
+        writer.printf("제목: %s %n", title);
+        writer.printf("글쓴이: %s %n", name);
+        writer.println(content);
+        result = "SUCCESS";
+    }
+    catch (IOException ioe) {
+        result = "FAIL";
+    }
+    finally {
+        try {
+            writer.close();
+        } 
+        catch (Exception e) {
+        }
+    } 
+    //결과만을 보여주는 페이지로 redirect시킨다.
+    response.sendRedirect("BBSPostResult.jsp?RESULT=" + result); 
+%>
+```
+
++ BBSPostResult.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>게시판 글쓰기 - 결과 화면</TITLE></HEAD>
+    <BODY>
+        <H2>글쓰기</H2>
+        <% 
+        	//글저장 결과값을 요청파라메터에서 얻어온다.
+            String str = request.getParameter("RESULT");
+
+			
+            if (str.equals("SUCCESS"))
+                out.println("저장되었습니다.");
+            else
+                out.println("파일에 데이터를 쓸 수 없습니다.");
+        %>
+    </BODY>
+</HTML>
+```
+
 
 + 서블릿에서의 제어이동
 ```
@@ -901,9 +968,91 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
       
       참고) RequestDispatcher 객체를 얻어서 include/forward 시켰다.
 ==============================================================
- JSP에서도 동일한 기능을 사용해보자
+ JSP에서도 동일한 기능을 사용해보자(서블릿과 동일)
 ```
 
+
++ include/forward되는 page에 정보를 전달할때....request.setAttribute("키",값);
+
++ ForRulesInput.html
+```html
+<HTML>
+    <HEAD>
+        <META http-equiv="Content-Type" content="text/html;charset=euc-kr">
+        <TITLE>사칙연산</TITLE>
+    </HEAD>
+    <BODY>
+        <FORM ACTION=FourRules.jsp>
+            첫 번째 수: <INPUT TYPE=TEXT NAME=NUM1><BR>
+            두 번째 수: <INPUT TYPE=TEXT NAME=NUM2><BR>
+            <INPUT TYPE=SUBMIT VALUE='입력'>
+        </FORM>
+    </BODY>
+</HTML>
+```
+
+
++ FourRules.jsp
+```jsp
+<%
+	//현재의 JSP코드는 로직처리만 수행하고 그결과를 보여주는 JSP페이지로
+	//forward 시킬것이므로 별도의 html태그가 불필요하다.
+	
+	//요청파라메터 얻기
+    String str1 = request.getParameter("NUM1"); //"5"
+    String str2 = request.getParameter("NUM2"); //"7"
+    
+    //작업하기 적합한 자료형으로 변환 -- 내부적으로 예외가 발생할수도 있다.
+    int num1 = Integer.parseInt(str1);
+    int num2 = Integer.parseInt(str2);
+    
+    //사칙연산을 수행후 그결과값은 request객체에 저장
+    request.setAttribute("SUM", new Integer(num1 + num2));
+    request.setAttribute("DIFFERENCE", new Integer(num1 - num2));
+    request.setAttribute("PRODUCT", new Integer(num1 * num2));
+    request.setAttribute("QUOTIENT", new Integer(num1 / num2));
+    
+    //결과를 보여줄 페이지로 forward
+    RequestDispatcher dispatcher = request.getRequestDispatcher("FourRulesResult.jsp");
+    
+    //forward -- 제어이동(다시 돌아오지 않음)
+    dispatcher.forward(request, response); 
+%>
+```
+
+
++ FourRulesResult.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>사칙연산</TITLE></HEAD>
+    <BODY>
+        입력된 수: <%= request.getParameter("NUM1") %>,
+             <%= request.getParameter("NUM2") %> <BR><BR>
+     <hr>
+       forward된 page와 이전페이지에서 reqeust객체를 공유하고 있으므로<br>
+       forward된 page에서도 요청 파라메터를 당연히 사용할 수 있다.
+     <hr>
+        
+        덧셈의 결과는? <%= request.getAttribute("SUM") %> <BR>
+        뺄셈의 결과는? <%= request.getAttribute("DIFFERENCE") %> <BR>
+        곱셈의 결과는? <%= request.getAttribute("PRODUCT") %> <BR>
+        나눗셈의 결과는? <%= request.getAttribute("QUOTIENT") %> <BR>
+        <hr>
+        <%
+        	int sum = (int)request.getAttribute("SUM");
+        	int difference = (int)request.getAttribute("DIFFERENCE");
+        	int product = (int)request.getAttribute("PRODUCT");
+        	int quotient = (int)request.getAttribute("QUOTIENT");     
+        	
+        	out.println("덧셈의 결과는? "+sum+"<br>");
+        	out.println("뺄셈의 결과는? "+difference+"<br>");
+        	out.println("곱셈의 결과는? "+product+"<br>");
+        	out.println("나눗셈의 결과는? "+quotient+"<br>");
+        %>
+    </BODY>
+</HTML>
+```
 
 
 
