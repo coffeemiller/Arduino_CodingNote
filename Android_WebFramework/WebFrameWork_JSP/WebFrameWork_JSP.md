@@ -594,7 +594,7 @@ Test.jsp           class Test_jsp extends HttpJspBase{
    taglib  ... %>
 html태그                 jspInit(){}
 <% 스크립트렛 %>	    jspDestroy(){}
-<%= 익스프레션 %>		jspService(request, resoponse){
+<%= 익스프레션 %>		jspService(request, response){
 <%! 선언부   %> 		  지역변수 선언및 생성
 					  지시어요소의 값이 자바코드로 변환되어 포함된다.
 					  out.write("html태그");
@@ -697,8 +697,52 @@ html태그                 jspInit(){}
 
 
 
-#### 2. 내장객체
+#### 2. 내장객체 (내장변수-implicit variable)
 + 선언하거나 생성하지 않고도 jsp페이지에서 사용할수 있는 객체들
+```
+   ==>실질적인 의미 : jsp ---> 서블릿으로 변환될때
+   _jspService()메서드의 인자값으로 전달되는 변수(request,response) 혹은 내부에서 선언 및 생성한 변수이다.
+```
+
++ 내장객체를 사용하는 장소 (아래의 2곳뿐)
+```
+<% 스크립트렛 %>
+<%= 익스프레션 %>
+```
+```java
+//위 2가지 표현은 jsp가 서블릿으로 변환될때 
+public void _jspService(final javax.servlet.http.HttpServletRequest request, final javax.servlet.http.HttpServletResponse response) throws java.io.IOException, javax.servlet.ServletException {
+    
+    //요청방식 검사(GET/POST/HEAD만 허용)
+
+    //지역변수 선언
+    PageContext pageContext;
+    HttpSession session = null;
+    ServletContext application;
+    ServletConfig config;
+    JspWriter out = null;
+    Object page = this;
+    JspWriter _jspx_out = null;
+    PageContext _jspx_page_context = null;
+
+
+    try {
+      // 지역변수 생성(정의)
+      //...
+      pageContext = _jspxFactory.getPageContext(this, request, response, null, true, 8192, true);
+      application = pageContext.getServletContext();
+      config = pageContext.getServletConfig();
+      session = pageContext.getSession();
+      out = pageContext.getOut();
+      //...
+
+      out.write("html태그들");
+      //...
+    //이곳에 스크립트렛(<% %>, 익스프레션(<%= %>)의 내용이 포함된다.)
+    //그래서 내장변수를 스크립트렛이나 익스프레션에서 자유롭게 사용할 수 있는 것.
+```
+
+
 
 + 내장객체(변수)명칭
 ```
@@ -710,8 +754,56 @@ html태그                 jspInit(){}
     pageConext
     session
     exception
-
 ```
+
+
+
++ 1) 내장객체의 종류
+```
+   _jspService()메서드의 인자값               Servlet에서의 클래스
+   ------------------------------------------------------- 
+   HttpServletRequest request                동일
+   HttpServletResponse response              동일
+   
+
+
+   _jspService()메서드의 지역변수
+   --------------------------             
+    JspWriter out;                           PrintWriter와 유사
+    ServletContext application;              동일
+    ServletConfig config;                    동일   
+    HttpSession session;                     동일(jsp에서는 기본으로 세션객체가 만들어짐==><%@page session="true" %>)
+    Exception exception;                     동일(예외처리 코드 작성시 만들어짐 ==> <%@page errorPage="페이지" isErrorPage="true" %>
+    ----------------여기까지는 서블릿의 객체와 99% 동일하다 -----------------
+    PageContext pageContext;                 현재jsp의 모든실행상태정보를 가진 객체 
+    Object page;                             현재jsp페이지 객체 자체 즉, this
+```
+
+
+
++ 2) 내장객체의 사용
+```
+   - <% 내장객체사용가능 %>, <%= 내장객체의 메서드호출가능  %>  
+   - <%! 사용못함  %> 
+         ------->멤버변수이거나 메서드 정의부이다
+   
+   client                       server
+      -------------------------> test.jsp
+                                 //요청파라메터값 얻기 request.getParameter()
+                                 //로직처리
+                                 //결과값을 직접 응답하거나
+      <-----------------------   //response.sendRedirect("url/컴퍼넌트")할수 있다.
+    웹브라우저가 자체적으로
+    재요청한다. ("url/컴퍼넌트")------->            
+    
+    
+    client                      server
+       ------------------------> test.jsp (RequestDispatcher가 필요)
+                                        -----include,forward-----------> *.jsp
+       <------------------------forward---------------------------------- 
+```
+
+
 
 #### 3. 쿠키와 세션
 
