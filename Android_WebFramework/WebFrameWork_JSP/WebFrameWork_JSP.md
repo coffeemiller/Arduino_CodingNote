@@ -969,6 +969,7 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
       참고) RequestDispatcher 객체를 얻어서 include/forward 시켰다.
 ==============================================================
  JSP에서도 동일한 기능을 사용해보자(서블릿과 동일)
+ ====> 나중에는 액션태그를 이용하여 
 ```
 
 
@@ -1054,11 +1055,44 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
 </HTML>
 ```
 
++ ChineseMenu.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>오늘의 메뉴</TITLE></HEAD>
+    <BODY>
+        <H3>오늘의 메뉴</H3>
+        - 짜장면 <BR>
+        - 볶음밥 <BR>
+        - 짬뽕 <BR><BR>
+        <hr>
+        아래의 코드는 Now.jsp에서 출력된 내용입니다.<br>
+        아래의 코드는 소스가 포함되는 것이 아니라 독립적으로 Now.jsp가 실행되고 <br>
+        결과값만 받아오는 것이다.<br>
+        include는 정적인 포함이 아니라 동적인 실행결과만을 가져온 것이다.<br>
+        <hr>
+        <%
+            out.flush(); //강제출력버퍼 비우기(여기까지의 html태그내용이 응답)
+            //아래의 코드로 request, response값을 공유함.
+            RequestDispatcher dispatcher = request.getRequestDispatcher("Now.jsp");
+            dispatcher.include(request, response); 
+        %>
+    </BODY>
+</HTML>
+```
 
-
-#### 3. 쿠키와 세션
-
-#### 4. 예외처리
++ Now.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<% 
+	GregorianCalendar now = new GregorianCalendar(); 
+%>
+[현재의 시각] <%= String.format("%TF %TT ", now, now) %>
+<hr>
+<br>
+위의 코드는 내부적으로 out.print(String.format(String.format("%TF %TT ", now, now)))실행
+```
 
 ##### [오늘의 과제]
     - <form태그관련 서블릿 --> jsp 만들어보기!!
@@ -1074,6 +1108,11 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
 ### [2019-05-30]
 
 #### 1. Review
+
+
+#### 3. 쿠키와 세션
+
+#### 4. 예외처리
 
 
 #### 4. 실습
