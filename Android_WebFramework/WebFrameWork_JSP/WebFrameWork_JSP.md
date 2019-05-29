@@ -591,8 +591,6 @@ html태그                 jspInit(){}
 5. 액션 태그 : <jsp: … />
 
 
-
-
 #### 7. 실습
 #### 8. Summary / Close
 
@@ -604,11 +602,26 @@ html태그                 jspInit(){}
 ### [2019-05-29]
 
 #### 1. Review
++ JSP(HTML태그)  -> `*.java`(서블릿) -> `*.class`
 
-#### 6. 내장객체
++ 1) HTML태그  -> out.write("내용");
++ 2) JSP태그
+    - (1) 스크립팅요소 - (`<%@ %>`scriptlet, `<%= 변수 %>`expression, `<%! 멤버변수정의/메서드선언%>`declation-인스턴스멤버변수)
+    - (2) 지시어(directive element) - `<%@page 속성값 %>`
+    - (3) 표준액션태크
+    - (4) EL
+    - (5) 외부태그라이브러리(JSTL)
 
-#### 4. 실습
-#### 5. Summary / Close
+
+
+#### 2. 내장객체
+
+#### 3. 쿠키와 세션
+
+#### 4. 예외처리
+
+#### 5. 실습
+#### 6. Summary / Close
 
 
 
