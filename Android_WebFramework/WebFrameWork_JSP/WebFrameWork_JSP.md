@@ -1499,6 +1499,7 @@ public class Adder {
    (web.xml)
     1) 예외종류별로 등록
        NullPointerException  ---->  NullException.jsp
+       NumberFormatException ---->  NumberFormatError.jsp
     2) 최종응답코드별로 등록
        404 최종응답 -------> 별도의 웹페이지 
 ```
@@ -1666,6 +1667,166 @@ public class AdderServlet extends HttpServlet {
 </HTML>
 ```
 
+
+
++ web.xml을 이용한 예외처리
+
++ Multiplyer.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    String str1 = request.getParameter("NUM1");
+    String str2 = request.getParameter("NUM2");
+    int num1 = Integer.parseInt(str1);
+    int num2 = Integer.parseInt(str2);
+    int result = num1 * num2;
+%>
+<HTML>
+    <HEAD><TITLE>곱셈 프로그램</TITLE></HEAD>
+    <BODY>
+        <%= num1 %> * <%= num2 %> = <%= result %>
+    </BODY>
+</HTML>
+```
+
+
+
++ Divider.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    String str1 = request.getParameter("NUM1");
+    String str2 = request.getParameter("NUM2");
+    int num1 = Integer.parseInt(str1);
+    int num2 = Integer.parseInt(str2);
+    int result = num1 / num2;
+%>
+<HTML>
+    <HEAD><TITLE>나눗셈 프로그램</TITLE></HEAD>
+    <BODY>
+        <%= num1 %> / <%= num2 %> = <%= result %>
+    </BODY>
+</HTML>
+```
+
+
+
++ NumberFormatError.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" isErrorPage="true" %>
+<% response.setStatus(200); %>
+<HTML>
+    <HEAD><TITLE>숫자 포맷 에러</TITLE></HEAD>
+    <BODY>
+        숫자 포맷이 잘못되었습니다. <BR><BR>
+        상세 에러 메시지: <%= exception.getMessage() %>
+    </BODY>
+</HTML>
+```
+
+
++ NotFoundError.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<% response.setStatus(200); %>
+<HTML>
+    <HEAD><TITLE>페이지 없음 에러</TITLE></HEAD>
+    <BODY>
+        해당 페이지를 찾을 수 없습니다. 
+    </BODY>
+</HTML>
+```
+
+
++ ServerInternalError.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<%response.setStatus(200);%>
+<HTML>
+    <HEAD><TITLE>웹 서버 에러</TITLE></HEAD>
+    <BODY>
+        웹 서버 내부에서 에러가 발생했습니다.<br>
+        서버를 갱신중이므로 오전 02:00~04:00까지 사용할 수 없습니다.
+    </BODY>
+</HTML>
+```
+
+
++ PrimeNumbers.jsp
+```jsp
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>brain5</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+
+   <!-- 예외종류별 예외페이지 등록 -->
+    <error-page>
+        <exception-type>java.lang.NumberFormatException</exception-type>
+        <location>/NumberFormatError.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.ArithmeticException</exception-type>
+        <location>/ArithmeticError.jsp</location>
+    </error-page>
+    
+   <!-- 최종응답코드별로 등록 -->
+   <error-page>
+   		<error-code>404</error-code>
+   		<location>/NotFoundError.jsp</location>
+   </error-page>
+   <error-page>
+   		<error-code>500</error-code>
+   		<location>/ServerInternalError.jsp</location>
+   </error-page>
+</web-app>
+```
+
+
+
++ web.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>brain5</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+
+<!-- 예외종류별 예외페이지 등록 -->
+    <!-- 숫자가 아닌 문자 에러 -->
+    <error-page>
+        <exception-type>java.lang.NumberFormatException</exception-type>
+        <location>/NumberFormatError.jsp</location>
+    </error-page>
+    <!-- 0으로 나눌때 에러 -->
+    <error-page>
+        <exception-type>java.lang.ArithmeticException</exception-type>
+        <location>/ArithmeticError.jsp</location>
+    </error-page>
+
+    <!-- 최종응답코드별로 등록 -->
+    <error-page>
+    		<error-code>404</error-code>
+    		<location>/NotFoundError.jsp</location>
+    </error-page>
+    <error-page>
+    		<error-code>500</error-code>
+    		<location>/ServerInternalError.jsp</location>
+    </error-page>
+</web-app>
+```
 
 
 
