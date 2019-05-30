@@ -1110,6 +1110,156 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
 #### 1. Review
 
 #### 2. 쿠키와 세션
++ HTTP프로토콜의 비연결지향성을 보완하고자 만듦(지난정리 참고).
+
++ StoreCookies.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+	//쿠키의 생성및 사용은 서블릿과 동일
+    //response.addCookie(new Cookie("NAME", "John"));
+	Cookie c = new Cookie("NAME", "John");
+	//필요하다면 c.setXXX()사용하여 부가정보를 저장.
+	response.addCookie(c);
+	
+    response.addCookie(new Cookie("GENDER", "Male"));
+    response.addCookie(new Cookie("AGE", "15"));
+%>
+<HTML>
+    <HEAD><TITLE>쿠키 데이터 저장하기</TITLE></HEAD>
+    <BODY>
+        쿠키 데이터가 저장되었습니다.<BR><BR>
+    </BODY>
+</HTML>
+```
+
+
++ ReadCookies.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<% 
+	Cookie[] cookies = request.getCookies();
+	if ( cookies != null) {
+		out.println("전달된 쿠키정보는 다음과 같습니다.<br>");
+		for ( int i=0; i<cookies.length; i++) {
+			Cookie c = cookies[i];
+			String cName = c.getName();
+			String cValue = c.getValue();
+			out.println(cName+" : "+cValue+"<br>");
+		}
+	} else {
+		out.println("쿠키정보가 없습니다.<br>");
+	}
+	out.println("<hr>");
+%>
+<HTML>
+    <HEAD><TITLE>쿠키 데이터 읽기</TITLE></HEAD>
+    <BODY>
+        이름: <%= getCookieValue(cookies, "NAME") %> <BR>
+        성별: <%= getCookieValue(cookies, "GENDER") %> <BR>
+        나이: <%= getCookieValue(cookies, "AGE") %>
+    </BODY>
+</HTML>
+<%!
+    private String getCookieValue(Cookie[] cookies, String name) {
+        String value = null;
+        if (cookies == null)
+            return null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(name))
+                return cookie.getValue();
+        }
+        return null;
+    }
+%>
+```
+
+
++ 쿠키의 수정
+    - 쿠키값 변경은 동일한 명칭의 쿠키를 만들어서 값을 설정하면 기존 쿠키값이 변경된다.
+
++ ModifyCookie.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+	//쿠키이름이 동일한 새로운 쿠키를 만들면 기존 쿠키의 내용이 수정되는 효과가 있다.
+	response.addCookie(new Cookie("AGE", "16")); 
+%>
+<HTML>
+    <HEAD><TITLE>쿠키 데이터 수정하기</TITLE></HEAD>
+    <BODY>
+        AGE 쿠키에 새로운 값이 저장되었습니다.<BR><BR>
+    </BODY>
+</HTML>
+```
+
+
+
++ 쿠키의 삭제
+    - 1) c.setMaxAge(분단위시간); ==> 지정한 시간 경과후 자동삭제
+    - 2) c.setMaxAge(0); ==> 즉시 쿠키가 삭제된다.
+
++ DeleteCookie.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    Cookie cookie = new Cookie("GENDER", "");
+    cookie.setMaxAge(0);
+    response.addCookie(cookie);
+%>
+<HTML>
+    <HEAD><TITLE>쿠키 삭제하기</TITLE></HEAD>
+    <BODY>
+        GENDER 쿠키가 삭제되었습니다.
+    </BODY>
+</HTML>
+```
+
+
+
++ 
+
++ StoreJobCookie.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    Cookie cookie = new Cookie("JOB", "programmer");
+	//위의 setPath에 의해 JOB쿠키는 /brain4/sub1/ 웹컴퍼넌트에 저장된다.
+    cookie.setPath("/brain4/sub1/");
+    response.addCookie(cookie);
+%>
+<HTML>
+    <HEAD><TITLE>쿠키 데이터 저장하기</TITLE></HEAD>
+    <BODY>
+        JOB 쿠키가 저장되었습니다. <BR><BR>
+    </BODY>
+</HTML>
+```
+
++ ReadJobCookie.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<% Cookie[] cookies = request.getCookies(); %>
+<HTML>
+    <HEAD><TITLE>쿠키 데이터 읽기</TITLE></HEAD>
+    <BODY>
+        JOB: <%= getCookieValue(cookies, "JOB") %> <BR>
+    </BODY>
+</HTML>
+<%!
+    private String getCookieValue(Cookie[] cookies, String name) {
+        String value = null;
+        if (cookies == null)
+            return null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(name))
+                return cookie.getValue();
+        }
+        return null;
+    }
+%>
+```
+
 
 #### 3. 예외처리
 
