@@ -1829,14 +1829,13 @@ public class AdderServlet extends HttpServlet {
 ```
 
 
+##### [오늘의 과제]
++ basic/com.jica.guestbook2  ---> `*.java`
++ guestbook2/GuestBookWrite.html  ----> GuestBookWrite.jsp / GuestBookRead.jsp
 
 
-#### 4. 서블릿과의 관계
-
-#### 5. EL
-
-#### 6. 실습
-#### 7. Summary / Close
+#### 4. 실습
+#### 5. Summary / Close
 
 
 -----------------------------------------------------------
@@ -1845,6 +1844,10 @@ public class AdderServlet extends HttpServlet {
 ### [2019-05-31]
 
 #### 1. Review
+
+#### 4. 서블릿과의 관계
+
+#### 5. EL
 
 
 #### 4. 실습
