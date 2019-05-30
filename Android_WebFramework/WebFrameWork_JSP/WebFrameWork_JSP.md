@@ -1111,6 +1111,25 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
 
 #### 2. 쿠키와 세션
 + HTTP프로토콜의 비연결지향성을 보완하고자 만듦(지난정리 참고).
+```
+쿠키 예)
+
+ 사용자                                   게임서버(1단계~10단계)
+   A   ---------------> 3단계
+       <---level=3-----
+       
+       ----level=3----> 3단계까지 진행했으므로 4단계부터 시작
+       
+----------------------------------------------------- 
+세션 예)
+ 사용자                                   게임서버(1단계~10단계)
+   A   ---------------> 3단계(다양한 장비 구매)
+     <--JSESSIONID=인식표-----      인식표----|저장 (setAttribute("key",값);
+       
+     ---JSESSIONID=인식표----> 인식표이용하여 상세데이타를 검색하여 식별
+                                                getAttribute("key")  
+-----------------------------------------------------
+```
 
 + StoreCookies.jsp
 ```jsp
@@ -1217,7 +1236,7 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
 
 
 
-+ 
++ 쿠키가 전달될 path설정    
 
 + StoreJobCookie.jsp
 ```jsp
@@ -1261,7 +1280,395 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
 ```
 
 
+
++ jsp에서의 세션
+    - 1) `<@page ... session="true" %>`가 기본으로 설정되므로 세션객체는 자동생성.
+        ==> 서블릿으로 바뀔때
+        session = request.getSession("true");
+        ==> 변환된 코드에서 관련있는 부분(_jspService(,))
+        ```
+
+        ```
+    - 2) 자동으로 생성된다는 의미는
+        - 전송된 JSESSIONID와 일치하는 세션 객체가 없을때는 생성.
+        - 전송된 JSESSIONID와 일치하는 세션 객체가 있을때는 검색해서 리턴.
+    - 3) 이때의 세션객체는 내장객체로 취급된다. ==> session
+    - 4) session 내장객체에 값을 설정하거나, 읽어오거나, 제거하는 메서드만 사용.
+        `session.setAttribute("key",값);`
+        `session.setAttribute("key");`
+        `session.removeAttribute("key");`
+
+
+
++ Food.html
+```html
+<HTML>
+    <HEAD>
+        <META http-equiv="Content-Type" content="text/html;charset=euc-kr">
+        <TITLE>성격 테스트</TITLE>
+    </HEAD>
+    <BODY>
+        <H3>좋아하는 음식은?</H3>
+        <!-- ACTION=animal ==> /brain4/ptest/animal
+         -->
+        <FORM ACTION=/brain4/animal>
+            <INPUT TYPE=TEXTFIELD NAME=FOOD>
+            <INPUT TYPE=SUBMIT VALUE='확인'>
+        </FORM>
+    </BODY>
+</HTML>
+```
+
+
++ AnimalServlet.jsp
+```jsp
+package com.jica.brain4;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.*;
+
+@WebServlet(description = "서블릿에서의 세션예제", urlPatterns = { "/animal" })
+public class AnimalServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	public void doGet(HttpServletRequest request, 
+			          HttpServletResponse response) 
+                                  throws IOException, ServletException {
+        
+		response.setContentType("text/html;charset=euc-kr"); 
+        PrintWriter out = response.getWriter();
+        request.setCharacterEncoding("euc-kr");
+        
+		//요청파라메터값 얻기
+        String food = request.getParameter("FOOD");
+        
+        //세션생성 -- 전송된 JSESSIONID없거나 , JSESSIONID와 일치하는 세션객체가 없을때 생성하여 리턴하고
+        //                               JSESSIONID와 일치하는 세션객체가 있으면 검색하여 리턴
+        HttpSession session = request.getSession();
+        //디버깅용
+        if(session.isNew()) {
+        	System.out.println("AnimalServlet::==>" + session.getId() + " 세션객체 신규 생성");
+        }else {
+        	System.out.println("AnimalServlet::==>" + session.getId() + " 기존 세션객체 사용");
+        }
+        //세션에 속성값 설정
+        session.setAttribute("FOOD", food); 
+
+        out.println("<HTML>");
+        out.println("<HEAD><TITLE>성격 테스트</TITLE></HEAD>");
+        out.println("<BODY>");
+        out.println("<H3>좋아하는 동물은?</H3>");
+        out.println("<FORM ACTION=/brain4/result>");
+        out.println("<INPUT TYPE=TEXTFIELD NAME=ANIMAL>");
+        out.println("<INPUT TYPE=SUBMIT VALUE='확인'>");
+        out.println("</FORM>");
+        out.println("</BODY>");
+        out.println("</HTML>");
+    }
+}
+```
+
+
++ ResultServlet.jsp
+```jsp
+package com.jica.brain4;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.*;
+
+@WebServlet(description = "서블릿에서의 세션예제", urlPatterns = { "/result" })
+public class ResultServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+                                  throws IOException, ServletException {
+      
+        response.setContentType("text/html;charset=euc-kr"); 
+        PrintWriter out = response.getWriter();
+        request.setCharacterEncoding("euc-kr");
+        
+        //요청 파라메터값 얻기
+        String animal = request.getParameter("ANIMAL");
+        
+        //이전 AnimalServlet에서 저장했던 음식명 구하기
+		HttpSession session = request.getSession();
+        if(session.isNew()) {
+        	System.out.println("ResultServlet::==>" + session.getId() + " 세션객체 신규 생성");
+        }else {
+        	System.out.println("ResultServlet::==>" + session.getId() + " 기존 세션객체 사용");
+        }
+        String food = (String) session.getAttribute("FOOD");
+
+        //세션을 제거하자
+        session.invalidate();
+
+        out.println("<HEAD><TITLE>성격 테스트</TITLE></HEAD>");
+        out.println("<BODY>");
+        out.println("<H3>성격 테스트</H3>");
+        out.printf("당신은 %s와 %s를 좋아하는 성격입니다.", food, animal);
+        out.println("</BODY>");
+        out.println("</HTML>");
+    }
+}
+```
+
+
+
 #### 3. 예외처리
++ Java에서의 예외처리 --> Servlet도 java코드이므로 동일하게 사용.
+```
+예외의 종류
+        Object
+        Throwable
+   Error       Exception(예외) -- 복구가능하거나 최소한 정상적으로 종료시킬수 있다.   
+하위클래스          IOException   ==>반드시 2가지 예외처리방법으로  예외를
+                    ...                 처리해야 *.class를 만들수 있다.
+                    RuntimeException      -------|  
+                       NullPointException        | 프로그래머의 실수에 의한 예외
+                       ArithmeticException       | 특별히 예외처리를 해주지 않아도 
+                       ArrayIndexOuofException   | 실행은 시킬수 있다.
+                       NumberFormatException
+                       ...               --------| 
+
+
+2가지 예외처리 방법
+1) 예외 던지기
+    void method() throws 예외클래스 {
+    ...
+    예외발생 가능성이 있는 코드
+    ...
+    }
+
+2) 직접 예외처리하기
+    void method() {
+    ...
+    try {
+        예외발생 가능성이 있는 코드
+    } catch (예외클래스 객체) {
+        예외처리코드(복구코드)
+    }
+    ...
+    }
+```
+
++ Adder.java
+```java
+package com.jica.brain5;
+
+public class Adder {
+    public static void main(String args[]) {
+        try {
+            int num1 = Integer.parseInt("5");
+            int num2 = Integer.parseInt("7");
+            int result = num1 + num2;
+            System.out.printf("%d + %d = %d", num1, num2, result);
+        }
+        catch (NumberFormatException e) {
+            System.out.println("잘못된 데이터가 입력되었습니다.");
+        }
+    }        
+}
+```
+
+
+
++ jsp에서의 예외처리
+```
+1) <% 자바코드 - 예외처리 %>
+   <%!
+        리텀값 메서드명() {
+            실행코드 -- 예외처리
+        }
+   %>
+
+2) html태그 + jsp코드 + 자바코드 => 위의 자바코드에서의 예외처리방식을 사용하면                                                             코드가 복잡(지져분해진다)
+
+    그래서 개선책으로 별도의 에러처리결과만을 보여주는 에러페이지를 만들어서 명시적으로 forward시킬수 있다. 단, 예외가 발생한 원인을 접근하려고 하면... 즉, exception 내장객체를 사용하려고 하면 NullPointException이 발생한다.
+================================================================================
+* forward에 의한 명시적 호출이 아니라 다음의 page지시어를 사용한다.
+  <%@ page ... errorPage="에러결과출력전담페이지" %>
+  해당 페이지에서 예외가 발생하면 자동으로 에러결과출력전담페이지가 작동하고
+  이곳에서는 exception 내장객체를 정상적으로 사용할 수 있다.
+================================================================================
+
+3) 설정파일에 미리 예외정보를 등록시켜서 특정 예외가 발생하면 자동으로 호출되도록 할 수 있다.
+   (web.xml)
+    1) 예외종류별로 등록
+       NullPointerException  ---->  NullException.jsp
+    2) 최종응답코드별로 등록
+       404 최종응답 -------> 별도의 웹페이지 
+```
+
++ AdderServlet.java
+```java
+package com.jica.brain5;
+
+import javax.servlet.http.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+
+import java.io.*;
+
+@WebServlet(description = "서블릿에서 예외처리 예제", urlPatterns = { "/AdderServlet" })
+public class AdderServlet extends HttpServlet {
+    
+	private static final long serialVersionUID = 1L;
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response) 
+                             throws IOException, ServletException {
+        
+		//요청파라메터 얻기
+		String str1 = request.getParameter("NUM1");
+        String str2 = request.getParameter("NUM2");
+        
+        //출력스트림 얻기
+        response.setContentType("text/html;charset=euc-kr"); 
+        PrintWriter out = response.getWriter();
+        
+        try {
+            int num1 = Integer.parseInt(str1);
+            int num2 = Integer.parseInt(str2);
+            int result = num1 + num2;
+            out.println("<HTML>");
+            out.println("<HEAD><TITLE>덧셈 프로그램</TITLE></HEAD>");
+            out.println("<BODY>");
+            out.printf("%d + %d = %d", num1, num2, result);
+            out.println("</BODY>");
+            out.println("</HTML>");
+        }
+        catch (NumberFormatException e) {
+            out.println("<HTML>");
+            out.println("<HEAD><TITLE>덧셈 프로그램 - 에러 화면</TITLE></HEAD>");
+            out.println("<BODY>");
+            out.println("잘못된 데이터가 입력되었습니다.");
+            out.println("</BODY>");
+            out.println("</HTML>");
+        }
+    }        
+}
+```
+
++ Adder_old.jsp.... 지저분한 코딩의 예!! 
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    try {
+        String str1 = request.getParameter("NUM1");
+        String str2 = request.getParameter("NUM2");
+        int num1 = Integer.parseInt(str1);
+        int num2 = Integer.parseInt(str2);
+        int result = num1 + num2;
+%>
+        <HTML>
+            <HEAD><TITLE>덧셈 프로그램</TITLE></HEAD>
+            <BODY>
+                <%= num1 %> + <%= num2 %> = <%= result %>
+            </BODY>
+        </HTML>
+<% 
+    } 
+    catch (NumberFormatException e) {
+%>
+        <HTML>
+            <HEAD><TITLE>덧셈 프로그램 - 에러 화면</TITLE></HEAD>
+            <BODY>
+                잘못된 데이터가 입력되었습니다.
+            </BODY>
+        </HTML>
+<%
+    }
+%>
+```
++ DataError_old.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>덧셈 프로그램 - 에러 화면</TITLE></HEAD>
+    <BODY>
+        잘못된 데이터가 입력되었습니다. 
+    </BODY>
+</HTML>
+```
+
+
+
+
+
+
+
++ Adder.jsp..... 간결한 코딩의 예!!  그러나...exception 객체를 읽을수 X!!
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    int num1 = 0, num2 = 0, result = 0;
+    try {
+        String str1 = request.getParameter("NUM1");
+        String str2 = request.getParameter("NUM2");
+        num1 = Integer.parseInt(str1);
+        num2 = Integer.parseInt(str2);
+        result = num1 + num2;
+    } 
+    catch (NumberFormatException e) {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("DataError.jsp");
+        dispatcher.forward(request, response);
+    }
+%>
+<HTML>
+    <HEAD><TITLE>덧셈 프로그램</TITLE></HEAD>
+    <BODY>
+        <%= num1 %> + <%= num2 %> = <%= result %>
+    </BODY>
+</HTML>
+```
+
++ DataError.jsp ==> page지시어에 'true'을 주고, setStatus를 200으로 정상처리~
+```jsp
+<%@page contentType="text/html; charset=euc-kr" isErrorPage="true" %>
+<% response.setStatus(200); %>
+<HTML>
+    <HEAD><TITLE>덧셈 프로그램 - 에러 발생</TITLE></HEAD>
+    <BODY>
+        잘못된 데이터가 입력되었습니다. <BR><BR>
+        상세 에러 메시지: <%= exception.getMessage() %>
+        <hr>
+        exciption 내장객체를 사용하여 원인을 출력하고 있다.<br>
+        그런데 현재의 코드에서는 내부에러 즉, exception객체를 인식하지 못한다는 <br>
+        NullporintException이 발생했다.<br>
+        이것을 해결하려면 예외가 발생한 페이지에서 (Adder.jsp) 인위적으로<br>
+        forward시키지 말고 페이지 지시어를 사용하여 에러처리페이지를 명시적으로<br>
+        지정하면 문제를 해결할 수 있다.<br>
+        즉, exception 내장객체는 에러페이지일때만 생성되는 객체다.
+    </BODY>
+</HTML>
+```
+
+
+
++ NewAdder.jsp  ==> page 지시어를 이용해서 'error'전담 페이지로 이동!!
+```jsp
+<%@page contentType="text/html; charset=euc-kr" errorPage="DataError.jsp" %>
+<%
+    String str1 = request.getParameter("NUM1");
+    String str2 = request.getParameter("NUM2");
+    int num1 = Integer.parseInt(str1);
+    int num2 = Integer.parseInt(str2);
+    int result = num1 + num2;
+%>
+<HTML>
+    <HEAD><TITLE>덧셈 프로그램</TITLE></HEAD>
+    <BODY>
+        <%= num1 %> + <%= num2 %> = <%= result %>
+    </BODY>
+</HTML>
+```
+
+
+
+
 
 #### 4. 서블릿과의 관계
 
