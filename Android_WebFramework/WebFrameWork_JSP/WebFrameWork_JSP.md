@@ -2723,6 +2723,7 @@ public class Header extends HttpServlet {
     </context-param>
 ```
 
+
 + InitParam.jsp
 ```jsp
 <%@page contentType="text/html; charset=euc-kr" %>
@@ -2737,6 +2738,23 @@ public class Header extends HttpServlet {
     </BODY>
 </HTML>
 ```
+
+
++ PageContext.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<HTML>
+    <HEAD><TITLE>PageContext 내장 개체의 사용 예</TITLE></HEAD>
+    <BODY>
+    <%
+    	String uri = ((HttpServletRequest)pageContext.getRequest()).getRequestURI();
+		out.println("요청 URL: " + uri);
+    %>
+        요청 URL: ${pageContext.request.requestURI} <BR>
+    </BODY>
+</HTML>
+```
+
 
 #### 5. 실습
 #### 6. Summary / Close
