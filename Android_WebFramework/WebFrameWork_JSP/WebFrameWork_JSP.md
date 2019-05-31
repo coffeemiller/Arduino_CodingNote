@@ -1883,7 +1883,206 @@ public class AdderServlet extends HttpServlet {
                                     4) 
 ```
 
++ FibonacciServlet.java
+```java
+package com.jica.brain6;
 
+import javax.servlet.http.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+
+import java.io.*;
+import java.math.BigInteger;
+
+@WebServlet(description = "서블릿 생명주기 예제", urlPatterns = { "/fibonacci" })
+public class FibonacciServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	//멤버변수
+    private BigInteger arr[];
+    
+    
+    
+    public FibonacciServlet() {
+    	System.out.println("FibonacciServlet::FibonacciServlet()...."+this);
+	}
+
+
+	//초기화 메서드
+    public void init() {
+    	System.out.println("FibonacciServlet::init()...."+this);
+ 
+        arr = new BigInteger[100];
+        arr[0] = new BigInteger("1");
+        arr[1] = new BigInteger("1");
+        for (int cnt = 2; cnt < arr.length; cnt++) {
+            arr[cnt] = arr[cnt-2].add(arr[cnt-1]);
+        }
+    }
+    
+    
+    public void doGet(HttpServletRequest request, HttpServletResponse response) 
+                             throws IOException, ServletException {
+    	System.out.println("FibonacciServlet::doGet(,)...."+this);
+    	
+    	//기본준비
+    	response.setContentType("text/html;charset=euc-kr");
+    	response.setCharacterEncoding("EUC-kr");
+    	PrintWriter out = response.getWriter();
+    	
+    	//요청파라메터 얻기
+        String str = request.getParameter("NUM");
+        int num = Integer.parseInt(str);
+        if (num > 100)
+            num = 100;
+        
+        out.println("<HTML>");
+        out.println("<HEAD><TITLE>피보나치 수열</TITLE></HEAD>");
+        out.println("<BODY>");
+        for (int cnt = 0; cnt < num; cnt++)
+            out.println((cnt+1)+" : "+arr[cnt] + " <br>");
+        out.println("</BODY>");
+        out.println("</HTML>");
+    }
+
+
+	@Override
+	public void destroy() {
+		System.out.println("FibonacciServlet::destroy()...."+this);
+		super.destroy();
+	}           
+}
+```
+
++ YourName.html
+```html
+<HTML>
+    <HEAD>
+        <META http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <TITLE>이름 입력</TITLE>
+    </HEAD>
+    <BODY>
+        <H3>이름을 입력하십시오.</H3>
+        <FORM ACTION=greeting>
+            이름: <INPUT TYPE=TEXT NAME=NAME>
+            <INPUT TYPE=SUBMIT VALUE='확인'>
+        </FORM>
+    </BODY>
+</HTML>
+```
+
++ GreetingServlet.java
+```java
+package com.jica.brain6;
+
+import javax.servlet.http.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebInitParam;
+import javax.servlet.annotation.WebServlet;
+
+import java.io.*;
+import java.util.*;
+
+
+@WebServlet(
+		description = "초기파라메터 예제", 
+		urlPatterns = { "/greeting" }, 
+		initParams = { 
+				@WebInitParam(name = "FILE_NAME", value = "C:\\data\\greeting_log.txt", description = "로그기록"), 
+		})
+
+
+public class GreetingServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	//멤버변수
+    private PrintWriter logFile;
+    
+    public void init() throws ServletException {
+        String filename = getInitParameter("FILE_NAME");
+        try {
+            logFile = new PrintWriter(new FileWriter(filename, true));
+        }
+        catch (IOException e) { 
+            throw new ServletException(e);
+        }
+    }
+    
+    public void doGet(HttpServletRequest request, HttpServletResponse response) 
+                             throws IOException, ServletException {
+    	//기본준비작업
+    	response.setContentType("text/html;charset=euc-kr");
+    	response.setCharacterEncoding("EUC-KR");
+    	PrintWriter out = response.getWriter();
+    	
+    	//요청파라메터 얻기
+        String name = request.getParameter("NAME");
+        String greeting = "안녕하세요, " + name + "님.";
+        if (logFile != null) {
+            GregorianCalendar now = new GregorianCalendar();
+            logFile.printf("%TF %TT  - %s %n", now, now, name);
+        }
+        
+        out.println("<HTML>");
+        out.println("<HEAD><TITLE>인사하기</TITLE></HEAD>");
+        out.println("<BODY>");
+        out.println(greeting);
+        out.println("방문기록이 저장되었습니다.<br>");
+        out.println("</BODY>");
+        out.println("</HTML>");
+    }        
+    
+    public void destroy() {
+        if (logFile != null)
+            logFile.close();
+    }
+}
+```
+
++ DateTime.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" import="java.io.*, java.util.*" %>
+<%!
+	//멤버변수 선언
+    private PrintWriter logFile;
+
+	//초기화메서드
+    public void jspInit() {
+        String filename = "c:\\data\\datetime_log.txt";
+        try {
+            logFile = new PrintWriter(new FileWriter(filename, true));
+        }
+        catch (IOException e) {
+            System.out.printf("%TT - %s 파일을 열 수 없습니다. %n", new GregorianCalendar(), filename);
+        }
+    }
+%>
+<HTML>
+    <HEAD><TITLE>현재의 날짜와 시각</TITLE></HEAD>
+    <BODY>
+    <%
+    	//날짜(시간)정보얻기
+        GregorianCalendar now = new GregorianCalendar();
+		//날짜/시간 출력형식
+        String date = String.format("현재 날짜: %TY년 %Tm월 %Te일", now, now, now);
+        String time = String.format("현재 시각: %TI시 %Tm분 %TS초", now, now, now);
+		
+        out.println(date + "<BR>");
+        out.println(time + "<BR>");
+        out.println("jspInit(), jspDestroy() 연습중!");
+        
+        if (logFile != null)
+            logFile.printf("%TF %TT에 호출되었습니다.%n", now, now);
+    %>
+    </BODY>
+</HTML>      
+<%!
+    public void jspDestroy() {
+        if (logFile != null)
+            logFile.close();
+    }
+%>
+```
 
 
 #### 3. EL
