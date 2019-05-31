@@ -1846,6 +1846,45 @@ public class AdderServlet extends HttpServlet {
 #### 1. Review
 
 #### 2. 서블릿과의 관계
++ 서블릿의 생명주기
+```
+--------최초요청---->    1) 요청한 서블릿객체를 검색 --> 없다
+                        - 서블릿코드를 메모리로 적제(LOAD)
+                        - 서블릿객체 생성 --인스턴스화 --> 생성자()
+                        - 초기화작업 --> init()
+--------이후요청--->    2) 요청한 서블릿객체가 있다.(쓰레드단위로 실행)
+                        - service() --> doGet()/doPost()
+<-------응답-----------  -------------작업결과----------------------------
+                        1) 서블릿코드의 유지보수
+                        - 마무리 작업 ---> destroy()
+                        - 객체소멸
+```
+
++ JSP의 생명주기
+```
+ jsp--------------변환--------------> Servlet
+ Adder.jsp                          class Adder_jsp extends HttpJspBase
+                                    <%! %> --> 사용자가 만든 멤버변수, 메서드
+
+<%! void jspInit(){                 멤버변수와 메서드들
+     초기화                         public void _jspInit() {   }
+    }
+    void jspDestroy(){              public void _jspDestroy() {    }
+     마무리
+    }                               public void _jspService(HttpServletRequest request,
+%>                                                          HttpServletResponse response)
+                                                            throws IOException, 
+                                                            ServletException
+                                    1) 요청방식 확인
+                                    2) 내장객체 선언 및 생성
+                                    3) 순서대로 html태그 --> 그대로 출력
+                                        scriptlet, expression -> 그대로 포함, 출력표현
+                                        EL, 액션태그, JSTL -> 독립적 메서드 호출
+                                    4) 
+```
+
+
+
 
 #### 3. EL
 
