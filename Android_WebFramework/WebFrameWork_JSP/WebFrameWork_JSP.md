@@ -1880,7 +1880,6 @@ public class AdderServlet extends HttpServlet {
                                     3) 순서대로 html태그 --> 그대로 출력
                                         scriptlet, expression -> 그대로 포함, 출력표현
                                         EL, 액션태그, JSTL -> 독립적 메서드 호출
-                                    4) 
 ```
 
 + FibonacciServlet.java
@@ -2083,6 +2082,19 @@ public class GreetingServlet extends HttpServlet {
     }
 %>
 ```
+
+
++ 서블릿에서의 초기화파라메터 전달
+    1) web.xml
+    2) @WebServlet(,,initParams = { @WebInitParam(name = "FILE_NAME", value = "C:\\log.txt")})
+
+
++ jsp에서의 초기화파라메터 전달 - web.xml
+
++ 참고)
+    - 개별 서블릿에 전달하는 초기화파라메터 getInitParameter("파라메터명")
+    - 웹어플리케이션 전체의 초기화파라메터 application.getInitParameter("파라메터명")
+
 
 
 #### 3. EL
