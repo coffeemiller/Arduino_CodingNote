@@ -2311,7 +2311,7 @@ public class ServerInfoServlet extends HttpServlet {
         (0) 속성명 -- scope를 가지는 내장객체의 속성명
             ${ RESULT }
 
-        (1) 자체의 내장객체를 사용한다.
+        (1) JSP의 내장객체는 사용하지 못하고...자체의 내장객체를 사용한다.
             ${ requestScope.RESULT }
             pageScopre, requestScope, sessionScope, applicationScope
             ${ param.NAME }
@@ -2414,6 +2414,51 @@ $>
 
 
 + EL의 실제 사용예제
+```
+ 1) ${ 속성명 }
+
+ 2) ${ pageScope.속성명 }
+    ${ requestScope.속성명 }
+    ${ sessionScope.속성명 }
+    ${ applicationScope.속성명 }
+
+ 3) ${ param.파라메터명 }
+    ${ paramValues.파라메터명[0] }
+
+ 4) ${ header.헤더명 }, ${ header["헤더명"] } 
+                -----> 헤더명에 영문자,숫자,$,_가 아닌 특수문자가 포함되어 있을때
+                                 반드시 지금형태로 사용해야 한다.      
+    ${ headerValues.헤더명[0] }, ${ headerValues["헤더명"][0] } 
+
+ 5) ${ cookie.쿠키명 }        ==> Cookie객체의 참조값 출력
+    ${ cookie.쿠키명.value }  ==> 쿠키의 값이 출력
+    ${ cookie["쿠키명"].value }
+    ${ cookie.쿠키명["value"] }
+    ${ cookie.["쿠키명"]["value] }
+    ========================================
+     ${ cookie.쿠키명.path }
+     ${ cookie.쿠키명.maxAge }
+    <%
+        Cookie cookies[] = request.getCookies();
+        if(cookies != null) {
+            for(Cookie c : cookies) {
+                String cName = c.getName(); //쿠키명
+                String cValue = c.getValue(); //쿠키값
+                String cPath = c.getPath(); //경로
+                int max = c.getMaxAge;  //시간
+            }
+        }
+    %>
+
+ 6) ${ initParam.파라메터명 }
+
+ 7) ${ pageContext.get을 제외한 메서드명 } ==> 아주 예외적인 코드가 가능
+    자바에서 get메서드호출을 수행하는 코드를 EL로 표현할 수 있다.
+    pageContext.getRequest().getRequestURI() --> EL표현가능
+    ${ pageContext.request.requestURI } 
+
+```
+
 
 + Thousand.jsp
 ```jsp
@@ -2476,13 +2521,222 @@ $>
 </HTML>
 ```
 
++ PetsInput.html
+```html
+<HTML>
+    <HEAD>
+        <META http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <TITLE>아이 러브 펫</TITLE>
+    </HEAD>
+    <BODY>
+    	<FORM ACTION=PetsResult.jsp>
+          아이디: <INPUT TYPE=TEXT NAME=ID><BR><BR>
+          다음 중 회원님이 키우고 있는 애완 동물을 선택하십시오.<BR><BR>
+            개<INPUT TYPE=CHECKBOX NAME=ANIMAL VALUE="개">
+            고양이<INPUT TYPE=CHECKBOX NAME=ANIMAL VALUE="고양이">
+            금붕어<INPUT TYPE=CHECKBOX NAME=ANIMAL VALUE="금붕어"><BR><BR>
+          <INPUT TYPE=RESET VALUE="취소">
+          <INPUT TYPE=SUBMIT VALUE="확인">
+        </FORM>
+    </BODY>
+</HTML>
+```
+
+
++ PetsResult.jsp
+```jsp
+<%@page contentType="text/html; charset=utf-8"%>
+<HTML>
+    <HEAD><TITLE>아이 러브 펫</TITLE></HEAD>
+    <BODY>
+    <%
+    	String id = request.getParameter("ID");
+		String animals[] = request.getParameterValues("ANIMAL");
+		
+		out.println("아이디 : "+id+"<br>");
+		out.print("선택한 동물 : ");
+		if(animals != null) {
+			for(String animal : animals) {
+				out.print(animal + " ");
+			}
+		}
+    %>
+    <br>위의 코딩은 기존 자바코딩으로...
+    <hr>
+        아이디: ${param.ID} <BR>
+        선택한 동물: ${paramValues.ANIMAL[0]} ${paramValues.ANIMAL[1]} ${paramValues.ANIMAL[2]}
+    </BODY>
+</HTML>
+```
 
 
 
++ Header.html
+```html
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+	<title>요청 헤더정보 확인</title>
+</head>
+<body>
+	<center><h2>Heder정보 테스트</h2></center>
+	<br>
+	<a href="/brain7/Header">헤더정보 확인 - 서블릿</a><br><br>
+	<a href="/brain7/Header.jsp">헤더정보 확인 - JSP(EL)</a>
+</body>
+</html>
+```
+
+
++ Header.java
+```html
+package com.jica.brain7;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet(description = "요청header정보 확인 예제", urlPatterns = { "/Header" })
+public class Header extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	protected void doGet(HttpServletRequest request, 
+			             HttpServletResponse response) throws ServletException, IOException {
+		
+		response.setContentType("text/html;charset=euc-kr");
+		PrintWriter out = response.getWriter();
+		request.setCharacterEncoding("euc-kr");
+		
+		out.println("<html>");
+		out.println("<head><title> 헤더 정보 </title></head");
+		out.println("<body>");
+		out.println("<center><h2> 헤더 정보 </h2></center>");
+		
+		//헤더명을 얻어 헤더값을 추출
+		Enumeration<String> en = request.getHeaderNames();
+		out.println("<ul type='square'>");
+		while(en.hasMoreElements()) {
+			String headerName = en.nextElement();
+			String headerValue = request.getHeader(headerName);
+			out.println("<li> " + headerName + " : " + headerValue);
+		}
+		out.println("</ul>");
+		out.println("<br><br><a href='Header.html'>뒤로</a>");
+		out.println("</body>");
+		out.println("</html>");
+	}
+}
+```
+
+
++ Header.jsp
+```jsp
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+    pageEncoding="EUC-KR"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+		<title>EL을 사용한 Heder정보확인</title>
+	</head>
+	<body>
+		host 헤더값 : ${ header.host }<br>
+		accept 헤더값 : ${ header.accept }<br>
+		user-agent : ${ header["user-agent"] }<br>
+	</body>
+</html>
+```
+
++ CookieDataWriter.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<%
+    Cookie cookie = new Cookie("NAME", "John");
+    response.addCookie(cookie);
+%>
+<HTML>
+    <HEAD><TITLE>쿠키 데이터 저장 프로그램</TITLE></HEAD>
+    <BODY>
+        쿠키 값이 설정되었습니다.
+    </BODY>
+</HTML>
+```
+
+
++ CookieDataReader.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+<HEAD>
+<TITLE>쿠키 데이터 출력 프로그램</TITLE>
+</HEAD>
+<BODY>
+	<%
+		//헤더정보를 이용해서 쿠키정보를 한꺼번에 얻을때
+		String cValue = request.getHeader("Cookie");
+
+		//NAME쿠키값을 로직으로 검출
+		int pos = cValue.indexOf("NAME");
+		if(pos != -1) {
+			cValue = cValue.substring(pos+5);
+		}
+		out.println("NAME 쿠키 데이터의 값은? " + cValue + "<br>");
+		
+		
+		//쿠키객체에서 쿠키값 얻기
+		Cookie cookies[] = request.getCookies();
+		if (cookies != null) {
+			for (Cookie c : cookies) {
+				String cName = c.getName(); //쿠키명
+				if(cName.equals("NAME")){
+					cValue = c.getValue(); //쿠키값
+					//cPath = c.getPath(); //경로
+					//int max = c.getMaxAge;
+					out.println("NAME 쿠키 데이터의 값은? " + cValue + "<br>");
+				}
+			}
+		}
+	%>
+	<hr>
+	NAME 쿠키 데이터의 값은? ${cookie.NAME.value}
+	<hr>
+	EL표현에서 출력되는 값을 변수에 저장할수 있다면? JSTL에서 가능
+	
+</BODY>
+</HTML>
+```
 
 
 
-#### 4. 액션tag
++ web.xml --> 추가등록
+```xml
+    <context-param>
+        <param-name>DB_NAME</param-name>
+        <param-value>malldb</param-value>
+    </context-param>
+```
+
++ InitParam.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<HTML>
+    <HEAD><TITLE>애플리케이션 초기화 파라미터 예제</TITLE></HEAD>
+    <BODY>
+    <%
+    	String db_name = application.getInitParameter("DB_NAME");
+		out.println("DB_NAME 초기화 파라메터 값은? "+db_name+"<br>");
+    %>
+        DB_NAME 초기화 파라미터의 값은? ${initParam.DB_NAME}
+    </BODY>
+</HTML>
+```
 
 #### 5. 실습
 #### 6. Summary / Close
@@ -2496,6 +2750,7 @@ $>
 ### [2019-06-03]
 
 #### 1. Review
+#### 4. 액션tag
 
 
 #### 4. 실습
