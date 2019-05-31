@@ -1320,8 +1320,8 @@ BBSInput_new.html  -------------------------->  BBSPost_new.jsp
 ```
 
 
-+ AnimalServlet.jsp
-```jsp
++ AnimalServlet.java
+```java
 package com.jica.brain4;
 
 import javax.servlet.*;
@@ -1845,13 +1845,14 @@ public class AdderServlet extends HttpServlet {
 
 #### 1. Review
 
-#### 4. 서블릿과의 관계
+#### 2. 서블릿과의 관계
 
-#### 5. EL
+#### 3. EL
 
+#### 4. 액션tag
 
-#### 4. 실습
-#### 5. Summary / Close
+#### 5. 실습
+#### 6. Summary / Close
 
 
 
