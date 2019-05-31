@@ -2313,7 +2313,7 @@ public class ServerInfoServlet extends HttpServlet {
 
         (1) 자체의 내장객체를 사용한다.
             ${ requestScope.RESULT }
-            pageScopre, requestScope, sessionScope, application의
+            pageScopre, requestScope, sessionScope, applicationScope
             ${ param.NAME }
             param, paramValue
             header, headerValue
@@ -2322,9 +2322,10 @@ public class ServerInfoServlet extends HttpServlet {
             pageContext(특별한 목적 : getXXX()메서드 호출목적)
 
         (2) 연산자를 사용할 수 있다.
-            산술연산자, 관계연산자, 논리연산자, 삼항연산자(?:), empty, []
+            산술연산자, 관계연산자, 논리연산자, 삼항연산자(?:), empty, [], ., ()
 
         (3) 특정클래스의 static 메서드만 호출할 수 있다.=>별도의 표기법
+            ${ m:sqrt(4) }  ==> java.lang.Math.sqrt(4)
 
     ${ cnt + 1 }
         ===> 자체내장객체의 속성명 (ok)
@@ -2410,6 +2411,75 @@ $>
     </BODY>
 </HTML>
 ```
+
+
++ EL의 실제 사용예제
+
++ Thousand.jsp
+```jsp
+<%@page import="java.nio.channels.SeekableByteChannel"%>
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    int sum = 0;
+    for (int cnt = 1; cnt <= 1000; cnt++)
+        sum += cnt;
+    
+    //scope를 가진 내장객체들에 속성명을 정하여 값을 저장했다.
+    //pageContext.setAttribute("RESULT", new Integer(sum)); // -- pageContext
+    //request.setAttribute("RESULT", new Integer(sum));  // -- request
+    //session.setAttribute("RESULT", new Integer(sum));  // -- 세션
+    //application.setAttribute("RESULT", new Integer(sum));
+    
+    
+    //같은 속성명이 여러개라면???
+    //pageContext.setAttribute("RESULT", new Integer(sum));
+    //request.setAttribute("RESULT", new Integer(sum+100));
+    //session.setAttribute("RESULT", new Integer(sum+500));
+    //application.setAttribute("RESULT", new Integer(sum+1000));
+    
+    //---?
+    pageContext.setAttribute("RESULT", "pageContext의 속성값");
+    request.setAttribute("RESULT", "request의 속성값");
+    session.setAttribute("RESULT", "session의 속성값");
+    application.setAttribute("RESULT", "application의 속성값");
+    
+%>
+
+<HTML>
+    <HEAD><TITLE>1부터 1000까지의 합</TITLE></HEAD>
+    <BODY>
+        1부터 1000까지 더한 결과는? ${RESULT}<br>
+        ${ pageScope.RESULT }<br>
+        ${ requestScope.RESULT }<br>
+        ${ sessionScope.RESULT }<br>
+        ${ applicationScope.RESULT }<br>
+        
+        <%
+        	session.invalidate(); 
+        %>
+        EL내부표현에 속성명이 단독으로 나타나면<br>
+        pageContext -> request -> session -> application 내장객체의 순서로<br>
+        차례로 해당 속성명이 존재하는지 검사하여 값을 얻어온다.<br>
+        만약 없다면 아무일도 하지 않는다.
+        <hr>
+        만일 공교롭게도 내장객체의 속성명이 동일한 것이 존재하면<br>
+        scope가 작은 내장객체의 속성 값이 출력된다.<br>
+        특정내장객체의 속성을 지정하고 싶다면 EL내부에서만 별도로<br>
+        지칭할 수 있는 명칭을 만들었다.<br>
+        <ul>
+        <li> pageContext --> pageScope
+        <li> request ------> requestScope
+        <li> session ------> sessionScope
+        <li> application --> applicationScope
+        </ul>
+    </BODY>
+</HTML>
+```
+
+
+
+
+
 
 
 #### 4. 액션tag
