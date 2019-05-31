@@ -97,7 +97,7 @@ ${ 표현식 }
      out
      application  ==> ServletContext sc = getServletContext(); [웹전체를 관리하는 놈]
      page
-     pageConext
+     pageContext
      session
      exception
 ```
@@ -756,7 +756,7 @@ public void _jspService(final javax.servlet.http.HttpServletRequest request, fin
     out
     application ==> ServletContext sc = getServletContext();
     page
-    pageConext
+    pageContext
     session
     exception
 ```
@@ -2095,6 +2095,212 @@ public class GreetingServlet extends HttpServlet {
     - 개별 서블릿에 전달하는 초기화파라메터 getInitParameter("파라메터명")
     - 웹어플리케이션 전체의 초기화파라메터 application.getInitParameter("파라메터명")
 
+
+
++ getInitParameter()메서드는 init()메서드 이외의 다른 곳에서도 자유롭게 사용할 수 있다.
+
++ web.xml
+```xml
+   <servlet>
+        <servlet-name>dbname-jsp</servlet-name>
+        <jsp-file>/DBName.jsp</jsp-file>
+        <init-param>
+            <param-name>DB_NAME</param-name>
+            <param-value>jicadb</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dbname-jsp</servlet-name>
+        <url-pattern>/dbname</url-pattern>
+    </servlet-mapping>
+```
++ `/dbname`으로 호출시 `null`아닌 초기값이 등록.
+
+
++ DBName.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<HTML>
+    <HEAD><TITLE>초기화 파라미터 테스트</TITLE></HEAD>
+    <BODY>
+        <% String dbName = getInitParameter("DB_NAME"); %>
+        데이터베이스 이름: <%= dbName %> <BR>
+    </BODY>
+</HTML>    
+```
+
+
++ jsp파일은 web.xml에 별도로 등록하지 않아도 원래의 명칭을 호출할 수 있다.
+    단, 초기화파라메터가 필요할때는 web.xml등록하여야 한다.
+    또한 호출하는 명칭 즉, url-pattern을 다르게 등록할수도 있다.
+
+
++ web.xml -> 추가
+```xml
+    <servlet-mapping>
+        <servlet-name>dbname-jsp</servlet-name>
+        <url-pattern>/DBName.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>server-info-servlet</servlet-name>
+        <servlet-class>com.jica.brain6.ServerInfoServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>server-info-servlet</servlet-name>
+        <url-pattern>/server-info</url-pattern>
+    </servlet-mapping>
+```
+
++ ServerInfo.java
+```java
+package com.jica.brain6;
+
+import javax.servlet.http.*;
+import javax.servlet.*;
+import java.io.*;
+
+//web.xml에 필요정보를 설정했으므로 @WebServlet() Annotation
+public class ServerInfoServlet extends HttpServlet {
+	
+	private static final long serialVersionUID = 1L;
+	
+    public void doGet(HttpServletRequest request, HttpServletResponse response) 
+                             throws IOException, ServletException {
+    	
+    	response.setContentType("text/html;charset=euc-kr"); 
+    	PrintWriter out = response.getWriter();
+    	
+    	//현재 서블릿이 동작하는 웹어플리케이션(brain6)의
+    	//모든 실행상태정보를 관리
+        ServletContext context = getServletContext();
+        //JSP에서는 내장객체로 application이라는 명칭으로 사용한다.
+        
+        String serverInfo = context.getServerInfo();
+        int majorVersion = context.getMajorVersion();
+        int minorVersion = context.getMinorVersion();
+        
+        out.println("<HTML>");
+        out.println("<HEAD><TITLE>웹 서버의 정보</TITLE></HEAD>");
+        out.println("<BODY>");
+        out.printf("웹 서버의 종류: %s <BR>", serverInfo);
+        out.printf("지원하는 서블릿 버전: %d.%d <BR>", majorVersion, minorVersion);
+        out.println("</BODY>");
+        out.println("</HTML>");
+    }        
+}
+```
+
++ ServerInfo.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>웹 서버의 정보</TITLE></HEAD>
+    <BODY>
+    <hr>
+    	서블릿에서의 servletContext객체가 JSP에서는<br>
+    	application 내장객체로 이미 준비되어 있다.
+    <hr>
+        웹 서버의 종류: <%= application.getServerInfo() %> <BR>
+        지원하는 서블릿 버전: <%= application.getMajorVersion() %>.<%= application.getMinorVersion() %> <BR>
+    </BODY>
+</HTML>    
+```
+
+
++ web.xml  --> 추가
+```xml
+    <context-param>
+        <param-name>DB_NAME</param-name>
+        <param-value>bankdb</param-value>
+    </context-param>
+```
+
++ AppParamTest.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>웹 애플리케이션의 초기화 파라미터</TITLE></HEAD>
+    <BODY>
+    <hr>
+    	웹어플리케이션 전체의 초기화 파라메터는<br>
+    	application.getInitParameter("파라메터명");을 사용한다.<br>
+    	단, web.xml에 최기화 파라메터를 등록해야 한다.
+    <hr>
+         데이터베이스 이름: <%= application.getInitParameter("DB_NAME") %> <BR>
+    </BODY>
+</HTML>
+```
+
+
+
++ Hello.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<HTML>
+    <HEAD><TITLE>인사하기</TITLE></HEAD>
+    <BODY>
+        안녕하세요, <%= request.getParameter("NAME") %>님
+        <%
+        	application.log("[인사하기] JSP 페이지가 호출되었습니다. ");
+        	System.out.println("[인사하기] JSP 페이지가 호출되었습니다. ");
+        %>
+    </BODY>
+</HTML>
+```
+
+
+
++ scope를 가지는 jsp의 내장객체들
+    - 특정값을 저장/유지/삭제하는 주기
+    ```
+    setAttribute("키",값)
+    getAttribute("키")
+    removeAttribute("키")
+    ```
+    1) pageContext -- 현재페이지에서만 정보유지
+    2) request     -- 요청이 가고 최종응답이 올대까지(include/forward)
+    3) session     -- 세션객체가 유지되는 동안
+    4) applicaion  -- 서버가 시작되고 끝날때까지 정보유지
+
+
++ StoreName.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    String name = request.getParameter("NAME");
+    application.setAttribute("NAME", name); 
+%>
+<HTML>
+    <HEAD><TITLE>웹 애플리케이션 데이터 저장하기</TITLE></HEAD>
+    <BODY>
+         NAME 데이터가 저장되었습니다.          
+    </BODY>
+</HTML>
+```
+
++ ReadName.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>웹 애플리케이션 데이터 조회하기</TITLE></HEAD>
+    <BODY>
+         이름: <%= application.getAttribute("NAME") %>
+    </BODY>
+</HTML>
+```
+
++ DeleteName.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<% application.removeAttribute("NAME"); %>
+<HTML>
+    <HEAD><TITLE>웹 애플리케이션 데이터 삭제하기</TITLE></HEAD>
+    <BODY>
+         NAME 데이터가 삭제되었습니다.   
+    </BODY>
+</HTML>
+```
 
 
 #### 3. EL
