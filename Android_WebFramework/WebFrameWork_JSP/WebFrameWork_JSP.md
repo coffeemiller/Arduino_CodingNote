@@ -2303,7 +2303,114 @@ public class ServerInfoServlet extends HttpServlet {
 ```
 
 
-#### 3. EL
+
+#### 3. EL(Expression Language)
++ 1) 최종응답 코드 즉, 출력을 목적으로 한다.
++ 2) ${표현} <== EL
+    ----> 자바변수나 코드는 사용할 수 없다.
+        (0) 속성명 -- scope를 가지는 내장객체의 속성명
+            ${ RESULT }
+
+        (1) 자체의 내장객체를 사용한다.
+            ${ requestScope.RESULT }
+            pageScopre, requestScope, sessionScope, application의
+            ${ param.NAME }
+            param, paramValue
+            header, headerValue
+            cookie
+            initParam
+            pageContext(특별한 목적 : getXXX()메서드 호출목적)
+
+        (2) 연산자를 사용할 수 있다.
+            산술연산자, 관계연산자, 논리연산자, 삼항연산자(?:), empty, []
+
+        (3) 특정클래스의 static 메서드만 호출할 수 있다.=>별도의 표기법
+
+    ${ cnt + 1 }
+        ===> 자체내장객체의 속성명 (ok)
+
++ 서블릿이나 JSP에서 Logic을 처리하고 그결과값이 만들어졌을때, 결과값을 직접 사용하는 것이 아니라, scope를 가진 내장객체에 속성으로 값을 저장한 후.... EL표현에서 사용한다.
+
+```
+[ scope를 가지는 jsp의 내장객체들 ]
+- 특정값을 저장/유지/삭제하는 주기
+
+setAttribute("키",값)
+getAttribute("키")
+removeAttribute("키")
+
+1) pageContext -- 현재페이지에서만 정보유지
+2) request     -- 요청이 가고 최종응답이 올대까지(include/forward)
+3) session     -- 세션객체가 유지되는 동안
+4) applicaion  -- 서버가 시작되고 끝날때까지 정보유지
+
+===========================================================================
+<%
+    int total = 0;
+    for(in cnt=1; cnt<=100; cnt++) {
+        total += cnt;
+    }
+    pageContext.setAttribute("TOTAL",total);
+    //방법1)
+    out.println("100까지의 합 : "+total+"<br>);
+$>
+//방법2)
+100까지의 합 : <%= total %><br>
+100까지의 합 : <%= request.getAtrribute("TOTAL") %><br>  ==> Expression
+
+//방법3) EL표현
+100까지의 합 : ${ TOTAL }<br>  -- ok (속성명)
+100까지의 합 : ${ total }<br>  -- error
+100까지의 합 : ${ request.getAttribute("TOTAL") }<br>  -- error
+100까지의 합 : ${ requestScope.TOTAL }<br>  -- ok (자체내장객체명.속성명)
+==========================================================================
+```
+
++ Hundred.jsp
+```jsp
+<%
+	//logic처리만 전담하고 최종결과를 보여주는 별도의 페이지로 제어이동
+	//forward를 통해 전해준다.
+    int sum = 0;
+    for (int cnt = 1; cnt <= 100; cnt++){
+        sum += cnt;
+    }
+    
+    RequestDispatcher dispatcher = request.getRequestDispatcher("HundredResult.jsp");
+    request.setAttribute("RESULT", new Integer(sum));
+    dispatcher.forward(request, response); 
+%>
+```
+
++ HundredResult.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>1부터 100까지의 합</TITLE></HEAD>
+    <BODY>
+    <%
+    	//Integer iSum = request.getAttribute("RESULT");
+    	//int sum = iSum.intValue();
+    	
+    	int sum = (int)request.getAttribute("RESULT");
+    	out.println("자바코드 사용 - scriptlet<br>");
+    	out.println("1부터 100까지 더한 결과는? "+sum);
+    %>
+    <hr>
+    	Expression 사용<br>
+        1부터 100까지 더한 결과는? <%= request.getAttribute("RESULT") %><br>
+    <hr>
+        EL 사용<br>
+        1부터 100까지 더한 결과는? ${RESULT}<br>
+        ---------------------------------------------------<br>
+        위의 EL표현은 내부적으로 scope를 가진 내장객체들의 속성에서<br>
+        RESULT명으로 저장된 값이 있는지를 차례로 검사하여,<br>
+        일치하는 속성명이 존재하면 값을 추출하여 출력시키고
+        <br> 없으면 아무일도 하지 않는다.
+    </BODY>
+</HTML>
+```
+
 
 #### 4. 액션tag
 
