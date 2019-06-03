@@ -2936,6 +2936,10 @@ if(a>10){
 배열, 컬렉션(ArrayList, HashMap, HashSet)
 
 EL 내부에서는 [첨자]의 표현을 사용한다.
+${ 속성명[첨자] }
+
+주의) HashMap은 key와 value의 쌍으로 이ㅜㄹ어진 표현이다.
+==> ${ 속성명["키"] }
 ```
 
 
@@ -3091,9 +3095,28 @@ EL 내부에서는 [첨자]의 표현을 사용한다.
     	%>
     	<hr>
         ${param.NAME}의 주소는? ${ADDRESS[param.NAME]}
+        <hr>
+        map에 저장된 값을 추출할때는 key를 알고 있을때 속성명["key"]를 사용하면 된다.<br>
+        ${ ADDRESS["Edgar"] }<br>
+        ${ ADDRESS['Thomas'] }<br>
+        ${ ADDRESS.John }<br>        
     </BODY>
 </HTML>
 ```
+
+
+
+
++ 사용자가 만든 객체의 값을 추출하여 출력할수도 있다.
+
++ ProductInfo2.jsp
+```jsp
+```
+
++ ProductInfoView2.jsp
+```jsp
+```
+
 
 
 
