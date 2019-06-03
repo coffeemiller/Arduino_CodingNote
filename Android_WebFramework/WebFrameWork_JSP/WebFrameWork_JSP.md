@@ -3533,7 +3533,81 @@ public class PersonalInfo {
 </HTML>
 ```
 
-+ 
+
+
++ CustomerInfoSaver.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<!-- 객체를 생성하여 request내장객체의 속성값으로 저장 -->
+<jsp:useBean class="com.jica.brain8.PersonalInfo" id="pinfo" scope="request" />
+ 
+<jsp:setProperty name="pinfo" property="name" value="김현수" /> 
+<jsp:setProperty name="pinfo" property="gender" value="남" /> 
+<jsp:setProperty name="pinfo" property="age" value="23" /> 
+
+<!-- 내부적으로 request객체가 전달되므로 forward된 페이지에서도 객체를 사용할 수 있다. -->
+<jsp:forward page="CustomerInfoViewer.jsp" />
+```
+
+
+
++ CustomerInfoViewer.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>회원 정보</TITLE></HEAD>
+    <BODY>
+    <!-- 결과적으로 객체를 생성한 것이 아니라 이전의 jsp페이지에서 생성저장한 객체를 얻어와서 사용. -->
+        <jsp:useBean class="com.jica.brain8.PersonalInfo" id="pinfo" scope="request" /> 
+        이름: <jsp:getProperty name="pinfo" property="name" /> <BR>
+        성별: <jsp:getProperty name="pinfo" property="gender" /> <BR>
+        나이: <jsp:getProperty name="pinfo" property="age" />
+    </BODY>
+</HTML>
+```
+
+
+
++ NewCustomerInfo.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>회원 정보</TITLE></HEAD>
+    <BODY>
+        <jsp:useBean class="com.jica.brain8.PersonalInfo" id="pinfo" />
+         
+        <jsp:setProperty name="pinfo" property="name" param="NAME" /> 
+        <jsp:setProperty name="pinfo" property="gender" param="GENDER" /> 
+        <jsp:setProperty name="pinfo" property="age" param="AGE" />
+         
+        이름: <jsp:getProperty name="pinfo" property="name" /> <BR>
+        성별: <jsp:getProperty name="pinfo" property="gender" /> <BR>
+        나이: <jsp:getProperty name="pinfo" property="age" />
+    </BODY>
+</HTML>
+```
+
+
+
++ NewerCustomerInfo.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>회원 정보</TITLE></HEAD>
+    <BODY>
+        <jsp:useBean class="com.jica.brain8.PersonalInfo" id="pinfo" />
+        
+        <!-- html문서에서 전송한 요청 파라메터명과
+        사용자가 만든 클래스의 벰버변수명이 일치할때는 아래의 코드로 단순화 시킬수 있다. --> 
+        <jsp:setProperty name="pinfo" property="*" /> 
+        
+        이름: <jsp:getProperty name="pinfo" property="name" /> <BR>
+        성별: <jsp:getProperty name="pinfo" property="gender" /> <BR>
+        나이: <jsp:getProperty name="pinfo" property="age" />
+    </BODY>
+</HTML>
+```
+
 
 #### 4. JSTL
 #### 5. 실습
