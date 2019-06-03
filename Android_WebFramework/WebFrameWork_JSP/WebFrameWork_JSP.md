@@ -2324,11 +2324,15 @@ public class ServerInfoServlet extends HttpServlet {
         (2) 연산자를 사용할 수 있다.
             산술연산자, 관계연산자, 논리연산자, 삼항연산자(?:), empty, [], ., ()
 
-        (3) 특정클래스의 static 메서드만 호출할 수 있다.=>별도의 표기법
+        (3) 사용자가 만든 객체의 getMethod호출기능
+
+        (4) 특정클래스의 static 메서드만 호출할 수 있다.=>별도의 표기법
             ${ m:sqrt(4) }  ==> java.lang.Math.sqrt(4)
 
     ${ cnt + 1 }
         ===> 자체내장객체의 속성명 (ok)
+
+
 
 + 서블릿이나 JSP에서 Logic을 처리하고 그결과값이 만들어졌을때, 결과값을 직접 사용하는 것이 아니라, scope를 가진 내장객체에 속성으로 값을 저장한 후.... EL표현에서 사용한다.
 
@@ -2415,6 +2419,7 @@ $>
 
 + EL의 실제 사용예제
 ```
+EL 자체사용
  1) ${ 속성명 }
 
  2) ${ pageScope.속성명 }
@@ -2766,6 +2771,159 @@ public class Header extends HttpServlet {
 
 
 ### [2019-06-03]
+
+#### 1. Review
+#### 2. EL
++ EL 표현에 사용할수 있는 연산자
+1) 산술연산
+```
++, -, *, /, %
+    div, mod <---------- 추가 문자로 표현된 연산자도 사용가능
+                   %
+    ${ param.NUM1 mod parma.NUM2 }
+
+    //위의 표현을 Java Code로 작성한다면 아래처럼 작성할 것이다.
+    String strNum1
+
+```
+
+2) 비교(관계)연산
+```
+>,  >=, <,  <=, ==, !=
+gt, ge, lt, le, eq, ne   <===== 추가로 문자로 표현된 연산자도 사용가능
+
+java code에서는 문자열을 비교할때는
+- 직접 연산자 사용  ==> 참조값이 비교대상이 되었다.
+- equals()  ==> 내용값 비교
+- compareTo() ==> 내용값 비교
+```
+
+
+3) 논리연산
+```
+&&,  ||,  !
+and, or, not   <====== 추가로 문자로 표현된 연산자도 사용가능
+```
+
+
+4) 삼항(조건)연산자
+```
+?  :
+
+int a=5;
+if(a>10){
+    a=100;
+}else{
+    a-100;
+}
+------------------> a = (a > 10 ) ? 100 : -100;
+```
+
+
+5) 속성값이  
+
+
+
+6)
+
+
+
++ Operators.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<HTML>
+    <HEAD><TITLE>익스프레션 언어 연산자 연습</TITLE></HEAD>
+    <BODY>
+        X = ${param.NUM1}, Y = ${param.NUM2} <BR><BR>    	  
+        X + Y = ${param.NUM1 + param.NUM2} <BR>
+        X - Y = ${param.NUM1 - param.NUM2} <BR>
+        X * Y = ${param.NUM1 * param.NUM2} <BR>
+        X / Y = ${param.NUM1 / param.NUM2} <BR>
+        X % Y = ${param.NUM1 % param.NUM2} <BR><BR>
+        X가 더 큽니까? ${param.NUM1 - param.NUM2 > 0} <BR>
+        Y가 더 큽니까? ${param.NUM1 - param.NUM2 < 0} <BR><BR>
+        X와 Y가 모두 양수입니까? ${(param.NUM1 > 0) && (param.NUM2 > 0)} <BR><BR>
+        X와 Y가 같습니까? ${param.NUM1 == param.NUM2? "예" : "아니오"} <BR> <BR>
+    </BODY>
+</HTML>
+```
+
+
+
++ CharOperators.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<HTML>
+    <HEAD><TITLE>익스프레션 언어 연산자 연습</TITLE></HEAD>
+    <BODY>
+    	EL 표현내부에서는 문자로 이루어진 연산자도 사용할 수 있습니다.
+    	<hr>
+    
+        ${param.NUM1}을 ${param.NUM2}로 나눈 몫은? ${param.NUM1 div param.NUM2} <BR>
+        나머지는? ${param.NUM1 mod param.NUM2} <BR><BR>
+        둘 다 양수입니까? ${(param.NUM1 gt 0) and (param.NUM2 gt 0)} <BR>
+        둘 다 음수입니까? ${(param.NUM1 lt 0) and (param.NUM2 lt 0)} <BR>
+       <hr>
+        ${param.NUM1}을 ${param.NUM2}로 나눈 몫은? ${param.NUM1 / param.NUM2} <BR>
+        나머지는? ${param.NUM1 % param.NUM2} <BR><BR>
+        둘 다 양수입니까? ${(param.NUM1 > 0) and (param.NUM2 > 0)} <BR>
+        둘 다 음수입니까? ${(param.NUM1 < 0) and (param.NUM2 < 0)} <BR>
+    </BODY>
+</HTML>
+```
+
+
+
++ StringOperators.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<HTML>
+    <HEAD><TITLE>문자열 비교</TITLE></HEAD>
+    <BODY>
+    <%
+    	//java code에서는 참조값을 비교
+    	String str1 = "JICA";
+		String str2 = "JICA";
+		String str3 = new String("JICA");
+		
+		out.println((str1 == str2) +"<br>");   //true
+		out.println((str1 == str3) +"<br>");   //false
+		out.println("<hr>");
+    %>
+        입력 문자열 : ${param.STR1}, ${param.STR2} <BR><BR>
+        두 문자열이 같습니까? ${param.STR1 == param.STR2} <BR>
+        어느 문자열이 먼저입니까? ${param.STR1 < param.STR2 ? param.STR1 : param.STR2}
+    </BODY>
+</HTML>
+```
+
+
+
+#### 3. 액션태그
+#### 4. JSTL
+#### 5. 실습
+#### 6. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-04]
+
+#### 1. Review
+#### 4. 액션tag
+
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-05]
 
 #### 1. Review
 #### 4. 액션tag
