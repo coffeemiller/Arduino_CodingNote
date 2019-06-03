@@ -3609,9 +3609,24 @@ public class PersonalInfo {
 ```
 
 
-#### 4. JSTL
-#### 5. 실습
-#### 6. Summary / Close
+
+
+##### 3) 기타 액션태그
+```
+<jsp:plugin  --> 자동 applet 사용(생략)
+<jsp:param   --> forward/include시 추가 파라메터 전달
+
+스크립팅요소를 태그로 표현
+<%  %>   ==>  <jsp:scriptlet>  </jsp:scriptblet>
+```
+
+
+
+##### [오늘의 과제]
++ EL / Action tag 복습
+
+#### 4. 실습
+#### 5. Summary / Close
 
 
 
@@ -3622,6 +3637,7 @@ public class PersonalInfo {
 ### [2019-06-04]
 
 #### 1. Review
+#### 4. JSTL
 #### 4. 액션tag
 
 
