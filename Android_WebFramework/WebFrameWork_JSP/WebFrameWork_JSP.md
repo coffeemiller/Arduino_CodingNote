@@ -2827,6 +2827,9 @@ if(a>10){
 6)
 
 
++ 연산자의 우선순위는 괄호를 사용하여 명시적으로 나타내기를 권장합니다.
+
+
 
 + Operators.jsp
 ```jsp
@@ -2889,10 +2892,205 @@ if(a>10){
 		out.println((str1 == str2) +"<br>");   //true
 		out.println((str1 == str3) +"<br>");   //false
 		out.println("<hr>");
+        //문자열 비교에서는 내용값을 비교하기 위해 다음을 사용했다.
+		// 1) equals()
+		// 2) compareTo()
+		// EL에서는 연산자를 사용해도 내부적으로 equals(), compareTo()을 자동으로 작동시킨다.
     %>
         입력 문자열 : ${param.STR1}, ${param.STR2} <BR><BR>
         두 문자열이 같습니까? ${param.STR1 == param.STR2} <BR>
         어느 문자열이 먼저입니까? ${param.STR1 < param.STR2 ? param.STR1 : param.STR2}
+    </BODY>
+</HTML>
+```
+
+
+
++ EmptyOperatoer.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr" %>
+<HTML>
+    <HEAD><TITLE>엠프티 연산자</TITLE></HEAD>
+    <BODY>
+    	empty 연산자는 ID파라메터가 존재하지 않거나, 값이 null이거나, 값이 빈문자열일때<br>
+    	참을 리턴한다.<br><br>
+        안녕하세요, ${empty param.ID ? "guest" : param.ID}님
+        <hr>
+        안녕하세요, 
+        <%
+        	String id = request.getParameter("ID");  // null, "", "jica"
+        	if(id == null || id.length() <= 0) {
+        		out.println("guest님");
+        	} else {
+        		out.println(id+"님");
+        	}
+        %>
+    </BODY>
+</HTML>
+```
+
+
++ 사용자가 만든 객체, 컬렉션 객체(ArrayList, HashMap, ...) 가 내장객체의 속성값으로 표현되었을때 사용법
+```
+여러개의 요소를 관리하는 표현---------------------
+배열, 컬렉션(ArrayList, HashMap, HashSet)
+
+EL 내부에서는 [첨자]의 표현을 사용한다.
+```
+
+
+
++ Winners.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    String winners[] = new String[3];
+    winners[0] = "이수현";
+    winners[1] = "정세훈";
+    winners[2] = "김진희";
+    
+    //WinnersView.jsp페이지로 제어를 옮길 준비를 한다.
+    RequestDispatcher dispatcher = request.getRequestDispatcher("WinnersView.jsp");
+    
+    //제어를 옮길때 전달할 정보를 설정한다.
+    request.setAttribute("NAME", "홍길동");  //단일값 속성
+    request.setAttribute("WINNERS", winners);
+    
+    //제어 이동
+    dispatcher.forward(request, response); 
+%>
+```
+
+
++ WinnersView.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>우승자 명단</TITLE></HEAD>
+    <BODY>
+        <H3>우승자 명단</H3>
+        <%
+        	String name = (String)request.getAttribute("NAME");
+			out.println("성명 : "+name+"<br>");
+        	String winners[] = (String[])request.getAttribute("WINNERS");
+			for(int i=0; i<winners.length; i++) {
+				out.println((i+1)+"등. "+winners[i]+"<br>");
+			}
+			//자바코드에서는 잘못된 첨자사용은 Runtime Error를 발생시킨다.
+			
+        %>
+        <br>
+		<hr>
+        성명 : ${ NAME }<br>
+        1등. ${WINNERS[0]} <BR>
+        2등. ${WINNERS[1]} <BR>
+        3등. ${WINNERS[2]} <BR>
+        4등. ${WINNERS[3]}
+        <hr>
+        EL표현 내부에서는 값이 존재하지 않으면 아무일도 하지 않는다.
+    </BODY>
+</HTML>
+```
+
+
++ Fruits.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*" %>
+<%
+    ArrayList<String> items = new ArrayList<String>();
+    items.add("딸기");
+    items.add("오렌지");
+    items.add("복숭아");
+    
+    //제어이동 준비
+    RequestDispatcher dispatcher = request.getRequestDispatcher("FruitsView.jsp");
+    
+    //request객체의 속성값으로 전달할 값 저장
+    request.setAttribute("FRUITS", items);
+    //제어이동
+    dispatcher.forward(request, response); 
+%>
+```
+
+
++ FruitsView.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*" %>
+<HTML>
+    <HEAD><TITLE>인기 상품 목록</TITLE></HEAD>
+    <BODY>
+        <H3>이달에 가장 많이 팔린 과일입니다.</H3>
+        <%= request.getAttribute("FRUITS")%> <BR>
+        <%
+        	ArrayList<String> fruits = (ArrayList<String>)request.getAttribute("FRUITS");
+        	
+        	//직접출력
+        	out.println(fruits+"<br>");
+        	
+        	//ArrayList의 개별요소 접근
+        	for(String a : fruits){
+        		out.println(fruits.indexOf(a)+1+"위. "+a+"<br>");
+        	}
+        %>
+        <hr>
+        1위. ${FRUITS[0]} <BR>
+        2위. ${FRUITS[1]} <BR>
+        3위. ${FRUITS[2]} <BR>
+    </BODY>
+</HTML>
+```
+
+
+
++ Address.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*" %>
+<%
+	//     key(성명) value(출생지)
+    HashMap<String, String> map = new HashMap<String, String>();
+	//데이터 추가
+    map.put("Edgar", "보스턴");
+    map.put("Thomas", "오하이오");
+    map.put("John", "워싱턴");
+	
+    //제어이동 준비
+    RequestDispatcher dispatcher = request.getRequestDispatcher("AddressView.jsp");
+    //제어이동 값 설정
+    request.setAttribute("ADDRESS", map);
+    //제어이동
+    dispatcher.forward(request, response); 
+%>
+```
+
+
++ AddressView.jsp
+```jsp
+<%@page import="java.util.*"%>
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>주소록</TITLE></HEAD>
+    <BODY>
+    	<%
+    		HashMap<String,String> map = (HashMap<String,String>)request.getAttribute("ADDRESS");
+			//map에 설정된 key값들을 알고 있다면
+			out.println(map.get("Edgar")+"<BR>");
+			out.println(map.get("Thomas")+"<BR>");
+			out.println(map.get("John")+"<BR>");
+			
+			//key값을 모른다면
+			Set<String> keys = map.keySet();
+			//set의 전체요소를 접근하려면 iterator가 필요하다.
+			Iterator<String> it = keys.iterator();
+			while(it.hasNext()){
+				String key = it.next();
+				out.println(key+"의 주소는 "+map.get(key)+"<br>");
+			}
+    	%>
+    	<hr>
+        ${param.NAME}의 주소는? ${ADDRESS[param.NAME]}
     </BODY>
 </HTML>
 ```
