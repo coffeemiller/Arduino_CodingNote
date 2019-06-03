@@ -3111,16 +3111,213 @@ ${ 속성명[첨자] }
 
 + ProductInfo2.jsp
 ```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="com.jica.brain7.ProductInfo,java.util.*"%>
+<%
+	//사용자 정의객체 생성
+	ProductInfo product = new ProductInfo();
+	//멤버변수에 값 설정
+	product.setName("초코케이크 3호");
+	product.setPrice(20000);
+
+	ArrayList<ProductInfo> products = new ArrayList<ProductInfo>();
+	products.add(product);
+
+	product = new ProductInfo();
+	product.setName("삼각깁밥");
+	product.setPrice(1200);
+
+	products.add(product);
+
+	//제어이동준비    
+	RequestDispatcher dispatcher = request.getRequestDispatcher("ProductInfoView2.jsp");
+	//사용자 정의 객체를 속성값으로 저장하여 제어이동시 전달
+	request.setAttribute("PRODUCTS", products);
+	//제어이동
+	dispatcher.forward(request, response);
+%>
 ```
 
 + ProductInfoView2.jsp
 ```jsp
+<%@page import="com.jica.brain7.ProductInfo"%>
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>상품 정보</TITLE></HEAD>
+    <BODY>
+        <H3>상품 정보</H3>
+        
+        <hr>
+        상품명: ${PRODUCTS[0].name} <BR>
+        가격: ${PRODUCTS[0].price}원 <BR>
+        <hr>
+        상품명: ${PRODUCTS[1].name} <BR>
+        가격: ${PRODUCTS[1].price}원 <BR>
+        <hr>
+        내부적으로 get method를 작동시켜 그 값을 출력시켰다.
+    </BODY>
+</HTML>
 ```
 
 
 
 
+
+
+
+
+
+
++ web.xml  ==> 추가
+```xml
+   <jsp-config>
+        <taglib>
+            <taglib-uri>http://www.jica.kr/brain7/math-functions.tld</taglib-uri>
+            <taglib-location>/WEB-INF/tlds/math-functions.tld</taglib-location>
+        </taglib>
+    </jsp-config>
+```
+
++ math-functions.xml
+```xml
+<taglib xmlns="http://java.sun.com/xml/ns/javaee" version="2.1">
+    <tlib-version>1.0</tlib-version>
+    <short-name>math</short-name>
+    <function>
+        <name>squareroot</name>
+        <function-class>java.lang.Math</function-class>
+        <function-signature>double sqrt(double)</function-signature>
+    </function>
+    <function>
+        <name>total</name>
+        <function-class>com.jica.brain7.MyMath</function-class>
+        <function-signature>int sum(int, int)</function-signature>
+    </function>
+</taglib>
+```
+
+
++ SquareRoot.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="m" uri="http://www.jica.kr/brain7/math-functions.tld"%>
+<HTML>
+    <HEAD><TITLE>제곱근 구하기</TITLE></HEAD>
+    <BODY>
+    <hr>
+    	EL표현 내부에서는 JAVA CODE를 전혀 사용할수 없다.<br>
+    	EL자체 내장객체 표현을 사용하였다.<br>
+    	Java 클래스의 static메서드는 호출할수 있는데,<br>
+    	그 호출절차는 다음과 같다.<br>
+    	<br>
+    	1. TLD 작성<br>
+    	2. web.xml에서 TLD파일 인식하도록 등록<br> 
+    	3. 정적메서드를 호출하는 jsp페이지에서 taglib지시어를 사용하여 인식<br>
+    	4. 정적메서드 호출
+    <HR>
+    <%
+    	double num = Double.parseDouble(request.getParameter("NUM"));
+    	double result = Math.sqrt(num);
+    	out.println(num+"의 제곱근은? "+result+"<br>");
+    %>
+    
+        ${param.NUM}의 제곱근은? ${m:squareroot(param.NUM)} <BR>
+    </BODY>
+</HTML>
+```
+
+
+
+
+
++ MyMath.java
+```java
+package com.jica.brain7;
+
+public class MyMath {
+    public static int sum(int start, int end) {
+        int sum = 0;
+        for (int cnt = start; cnt <= end; cnt++)
+            sum += cnt;
+        return sum;
+    }
+}
+```
+
+
++ Sigma.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="m" uri="http://www.jica.kr/brain7/math-functions.tld"%>
+<%@page import="com.jica.brain7.*" %>
+<HTML>
+    <HEAD><TITLE>주어진 범위의 합 구하기</TITLE></HEAD>
+    <BODY>
+        ${param.NUM1}부터 ${param.NUM2}까지의 합은? <BR><BR>
+        답: ${m:total(param.NUM1, param.NUM2)}
+        <hr>
+        <%
+        	int num1 = Integer.parseInt(request.getParameter("NUM1"));
+        	int num2 = Integer.parseInt(request.getParameter("NUM2"));
+        	out.println("답 : "+MyMath.sum(num1,num2));
+        %> 
+    </BODY>
+</HTML>
+```
+
+
+
 #### 3. 액션태그
++ 액션 태그(action tag)
+    - jsp에서 java코드없이 java코드를 사용한 효과를 나타낼수 있는 xml형태의 태그들을 제공한다. 이러한 태그들을 표준 액션태그라고 부른다.(jsp문법 확장)
+    - 액션태그는 원래 java code로 작성할 기능을 태그로 손쉽게 사용하도록 만들어 놓은 것.
+
++ 액션태그의 종류
+    1) JSP 자체에서 제공하는 액션태그 ==> 교재8장
+```
+[표준액션태그]
+`<jsp:태그명 속성=값,... />`
+`<jsp:태그명 속성=값,...> </jsp:태그명>`
+```
+    2) 외부에서 제공하는 액션태그를 외부태그라이브러리(커스텀액션)라고 부른다. ==> 교재9장
+        - 그중에서 대표적인 것이 JSTL(Jsp Standard Tag Library)이다.
+```
+<c:>
+<fmt:>
+<fn:>
+<x:>
+<sql:>
+```
+
++ 참고) 커스텀(Custom)이라는 용어
+    - 프로그램에서 사용될때 사용자가 만든이라는 의미로 주로 사용한다.
+    - 커스텀 class ==> 사용자가 만든 class
+    - 커스텀 tag  ===> 사용자가 만든 tag
+
+
+
+
+
+
++ 표준 액션 태그 사용법
+1) JSP페이지 모듈화 지원 액션 태그
+    - 우리가 이미 많이 사용했던 기능으로 프로그램제어를 이동시키는 Include와 Forward기능.
+```
+<jsp:include page="jsp페이지" />
+<jsp:forward page="jsp페이지" />
+
+<jsp:include page="jsp페이지">
+    <jsp:param 파라메터정보.... />
+</jsp:include>
+
+모듈화------------------------------------------------------------------------
+서블릿코드 ------forward----------> 한화면을 구성하기위한 jsp페이지(View)
+(로직처리)                          화면 상단 --------include--------> top.jsp
+                                    화면 중단 --------include--------> contents.jsp
+                                    화면 하단 --------include--------> bottom.jsp
+```
+
+
 #### 4. JSTL
 #### 5. 실습
 #### 6. Summary / Close
