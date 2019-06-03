@@ -3300,8 +3300,9 @@ public class MyMath {
 
 
 + 표준 액션 태그 사용법
-1) JSP페이지 모듈화 지원 액션 태그
+##### 1) JSP페이지 모듈화 지원 액션 태그
     - 우리가 이미 많이 사용했던 기능으로 프로그램제어를 이동시키는 Include와 Forward기능.
+    - 자동적으로 내부에서 reqeust, response객체를 전달해 준다.
 ```
 <jsp:include page="jsp페이지" />
 <jsp:forward page="jsp페이지" />
@@ -3319,6 +3320,220 @@ public class MyMath {
            <--------최종응답-------
 ```
 
+
++ Winners.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>당첨자 명단</TITLE></HEAD>
+    <BODY>
+        <H3>당첨자 명단</H3>
+        14553 연흥부 <BR>
+        63563 심청 <BR>
+        73992 이몽룡 <BR><BR>
+        <jsp:include page="Now.jsp"/>
+        <hr>
+        <jsp:include page="Now.jsp" />
+    </BODY>
+</HTML>
+```
+
+
++ Now.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<% 
+    GregorianCalendar now = new GregorianCalendar();
+    String date = String.format("%TY년 %Tm월 %Td일", now, now, now); 
+    String time = String.format("%Tp %TR", now, now); 
+%>
+[현재 시각] <%= date %> <%= time %>
+```
+
+
+
+
+
++ Hundred.jsp
+```jsp
+<%
+    int sum = 0;
+    for (int cnt = 1; cnt <= 100; cnt++)
+        sum += cnt;
+    request.setAttribute("RESULT", new Integer(sum));
+%>
+<jsp:forward page="HundredResult.jsp" />
+```
+
+
++ HundredResult.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>1부터 100까지의 합</TITLE></HEAD>
+    <BODY>
+    	<%
+    		int result = (int)request.getAttribute("RESULT");
+			out.println("1부터 100까지 더한 결과는? "+result+"<br>");
+    	%>
+    	<hr>
+    	1부터 100까지 더한 결과는? <%= request.getAttribute("RESULT") %><br>
+    	<hr>
+        1부터 100까지 더한 결과는? ${RESULT}
+    </BODY>
+</HTML>
+```
+
+
+##### 2) 사용자 객체의 생성 및 사용
+```
+사용자 객체 생성       <jsp:useBean>
+객체에 set메서드 사용  <jsp:setProperty>
+객체에 get메서드 사용  <jsp:getProperty>
+
+
+<jsp:useBean class="com.jica.brain8.PersonalInfo" id="pinfo" scope="page"/> 
+                                                             scope="request"
+                                                             scope="session"
+                                                             scope="application"
+속성으로 scope를 사용하지 않으면 기본이 page이다.
+
+useBean태그는 객체를 생성하고
+내장객체의 속성값으로 객체를 설정한다.
+
+-------------------------------------------------------------------------------
+<jsp:useBean class="com.jica.brain8.PersonalInfo" id="pinfo"/> 
+       
+위의 useBean태그는
+pageContext내장객체에서 pinfo 속성이 있는지 검사하여, 있다면 그 값을 변수로 만든다.(없다면 신규생성)
+    PersonalInfo pinfo = null;
+    if(pageContext.findAttribute("pinfo")) {
+        pinfo = pageContext.getAttribute("pinfo");
+    }else{
+        prinfo = new PersonalInfo();
+        pageContext.setAttribute("pinfo", pinfo);
+    }
+-------------------------------------------------------------------------------
+<jsp:setProperty name="pinfo" property="name" value="김연희" /> 
+<jsp:setProperty name="pinfo" property="gender" value="여" /> 
+<jsp:setProperty name="pinfo" property="age" value="29" />
+
+위의 setProperty는 내장객체의 속성값 객체에 setMethod() 호출하여 값을 저장한다.
+pinfo.setName("김연희");
+pinfo.setGender('여');
+pinfo.setAge(29);
+-------------------------------------------------------------------------------
+이름: <jsp:getProperty name="pinfo" property="name" /> 
+성별: <jsp:getProperty name="pinfo" property="gender" /> 
+나이: <jsp:getProperty name="pinfo" property="age" />
+
+위의 getProperty는 내장객체의 속성값 객체에 setMethod()를 작동시켜 멤버변수값을 읽어온다.
+pinfo.getName()
+pinfo.getGender()
+pinfo.getAge()    
+```
+
+
++ PersonalInfo.java
+```java
+package com.jica.brain8;
+
+//커스텀 클래스
+//1건의 데이터를 표현하는 클래스 -- 자바빈즈
+public class PersonalInfo {
+	private String name; // 이름
+	private char gender; // 성별
+	private int age; // 나이
+
+	public PersonalInfo() {
+		// 디버깅용
+		System.out.println("PersonalInfo::PersonalInfo()....");
+	}
+
+	public void setName(String name) {
+		// 디버깅용
+		System.out.println("PersonalInfo::setName(" + name + ")....");
+		this.name = name;
+	}
+
+	public String getName() {
+		// 디버깅용
+		System.out.println("PersonalInfo::getName()....");
+		return name;
+	}
+
+	public void setGender(char gender) {
+		// 디버깅용
+		System.out.println("PersonalInfo::setGender("+gender+")....");
+		this.gender = gender;
+	}
+
+	public char getGender() {
+		// 디버깅용
+		System.out.println("PersonalInfo::getGender()....");
+		return gender;
+	}
+
+	public void setAge(int age) {
+		// 디버깅용
+		System.out.println("PersonalInfo::setAge(" + age + ")....");
+		this.age = age;
+	}
+
+	public int getAge() {
+		// 디버깅용
+		System.out.println("PersonalInfo::getAge()....");
+		return age;
+	}
+}
+```
+
+
++ CustomerInfo.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>회원 정보</TITLE></HEAD>
+    <BODY>
+        <jsp:useBean class="com.jica.brain8.PersonalInfo" id="pinfo"/> 
+        <hr>
+        <pre>
+        위의 useBean태그는
+        pageContext내장객체에서 pinfo 속성이 있는지 검사하여, 있다면 그 값을 변수로 만든다.(없다면 신규생성)
+        	PersonalInfo pinfo = null;
+        	if(pageContext.findAttribute("pinfo")) {
+        		pinfo = pageContext.getAttribute("pinfo");
+        	}else{
+        		prinfo = new PersonalInfo();
+        		pageContext.setAttribute("pinfo", pinfo);
+        	}
+        </pre>
+        <hr>
+        <jsp:setProperty name="pinfo" property="name" value="김연희" /> 
+        <jsp:setProperty name="pinfo" property="gender" value="여" /> 
+        <jsp:setProperty name="pinfo" property="age" value="29" />
+        <pre>
+        위의 setProperty는 내장객체의 속성값 객체에 setMethod() 호출하여 값을 저장한다.
+        pinfo.setName("김연희");
+        pinfo.setGender('여');
+        pinfo.setAge(29);
+        </pre>
+        이름: <jsp:getProperty name="pinfo" property="name" /> <BR>
+        성별: <jsp:getProperty name="pinfo" property="gender" /> <BR>
+        나이: <jsp:getProperty name="pinfo" property="age" />
+        <hr>
+        <pre>
+        위의 getProperty는 내장객체의 속성값 객체에 setMethod()를 작동시켜 멤버변수값을 읽어온다.
+        pinfo.getName()
+        pinfo.getGender()
+        pinfo.getAge()    
+        </pre>
+    </BODY>
+</HTML>
+```
+
++ 
 
 #### 4. JSTL
 #### 5. 실습
