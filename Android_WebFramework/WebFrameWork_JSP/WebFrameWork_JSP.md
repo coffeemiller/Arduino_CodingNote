@@ -3782,6 +3782,10 @@ public class ProductInfo {
 가격: <jsp:getProperty name="pinfo" property="price" /> <BR>
 ```
 
+```
+<jsp:useBean class="패키지명.클래스">
+<jsp:useBean type="패키지명.추상클래스">
+```
 
 + 
 
