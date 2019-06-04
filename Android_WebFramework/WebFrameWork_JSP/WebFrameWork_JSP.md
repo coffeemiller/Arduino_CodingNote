@@ -3935,6 +3935,26 @@ public class ProductInfo {
                                                         </c:otherwise>                   
         											  </c:choose>	
 
+4)반복처리
+- Java언어 : while(), do while(), for
+  for(int cnt=0; cnt<=5; cnt++){
+      System.out.println(cnt+" 안녕하세요");
+  }
+
+
+- JSTL
+  <c:forEach begin="1" end="5" step="2">
+    ${cnt}<br>
+  </c:forEach>
+
+  <c:forEach begin="1" end="5" step="2" status="변수">
+    --forEach 태그 내부에서 반복제어변수의 다양한 상태값을 얻을수 있는 방법
+    ${cnt}<br>
+  </c:forEach>
+
+  <c:forEach var="cnt" items="${표현-속성(배열,컬렉션개체)}">
+  </c:forEach>
+
 ```
 
 
@@ -4058,6 +4078,19 @@ public class ProductInfo {
 ```
 
 
+
+##### 3. 반복처리
+```
+- Java언어 : while(), do while(), for
+  for(int cnt=0; cnt<=5; cnt++){
+      System.out.println(cnt+" 안녕하세요");
+  }
+
+
+- JSTL
+  <c:forEach begin="1" end="5" step="2">
+  </c:forEach>
+```
 
 
 #### 4. 게시판 만들기
