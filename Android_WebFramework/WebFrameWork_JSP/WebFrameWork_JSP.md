@@ -4404,6 +4404,9 @@ public class Product {
 + 게시판 만들기(Servlet, JSP, JSP(EL, Action태그, JSTL))  <=== 종합
 
 
+##### [오늘의 과제]
++ 4시 이후, 
+
 #### 4. 실습
 #### 5. Summary / Close
 
