@@ -3897,6 +3897,169 @@ public class ProductInfo {
 
 
 
++ 1. CORE 라이브러리
+```
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+1)변수 생성 및 초기화 -- scope를 가진 내장객체에 속성을 저장
+<c:set var="식별자명" value="상수값"            scope="page">
+                           ="<%= 자바변수 %>"        ="request"
+                           ="${ 표현식 }"            ="session"
+                                                     ="application"
+사용 -- scope를 가진 내장객체.getAttribute("식별자명")
+        ${ 식별자명 }
+
+
+
+2)제거 -- 삭제(scope를 가진내장객체.removeAttribute("식별자"))
+    <c:remove var="식별자명 />
+
+
+
+3)조건처리
+      java 언어 ---> 단순조건(if), 양자택일(if else), 다중조건(else if, switch)
+      JSTL    ----> ==========================   =======================
+                        ||                                 ||
+                        VV                                 vv 
+                        <c:if test="EL표현의 조건" >     <c:choose>
+                                                        수행할 기능  
+                                                        <c:when test="${EL조건}" >
+                                                         수행할 기능 1    
+                        </c:if>                         </c:when>
+                                                        <c:when test="${EL조건2}" >
+                                                          수행할 기능2
+                                                        </c:when>
+                                                        ...  
+                                                        <c:otherwise>
+                                               위의 모든조건이 거짓일때 수행할 기능
+                                                        </c:otherwise>                   
+        											  </c:choose>	
+
+```
+
+
++ ProductInfo.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="CODE" value="80012" scope="request" /> 
+<c:set var="NAME" value="온습도계" scope="request" /> 
+<c:set var="PRICE" value="15000" scope="request" />
+<jsp:forward page="ProductInfoView.jsp" />
+```
+
++ ProductInfoView.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<HTML>
+    <HEAD><TITLE>상품 정보</TITLE></HEAD>
+    <BODY>
+        <H3>상품 정보</H3>
+        상품코드: ${CODE} <BR>
+        상품명: ${NAME} <BR>
+        단가: ${PRICE}원 <BR>
+        <hr>
+        <%
+        	String code =(String)request.getAttribute("CODE");
+        	String name =(String)request.getAttribute("NAME");
+        	int price = Integer.valueOf((String)request.getAttribute("PRICE"));
+        	out.println("상품코드 : "+code+"<br>");
+        	out.println("상품명 : "+name+"<br>");
+        	out.println("단가 : "+price+"원<br>");
+        %>
+        <hr>
+        상품코드: <%=request.getAttribute("CODE")%> <BR>
+        상품명: <%=request.getAttribute("NAME")%> <BR>
+        단가: <%=request.getAttribute("PRICE")%>원 <BR>
+		<hr>
+		<c:remove var="NAME" />
+		<!-- scope를 가진 모든 내장객체에서 NAME속성을 제거한다. -->
+		<c:remove var="PRICE" scope="request"/>
+		<!-- scope속성이 사용되면, 해당 scope 내장객체의 속성만 제거한다. -->    
+    </BODY>
+</HTML>
+```
+
+
+
+
++ Maximum.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<HTML>
+    <HEAD><TITLE>최대값 구하기</TITLE></HEAD>
+    <BODY>
+        최대값: 
+        <c:if test="${param.NUM1 - param.NUM2 >= 0}">
+            ${param.NUM1}
+        </c:if>
+        <c:if test="${param.NUM1 - param.NUM2 < 0}">
+            ${param.NUM2}
+        </c:if>
+        <hr>
+        <c:if test="true">
+        항상 수행되는 문장입니다.
+        </c:if>
+        
+        <c:if test="false">
+        항상 실행되지 않는 문장입니다.
+        </c:if>
+        <hr>
+        <c:set var="num1" value="50" />
+        <c:set var="num2" value="72" />
+        
+        <c:if test="${ (num2-num1) > 0 }" >
+        	${ num2 }이(가) 더 큰수입니다.
+        </c:if>
+        <hr>
+        <%
+        	int num1 = 50;
+        	int num2 = 72;
+        %>
+        <c:if test="<%= (num2-num1)>0 %>" >
+        	${ num2 }이(가) 더 큰수입니다.
+        </c:if>
+    </BODY>
+</HTML> 
+```
+
+
+
+
++ Greeting.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<HTML>
+    <HEAD><TITLE>인사하기</TITLE></HEAD>
+    <BODY>
+        <c:choose> 
+            <c:when test="${param.NUM == 0}"> 
+                처음 뵙겠습니다. <BR>
+            </c:when> 
+            <c:when test="${param.NUM == 1}"> 
+                반갑습니다. <BR>
+            </c:when> 
+            <c:when test="${param.NUM == 2}"> 
+                또 뵙는군요. <BR>
+            </c:when> 
+            <c:when test="${param.NUM == 3}"> 
+                자꾸보니 더 반가워요. <BR>
+            </c:when> 
+            <c:otherwise> 
+                안녕하세요. <BR>
+            </c:otherwise> 
+        </c:choose> 
+    </BODY>
+</HTML> 
+```
+
+
+
+
 #### 4. 게시판 만들기
 
 #### 5. 실습
