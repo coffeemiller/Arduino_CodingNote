@@ -3782,14 +3782,120 @@ public class ProductInfo {
 가격: <jsp:getProperty name="pinfo" property="price" /> <BR>
 ```
 
+
+
 ```
 <jsp:useBean class="패키지명.클래스">
+    객체를 scope를 가진 내장객체에서 검색하거나 생성해서 속성으로 저장 후 사용
 <jsp:useBean type="패키지명.추상클래스">
+    객체를 scope를 가진 내장객체에서 검색해서 사용만 한다.(생성하지 않고 검색만..)
 ```
 
-+ 
 
-#### 3. JSTL
+
++ 스크립팅요소를 태그로 표현
+```
+<%  %>  ==> <jsp:scriptlet>  </jsp:scriptlet>
+<%= %>  ==> <jsp:expression>  </jsp:expression>
+<%! %>  ==> <jsp:declaration>  </jsp:declaration>
+```
+
+
+
++ Adder.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>두 수의 합</TITLE></HEAD>
+    <BODY>
+        <jsp:scriptlet>
+        	  String str1 = request.getParameter("NUM1");
+        	  String str2 = request.getParameter("NUM2");
+        	  int num1 = Integer.parseInt(str1);
+        	  int num2 = Integer.parseInt(str2);
+            int sum = add(num1, num2);
+        </jsp:scriptlet>
+        두 수의 합은 <jsp:expression>sum</jsp:expression>입니다.
+    </BODY>
+</HTML>
+<jsp:declaration>
+    private int add(int num1, int num2) {
+        return num1 + num2;
+    }
+</jsp:declaration>
+```
+
+
+
+
+#### 3. JSTL : Jsp Standard Tag Library
++ 사용준비
+    - 1) jstl 홈페이지에서 필요한 라이브러리 다운로드
+    - 2) Tomcat설치폴더에서 jstl 라이브러리 복사
+
++ jstl사용하는 jsp페이지에서는 taglib지시어를 사용
+    `<%@ taglib prefix="접두사" uri="http://java.sun.com/jsp/jstl/서브라이브러리종류">`
+
++ 실제사용
+```
+<접두사:태그명>
+```
+
+
+
+
+##### JSTL에서 제공되는 태그의 종류
+1. core라이브러리 : 변수를 생성/사용, 실행제어(조건문,반복문), 예외처리
+    `prefix="c" uri="http://java.sun.com/jsp/jstl/core`
+
+2. 포멧팅 라이브러리 : 숫자, 날짜, 시간정보 등을 형식화시켜 출력.
+    `prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt`
+
+3. 문자함수 라이브러리 : 자바언어의 String클래스의 메서드 호출과 유사한 문자열처리.
+    `prefix="fn" uri="http://java.sun.com/jsp/jstl/functions`
+
+4. xml 라이브러리 : xml문서를 조작하는 기능
+    `prefix="x" uri="http://java.sun.com/jsp/jstl/xml`
+
+5. sql 라이브러리 : 데이터베이스관련기능(커넥션풀설정, SELECT, DML)
+    `prefix="sql" uri="http://java.sun.com/jsp/jstl/sql`
+
+
+
+
+
++ Multiply.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!-- 마치 자바변수를 선언하고 초기값을 대입한 형태의 표현이다.
+	단, 아래의 태그는 실제 변수를 만드는 것이 아니라,
+	scope를 가진 내장객체에 속성명으로 값(객체)를 저장한 것이다. -->
+<c:set var="num1" value="7" />
+<!-- 위의 set태그는 아래의 자바코드를 실행시켜준다.
+ pageContext.setAttribute("num1", new Integer(7)); -->
+<c:set var="num2" value="9" />
+<c:set var="result" value="${num1*num2}" /> 
+
+<HTML>
+    <HEAD><TITLE>곱셈 프로그램</TITLE></HEAD>
+    <BODY>
+        ${num1}과 ${num2}의 곱은? ${result}
+		<hr>
+		num1의 속성에 저장된 값 : <%= pageContext.getAttribute("num1") %><br>
+		num2의 속성에 저장된 값 : <%= pageContext.getAttribute("num2") %><br>
+		result의 속성에 저장된 값 : <%= pageContext.getAttribute("result") %><br><br>
+		<hr>
+		num1 : ${ num1 }<br>
+		num2 : ${ num2 }<br>
+		result : ${ result }<br>
+    </BODY>
+</HTML> 
+```
+
+
+
 
 #### 4. 게시판 만들기
 
