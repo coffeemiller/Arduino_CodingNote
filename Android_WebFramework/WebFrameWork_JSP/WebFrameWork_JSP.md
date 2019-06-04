@@ -3947,10 +3947,25 @@ public class ProductInfo {
     ${cnt}<br>
   </c:forEach>
 
-  <c:forEach begin="1" end="5" step="2" status="변수">
-    --forEach 태그 내부에서 반복제어변수의 다양한 상태값을 얻을수 있는 방법
+  <c:forEach begin="1" end="5" step="2" varStatus="변수">
+    forEach 태그 내부에서 반복제어변수의 다양한 상태값을 얻을수 있는 방법
     ${cnt}<br>
   </c:forEach>
+참고) <c:forEach> 태그 몸체에서는 varStatus 속성에 명시한 변수를 이용해서 현재 처리 중인 인덱스, begin 속성값, end 속성값 등을 구할 수 있다.
+
+      - varStatus 속성에 명시한 변수가 제공하는 프로퍼티는 다음과 같다.
+        값       리턴       설 명
+       ----------------------------------------------------------       
+       index     int     루프 실행에서 현재 인덱스, 즉 items에 정의한 항목을 가리키는 인덱스 번호, 0부터 시작
+       count     int     루프 실행 횟수, 반복을 몇번 할 것인지 나타냄, 1부터 시작
+       first     boolean 현재 실행이 첫번째 실행인 경우 true를 반환
+       last      boolean 현재 실행이 루프의 마지막 실행인 경우 true를 반환
+       current   object  컬렉션 중 현재 루프에서 사용할 객체 
+
+  <c:forEach var="cnt" items="${표현-속성(배열,컬렉션개체)}">
+  </c:forEach>
+
+
 
   <c:forEach var="cnt" items="${표현-속성(배열,컬렉션개체)}">
   </c:forEach>
@@ -4002,6 +4017,29 @@ public class ProductInfo {
 ```
 
 
+
+
+
+###### 2. 조건처리
+```
+java 언어 ---> 단순조건(if), 양자택일(if else), 다중조건(else if, switch)
+JSTL    ----> ==========================   =======================
+                  ||                                 ||
+                  VV                                 vv 
+                  <c:if test="EL표현의 조건" >     <c:choose>
+                                                  수행할 기능  
+                                                  <c:when test="${EL조건}" >
+                                                   수행할 기능 1    
+                  </c:if>                         </c:when>
+                                                  <c:when test="${EL조건2}" >
+                                                    수행할 기능2
+                                                  </c:when>
+                                                  ...  
+                                                  <c:otherwise>
+                                         위의 모든조건이 거짓일때 수행할 기능
+                                                  </c:otherwise>                   
+  											  </c:choose>	
+```
 
 
 + Maximum.jsp
@@ -4089,7 +4127,183 @@ public class ProductInfo {
 
 - JSTL
   <c:forEach begin="1" end="5" step="2">
+    ${cnt}<br>
   </c:forEach>
+
+  <c:forEach begin="1" end="5" step="2" varStatus="변수">
+    forEach 태그 내부에서 반복제어변수의 다양한 상태값을 얻을수 있는 방법
+    ${cnt}<br>
+  </c:forEach>
+참고) <c:forEach> 태그 몸체에서는 varStatus 속성에 명시한 변수를 이용해서 현재 처리 중인 인덱스, begin 속성값, end 속성값 등을 구할 수 있다.
+
+      - varStatus 속성에 명시한 변수가 제공하는 프로퍼티는 다음과 같다.
+        값       리턴       설 명
+       ----------------------------------------------------------       
+       index     int     루프 실행에서 현재 인덱스, 즉 items에 정의한 항목을 가리키는 인덱스 번호, 0부터 시작
+       count     int     루프 실행 횟수, 반복을 몇번 할 것인지 나타냄, 1부터 시작
+       first     boolean 현재 실행이 첫번째 실행인 경우 true를 반환
+       last      boolean 현재 실행이 루프의 마지막 실행인 경우 true를 반환
+       current   object  컬렉션 중 현재 루프에서 사용할 객체 
+
+  <c:forEach var="cnt" items="${표현-속성(배열,컬렉션개체)}">
+  </c:forEach>
+```
+
+
+
++ Echo.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<HTML>
+    <HEAD><TITLE>메아리</TITLE></HEAD>
+    <BODY>
+    	<c:forEach begin="1" end="5" step="3">
+    		안녕하세요<br>
+    	</c:forEach>
+    	
+    	<hr>
+        <c:forEach var="cnt" begin="1" end="5" step="2"> 
+            <FONT size="${cnt}" > 야~호~ </FONT> <BR>
+        </c:forEach> 
+        <hr>
+	    <!-- 반복상태에 대한 부가정보를 얻을수 있도록 status를 사용하여 얻을수 있다. -->
+	    forEach의 반복상태에 대한 부가정보를 status를 사용하여 얻을수 있다.<br>
+        <c:forEach var="cnt" begin="1" end="5" step="2" varStatus="status">
+		    ${ cnt }, ${ status.first }, ${ status.last }, ${ status.index }, ${ status.count }, ${ status.current }<br>
+        <c:if test="${ status.first }">
+        	첫번째 반복수행시 실행 문장<br>
+        </c:if>
+        <c:if test="${ status.last }">
+        	마지막 반복수행시 실행 문장<br>
+        </c:if>
+		</c:forEach>
+    </BODY>
+</HTML> 
+```
+
+
++ LunchMenu.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%
+    String arr[] = { "불고기 백반", "오므라이스", "콩국수" };
+    request.setAttribute("MENU", arr);
+%>    
+<jsp:forward page="LunchMenuView.jsp" />
+```
+
+
++ LunchMenuView.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<HTML>
+    <HEAD><TITLE>구내 식당</TITLE></HEAD>
+    <BODY>
+        <H3>오늘의 점심 메뉴입니다.</H3>
+        	<%
+        		out.println("Java Code로 속성값 출력<br>");
+        		String menus[] = (String[])request.getAttribute("MENU");
+				for(int i=0; i<menus.length; i++){
+					out.println("<li> "+menus[i]);
+				}
+        	%>
+        	<hr>
+        	
+        	EL로 속성값 출력<br>
+        <UL>
+        	<li>${ MENU[0] }<br>
+        	<li>${ MENU[1] }<br>
+        	<li>${ MENU[2] }<br>
+        <hr>
+        	JSTL의 반복태그 forEach로 출력<br>
+            <c:forEach var="dish" items="${MENU}" varStatus="status">
+            	${ status.current }, ${ status.index }, ${ status.first }, ${ status.last }, ${ status.count } <br>
+                <LI>${dish}</LI>
+            </c:forEach>
+        </UL>
+    </BODY>
+</HTML> 
+```
+
+
++ Product.java
+```java
+package com.jica.brain9;
+
+public class Product {
+	private String title;
+	private int price;
+	
+	public Product() {
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public int getPrice() {
+		return price;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
+	}
+	
+	
+}
+```
+
++ ProductRead.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.ArrayList, com.jica.brain9.Product" %>
+<%
+     //DB에 접속하여 원하는 데이타를 검색했다고 가정하고 검색결과를 
+     //ArrayList로 만들자.
+     ArrayList<Product> products = new ArrayList<Product>();
+	 
+ 	Product p = new Product();
+ 	p.setTitle("불고기백반");
+ 	p.setPrice(8000);
+ 	products.add(p);
+ 	
+ 	p = new Product();
+ 	p.setTitle("오므라이스");
+ 	p.setPrice(6000);
+ 	products.add(p);
+ 	
+ 	p = new Product();
+ 	p.setTitle("콩국수");
+ 	p.setPrice(6000);
+ 	products.add(p);
+ 
+ 	request.setAttribute("PRODUCTS", products);
+%>    
+<jsp:forward page="ProductReadView.jsp" />
+```
+
+
++ ProductReadView.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<HTML>
+    <HEAD><TITLE>구내 식당</TITLE></HEAD>
+    <BODY>
+        <H3>오늘의 점심 메뉴입니다.</H3>
+
+          
+        <c:forEach var="product" items="${PRODUCTS}" varStatus="status">
+          ${product}, ${product.title}, ${product.price}<br>
+        </c:forEach>
+    </BODY>
+</HTML> 
 ```
 
 
