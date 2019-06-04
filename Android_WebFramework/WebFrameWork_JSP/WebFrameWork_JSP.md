@@ -3970,7 +3970,30 @@ public class ProductInfo {
   <c:forEach var="cnt" items="${표현-속성(배열,컬렉션개체)}">
   </c:forEach>
 
+
+
+5) 문자열에서 부분문자열을 추출하는 기능
+    <c:forTokens>
+
+6) 예외처리 기능을 지원하는 태그
+   java 코드 => try catch블럭
+   JSTL => <c:catch var="e">
+            자바표현
+           </c:catch>
+           <c:if test="${e != null}">
+            예외처리코드
+           </c:if>
+
+
+7) 기타 코어라이브러리 태그
+   redirect, url, import, param, out
 ```
+
++ 2. format 태그 라이브러리(숫자, 날짜/시간정보를 형식에 맞추어 출력하는 기능)
++ 3. function 라이브러리(String클래스의 메서드를 호출하는 효과)
+
+
+
 
 
 + ProductInfo.jsp
@@ -4020,7 +4043,7 @@ public class ProductInfo {
 
 
 
-###### 2. 조건처리
+###### 3. 조건처리
 ```
 java 언어 ---> 단순조건(if), 양자택일(if else), 다중조건(else if, switch)
 JSTL    ----> ==========================   =======================
@@ -4117,7 +4140,7 @@ JSTL    ----> ==========================   =======================
 
 
 
-##### 3. 반복처리
+##### 4. 반복처리
 ```
 - Java언어 : while(), do while(), for
   for(int cnt=0; cnt<=5; cnt++){
@@ -4307,10 +4330,82 @@ public class Product {
 ```
 
 
-#### 4. 게시판 만들기
 
-#### 5. 실습
-#### 6. Summary / Close
+##### 5. 문자열에서 부분문자열을 추출하는 기능
+
++ WildKingdom.jsp
+```jsp
+<%@page import="java.util.StringTokenizer"%>
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<HTML>
+    <HEAD><TITLE>동물의 왕국</TITLE></HEAD>
+    <BODY>
+        사자의 생일잔치에 누가 왔을까요? <BR><BR>
+        <c:set var="guests" value="토끼^^거북이~사슴" />
+        
+        <c:forTokens var="animal" items="${guests}" delims="^~" > 
+            ${animal} <BR>
+        </c:forTokens>
+        <hr>
+        <%
+        	StringTokenizer st = new StringTokenizer("토끼^^거북이~사슴","^~");
+        	while(st.hasMoreTokens()){
+        		String str = st.nextToken();
+        		out.println(str+"<br>");
+        	}
+        %>
+    </BODY>
+</HTML> 
+```
+
+
+
+
+###### 6. 예외처리 기능을 지원하는 태그
+```
+   java 코드 => try catch블럭
+   JSTL => <c:catch var="e">
+            자바표현
+           </c:catch>
+           <c:if test="${e != null}">
+            예외처리코드
+           </c:if>
+```
+
++ Divide.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    String str1 = request.getParameter("NUM1"); //"5"
+    String str2 = request.getParameter("NUM2"); //"3"
+    
+    int num1 = Integer.parseInt(str1);
+    int num2 = Integer.parseInt(str2);
+%>
+<HTML>
+    <HEAD><TITLE>나눗셈 프로그램</TITLE></HEAD>
+    <BODY>
+        <c:catch var="e">
+            <% int result = num1 / num2; %> 
+            나눗셈의 결과는? <%= result %> 
+        </c:catch>
+        <c:if test="${e != null}" >
+            에러 메시지: ${e.message}<br>
+            에러 메시지: <%= ((Exception)pageContext.getAttribute("e")).getMessage() %>
+        </c:if>
+    </BODY>
+</HTML>
+```
+
+
+##### [내일]
++ 게시판 만들기(Servlet, JSP, JSP(EL, Action태그, JSTL))  <=== 종합
+
+
+#### 4. 실습
+#### 5. Summary / Close
 
 
 -----------------------------------------------------------
@@ -4320,6 +4415,7 @@ public class Product {
 
 #### 1. Review
 #### 4. 액션tag
+#### 4. 게시판 만들기
 
 
 #### 4. 실습
