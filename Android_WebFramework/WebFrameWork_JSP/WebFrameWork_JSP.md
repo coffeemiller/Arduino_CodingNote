@@ -3416,8 +3416,10 @@ pageContext내장객체에서 pinfo 속성이 있는지 검사하여, 있다면 
     }
 -------------------------------------------------------------------------------
 <jsp:setProperty name="pinfo" property="name" value="김연희" /> 
+<jsp:setProperty name="pinfo" property="name" param="name" /> 
 <jsp:setProperty name="pinfo" property="gender" value="여" /> 
 <jsp:setProperty name="pinfo" property="age" value="29" />
+<jsp:setProperty name="pinfo" property="*" />
 
 위의 setProperty는 내장객체의 속성값 객체에 setMethod() 호출하여 값을 저장한다.
 pinfo.setName("김연희");
@@ -3432,6 +3434,10 @@ pinfo.setAge(29);
 pinfo.getName()
 pinfo.getGender()
 pinfo.getAge()    
+
+
+<jsp:useBean class="패키지명.클래스">
+<jsp:useBean type="패키지명.추상클래스">
 ```
 
 
@@ -3638,9 +3644,149 @@ public class PersonalInfo {
 
 #### 1. Review
 
-
 #### 2. Action tag
++ BookInfo.java
+```java
+package com.jica.brain8;
+public class BookInfo extends ProductInfo {
+    private short page;         // 페이지수
+    private String writer;      // 저자
+    
+    public void setPage(short page) {
+        this.page = page;
+    }
+    public void setWriter(String writer) {
+        this.writer = writer;
+    }
+    public short getPage() {
+        return page;
+    }
+    public String getWriter() {
+        return writer;
+    }
+}
+```
+
++ BookInfoSaver.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+
+<jsp:useBean class="com.jica.brain8.BookInfo" id="pinfo" scope="request"/>
+ 
+<jsp:setProperty name="pinfo" property="code" value="50001" /> 
+<jsp:setProperty name="pinfo" property="name" value="의뢰인" /> 
+<jsp:setProperty name="pinfo" property="price" value="9000" /> 
+<jsp:setProperty name="pinfo" property="writer" value="존 그리샴" /> 
+<jsp:setProperty name="pinfo" property="page" value="704" /> 
+
+<HTML>
+    <HEAD><TITLE>책 정보 관리</TITLE></HEAD>
+    <BODY>
+        책 정보가 저장되었습니다. <BR>
+        --------------------------<BR>
+        <H3>제품 개략 정보</H3>
+        <jsp:include page="ProductInfo.jsp" />
+        <!-- include할때 내부적으로 request객체가 전달되고
+         request객체의 pinfo속성명으로 BookInfo객체가 저장되어 있다. -->
+        <h4>책 상세 정보</h4>
+        페이지: <jsp:getProperty name="pinfo" property="page" /> <BR>
+		저  자:<jsp:getProperty name="pinfo" property="writer" /> <BR>	
+    </BODY>
+</HTML>
+```
+
++ ClothingInfo.java
+```java
+package com.jica.brain8;
+public class ClothingInfo extends ProductInfo {
+    private char size;         // 사이즈 (L/M/S)
+    private String color;      // 색상
+    
+    public void setSize(char size) {
+        this.size = size;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }
+    public char getSize() {
+        return size;
+    }
+    public String getColor() {
+        return color;
+    }
+}
+```
+
++ ClothingInfoSaver.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+
+<jsp:useBean class="com.jica.brain8.ClothingInfo" id="pinfo" scope="request"/> 
+
+<jsp:setProperty name="pinfo" property="code" value="70002" /> 
+<jsp:setProperty name="pinfo" property="name" value="반팔 티셔츠" /> 
+<jsp:setProperty name="pinfo" property="price" value="15000" /> 
+<jsp:setProperty name="pinfo" property="size" value="M" /> 
+<jsp:setProperty name="pinfo" property="color" value="베이지" /> 
+
+<HTML>
+    <HEAD><TITLE>의류 정보 관리</TITLE></HEAD>
+    <BODY>
+        의류 정보가 저장되었습니다. <BR>
+        --------------------------<BR>
+        <H3>제품 개략 정보</H3>
+        <jsp:include page="ProductInfo.jsp" />
+        <h4>옷 상세 정보</h4>
+        사이즈: <jsp:getProperty name="pinfo" property="size" /> <BR>
+		색  상:<jsp:getProperty name="pinfo" property="color" /> <BR>	
+    </BODY>
+</HTML>
+```
+
++ ProductInfo.java
+```java
+package com.jica.brain8;
+public class ProductInfo {
+    private String code;     // 제품코드
+    private String name;     // 제품명
+    private int price;       // 가격
+    public void setCode(String code) {
+        this.code = code;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setPrice(int price) {
+        this.price = price;
+    }
+    public String getCode() {
+        return code;
+    }
+    public String getName() {
+        return name;
+    }
+    public int getPrice() {
+        return price;
+    }
+}
+```
+
++ ProductInfoSaver.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+
+<jsp:useBean class="com.jica.brain8.ProductInfo" id="pinfo" scope="request" />
+<!-- request객체의 속성 pInfo에 저장된 객체를 검색해서 리턴 -->
+코드: <jsp:getProperty name="pinfo" property="code" /> <BR>
+제품명:<jsp:getProperty name="pinfo" property="name" /> <BR>
+가격: <jsp:getProperty name="pinfo" property="price" /> <BR>
+```
+
+
++ 
+
 #### 3. JSTL
+
 #### 4. 게시판 만들기
 
 #### 5. 실습
