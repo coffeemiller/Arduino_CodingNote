@@ -2820,11 +2820,10 @@ if(a>10){
 ```
 
 
-5) 속성값이  
+5) 속성값이 존재하는지 여부 ==> empty
 
 
-
-6)
+6) [], ., ()  
 
 
 + 연산자의 우선순위는 괄호를 사용하여 명시적으로 나타내기를 권장합니다.
@@ -3987,6 +3986,25 @@ public class ProductInfo {
 
 7) 기타 코어라이브러리 태그
    redirect, url, import, param, out
+
+   - response.sendRedirect("URL");
+    <c:redirect url="/brain9/Test.jsp?NUM1=10&NUM2=20" />
+
+    <c:redirect url="/brain9/Test.jsp?NUM1=10&NUM2=20">
+        <c:param name="NUM1" value="10"/>
+        <c:param name="NUM2" value="20"/>
+    </c:redirect>
+
+
+    - 작동시킬 웹컴퍼넌트 정보만 기술하는 태그 =>  <c:url
+
+
+    - <jsp:inclue page="웹컴퍼넌트" />  동적으로 실행시켜 결과를
+     <c:import url="웹컴퍼넌트" /> 
+
+    - out내장객체를 이용하여 스크립팅요소(Java Code)에서 출력한다.
+    이와 유사하게 out 태그도 있다.
+    <c:out value="html태그" /> 
 ```
 
 + 2. format 태그 라이브러리(숫자, 날짜/시간정보를 형식에 맞추어 출력하는 기능)
@@ -4417,9 +4435,194 @@ public class Product {
 ### [2019-06-05]
 
 #### 1. Review
-#### 4. 액션tag
-#### 4. 게시판 만들기
+#### 2. Action tag / JSTL
 
+
++ Divide.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    String str1 = request.getParameter("NUM1"); //"5"
+    String str2 = request.getParameter("NUM2"); //"3"
+    
+    int num1 = Integer.parseInt(str1);
+    int num2 = Integer.parseInt(str2);
+%>
+<HTML>
+    <HEAD><TITLE>나눗셈 프로그램</TITLE></HEAD>
+    <BODY>
+        <c:catch var="e">
+            <% int result = num1 / num2; %> 
+            나눗셈의 결과는? <%= result %> 
+        </c:catch>
+        <c:if test="${e != null}" >
+            에러 메시지: ${e.message}<br>
+            에러 메시지: <%= ((Exception)pageContext.getAttribute("e")).getMessage() %>
+        </c:if>
+    </BODY>
+</HTML>
+```
+
++ NewRedirect.jsp
+```jsp
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!--
+[방법1] 
+<c:redirect url="Multiply2.jsp?NUM1=5&NUM2=25"/>
+
+[방법2]
+<c:redirect url="Multiply2.jsp" > 
+    <c:param name="NUM1" value="5" />
+    <c:param name="NUM2" value="25" />
+</c:redirect> 
+
+[방법3] 
+<c:url var="mul" value="Multiply2.jsp" >
+	<c:param name="NUM1" value="5" />
+	<c:param name="NUM2" value="25" />
+</c:url>
+
+<c:redirect url="${ mul }" />
+-->
+
+<c:url var="next" value="Divide.jsp" > 
+    <c:param name="NUM1" value="100" />
+    <c:param name="NUM2" value="25" />
+</c:url> 
+<c:redirect url="${next}" /> 
+```
+
+
++ Now.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<% 
+    GregorianCalendar now = new GregorianCalendar();
+    String date = String.format("%TY년 %Tm월 %Td일", now, now, now); 
+    String time = String.format("%Tp %TR", now, now); 
+%>
+[현재 시각] <%= date %> <%= time %><br>
+${ pram.NUM1 }, ${ param.NUM2 }
+```
+
++ Import.jsp
+```jsp
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+    pageEncoding="EUC-KR"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+	<title>import jstl core 태그 사용법</title>
+</head>
+<body>
+	액션태그를 사용하여 현재 날짜와 시각정보<br>
+	<jsp:include page="Now.jsp" />
+	<br>	
+	<jsp:include page="Now.jsp" />
+	<hr>
+	jstl core라이브러리의 import 태그사용<br>
+	<c:url var="now" value="Now.jsp" >
+		<c:param name="NUM1" value="1000" /> 
+		<c:param name="NUM2" value="2000" />		
+	</c:url>
+	<c:import url="${ now }" />
+	<br>
+	<c:import url="${ now }" />
+		
+	<%--
+	<c:import url="Now.jsp?NUM1=100&NUM2=200" />
+	--%>
+</body>
+</html>
+```
+
+
+
+
++ HtmlUsage.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<HTML>
+    <HEAD><TITLE>HTML 문법 설명</TITLE></HEAD>
+    <BODY>
+        <H3>FONT 태그에 대하여</H3>
+        <c:out value="<FONT size=7>커다란 글씨</FONT>는 다음과 같은 출력을 합니다." /> <BR><BR>
+        <c:out value="<FONT size=7>커다란 글씨</FONT>" escapeXml="false" />
+    </BODY>
+</HTML>
+```
+
+
+
++ Hello.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<HTML>
+    <HEAD><TITLE>간단한 인사</TITLE></HEAD>
+    <BODY>
+    	안녕하세요, <%= request.getParameter("ID") %>님<br><hr>
+        안녕하세요, <c:out value="${param.ID}" default="guest" />님
+    </BODY>
+</HTML>
+```
+
+
+
+
+
+##### format 태그 라이브러리(숫자, 날짜/시간정보를 형식에 맞추어 출력하는 기능)
++ fmt 태그의 종류
+```
+태그명	내용
+===================================================
+  requestEncoding	value 속성을 통해 지정한 문자 셋으로 변경
+v setLocale     	통화 기호나 시간 대역을 설정한 지역에 맞게 표시
+v timeZone      	특정 영역의 시간대를 설정
+v setTimeZone   	특정 영역의 시간대 설정 정보를 변수에 저장
+  bundle	        basename 속성에 지정된 properties 파일을 읽어옴
+  setBundle     	properties 파일을 읽어와 다양한 영역에서 참조할 수 있게 설정
+  message	        bundle 태그를 통해 저장된 key로 value를 가져온다
+v formatNumber	    숫자를 특정 양식에 맞추어 출력
+v parseNumber	    문자열을 숫자 형식으로 변환
+v formatDate	    날자 정보를 가진 객체(Date)를 특정 형식으로 변호나하여 출력
+   parseDate	    문자열을 날짜 형식으로 변환하여 출력
+
+```
+
+```
+- 자바변수로 날짜 객체
+    Date today = new Date();
+    out.println("년도 : "+today.getYear()+190+"<br>");
+
+- jstl fmt 라이브러리의 formatDate태그를 사용
+    <c:set var="today" value="<%= new Date() %>" >
+    <fmt:formatDate value="${today}" type="date"  dateStyle="long" timeStyle="shot">
+                                         ="time"
+                                         ="both"
+
+- jstl fmt 사용형식
+
+
+- jstl fmt 속성값
+```
+
+
++ Now2.jsp
+```jsp
+```
+
+
+
+
+#### 3. 게시판 만들기
 
 #### 4. 실습
 #### 5. Summary / Close
