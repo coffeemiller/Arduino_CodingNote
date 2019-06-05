@@ -4594,7 +4594,6 @@ v formatNumber	    숫자를 특정 양식에 맞추어 출력
 v parseNumber	    문자열을 숫자 형식으로 변환
 v formatDate	    날자 정보를 가진 객체(Date)를 특정 형식으로 변호나하여 출력
    parseDate	    문자열을 날짜 형식으로 변환하여 출력
-
 ```
 
 ```
@@ -4609,17 +4608,454 @@ v formatDate	    날자 정보를 가진 객체(Date)를 특정 형식으로 변
                                          ="both"
 
 - jstl fmt 사용형식
-
+    <fmt:formatDate value = "날짜값"
+                    [type = "타입"]
+                    [dateStyle = "날짜스타일"]
+                    [timeStyle = "시간스타일"]
+                    [pattern = "패턴"]
+                    [timeZone = "타임존"]
+                    [var = "변수 명"][scope = "영역"]/>   
 
 - jstl fmt 속성값
+  속성      표현식/EL  타입                     설명
+ ------------------------------------------ 
+ value     사용가능      java.util.Date 포맷팅할 날짜 및 시간 값
+ type      사용가능      String         날짜, 시간 또는 둘 다 포맷팅 할지의 여부를 지정한다. 
+                               time, date, both중 한 가지 값을 가질 수 있으며, 기본값은 date이다.
+ dateStyle 사용가능 String        날짜에 대해 미리 정의된 포맷팅 스타일을 지정한다. 
+                               default, short, medium, long, full 중 한가지 값을 가질 수 있으며, 기본값은 default이다
+ timeStyle 사용가능 String        시간에 대해 미리 정의된 포맷팅 스타일을 지정한다. 
+                               default, short, medium, long, full 중 한가지 값을 가질 수 있으며, 기본값은 default이다.
+ pattern  사용가능  boolean       직접 파싱할 때 사용할 양식을 지정한다. 
+                                java.text.DateFormat에 있는 양식을 사용한다.
+ timeZone 사용가능 String또는     시간대를 변경하고 싶을 때 사용한다. 
+                java.util.Locale  <fmt:setTimeZone>태그에서 생성한 TimeZone객체를 사용한다.
+
+ var    사용불가   String        파싱한 결과를 저장할 변수 명을 지정.
+ scope  사용불가   String        변수를 저장할 영역을 지정한다. 기본값은 page.  
+
+
+
+- 숫자값이 출력되는 형식 지정태그
+  숫자를 양식에 맞춰 문자열로 변환해 준다.
+  
+     <fmt:formatNumber value = "숫자값" 
+                     [type = "값타입"]
+                     [pattern = "패턴"]
+                     [currentCode = "통화코드"]
+                     [currencySymbol = "통화심벌"]
+                     [groupingUsed = "(true|false)"]
+                     [var = "변수명"]
+                     [scope = "영역"]/>
+
+
+
+ 속성 사용법)
+  ===================================================
+   속성      표현식/EL  타입                     설명
+ ------------------------------------------ 
+  value  사용가능   String         양식에 맞춰 출력할 숫자
+                               또는 Number 
+  type  사용가능  String   어떤 양식으로 출력할지를 정한다.
+                         number, percent, currency(통화형식)
+                                              기본값은 number이다.
+  pattern 사용가능 String  직접 숫자가 출력하는 양식을 지정한다. 
+                         java.text.DecimalFormat클래스에서 정의되어 있는 패턴 사용.
+  currencyCode 사용가능 String    통화 코드를 지정한다. type속성의 값이 currency일 때에만 의미있다.
+                                                           한국의 '원'화 코드 KRW.
+  currentSymbol 사용가능 String   통화를 표현할 때 사용할 기호를 표시한다. type속성의 값이 currency일 때에만 의미가 있다.
+
+  groupingUsed 사용가능  boolean   콤마(,)와 같이 단위를 구분할 기호를 사용할지의 여부를 결정한다. 이 속성의 값이 true일 경우 12000과 같이 구분 기호가 사용되며, false일 경우 사용 되지 않는다. 기본값은 true.
+
+  var   사용불가  String          포맷팅한 결과를 저장할 변수 명. 저장되는 변수의 타입은 String이다 var속성을 사용하지 않으면 결과가 곧바로 출력된다.
+
+  scope 사용불가  String          변수를 지정할 영역. 기본값은 page.
+  --------------------------------------------------------------
+
+
+
+
+- 웹페이지의 결과로 표출되는 언어(국가코드,언어코드) 와 타임존설정
+  <fmt:setLocale value="en_us"
+    Wednesday, June 5
+  <fmt:timeZone  value="en_us"     <fmt:setTimeZone
+
+
+
+
+- 웹페이지에서의 다국어 지원  ==> 교재 466~477page 개별실습
+    <fmt:setBundle>
+    <fmt:bundle>
+
+
+
+- Post방식의 요청처리에서 요청파라메터 한글엔코딩지정
+  <% request.setChracterEndoding("euc-kr") %>
+  대신에 아래의 태그사용 가능
+  <fmt:requestEncoding value="euc-kr" />
+
+
+
+- Function(함수) 라이브러리(String클래스의 메서드를 호출하는 효과)
+문자열처리 메서드중 자주사용하는 기능을 함수처럼 호출할수 있도록 제공
+  <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+  <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+  
+  <c:if test="${ EL조건 }">
+     실행 문장
+  </c:if>
+     
+  <fmt:formatDate value="${속성명}" type="date" />
+  
+  <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+
+====================================================
+  ${fn:함수명(인자정보)}
+  
+  함수사용형식) 
+ --------------------------------------------------- 
+ 함수명           리턴         사용법                   설명
+ ---------------------------------------------------
+ contains boolean fn:contains("A", "B") 문자열 A에 문자열B가 포함되어 있는지 확인한다
+ containsIgnoreCase  boolean  fn:containsIgnoreCase(A, B)  대소문자 구분없이 A에 B가 포함되어 있는지 확인한다
+ endWith  boolean  fn:endWith(A, B)   문자열 A의 끝이 B로 끝나는지 확인한다.
+ escapeXml String  fn:escapeXml(A)  A가 XML과 HTML에서 정의된 문자열이 포함되어 있을경우, 엔티티 코드로 변환하여 준다.
+ indexOf  int      fn:indexOf(A, B) 문자열 A에서 B가 처음으로 위치하는 index를 반환한다
+ join     String   fn:join(A[], B)  문자열 배열A를 구분자를 붙여 하나의 문자열로 변환
+ length  int       fn:length(A)     Collection 객체(List,ArrayList)의 전체 길이를 반환한다
+ replace String    fn:replace(A, B, C) 문자열 A에서 B에 해당하는 문자를 찾아 C로 변환한다
+ split   String[]  fn:split(A, B)   A에서 B에서 지정한 문자열로 나눠 배열로 반환한다.
+ startsWith boolean fn:startsWith(A, B) 문자열 A의 시작이 B로 시작하는지 확인한다
+ substring String  fn:substring(A, B, C) A에서 index 번호 B부터 C까지 해당하는 문자열을 반환
+ substringAfter  String   fn:substringAfter(A, B)  A에서 B가 나타내는 이후의 문자열을 반환한다.
+ substringBefore String   fn:substringBefore(A, B) A에서 B가 나타내는 이전의 문자열을 반환한다.
+ toLowerCase String  fn:toLowerCase(A) A를 모두 소문자로 변환한다.
+ toUpperCase String  fn:toUpperCase(A) A를 모두 대문자로 변환한다.
+ trim      String   fn:trim(A) 문자열 A에서 앞 뒤 공백을 제거한다.
+
 ```
 
 
 + Now2.jsp
 ```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<!-- 속성값으로 오늘날짜를 저장 Java Code로 표현하면
+	pageContext.setAttrivute("date", new Date)
+ -->
+<c:set var="date" value="<%= new Date() %>" />
+
+<HTML>
+    <HEAD><TITLE>현재의 시각</TITLE></HEAD>
+    <BODY>
+        [오늘의 날짜] <fmt:formatDate value="${date}" /> <BR>
+        [현재의 시각] <fmt:formatDate value="${date}" type="time" />
+    </BODY>
+</HTML>
+```
+
++ DateTimeFormat.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="date" value="<%= new Date() %>" />
+<HTML>
+    <HEAD><TITLE>현재의 시각</TITLE></HEAD>
+    <BODY>
+        [S] <fmt:formatDate value="${date}" type="both" dateStyle="short"  timeStyle="short"  /> <BR>
+        [M] <fmt:formatDate value="${date}" type="both" dateStyle="medium" timeStyle="medium" /> <BR>
+        [L] <fmt:formatDate value="${date}" type="both" dateStyle="long"   timeStyle="long"   /> <BR>
+        [F] <fmt:formatDate value="${date}" type="both" dateStyle="full"   timeStyle="full"  /> 
+    </BODY>
+</HTML>
 ```
 
 
+
++ DateTimePattern.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="date" value="<%= new Date() %>" />
+<HTML>
+    <HEAD><TITLE>현재의 시각</TITLE></HEAD>
+    <BODY>
+        [오늘의 날짜] <fmt:formatDate  value="${date}" type="date" pattern="yyyy/MM/dd (E)" /> <BR>
+        [현재의 시각] <fmt:formatDate  value="${date}" type="time" pattern="(a) hh:mm:ss" />
+    </BODY>
+</HTML>
+```
+
+
+##### 숫자값이 출력되는 형식 지정태그
++  숫자를 양식에 맞춰 문자열로 변환해 준다.
+```  
+     <fmt:formatNumber value = "숫자값" 
+                     [type = "값타입"]
+                     [pattern = "패턴"]
+                     [currentCode = "통화코드"]
+                     [currencySymbol = "통화심벌"]
+                     [groupingUsed = "(true|false)"]
+                     [var = "변수명"]
+                     [scope = "영역"]/>
+```
+
+
++ NumverFormat.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<HTML>
+    <HEAD><TITLE>숫자 포맷</TITLE></HEAD>
+    <BODY>
+    <c:set var="tValue" value="1234500" />
+        첫번째 수: <fmt:formatNumber value="${ tValue }" groupingUsed="true" /> <BR>
+        
+        첫번째 수: <fmt:formatNumber value="1234500" groupingUsed="true" /> <BR>
+        두번째 수: <fmt:formatNumber value="3.14158" pattern="#.##" /> <BR>
+        세번째 수: <fmt:formatNumber value="10.5" pattern="#.00" /> 
+    </BODY>
+</HTML>
+```
+
+
++ NumberType.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<HTML>
+    <HEAD><TITLE>숫자 포맷</TITLE></HEAD>
+    <BODY>
+        금액: <fmt:formatNumber value="1000000" type="currency" currencySymbol="￦" /> <BR>
+        퍼센트: <fmt:formatNumber value="0.99" type="percent"  /> 
+    </BODY>
+</HTML>
+```
+
++ NumberFmtExam.jsp
+```jsp
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+    pageEncoding="EUC-KR"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+	<title>jstl fmt의 formatNumber태그 예제</title>
+</head>
+<body>
+
+<c:set var="price" value="10000" />
+
+<fmt:formatNumber value="${price}" type="number" var="numberType" /><br>
+통화: <fmt:formatNumber value="${price}" type="currency" currencySymbol="원" /><br>
+퍼센트: <fmt:formatNumber value="${price}" type="percent" groupingUsed="false" /><br>
+숫자: ${numberType}<br>
+패턴: <fmt:formatNumber value="${price}" pattern="00000000.00"/>
+
+</body>
+</html>
+```
+
+
+
+##### 웹페이지의 결과로 표출되는 언어(국가코드,언어코드) 와 타임존설정
+```
+  <fmt:setLocale
+  <fmt:timeZone  <fmt:setTimeZone
+```
+
++ WorldFormat.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="date" value="<%= new Date() %>" />
+<HTML>
+    <HEAD><TITLE>나라마다 다른 포맷</TITLE></HEAD>
+    <BODY>
+        <H3>우리나라의 포맷</H3>
+        <fmt:setLocale value="ko_kr" />
+        금액: <fmt:formatNumber value="1000000" type="currency" /> <BR>
+        일시: <fmt:formatDate value="${date}" type="both" dateStyle="full" timeStyle="full" />  <BR>
+        <H3>미국의 포맷</H3>
+        <fmt:setLocale value="en_us" />
+        금액: <fmt:formatNumber value="1000000" type="currency"  /> <BR>
+        일시: <fmt:formatDate value="${date}" type="both" dateStyle="full" timeStyle="full" />  <BR>
+        <H3>일본의 포맷</H3>
+        <fmt:setLocale value="ja_jp" />
+        금액: <fmt:formatNumber value="1000000" type="currency" /> <BR>
+        일시: <fmt:formatDate value="${date}" type="both" dateStyle="full" timeStyle="full" />  <BR>
+    </BODY>
+</HTML>
+```
+
+
+
++ TimeZoneIds.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.TimeZone"%>
+<HTML>
+    <HEAD><TITLE>시간대 ID 목록</TITLE></HEAD>
+    <BODY>
+        <%
+            String arr[] = TimeZone.getAvailableIDs();
+            for (int cnt =0; cnt < arr.length; cnt++)
+                out.println(arr[cnt] + "<BR>");
+        %>
+    </BODY>
+</HTML> 
+```
+
+
+
++ WorldTime.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="date" value="<%= new Date() %>" />
+<HTML>
+    <HEAD><TITLE>세계시 프로그램</TITLE></HEAD>
+    <BODY>
+        서울: <fmt:formatDate value="${date}" type="both" />  <BR>
+        <fmt:timeZone value="Asia/Hong_Kong" > 
+            홍콩: <fmt:formatDate value="${date}" type="both" />  <BR>
+        </fmt:timeZone>
+        <fmt:timeZone value="Europe/London" > 
+            런던: <fmt:formatDate value="${date}" type="both" />  <BR>
+        </fmt:timeZone>
+        <fmt:timeZone value="America/New_York" > 
+            뉴욕: <fmt:formatDate value="${date}" type="both" />  <BR>
+        </fmt:timeZone>
+    </BODY>
+</HTML>
+```
+
+
+
++ NewWorldTime.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="date" value="<%= new Date() %>" />
+<HTML>
+    <HEAD><TITLE>세계시 프로그램</TITLE></HEAD>
+    <BODY>
+        서울: <fmt:formatDate value="${date}" type="both" />  <BR>
+        <fmt:setTimeZone value="Asia/Hong_Kong" /> 
+        홍콩: <fmt:formatDate value="${date}" type="both" />  <BR>
+        <fmt:setTimeZone value="Europe/London" /> 
+        런던: <fmt:formatDate value="${date}" type="both" />  <BR>
+        <fmt:setTimeZone value="America/New_York" /> 
+        뉴욕: <fmt:formatDate value="${date}" type="both" />  <BR>
+    </BODY>
+</HTML>
+
+```
+
+
+
+
+
+##### Post방식의 요청처리에서 요청파라메터 한글엔코딩지정
+```
+  <% request.setChracterEndoding("euc-kr") %>
+  대신에 아래의 태그사용 가능
+  <fmt:requestEncoding value="euc-kr" />
+```
+
++ Hello.html
+```html
+<HTML>
+    <HEAD>
+        <META http-equiv="Content-Type" content="text/html;charset=euc-kr">
+        <TITLE>한글로 인사하기</TITLE>
+    </HEAD>
+    <BODY>
+        <FORM ACTION=Hello.jsp METHOD=POST>
+            한글 아이디를 입력하십시오. <BR>
+            <INPUT TYPE=TEXT NAME=ID> <BR><BR>
+            <INPUT TYPE=SUBMIT VALUE='확인'>
+        </FORM>
+    </BODY>
+</HTML>
+```
+
++ HelloResult_old.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<HTML>
+    <HEAD><TITLE>인사하기</TITLE></HEAD>
+    <BODY>
+        안녕하세요, ${param.ID}님
+    </BODY>
+</HTML>
+```
+
++ HelloResult.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:requestEncoding value="euc-kr" />
+<HTML>
+    <HEAD><TITLE>인사하기</TITLE></HEAD>
+    <BODY>
+        안녕하세요, ${param.ID}님
+    </BODY>
+</HTML>
+```
+
+
+
+##### 함수라이브러리
+```
+ ${fn:함수명(인자정보)}
+```
+
++ VariousGreetings.jsp
+```jsp
+<%@page contentType="text/html; charset=euc-kr"%>
+<%@page import="java.util.*"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:set var="greeting" value="How Are You?" />
+<HTML>
+    <HEAD><TITLE>여러가지 인사말</TITLE></HEAD>
+    <BODY>
+        본래의 문자열: ${greeting} <BR>
+        <hr>
+        모두 대문자로: ${fn:toUpperCase(greeting)} <BR>
+        모두 소문자로: ${fn:toLowerCase(greeting)} <BR>
+        Are의 위치는? ${fn:indexOf(greeting, "Are")} <BR>
+        Are를 Were로 바꾸면? ${fn:replace(greeting, "Are", "Were")} <BR>
+        문자열의 길이는? ${fn:length(greeting)} <BR>
+        <hr>
+        <c:set var="name" value=" 홍길동 "/>
+        제 이름은 |${ fn:trim(name) }|입니다.<br>
+        이름에 '동'이 포함되어 있을까? 정답은 ${ fn:contains(name,"동") }입니다.<br>
+        <c:if test="${ fn:contains(name,'동') }">
+        정답은 ---> 있습니다.
+        </c:if>
+    </BODY>
+</HTML>
+```
 
 
 #### 3. 게시판 만들기
