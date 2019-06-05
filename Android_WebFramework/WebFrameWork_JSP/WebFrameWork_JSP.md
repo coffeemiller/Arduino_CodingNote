@@ -5058,7 +5058,63 @@ v formatDate	    날자 정보를 가진 객체(Date)를 특정 형식으로 변
 ```
 
 
+
+
 #### 3. 게시판 만들기
++ 게시판의 종류
+1) 기본게시판 -- 방명록과 동일
+   1) 주제글목록
+   2) 읽기/수정/삭제(JSP 복습용)
+
+2) 답변형 게시판 (jspboard2, jspboard4(mvc패턴적용))
+   1) 주제글
+   2) 댓글1
+   3) 댓글11
+   4) 댓글12
+   5) 댓글2
+   6) 댓글3
+
+```
+기본 게시판 : Jspboard
+
+      서블릿변환
+*.jsp ====> *.java
+            
+               클래스의 멤버변수 및 메서드
+            
+            jspInit(){
+            }
+            jspService(HttpServletRequest reqeust, HttpServletResponse response){
+            	내장객체 선언부
+            	내장객체 생성
+            	out객체의 write()이용한 html태그출력
+            	스크립트렛....
+            }
+            
+            jspDestroy(){
+            } 
+
+
+
+테이블(board)
+
+
+전체적인 작동구조
+
+    목록보기 list.jsp  <--------------------------------|
+              |              ^                          |
+              |              |                          |
+    글쓰기    |---> writeForm.jsp --->writePro.jsp      |
+    글내용보기|---> content.jsp                         |
+    글수정          |-------> updateForm.jsp --->udpatePro.jsp    
+    글삭제	            |-------> deleteForm.jsp --->deletePro.jsp				
+
+    
+데이타베이스에 접근하는 클래스(자바빈 클래스)
+   BoardDataBean  -- 1건의 글
+   BoardDBBean    -- DAO
+```
+
 
 #### 4. 실습
 #### 5. Summary / Close
