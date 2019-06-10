@@ -111,8 +111,7 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
       Eclipse IDE
 ```
 
-![안드로이드 아키텍쳐](안드로이드 아키텍쳐.png "안드로이드 아키텍쳐")
-
+![안드로이드 아키텍쳐](안드로이드_아키텍쳐.png "view계층구조")
 
 
 
@@ -231,7 +230,10 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
     1) id      setId(속성명), getId()       android:id = 속성명
     2) text    setText("예제")              android:text = "예제"
 ```
++ view계층구조
 ![view계층구조](view계층구조.jpg "view계층구조")
+
++ viewgroup-layout계층구조
 ![viewgroup-layout](viewgroup-layout계층구조.jpg "viewgroup-layout계층구조")
 
 
