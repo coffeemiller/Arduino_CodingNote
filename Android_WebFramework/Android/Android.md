@@ -222,14 +222,9 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
         set/get메서드  --------------->  xml attribute
         메서드
     -------------------------------------------------------------------------------
-    
-    View의 속성중 자주 사용하는 속성값들(중요)
-    ===============================================================
-    멤버변수       (80 ~ 90%)                xml속성
-    ---------------------------------------------------------------
-    1) id      setId(속성명), getId()       android:id = 속성명
-    2) text    setText("예제")              android:text = "예제"
+
 ```
+
 + view계층구조
 ![view계층구조](view계층구조.jpg "view계층구조")
 
@@ -239,10 +234,58 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
 
 
 ##### 2.5. View의 공통속성
-##### 2.6. Layout
-##### 2.7. Event처리
+```
+View의 속성중 자주 사용하는 속성값들(중요)
+=============================================================
+멤버변수       (80 ~ 90%)                xml속성
+-----------------------------------------------------------------------------
+1) id      setId(속성명), getId()       android:id = 속성명       객체식별
+2) backtround                           android:background         배경색
+                                ----------------------------------------------
+                                        색상지정 #AARRGGBB, #RRGGBB
+3) width       ?                        android:layout_width       폭
+   height      ?                        android:layout_height      크기
+                                ----------------------------------------------
+                                        1. 부모크기만큼 : MATCH_PARENT
+                                        2. 자신의 내용물만큼 : WRAP_CONTENT
+                                        3. 값지정 ==> dp(기본), px, dp, sp(글자크기), in, mm, ...
+
+4) padding                              android:padding          경계선과 내용과 여백
+
+5) gravity                              android:gravity           내용물의 위치(여백)
+                                    ----------------------------------------------
+                                            top         ldft   h_center   right
+                                            v_center
+                                            bottom
+                                            
+6) margine                              android:layout_margin    부모뷰or형제뷰 간격
+
+7) layout gravity                       android:layout_gravity   부모뷰에게 자신의 위치!!
+
+8) visibility                           android:visibility       가시성
+
+
+
+
+속성값의 종류
+- 자체 속성 : 독단적으로 값을 사용
+    JavaCode에서 사용할수 있도록 set/get메서드가 제공된다.
+
+- layout 속성 : 현재의 위젯이 어느 layout의 구성요소가 되느냐에 따라 달라지는 값
+    JavaCode에서 set/get메서드 아닌, 별도방법 즉, layoutParam을 사용하여 별도로 설정.
+1) text    setText("예제")              android:text = "예제"
+```
+
+
 
 #### 3. 실습
++ 묻지도 따지지도 말고 교재 35~57page까지만 그대로 실습!!
+  + ConstraintLayout을 사용하여 화면 구성
+  + 버튼 이벤트처리
+  + 안드로이드에 이미 설치되어 있는 웹브라우저호출, 전화걸기 호출기능
+
+
+
 #### 4. Summary / Close
 
 
@@ -255,5 +298,38 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
 
 #### 1. Review
 
+##### 2.6. Layout
+##### 2.7. Event처리
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-12]
+
+#### 1. Review
+
+##### 2.6. Layout
+##### 2.7. Event처리
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-13]
+
+#### 1. Review
+
+##### 2.6. Layout
+##### 2.7. Event처리
 #### 4. 실습
 #### 5. Summary / Close
