@@ -15,6 +15,27 @@
 
 
 ##### 2.1. 개발환경설치
+```
+0) Java SDK설치
+
+1) 전통적인 방법
+   Eclipse + plug-in
+           + Android SDK(클래스 라이브러리) - 도움말(Reference)
+           + AVD(가상기기) | 실제기기 
+           
+2) Android Studio(안드로이드 통합개발환경)
+-------------------------------------------------
+   개발자 사이트(http://developer.android.com/studio)
+   android-studio-ide-181.5014246-windows.exe 다운받아 실행
+   1) tool 자체 필요내용(editor, 디자인도구, 시뮬레이터)
+   2) 최신 Android SDK설치 
+   3) AVD tool , SDK tool
+
+3) 프로젝트 만들기
+   특이점)Java를 컴파일/실행코드를 만들때 Gradle을 이용하여  Project 관리
+```
+
+
 ##### 2.2. project구조
 ##### 2.3. 4대 구성요소 (Intent:인텐트..정보교환)
 1. Activity
