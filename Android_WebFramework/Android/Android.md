@@ -2,6 +2,9 @@
 ### [2019-06-10]
 
 #### 1. Review
++ Java ----(JDBC)----- Oracle ------- WebProgram(HTML/JavaScript/Savlet/JSP)
+
+
 
 #### 2. Android
 
@@ -25,8 +28,6 @@
 ### [2019-06-11]
 
 #### 1. Review
-#### 4. 액션tag
-
 
 #### 4. 실습
 #### 5. Summary / Close
