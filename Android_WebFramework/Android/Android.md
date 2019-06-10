@@ -29,7 +29,7 @@
    개발자 사이트(http://developer.android.com/studio)
    android-studio-ide-181.5014246-windows.exe 다운받아 실행
    1) tool 자체 필요내용(editor, 디자인도구, 시뮬레이터)
-   2) 최신 Android SDK설치 
+   2) 최신 Android SDK설치 ----> 도움말문서
    3) AVD tool , SDK tool
 ```
 3) 프로젝트 만들기
@@ -113,6 +113,10 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
 
 ![안드로이드 아키텍쳐](안드로이드 아키텍쳐.png "안드로이드 아키텍쳐")
 
+
+
+
+
 ##### 2.2. project구조
 + 실제 프로젝트 폴더의 구조와 개발화면의 구조가 다르다.
 
@@ -136,17 +140,30 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
           mipmap    - 런처이미지(스마트폰의 바탕화면에서 App을 식별하는 아이콘)
           values    - 값으로 표현될 내용을 저장해 놓고 Java Code나 layout에서 사용
                       값의 종류(용도)에 따라 화일명이 정해져 있다.
+
+        참고) Java Code에서 res의 자원을 접근할때는 R.리소스종류.리소스식별자
+            기타의 장소에서 res의 자원을 접근할때는 @리소스종류.리소스식별자
   
   Gradle Scripts : 프로젝트관리(컴파일/링크/설치/테스트-디버깅)에 필요한 정보를 설정(외부라이브러리 사용시)
       build.gradle(Project:프로젝트명)
       build.gradle(Module:app)
+
+    화면하단의 탭구성 <- App개발도중에 실행중 상태정보 제공하는 창
 ```
+
+
 
 2. 프로젝트를 실행
 ```
     - AVD( AVD Manager를 이용하여 AVD를 생성)
      - 실제기기( 1. 컴퓨터에서 스마트폰 인식 : 자동인식, 모델번호별 USB 드라이버 설치해서 인식-권장)
                  2. 스마트폰 설정메뉴 - 개발자옵션(없으면 폰정보에 빌드버전을 여러번 클릭) - USB 디버깅 ON )
+
+참고사항) -- UI객체의 사용법
+    1. Java Code에서는 생성자, 멤버변수, 메서드(set/get, 일반메서드, ...)
+    2. 디자인 tool에서 즉, xml문서에서 접근 ----^
+                                                속성(attribute)
+
 ```
 
 
@@ -157,7 +174,25 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
 3. Service (Background 기능)
 4. Contents Provider
 
+
+
+
 ##### 2.4. Activity와 View
++ Activity : 화면구성요소를 관리하는 안드로이드 App의 구성요소
+  - 보여지는 모든 화면요소(View)를 관리 : 추가/수정/삭제
+  - 화면요소의 기능에 따른 분류
+    1) 위젯(wiget) --> 특정 기능을 가졌다.
+    2) 레이아웃(layout) --> 특정 기능보다는 구성요소 자체의 위치및 크기설정 즉, 화면배치에 그 기능이 집중된 위젯을 말함.
+    *** 화면구성은 먼저 레이아웃을 결정하고,
+        레이아웃내부에 위젯을 정해진 방식대로 배치하여 구성한다.
+    
+  - 화면구성 방법
+    1) Java Code로 작성
+    2) 디자인 Tool 사용(*.xml)  ==> 우선 학습내용.
+    3) 두 방법을 함께 사용
+
+
+
 ##### 2.5. View의 공통속성
 ##### 2.6. Layout
 ##### 2.7. Event처리
