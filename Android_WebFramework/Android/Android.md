@@ -114,6 +114,43 @@ Android Studio를 설치하면 최신  Android SDK, 즉 현재로서는 Android 
 ![안드로이드 아키텍쳐](안드로이드 아키텍쳐.png "안드로이드 아키텍쳐")
 
 ##### 2.2. project구조
++ 실제 프로젝트 폴더의 구조와 개발화면의 구조가 다르다.
+
+1. 개발화면에서의 프로젝트 구조
+```
+  app : 프로젝트 관련 모든 작업내용
+        manifests
+          AndroidManifest.xml(폰에 현재 프로젝트를 설치할때 현재App에 대한 정보(4대구성요소,권한)를 Android시스템에게 제공)
+        
+        java(소스 프로그램이 위치)
+          com.jica.firstandroid
+               Android  App의 4대구성요소에 대한 Java Code
+                   1.Activity,
+                   2.Broadcast Rreciver,
+                   3.Service,
+                   4.Contents Provider
+        
+        res(자바코드에서 사용하는 자원(resource)을 모아 놓은곳) : 주의점(모든화일명은 소문자로만 기술되어야 한다)
+          drawable  - 이미지화일 (*.jpg, *.png ... *.xml)
+          layout    - Activity의 화면구성을 디자인 tool을 사용했을때 결과물이 저장(xml)
+          mipmap    - 런처이미지(스마트폰의 바탕화면에서 App을 식별하는 아이콘)
+          values    - 값으로 표현될 내용을 저장해 놓고 Java Code나 layout에서 사용
+                      값의 종류(용도)에 따라 화일명이 정해져 있다.
+  
+  Gradle Scripts : 프로젝트관리(컴파일/링크/설치/테스트-디버깅)에 필요한 정보를 설정(외부라이브러리 사용시)
+      build.gradle(Project:프로젝트명)
+      build.gradle(Module:app)
+```
+
+2. 프로젝트를 실행
+```
+    - AVD( AVD Manager를 이용하여 AVD를 생성)
+     - 실제기기( 1. 컴퓨터에서 스마트폰 인식 : 자동인식, 모델번호별 USB 드라이버 설치해서 인식-권장)
+                 2. 스마트폰 설정메뉴 - 개발자옵션(없으면 폰정보에 빌드버전을 여러번 클릭) - USB 디버깅 ON )
+```
+
+
+
 ##### 2.3. 4대 구성요소 (Intent:인텐트..정보교환)
 1. Activity
 2. Broadcast Receiver
