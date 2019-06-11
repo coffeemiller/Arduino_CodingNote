@@ -298,8 +298,109 @@ View의 속성중 자주 사용하는 속성값들(중요)
 
 #### 1. Review
 
-##### 2.6. Layout
-##### 2.7. Event처리
+#### 2. Activity와 View
++ 버튼에 이벤트를 줄수 있는 3가지 방법
++ MainActivity.java(BookHello_Project)
+```java
+package com.jica.bookhello;
+
+import android.graphics.Color;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+    LinearLayout rootLayout;
+    Button btnMessage2;
+    Button btnMessage3;
+
+    //생성자
+    public MainActivity(){
+        Log.d("TAG", "BookHello 앱의 MainActivity객체 생성됨!!");
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        Log.d("TAG", "MainActivity::onCreate()...");
+        super.onCreate(savedInstanceState);
+
+        //화면구성내용을 resource file에서 가져온다
+        //내부적으로 실행되는 내용
+        //1)지정된 layout파일의 모든 내용을 참조하여 객체생성 및 구조결정
+        //2)지정된 layout파일의 root element 객체를 액티비티와 연결
+        setContentView(R.layout.activity_main);
+
+        //참고) tool내에서 생성하는 모든 자원들은 자동으로 식별자를 부여한다.
+        //      이러한 식별자들만 정의해 놓는 내부파일 R.java파일이 만들어져 사용된다.
+        /*
+            class R {
+                static class layout{
+                    static int final activity_main = 16진수 상수값
+                }
+
+                static class id{
+                }
+            }
+        */
+        //버튼 이벤트 처리방법
+        //1) 교재 -- button 리소스의의 onClick 속성사용(메서드명 작성)
+        //2) 일반적인 이벤트 처리 방법 - Java의 AWT방식과 유사
+
+        //UI 객체 찾기 - findViewById(id)
+        rootLayout = findViewById(R.id.layoutRoot);
+        btnMessage2 = findViewById(R.id.btnMessage2);
+        btnMessage3 = findViewById(R.id.btnMessage3);
+
+        //배경색 바꾸기
+        rootLayout.setBackgroundColor(Color.WHITE);
+
+        //두번째 버튼 클릭시 이벤트핸들러 설정
+//        MyOnClickedListener btnHandler = new MyOnClickedListener();
+//        btnMessage2.setOnClickListener(btnHandler);
+
+        btnMessage2.setOnClickListener(new MyOnClickedListener());
+
+        //세번째 버튼 클릭시 이벤트 설정
+        btnMessage3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("TAG","세번째 버튼이 클릭되었습니다.");
+                Toast.makeText(getApplicationContext(), "세번째 버튼이 클릭되었습니다.",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //버튼을 클릭했을때 작동할 메서드
+    public void onButton1Clicked(View v){
+        System.out.println("consol 화면에 정보출력");
+        Log.v("TAG","logcat에 정보를 출력 verbose");
+        Log.d("TAG","logcat에 정보를 출력 debug");
+
+        //스마트폰 화면에 간단히 메세지 출력(참시나타났다가 사라지는 메세지) ->Toast
+        Toast.makeText(this,"버튼이 클릭되었습니다.",Toast.LENGTH_SHORT).show();
+    }
+
+    class MyOnClickedListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            Log.d("TAG", "두번째 버튼이 클릭되었습니다.");
+            //외부 클래스객체를 지칭할때 : 외부클래스명.this  ==>  MainActivity.this
+            Toast toast = Toast.makeText(getApplicationContext(),"두번째 버튼이 클릭되었습니다.", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+}
+```
+
+
+
+#### 3. 기본위젯과 배치관리자
+#### 4. Event처리방법
+
 #### 4. 실습
 #### 5. Summary / Close
 
