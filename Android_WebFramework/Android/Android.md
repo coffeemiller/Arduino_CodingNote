@@ -399,7 +399,37 @@ public class MainActivity extends AppCompatActivity {
 
 
 #### 3. 기본위젯과 배치관리자
+1. 배치관리자 -- xxxLayout
+   - LinearLayout
+   - RelatviewLayout
+   - FrameLayout
+   - TableLayout
+   - GridLayout
+   - ConstraintLayout
+
+2. 기본위젯(단일기능 위젯)
+   - TextView, EditText, Button, ImageView, Checkbox, RadioButton,
+
+
+
++ 실습1)
+  + 1. MainActivity에서 다른 Activity를 호출해 보자
+  + 2. 현재화면 구성내용을 바꾸어 보자.
+  - res폴더에 정의된 식별자를 사용하여 값을 이용할때
+    1) Java Code에서 R.color.colorPrimary
+    2) res폴더내부에서  @color/colorPrimary 
+    - res폴더의 values폴더는 종류에 따라 식별자명=값의 형태로 
+      - 문자열(strings.xml), 색상코드(colors.xml), 스타일과 테마(styles.xml)
+      - 별도의 파일에 값이 저장된다.
+
+
+
+
 #### 4. Event처리방법
+
+
+##### [오늘의 과제]
++ 수업 후 실습 (교재 70~85 Page)
 
 #### 4. 실습
 #### 5. Summary / Close
