@@ -300,12 +300,17 @@ View의 속성중 자주 사용하는 속성값들(중요)
 
 #### 2. Activity와 View
 + 버튼에 이벤트를 줄수 있는 3가지 방법
+
+
 + MainActivity.java(BookHello_Project)
 ```java
 package com.jica.bookhello;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -313,83 +318,123 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     LinearLayout rootLayout;
     Button btnMessage2;
     Button btnMessage3;
+    Button btnCallBrowser, btnCallPhone;
 
     //생성자
     public MainActivity(){
-        Log.d("TAG", "BookHello 앱의 MainActivity객체 생성됨!!");
+        Log.d("TAG", "BookHello 앱의 MainActivity객체 생성됨!");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("TAG", "MainActivity::onCreate()...");
         super.onCreate(savedInstanceState);
+
+        Log.d("TAG","MainActivity::onCreate(Bundle)...");
 
         //화면구성내용을 resource file에서 가져온다
         //내부적으로 실행되는 내용
-        //1)지정된 layout파일의 모든 내용을 참조하여 객체생성 및 구조결정
-        //2)지정된 layout파일의 root element 객체를 액티비티와 연결
+        //1) 지정된 layout화일의 모든 내용을 참조하여 객체생성 및 구조결정
+        //2) 지정된 layout화일의 root element 객체를 액티비티와 연걸
         setContentView(R.layout.activity_main);
 
         //참고) tool내에서 생성하는 모든 자원들은 자동으로 식별자를 부여한다.
-        //      이러한 식별자들만 정의해 놓는 내부파일 R.java파일이 만들어져 사용된다.
-        /*
-            class R {
-                static class layout{
-                    static int final activity_main = 16진수 상수값
-                }
+        //      이러한 식별자들만 정의해 놓는 내부화일 R.java화일이 만들어져서 사용된다.
 
-                static class id{
-                }
-            }
-        */
         //버튼 이벤트 처리방법
-        //1) 교재 -- button 리소스의의 onClick 속성사용(메서드명 작성)
+        //1) 교재 -- button 리소스의 onClick속성사용(메서드명 작성)
         //2) 일반적인 이벤트 처리 방법 - Java의 AWT방식과 유사
 
-        //UI 객체 찾기 - findViewById(id)
+
+        //UI객체 찿기 - findViewById(id)
         rootLayout = findViewById(R.id.layoutRoot);
         btnMessage2 = findViewById(R.id.btnMessage2);
         btnMessage3 = findViewById(R.id.btnMessage3);
+        btnCallBrowser = findViewById(R.id.btnCallBrowser);
+        btnCallPhone = findViewById(R.id.btnCallPhone);
 
         //배경색 바꾸기
         rootLayout.setBackgroundColor(Color.WHITE);
 
-        //두번째 버튼 클릭시 이벤트핸들러 설정
-//        MyOnClickedListener btnHandler = new MyOnClickedListener();
-//        btnMessage2.setOnClickListener(btnHandler);
+        //두번째 버튼 클릭시 이벤트핸들러 설정 - 방법2)
+        //MyOnClickListener btnHandler = new MyOnClickListener();
+        //btnMessage2.setOnClickListener(btnHandler);
 
-        btnMessage2.setOnClickListener(new MyOnClickedListener());
+        btnMessage2.setOnClickListener(new MyOnClickListener());
 
-        //세번째 버튼 클릭시 이벤트 설정
-        btnMessage3.setOnClickListener(new View.OnClickListener() {
+
+        //세번째 버큰 클릭시 이벤트핸들러 설정 - 방법3)
+        btnMessage3.setOnClickListener(new View.OnClickListener(){
+
             @Override
-            public void onClick(View v) {
-                Log.d("TAG","세번째 버튼이 클릭되었습니다.");
-                Toast.makeText(getApplicationContext(), "세번째 버튼이 클릭되었습니다.",Toast.LENGTH_SHORT).show();
+            public void onClick(View view) {
+                Log.d("TAG","세번째 버튼이 클릭되었습니다");
+                Toast.makeText(getApplicationContext(),"세번째 버튼이 클릭되었습니다.", Toast.LENGTH_SHORT).show();
             }
         });
+
+        //브라우저호출,전화걸기 클릭시 이벤트핸들러 설정 - 방법4)
+        btnCallBrowser.setOnClickListener(this);
+        btnCallPhone.setOnClickListener(this);
+
     }
 
-    //버튼을 클릭했을때 작동할 메서드
-    public void onButton1Clicked(View v){
-        System.out.println("consol 화면에 정보출력");
+    //버튼을 클릭했을때 작동할 메서드 - 방법1)
+    public void onButton1Clicked(View view){
+        System.out.println("consol 화면에 정보 출력");
         Log.v("TAG","logcat에 정보를 출력 verbose");
         Log.d("TAG","logcat에 정보를 출력 debug");
 
-        //스마트폰 화면에 간단히 메세지 출력(참시나타났다가 사라지는 메세지) ->Toast
+        //스마트폰 화면에 간단 메세지 출력(잠시나타났다가 사라지는 메서지)--> Toast
         Toast.makeText(this,"버튼이 클릭되었습니다.",Toast.LENGTH_SHORT).show();
+
     }
 
-    class MyOnClickedListener implements View.OnClickListener{
+    //브라우저호출,전화걸기 버튼클릭시 동작할 이벤트핸들러 메서드 - 방법4)
+    @Override
+    public void onClick(View view) {
+        //어느버튼이 클릭되어서 호출되었는지를 판단하는 방법 2가지
+        /* 방법1)
+        Button curButtton = (Button)view;
+        if(curButtton == btnCallBrowser){
+            Log.d("TAG", "웹브라우저 호출버튼이 클릭되었습니다.");
+        }else{ //btnCallPhone
+            Log.d("TAG", "전화걸기 버튼이 클릭되었습니다.");
+        }
+        */
+
+        //인자로 전달된 객체의 id값을 구하여 비교--방법2)
+        int curId = view.getId();
+        Log.d("TAG", "현재 id값 : " + curId);
+        if(curId == R.id.btnCallBrowser){
+            Log.d("TAG", "웹브라우저 호출버튼이 클릭되었습니다.");
+
+            //실제 웹브라우저(외부) 호출
+            //Intent(String action, Uri uri) -- 암시적 인텐트
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://m.naver.com"));
+            startActivity(intent);
+
+       }else{ //R.id.btnCallPhone
+            Log.d("TAG", "전화걸기 버튼이 클릭되었습니다.");
+
+            //전화걸기 기능 호출
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("tel:010-7242-9424"));
+            startActivity(intent);
+        }
+    }
+
+    //방법2)
+    class MyOnClickListener implements View.OnClickListener{
+
         @Override
-        public void onClick(View v) {
-            Log.d("TAG", "두번째 버튼이 클릭되었습니다.");
-            //외부 클래스객체를 지칭할때 : 외부클래스명.this  ==>  MainActivity.this
-            Toast toast = Toast.makeText(getApplicationContext(),"두번째 버튼이 클릭되었습니다.", Toast.LENGTH_SHORT);
+        public void onClick(View view) {
+            Log.d("TAG","두번째 버튼이 클릭되었습니다.");
+
+            //외부클래스객체를 지칭할때 : 외부클래스명.this ==> MainActivity.this
+            Toast toast = Toast.makeText(getApplicationContext(),"두번째 버튼이 클릭되었습니다.", Toast.LENGTH_SHORT );
             toast.show();
         }
     }
@@ -443,9 +488,23 @@ public class MainActivity extends AppCompatActivity {
 ### [2019-06-12]
 
 #### 1. Review
+1. Activity의 생명주기 (생성 -> 사용 -> 소멸)
+2. View의 공통속성 -> 위젯(widget)
+   1. 자체속성 ..... android:속성명=값
+   2. layout속성 ... android:layout.속성명
+3. Event처리 방법
 
-##### 2.6. Layout
-##### 2.7. Event처리
+
+#### 2. Activity와 View
++ Activity 생명주기
+
+
+
++ 
+
+
+#### 3. 기본위젯과 배치관리자
+#### 4. Event처리
 #### 4. 실습
 #### 5. Summary / Close
 
