@@ -446,7 +446,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 #### 3. 기본위젯과 배치관리자
 1. 배치관리자 -- xxxLayout
    - LinearLayout
-   - RelatviewLayout
+   - RelativeLayout
    - FrameLayout
    - TableLayout
    - GridLayout
@@ -496,10 +496,228 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 #### 2. Activity와 View
-+ Activity 생명주기
+##### Activity 생명주기
++ 기본으로 사용하는 AppComatActivity의 상속계층구조
+```
+javajava.lang.Object
+   ↳	android.content.Context
+ 	   ↳	android.content.ContextWrapper
+ 	 	   ↳	android.view.ContextThemeWrapper
+ 	 	 	   ↳	android.app.Activity
+ 	 	 	 	   ↳	android.support.v4.app.FragmentActivity
+ 	 	 	 	 	   ↳	android.support.v7.app.AppCompatActivity
+```
 
 
 
++ 액티비티 생명주기 관련 메서드들
+```
+- 생성 ------> 생성자()
+             onCreate(Bundle)
+             onStart() <-- onRestart()
+             onResume()<-| |
+                         | |
+- 사용자 <---> 활성화    | |
+          || onPause() --| |
+ 강제종료 || onStop() -----|
+             onDestroy()
+                  |
+                소멸(정상소멸-사용자 백버튼 클릭, ProCode-finish())
+                        |--> 스마트폰 회전(가로모드, 세로모드)
+```
+
+
+
++ onCreate(Bundle) 메서드의 인자로 전달되는 Bundle의 역할
+  - 안드로이드 시스템에 의해 액티비티가 소멸되었다가 다시 생성되어야 할때
+                            ================
+                            1) 회전
+                            2) 강제종료
+
+  - 이전의 상태정보를 복구할 목적으로 만들어 놓은 것이다.
+
+
+
++ Bundle객체에 임시 상태정보를 저장하거나
+    - 아래의 메서드는 정상 종료시는 작동하지 않는다.
+    - 위의 안드로이드 시스템에 의해 액티비티가 소멸되고
+    - 다시 생성될 필요가 있을때만 동작한다.
+```
+    protected void onSaveInstanceState(Bundle outState)
+    protected void onRestoreInstanceState(Bundle outState)
+```
+
+
+
+
+##### 뷰(View) : 화면에 보여지는 모든 요소(객체)
+1) Layout(레이아웃) : 구성요소를 배치하는데 기능이 집중된 View
+2) Widget(위젯) : 특정 기능을 수행하는 View
+
+
+```
+Object
+    View
+        단일기능위젯(계층구조)
+        TextView, ImageView, Button, EditText, Checkbox, RadioButton
+
+        ViewGroup
+            xxxLayout : 배치관리자
+                복합위젯
+            AdapterView : 대량의 데이터를 관리하는 복합
+                ListView, Gallery, GridView
+                    ExpandableListView, Spinner
+=======================================================================
+    View ------- 기능위젯(TextView, Button)
+    상속            실제 화면구성에서 사용하는 관계(포함)
+    Viewgroup -- 레이아웃(LinearLayout)
+=======================================================================
+
+    모든 View 즉, 위젯들은 자신만의 속성(멤버변수)들을 가지고 있다.
+    모든 View가 공통으로 가지고 있는 속성을 상위클래스인 View클래스에 있다.
+
+```
+
+
++ View의 속성(xml - attribute, java - 멤버변수)
+         ==== 속성의 종류
+            1) 자체 속성    android:속성명
+            2) layout 속성  android:layout_속성명
+
+
+
+1. id : 개체를 식별하는 값
+   1. 식별자 : 정수값(자동생성-R.java)-R.id.id명
+   2. 사용 : Java code => R.id.id명 / res내부 => @id/id명
+   3. Java Code => getId()
+
+2. View의 크기 : 폭, 높이 ==> match_parent, wrap_content, 직접지정(기본단위:dp,..)
+   - Java Code에서의 기본단위는 pixel단위이다.
+   - layout_width
+   - layout_height
+
+
++ 참고) res폴더에는 새로운 폴더를 앞으로 만들어 나갈것이다.
+  - 아무이름이나 상요하지 않고 미리 정해진 명칭들이 있다.
+  - res폴더의 모든 명칭은(폴더명, 파일명)은 소문자이어야 한다.
+
+
+3. 마진(margin) 속성 : 부모뷰나 형제뷰간의 간격
+   - layout_margin
+   - layout_marginLeft, layout_marginRight
+   - layout_marginTop, layout_marginBottom
+   
+
+
+4. 패딩(padding)속성 : 내용물과 현재뷰의 간격
+   - padding
+   - paddingLeft, paddingRight
+   - paddingTop, paddingBottom
+
+
+
+##### 전체영역, 내용물, 여백, padding, margin의 관계
+```
+```
++ 전체영역에 내용물을 표시하고 남는 공간이 있다면 -- 여백
++ 테두리선과 내용물간의 간격을 설정 -- padding
++ 그리고 남은 공간에서의 내용물의 위치 설정 -- gravity
+
++ 현재의 위젯과 바깥 즉, 부모위젯이나 형제위젯과의 간격 -- layoutMargin
+
+
+
+
+
+5. 배경색(background)
+   - #AARRGGBB, #RRGGBB, #ARGB, #RGB
+
+
+
+
+
+##### 자주사용하는 Layout(결론:ConstraintLayout, LinearLayout이 제일 많이 사용)
+1. LinearLayout : 순서대로 구성요소(위젯) 배치
+2. RelativeLayout : 부모뷰나 형제뷰를 기준으로 구성요소의 위치 결정
+3. FrameLayout : 구성요소를 겹쳐서 배치
+4. TableLayout : TableRow를 이용하여 행담위로 규격화시켜 배치
+5. GridLayout : row, column(엑셀화면-표현식)으로 규격화시켜 배치
+--------------------------
+5. ConstraintLayout : 부모뷰나 형제뷰를 기준으로 구성요소의 위치결정
+                        추가적으로 기준이 되는 요소(가이드라인)를 추가.
+
+
+
+##### LinearLayout : 좌-->우, 위-->아래로 순차적으로 위젯을 배치한다.
++ 중요한 속성
+    1) orientation  : 방향
+    2) gravity      : 내부 내용물 즉, 위젯의 위치설정
+    ----------------------------------------------------
+    
+    LinearLayout 내부에 존재하는 위젯의 Layout 속성
+        1) layout_width, layout_height ---|
+        2) layout_margin -----------------| 모든 layout에서 공통사용
+        3) layout_weight ---> LinearLayout내부의 위젯에만 존재하는 속성으로
+                                화면을 차지할 비중을 지정한다.
+                                (1) layout_weight 속성에 값을 지정X- > 원래크기 영역
+                                (2) 값을 지정할때 특정위젯 1, 나머지영역 독차지
+                                (3) 몇개의 위젯 1, 영역을 공평하게 나눠서 차지.
+                                (4) 모든 위젯에 서로다른 값지정, 비율로나눠서 차지.
+        4) layout_gravity --> LinearLayout내부의 위젯에만 존재하는 속성
+                             부모위젯의 고유배치방식(좌-우,위-아래)에 영향X 영역요청
+    --------------------------------------------------
+    위의 layout속성들은 set/get 메서드가 존재하지 않으므로
+    java code로 객체를 만들때는 특별한 방법을 상요하여 해당 특성ㅇ르 지정해야한다.
+
+
+
+
+##### LinearLayout을 Java Code로 작성하기
+  
++ Linear2Activity.java
+```java
+package com.jica.basicwidget;
+
+import android.graphics.Color;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.LinearLayout;
+
+public class Linear2Activity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml파일 전개
+        //setContentView(R.layout.activity_linear2);
+
+        //직접 코드로 화면구성
+        //1.LinearLayout객체 생성
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setBackgroundColor(Color.GREEN);
+
+        //2.버튼객체생성
+        Button button = new Button(this);
+        button.setText("Java Code로 작성");
+        button.setTextSize(30);  //pixel
+        button.setTextColor(Color.RED);
+
+        //3.버튼을 LinearLayout에 등록
+        linearLayout.addView(button);
+
+        //4.LinearLayout을 액티비티에 연결
+        setContentView(linearLayout);
+    }
+}
+```
+
+
+##### [오늘의 과제]
++ ConstraintLayout
++ 별도의 Activity를 만들되 좋아하는 영화배우 프로필 화면 만들기
 + 
 
 
