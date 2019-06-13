@@ -815,7 +815,7 @@ Object
 
 
 
-2. 액티비티에 작업한 결과내용을 호출한 액티비티에서 사용하기
+2. 액티비티에 작업한 결과내용을 호출한 액티비티에서 사용하기[내일]
 
 
 + Sub3Activity.java
@@ -952,6 +952,88 @@ intent.putExtra("info", m);
 /////////////////////////////////////
 intent.getStringExtra("info");
 ```
++ 현재 예제의 MainActivity와 ScrollView을 사용하여 메뉴항목이 늘어나 보이도록 변경.
+
+
+
+
+
+##### RelativeLayout(상대레이아웃)
++ 부모뷰나 형제뷰를 기준으로 현재뷰(위젯)의 위치를 설정한다.
+```
+java.lang.Object
+   ↳	android.view.View
+ 	   ↳	android.view.ViewGroup
+ 	 	   ↳	android.widget.RelativeLayout
+
+
+android:layout_above	
+android:layout_alignBaseline
+android:layout_alignBottom	
+android:layout_alignEnd	
+android:layout_alignLeft
+android:layout_alignParentBottom	
+android:layout_alignParentEnd	
+android:layout_alignParentLeft	
+android:layout_alignParentRight	
+android:layout_alignParentStart	
+android:layout_alignParentTop	
+android:layout_alignRight	
+android:layout_alignStart	
+android:layout_alignTop	
+android:layout_alignWithParentIfMissing	
+android:layout_below	
+android:layout_centerHorizontal	
+android:layout_centerInParent	
+android:layout_centerVertical	
+android:layout_toEndOf	
+android:layout_toLeftOf	
+android:layout_toRightOf
+android:layout_toStartOf
+
+
+java.lang.Object
+   ↳	android.view.ViewGroup.LayoutParams
+ 	   ↳	android.view.ViewGroup.MarginLayoutParams
+ 	 	   ↳	android.widget.RelativeLayout.LayoutParams
+
+```
+
+
+
+##### TableLayout : 행단위(TableRow)의 위젯배치
+```
+java.lang.Object
+   ↳	android.view.View
+ 	   ↳	android.view.ViewGroup
+ 	 	   ↳	android.widget.LinearLayout
+ 	 	 	   ↳	android.widget.TableLayout
+
+
+java.lang.Object
+   ↳	android.view.ViewGroup.LayoutParams
+ 	   ↳	android.view.ViewGroup.MarginLayoutParams
+ 	 	   ↳	android.widget.LinearLayout.LayoutParams
+ 	 	 	   ↳	android.widget.TableLayout.LayoutParams
+
+
+
+ java.lang.Object
+↳	android.view.ViewGroup.LayoutParams
+  ↳	android.view.ViewGroup.MarginLayoutParams
+	   ↳	android.widget.LinearLayout.LayoutParams
+            ↳	android.widget.TableLayout.LayoutParams   layout_span, layout_column
+```
+
+
++ TableLayout에서 중요속성(셀을 확장하거나, 합치는 속성)
+  - 여분의 공간이 있으면 몇번째 셀이 나머지공간을 차지하라는 설정
+    - android:stretchColumns="0,1,2"
+  - 공간이 부족할때 특정컬럼을 자동으로 축소하라는 설정
+    - android:shrinkColoumns
+  - TableLayout내부의 layout속성
+    - android:layout_span --------- 현재위젯의 폭을 확장
+    - android:layout_column ------- 현재위젯을 몇번째 
 
 
 
@@ -997,51 +1079,11 @@ intent.getStringExtra("info");
 
 
 
-2. 액티비티에 작업한 결과내용을 호출한 액티비티에서 사용하기[내일]
+2. 액티비티에 작업한 결과내용을 호출한 액티비티에서 사용하기
 
 
 
 
-###### RelativeLayout(상대레이아웃)
-+ 부모뷰나 형제뷰를 기준으로 현재뷰(위젯)의 위치를 설정한다.
-```
-java.lang.Object
-   ↳	android.view.View
- 	   ↳	android.view.ViewGroup
- 	 	   ↳	android.widget.RelativeLayout
-
-
-java.lang.Object
-   ↳	android.view.ViewGroup.LayoutParams
- 	   ↳	android.view.ViewGroup.MarginLayoutParams
- 	 	   ↳	android.widget.RelativeLayout.LayoutParams
-
-
-
-android:layout_above	
-android:layout_alignBaseline
-android:layout_alignBottom	
-android:layout_alignEnd	
-android:layout_alignLeft
-android:layout_alignParentBottom	
-android:layout_alignParentEnd	
-android:layout_alignParentLeft	
-android:layout_alignParentRight	
-android:layout_alignParentStart	
-android:layout_alignParentTop	
-android:layout_alignRight	
-android:layout_alignStart	
-android:layout_alignTop	
-android:layout_alignWithParentIfMissing	
-android:layout_below	
-android:layout_centerHorizontal	
-android:layout_centerInParent	
-android:layout_centerVertical	
-android:layout_toEndOf	
-android:layout_toLeftOf	
-android:layout_toRightOf
-android:layout_toStartOf
-```
 
 
 
