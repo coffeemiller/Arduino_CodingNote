@@ -465,12 +465,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     2) res폴더내부에서  @color/colorPrimary 
     - res폴더의 values폴더는 종류에 따라 식별자명=값의 형태로 
       - 문자열(strings.xml), 색상코드(colors.xml), 스타일과 테마(styles.xml)
-      - 별도의 파일에 값이 저장된다.
-
-
-
-
-#### 4. Event처리방법
+      - 별도의 파일에 값이 저장된다
 
 
 ##### [오늘의 과제]
@@ -721,10 +716,9 @@ public class Linear2Activity extends AppCompatActivity {
 + 
 
 
-#### 3. 기본위젯과 배치관리자
-#### 4. Event처리
-#### 4. 실습
-#### 5. Summary / Close
+
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
@@ -736,8 +730,100 @@ public class Linear2Activity extends AppCompatActivity {
 ### [2019-06-13]
 
 #### 1. Review
++ 데이터 복구
+  1) 임시정보
+  2) 반영구정보
+     1) java file i/o
+     2) sharedPreforence -> put(키,값) / getXXX(키)
+     3) 데이터베이스(sqlite)
 
-##### 2.6. Layout
-##### 2.7. Event처리
+
+
+
+#### 2. 기본위젯과 배치관리자
+
+##### layout속성들을 표현하는 Java class들도 뷰의 계층구조와 유사하게 계층구조를 형성하고 있다.
+```
+[뷰의 상속계층구조]
+Object
+    View
+        ViewGroup
+            LinearLayout
+
+    layout속성을 표현하는 LayoutParams의 상속계층구조
+    --------------------------------------------------
+    java.lang.Object
+   ↳	android.view.ViewGroup.LayoutParams  ----  [layout_height/layout_width]
+ 	   ↳	android.view.ViewGroup.MarginLayoutParams
+                    -- [layout_margin
+                        layout_marginBottom	
+                        layout_marginLeft
+                        layout_marginRight
+                        layout_marginTop]
+ 	 	   ↳	android.widget.LinearLayout.LayoutParams
+                    --- [layout_gravity/layout_weight]
+
+```
+
++ 참고) xml로 화면을 디자인한것은 정적인 화면구성이다.
+  + 만일 실행시 화면구성요소에 대한 변화가 필요하다면 (추가/삭제),
+  + 코드로 작성해야 한다.
+
+
+
+##### 영구정보를 저장하고 사용하는 방법
++ 영구정보 : 정상적으로 액티비티가 종료되었을때 현재의 작업내용(상태정보)이 이후에 다시 액티비티를 실행시켰을때 이용할 수 있도록 영속성을 가지는 정보를 관리하는 것을 말한다.
+
++ 방법)
+  1) java언어 file i/o
+  2) SharedPreference 사용 (키-값)
+  3) SQLite(데이터베이스)
+
+
+
+
+##### 액티비티 호출시 정보를 전달하거나 작업결과를 되돌려 받는 방법
+
+
+
+
+
+#### 3. 실습
+#### 4. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-14]
+
+#### 1. Review
+
+
+
+#### 2. 기본위젯과 배치관리자
+
+
+#### 3. Event처리
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-15]
+
+#### 1. Review
+
+#### 2. 기본위젯과 배치관리자
+
+
+#### 3. Event처리
+
 #### 4. 실습
 #### 5. Summary / Close
