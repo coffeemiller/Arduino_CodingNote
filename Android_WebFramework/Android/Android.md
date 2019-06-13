@@ -647,6 +647,8 @@ Object
 + 중요한 속성
     1) orientation  : 방향
     2) gravity      : 내부 내용물 즉, 위젯의 위치설정
+    3) baselineAligned : 글자를 내용물로 하는 위젯이 옆으로 배치될때
+                        글자의 baseline에 맞추어 위젯의 위치를 자동으로 맞춰준다.
     ----------------------------------------------------
     
     LinearLayout 내부에 존재하는 위젯의 Layout 속성
@@ -783,8 +785,173 @@ Object
 
 
 ##### 액티비티 호출시 정보를 전달하거나 작업결과를 되돌려 받는 방법
+1. 액티비티 호출시 정보전달
+[호출하는 액티비티]
+   - Intent 생성
+     - Intent intent = new Intent(this, AgumentActivity.class);
+
+   - Intent 객체에 정보 저장 ==> putExtra("키",값);
+     - intent.putExtra("title", "기생충");
+     - intent.putExtra("poster", R.drawable.prasite);
+     - intent.putExtra("actor", "봉준호");
+     - intent.putExtra("director", "송강호");
+
+   - 액티비티 호출
+     - startActivity(intent);
 
 
+[호출하는 액티비티] - ArgumentActivity
+   - OnCreate(), onResum()메서드에서 정보 얻기
+     - Intent intent = getIntent();
+   
+   - 전달된 인자정보를 intent객체에 getXXXExtra(키,[디폴트값])
+     - title = intent.getStringExtra("title");
+     - posterId = intent.getIntExtra("poster",-1);
+     - actor = intent.getStringExtra("actor");
+     - director = intent.getStringExtra("director");
+   
+   - 인자값을 목적에 맞게 사용
+
+
+
+
+2. 액티비티에 작업한 결과내용을 호출한 액티비티에서 사용하기
+
+
++ Sub3Activity.java
+```java
+package com.jica.basicwidget;
+
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.RadioGroup;
+
+public class Sub3Activity extends AppCompatActivity {
+
+    RadioGroup grMovie;
+
+    String movieTitles[] = {"알라딘", "기생충", "맨인블랙", "천로역전", "이웃집토토로"};
+    int moviePosterIds[] = {R.drawable.aladdin, R.drawable.parasite, R.drawable.meninblack, R.drawable.the_pilgrim, R.drawable.totoro};
+    String moviesActors[] = {"메나마수드, 웰 스미스",
+            "송강호, 이선균",
+            "크리스 헴스워스, 테사 톰슨",
+            "폰 라이스 데이비스",
+            "토토로"};
+    String moviesDirectors[] = {"가이리치", "봉준호", "F.게리 그레이","로버트 페르난데스", "미야자키 하야오"};
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sub3);
+
+        grMovie = findViewById(R.id.grMovie);
+    }
+
+    public void onMovieDetail(View view) {
+        int curId = grMovie.getCheckedRadioButtonId();
+        int index = 0;
+        Intent intent = new Intent(this, AgumentActivity.class);
+
+        //액티비티 호출시 정보를 전달하고 싶다면 Intent의 extra속성에 전달
+        switch (curId) {
+            case R.id.rbAladdin:
+                index = 0;
+                break;
+            case R.id.rbParasite:
+                index = 1;
+                break;
+            case R.id.rbMeninblack:
+                index = 2;
+                break;
+            case R.id.rbPilgrim:
+                index = 3;
+                break;
+            case R.id.rbTotoro:
+                index = 4;
+                break;
+        }
+       intent.putExtra("title", movieTitles[index]);
+       intent.putExtra("poster", moviePosterIds[index]);
+       intent.putExtra("actor", moviesActors[index]);
+       intent.putExtra("director", moviesDirectors[index]);
+       startActivity(intent);
+    }
+}
+```
+
++ AgumentActivity.java
+```java
+package com.jica.basicwidget;
+
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+public class AgumentActivity extends AppCompatActivity {
+    //UI객체
+    TextView tvtitle, tvActor, tvDirector;
+    ImageView ivPoster;
+
+    //UI객체에 내용값 - 호출될때 인자로 전달됨
+    String title, actor, director;
+    int posterId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml 전개
+        setContentView(R.layout.activity_agument);
+
+        //UI객체 참조값 얻기
+        tvtitle = findViewById(R.id.tvTitle);
+        ivPoster = findViewById(R.id.ivPoster);
+        tvActor = findViewById(R.id.tvActors);
+        tvDirector = findViewById(R.id.tvDirector);
+
+        //현재의 액티비티가 호출될때 전달한 인자값 얻기
+        Intent intent = getIntent();
+       Intent intent;
+
+       title = intent.getStringExtra("title");
+       posterId = intent.getIntExtra("poster",-1);
+       actor = intent.getStringExtra("actor");
+       director = intent.getStringExtra("director");
+
+        tvtitle.setText(title);
+        ivPoster.setImageResource(posterId);
+        tvActor.setText(actor);
+        tvDirector.setText(director);
+    }
+}
+```
+
+
+
+##### [오늘의 과제]
++ 액티비티 호출시, putExtra에 사용자가 만든 객체를 전달할 수 있는 방법
++ MovieInfo 객체를 넘겨주는 방법 찾기~!!!
+```
+public class MovieInfo implements Serializable {
+    private String title;
+    private int posterId;
+    private String actor;
+    private String director;
+
+    public MovieInfo() {
+    }
+}
+//////////////////////////////////////
+MovieInfo m = new MovieInfo();
+intent.putExtra("info", m);
+/////////////////////////////////////
+intent.getStringExtra("info");
+```
 
 
 
@@ -799,6 +966,82 @@ Object
 ### [2019-06-14]
 
 #### 1. Review
+##### 액티비티 호출시 정보를 전달하거나 작업결과를 되돌려 받는 방법
+1. 액티비티 호출시 정보전달
+[호출하는 액티비티]
+   - Intent 생성
+     - Intent intent = new Intent(this, AgumentActivity.class);
+
+   - Intent 객체에 정보 저장 ==> putExtra("키",값);
+     - intent.putExtra("title", "기생충");
+     - intent.putExtra("poster", R.drawable.prasite);
+     - intent.putExtra("actor", "봉준호");
+     - intent.putExtra("director", "송강호");
+
+   - 액티비티 호출
+     - startActivity(intent);
+
+
+[호출하는 액티비티] - ArgumentActivity
+   - OnCreate(), onResum()메서드에서 정보 얻기
+     - Intent intent = getIntent();
+   
+   - 전달된 인자정보를 intent객체에 getXXXExtra(키,[디폴트값])
+     - title = intent.getStringExtra("title");
+     - posterId = intent.getIntExtra("poster",-1);
+     - actor = intent.getStringExtra("actor");
+     - director = intent.getStringExtra("director");
+   
+   - 인자값을 목적에 맞게 사용
+
+
+
+
+2. 액티비티에 작업한 결과내용을 호출한 액티비티에서 사용하기[내일]
+
+
+
+
+###### RelativeLayout(상대레이아웃)
++ 부모뷰나 형제뷰를 기준으로 현재뷰(위젯)의 위치를 설정한다.
+```
+java.lang.Object
+   ↳	android.view.View
+ 	   ↳	android.view.ViewGroup
+ 	 	   ↳	android.widget.RelativeLayout
+
+
+java.lang.Object
+   ↳	android.view.ViewGroup.LayoutParams
+ 	   ↳	android.view.ViewGroup.MarginLayoutParams
+ 	 	   ↳	android.widget.RelativeLayout.LayoutParams
+
+
+
+android:layout_above	
+android:layout_alignBaseline
+android:layout_alignBottom	
+android:layout_alignEnd	
+android:layout_alignLeft
+android:layout_alignParentBottom	
+android:layout_alignParentEnd	
+android:layout_alignParentLeft	
+android:layout_alignParentRight	
+android:layout_alignParentStart	
+android:layout_alignParentTop	
+android:layout_alignRight	
+android:layout_alignStart	
+android:layout_alignTop	
+android:layout_alignWithParentIfMissing	
+android:layout_below	
+android:layout_centerHorizontal	
+android:layout_centerInParent	
+android:layout_centerVertical	
+android:layout_toEndOf	
+android:layout_toLeftOf	
+android:layout_toRightOf
+android:layout_toStartOf
+```
 
 
 
