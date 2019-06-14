@@ -1049,7 +1049,6 @@ java.lang.Object
 
 #### 1. Review
 
-
 #### 2. Activity 호출 (정보받기)
 ##### 액티비티 호출시 정보를 전달하거나 작업결과를 되돌려 받는 방법
 1. 액티비티 호출시 정보전달
@@ -1109,17 +1108,52 @@ java.lang.Object
 
 
 
-#### 3. FrameLayout
+#### 3. FrameLayout : 내부구성요소들을 겹쳐서 보여준다.
++ 그대로 사용할때는 의미가 없다.
+    - 내부 구성요소의 Visibility 속성을 사용하여 1개의 구성요소만 보이게하고
+    - 나머지 구성요소는 보이지 않도록 하는 방법으로 응용한다.
+```
+java.lang.Object
+   ↳	android.view.View
+ 	   ↳	android.view.ViewGroup
+ 	 	   ↳	android.widget.FrameLayout
+
+
+java.lang.Object
+   ↳	android.view.ViewGroup.LayoutParams              layout_width, layout_height
+ 	   ↳	android.view.ViewGroup.MarginLayoutParams    layout_margin,....
+ 	 	   ↳	android.widget.FrameLayout.LayoutParams  layout_gravity
+
+```
+
+
++ 참고) 현재의 Project에 사용자가 추가한 이미지는
+    - R.drawable.이미지식별자
+    - 안드로이드 플랫폼 자체에서 내장하여 제공하는 자원(Resource)
+        - android.R.자원종류.식별자
+        - 자바코드에서 --> android.R.drawable.이미지식별자
+        - res 내부에서 --> @android:drawable/식별자
+    - 실제로 존재하는 장소는?
+        - C:\Users\사용자명\AppData\Local\Android\res
+
+
+
 
 
 #### 4. Layout전개
++ Inflation(전개) : xml로 화면의 일부내용만을 디자인 해놓고, 프로그램이 작동중에 화면내용이 필요한 시점에서 xml를 전개(inflation)시켜 현재화면에 반영하여 사용하는 것.
+    - 원래는 Java Code로 UI객체를 생성, 속성설정, 화면연결(Activity연결)해서 사용.
+    - 이는 너무 복잡하기때문에 손쉽게 xml로 미리 만들어 놓았다가 사용하기위함.
+
+
++ Inflation은 LinearLayout일때가 가장 사용하기 손쉽다.
 
 
 
-#### 5. 기본위젯 사용법과 Event처리
 
-#### 6. 실습
-#### 7. Summary / Close
+
+#### 5. 실습
+#### 6. Summary / Close
 
 
 
@@ -1133,6 +1167,7 @@ java.lang.Object
 
 #### 2. 기본위젯과 배치관리자
 
+#### 5. 기본위젯 사용법과 Event처리
 
 #### 3. Event처리
 
