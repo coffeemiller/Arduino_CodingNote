@@ -1048,6 +1048,16 @@ java.lang.Object
 ### [2019-06-14]
 
 #### 1. Review
+
+#### 2. FrameLayout
+
+
+#### 3. Layout전개
+
+
+
+
+#### 4. Activity 호출 (정보받기)
 ##### 액티비티 호출시 정보를 전달하거나 작업결과를 되돌려 받는 방법
 1. 액티비티 호출시 정보전달
 [호출하는 액티비티]
@@ -1080,20 +1090,36 @@ java.lang.Object
 
 
 2. 액티비티에 작업한 결과내용을 호출한 액티비티에서 사용하기
+```
+        Sub4Activity  ------------------------->  InputActivity
+                                                 성명, 나이, 점수 입력
+성명, 나이, 점수 사용  <------------------------
+``` 
+```
+    1) 액티비티 호출시
+        - startActivityForResult(Intent객체);
+    2) InputActivity에서 작업후 자신이 
+        - Intent객체를 생성하여 정보를 저장
+        - setResult(Intent객체, 결과코드)
+        - finish();
+    3) @Overrride
+       onActivityResult(int 요청코드, int 결과코드, Intent 객체) {
+           .... Intent객체로부터 정보 추출 사용           
+       }
+```
+
+
++ 위의 액티비티 호출관련 내용은.... 교재 246 ~ 260 Page 
++ Inttent에 대한 상세 설명......... 교재 280 Page ~
 
 
 
 
 
+#### 5. 기본위젯 사용법과 Event처리
 
-
-#### 2. 기본위젯과 배치관리자
-
-
-#### 3. Event처리
-
-#### 4. 실습
-#### 5. Summary / Close
+#### 6. 실습
+#### 7. Summary / Close
 
 
 
