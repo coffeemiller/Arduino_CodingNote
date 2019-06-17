@@ -1304,14 +1304,349 @@ public class BookToastActivity extends AppCompatActivity {
 
 + AlertDialogActivity.java
 ```java
+package com.jica.dialogactionbar;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class AlertDialogActivity extends AppCompatActivity {
+    String foods[] = {"짜장면", "짬뽕", "탕수육", "우동"};
+    int mSelect = 0;
+    boolean mSelects[] = {false,true,false,false};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml 전개
+        setContentView(R.layout.activity_alert_dialog);
+
+    }
+
+    public void onDialog(View view) {
+        Dialog dialog = new Dialog(this);
+
+        //대화상자의 메시지 - 내용물을 사용자가 직접 생성
+        TextView tvMessage = new TextView(this);
+        tvMessage.setText("대화상자 메세지입니다.");
+        dialog.setContentView(tvMessage);
+
+        //대화상자 제목
+        dialog.setTitle("대화상자 제목");
+
+        //아이콘이나 버튼을 추가하는 기능이 없다.
+
+        //대화상자 보이기
+        dialog.show();
+
+        //이후 대화상자는 대화상자이외의 화면영역을 터치하거나
+        //백 버튼을 누르면 사라진다.
+    }
+
+    public void onAlertDialog(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("AlertDialog");
+        builder.setIcon(android.R.drawable.btn_star);
+        builder.setMessage("AlertDialog입니다.");
+
+        //버튼은 3가지 형태가 제공된다.
+        //기본버튼, 긍정버튼, 부정버튼
+        builder.setNeutralButton("기본버튼",null);
+
+        //대화상자의 버튼 클릭시만 대화상자가 종료하도록 설정
+        builder.setCancelable(false);
+
+        //Dialog 객체 생성하면서 Builder 삽입.
+        AlertDialog dialog = builder.create();
+
+        //대화상자 보이기
+        dialog.show();
+    }
+
+    public void onAlertDialog2(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("AlertDialog")
+                .setIcon(android.R.drawable.btn_star)
+                .setMessage("AlertDialog입니다.")
+
+        //버튼은 3가지 형태가 제공된다.
+        //기본버튼, 긍정버튼, 부정버튼
+                .setNeutralButton("기본버튼",null)
+                .setPositiveButton("긍정버튼", null)
+                .setNegativeButton("부정버튼",null)
+
+        //대화상자의 버튼 클릭시만 대화상자가 종료하도록 설정
+                .setCancelable(false);
+
+        //Dialog 객체 생성하면서 Builder 삽입.
+        AlertDialog dialog = builder.create();
+
+        //대화상자 보이기
+        dialog.show();
+
+        //Java에서는 대화상자가 보이면 이곳 즉, 이후의 코드는 실행되지 않는
+        //모달 대화상자였다. 안드로이드는 그렇지 않다.
+        //여기의 코드가 실행된다.
+        Log.d("TAG","안드로이드의 대화상자는 모달리스 입니다.");
+    }
+
+
+    public void onAlertDialog3(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle("AlertDialog")
+                .setIcon(android.R.drawable.btn_star)
+                .setMessage("버튼의 이벤트핸들러 작성법입니다.")
+
+                //버튼은 3가지 형태가 제공된다.
+                //기본버튼, 긍정버튼, 부정버튼
+                .setNeutralButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(),"대화상자에서 '확인'을 클릭했습니다.",Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(),"대화상자에서 '예'를 클릭했습니다.",Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(),"대화상자에서 '아니오'를 클릭했습니다.",Toast.LENGTH_SHORT).show();
+                    }
+                })
+
+                //대화상자의 버튼 클릭시만 대화상자가 종료하도록 설정
+                .setCancelable(false);
+
+        //Dialog 객체 생성하면서 Builder 삽입.
+        AlertDialog dialog = builder.create();
+
+        //대화상자 보이기
+        dialog.show();
+
+        //Java에서는 대화상자가 보이면 이곳 즉, 이후의 코드는 실행되지 않는
+        //모달 대화상자였다. 안드로이드는 그렇지 않다.
+        //여기의 코드가 실행된다.
+        Log.d("TAG","안드로이드의 대화상자는 모달리스 입니다.");
+    }
+
+    public void onDoSomething(View view) {
+        //어떤 기능을 수행
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean isError = true;
+        if (isError) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Error 발생")
+                    .setMessage("에러메세지를 상세히 설명.... 종료합니다.")
+                    .setCancelable(false)
+                    .setPositiveButton("종료", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();   //현재 액티비티 종료
+                        }
+                    })
+                    .show();
+
+        } else {
+            Toast.makeText(this,"정삭적으로 작업을 마침!",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    //목록대화상자/선택대화상자
+    //사용자정의 대화상자
+
+    public void onItemDialog (View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("음식을 선택하세요");
+        builder.setIcon(android.R.drawable.btn_plus);
+        /*
+        builder.setItems(foods, new DialogInterface.OnClickListener() {
+            //목록 중 하나를 선택했을때의 이벤트 처리
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                //---선택한 항목의 목록 순서                 --
+                String curItem = foods[i];
+                Toast.makeText(getApplicationContext(),curItem+"을 선택했습니다.",Toast.LENGTH_SHORT).show();
+            }
+        });
+        */
+
+        builder.setItems(R.array.foods, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                //res/values/arrays.xml내용중 foods배열 내용 가져오기
+                Resources res = getResources();
+                String foods[] = res.getStringArray(R.array.foods);
+                String curItem = foods[i];
+                Toast.makeText(getApplicationContext(),curItem+"을 선택했습니다.",Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("취  소",null);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public void onSingleDialog (View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("음식을 선택하세요");
+        builder.setIcon(android.R.drawable.btn_plus);
+
+        //항목선택시 대화상자가 종료하지 않는다.
+        builder.setSingleChoiceItems(foods, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                //---선택한 항목의 목록 순서                 --
+                mSelect = i;
+            }
+        });
+
+        builder.setPositiveButton("확  인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"최종적으로 선택한 항목은"+foods[mSelect]+"입니다.",Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+        builder.setNegativeButton("취  소",null);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public void onMultiDialog (View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("음식을 선택하세요");
+        builder.setIcon(android.R.drawable.btn_plus);
+
+        //항목선택시 대화상자가 종료하지 않는다.
+        builder.setMultiChoiceItems(foods, mSelects, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i, boolean isChecked) {
+                mSelects[i] = isChecked;
+            }
+        });
+
+        builder.setPositiveButton("확  인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String str = "";
+                for (int pos=0; pos<mSelects.length; pos++){
+                    if (mSelects[pos]){
+                        str += foods[pos]+" ";
+                    }
+                }
+                Toast.makeText(getApplicationContext(), "최종적으로 선택한 항목은" + str + "입니다.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+        builder.setNegativeButton("취  소",null);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public void onUserDialog(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("상품정보를 입력하세요")
+                .setIcon(R.mipmap.ic_launcher);
+
+
+        //대화상자에 보여질 xml전개
+        final LinearLayout linearLayout = (LinearLayout)View.inflate(getApplicationContext(),R.layout.dialog_product,null);
+
+        //대화상자에 연결
+        builder.setView(linearLayout);
+//        builder.setView(R.layout.dialog_product);
+        builder.setPositiveButton("확 인", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText etProductName = linearLayout.findViewById(R.id.etProductName);
+                EditText etProductValue = linearLayout.findViewById(R.id.etProductValue);
+                CheckBox cbPayMent = linearLayout.findViewById(R.id.cbPayment);
+
+                String productName = etProductName.getText().toString();
+                int productQuantity = 0;
+                try{
+                    productQuantity = Integer.parseInt(etProductValue.getText().toString());
+                }catch (Exception e) {
+                    //토스트/아무일도 하지 않음.
+                    return;
+                }
+
+                String payment = (cbPayMent.isChecked() ? "착불결제" : "선결제");
+
+                String message = "구입 물건 정보 : "+productName+", 품목 : "+productQuantity+", 결제정보 : "+payment;
+                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("취 소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"주문을 취소하였습니다.",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+}
 ```
 
 
 
 
-#### 5. 기본위젯 사용법과 Event처리
+#### 3. AdapterView
+1. 어댑터뷰(AdapterView)
+    - AdapterView의 상속계층구조
+```
+Object
+    View
+        ViewGroup
+            AdapterView
+                ...
+                ListView, Spinner, GridView
+                    ExpandableListView
+                RecyclerView
+```
 
-#### 3. Event처리
+    - 주로 대용량의 데이터를 화면 스크롤을 통해 사용자에게 제공(선택)한다.
+```
+    ListView -- 여러항목을 관리
+    항목뷰1  |
+    항목뷰2  |<------>  Adapter[중계역할]  <-------->  원본데이터
+    항목뷰3  |
+    ...
+    항목뷰n
+```
+
+
+
 
 #### 4. 실습
 #### 5. Summary / Close
