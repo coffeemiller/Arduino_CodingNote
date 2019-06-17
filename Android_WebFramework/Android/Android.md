@@ -1290,7 +1290,21 @@ public class BookToastActivity extends AppCompatActivity {
 
 
 
++ 목록대화상자
+    - setMassage(String)에 의한 문자내용을 확인
+    
+    - setItems(목록)를 사용하여 목록에서 항목을 선택하게 한다.
+    - setSingleItems()
+    - setMultiItems() 를 사용하여 목록에서 항목을 선택하게 한다.
+    
+    - setView(사용자화면) -- 사용자가 선택하거나 입력하도록 자유롭게 화면설계.
 
+
+
+
++ AlertDialogActivity.java
+```java
+```
 
 
 
