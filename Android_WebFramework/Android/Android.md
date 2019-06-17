@@ -1161,7 +1161,193 @@ java.lang.Object
 -----------------------------------------------------------
 
 
-### [2019-06-15]
+### [2019-06-17]
+
+#### 1. Review
+
+#### 2. 토스트와 대화상자
+1. 토스트(toast) : 간단한 알림메세지
+    - 잠시 나타났다가 사라진다.
+    - 기본 모양과 위치가 정해져 있다.
+    - 모양과 위치 변경이 가능하다.
+
+
+2. 외부라이브러리로 스낵바를 사용하여 기능을 대체할 수 있다.
+    - 디자인 라이브러리를 프로젝트에 추가해야 한다.
+
+
+
++ BookToastActivity.java
+```java
+package com.jica.dialogactionbar;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class BookToastActivity extends AppCompatActivity {
+    EditText editText;
+    EditText editText2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml 전개
+        setContentView(R.layout.activity_book_toast);
+
+        //UI 객체얻기
+        editText = findViewById(R.id.editText);
+        editText2 = findViewById(R.id.editText2);
+    }
+
+    public void onButtonTosat(View view) {
+        Toast.makeText(this,"기본 토스트입니다.",Toast.LENGTH_SHORT).show();
+        //기본토스트에 내부적으로 설정된 위치값
+        //setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, -100);
+    }
+
+    public void onButton1Clicked(View v) {
+        try {
+            Toast toastView = Toast.makeText(this, "위치가 바뀐 토스트 메시지입니다.", Toast.LENGTH_LONG);
+
+            //x,y 위치값을 입력하지 않으면 아래 코드에서 예외가 발생하므로 아무일도 하지 않는다.
+            int xOffset = Integer.parseInt(editText.getText().toString());
+            int yOffset = Integer.parseInt(editText2.getText().toString());
+
+            //토스트의 위치를 변경시킨다.
+            toastView.setGravity(Gravity.TOP | Gravity.TOP, xOffset, yOffset);
+
+            toastView.show();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onButton2Clicked(View v) {
+        //LayoutInflater 구하기
+//        LayoutInflater layoutInflater
+//                = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = getLayoutInflater();
+
+        //방법2
+        View layout = inflater.inflate(
+                R.layout.toastborder,
+                (ViewGroup) findViewById(R.id.toast_layout_root));
+
+        TextView text = layout.findViewById(R.id.text);
+
+        //시스템 내부의 토스트 객체를 사용하지 않고 직접 Toast생성
+        Toast toast = new Toast(this);
+        text.setText("모양 바꾼 토스트");   //토스트에 의해 보여질 내용
+        toast.setView(layout);           //토스트와 뷰 연결
+
+        //토스트의 위치설정정
+       toast.setGravity(Gravity.CENTER, 0, -100);
+        toast.setDuration(Toast.LENGTH_SHORT);
+
+        toast.show();
+
+    }
+
+    public void onButton3Clicked(View v) {
+        Snackbar.make(v, "스낵바입니다.", Snackbar.LENGTH_LONG).show();
+    }
+}
+```
+
+```
+토스트나 스낵바는 잠시 나왔다가 사라진다. 즉 사용자의 확인을 100% 보장할 수 없다.
+중요한 정보에 대한 사용자의 확인이나 추가적인 데이터의 입력이 필요할때, 대화상자(Dialog)를 사용한다.
+
+일반적인 사용법은 Java AWT의 Dialog와 비슷하지만(모달대화상자),
+기본적인 작동구조가 Modalless이다.
+```
+
+
++ 대화상자 
+    - 아이콘 + 제목 + 메세지 내용 + 버튼
+
++ Android Dialog는...
+    - 제목 + 메세지 내용만 제공.... 거의 쓸모가 없다.
+    
++ Android AlertDialog를 사용한다.
+    - 직접생성
+    - AlertDialog.Builder로 생성(권장)
+    - 버튼은 기본 3가지 제공
+        1. 기본버튼
+        2. 긍정버튼
+        3. 부정버튼
+
+
+
+
+
+
+
+
+
+#### 5. 기본위젯 사용법과 Event처리
+
+#### 3. Event처리
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-18]
+
+#### 1. Review
+
+#### 2. 기본위젯과 배치관리자
+
+#### 5. 기본위젯 사용법과 Event처리
+
+#### 3. Event처리
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-19]
+
+#### 1. Review
+
+#### 2. 기본위젯과 배치관리자
+
+#### 5. 기본위젯 사용법과 Event처리
+
+#### 3. Event처리
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-20]
 
 #### 1. Review
 
