@@ -1145,10 +1145,43 @@ java.lang.Object
     - 원래는 Java Code로 UI객체를 생성, 속성설정, 화면연결(Activity연결)해서 사용.
     - 이는 너무 복잡하기때문에 손쉽게 xml로 미리 만들어 놓았다가 사용하기위함.
 
+```
+onCreate(Bundle si){
+  super.onCreate(si);
+
+  setContenView(R.layout.activity_main); ---->1) inflation
+                                              2) Activity에 연결
+}
+```
 
 + Inflation은 LinearLayout일때가 가장 사용하기 손쉽다.
 
 
+```
+1) LayoutInflator 구하기
+    (1) LayoutInflater layoutInflater
+                       = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    (2) View.inflate()메서드를 사용할 것이므로
+        LayoutInflater를 구하지 않는다.
+    (3) LayoutInflater layoutInflater = getLayoutInflater();
+
+
+2) 전개(inflate)
+   LinearLayout webToonLinearLayout =
+                   (LinearLayout)LinelayoutInflater.inflate(R.layout.weebtoon, rootLinearLayout, false);
+                            -----------------  ----------------  -----
+                            전개할 xml화일      전개후 연결시킬    연결여부
+                                               부모뷰
+                View.inflate(
+
+3) 전개된 객체들의 상태값을 원하는 내용으로 변경
+   TextView tvTitle = webToonLinearLayout.findViewById(R.id.xxx)
+   tvTitle.setTitle("제목");
+   ...
+
+4) 화면 UI반영
+   루트layout객체.addView(webToonLinearLayout)
+```
 
 
 
