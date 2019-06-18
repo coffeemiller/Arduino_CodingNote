@@ -1695,14 +1695,632 @@ Object
 
 #### 1. Review
 
-#### 2. 기본위젯과 배치관리자
+#### 2. 커스텀 ListView만들기
+1. 리스트뷰에 보여지는 항목뷰가 단순한 문자열이 아니라, 복잡한 형태의 다양한 정보를 제공한다면... 아래의 작업절차에 따라 '커스텀리스트뷰'를 구현한다.
+   1. 항목뷰를 별도의 layout파일로 작성
+   2. 어댑터 생성 ==> 위의 항목뷰에 데이터를 연동시켜야 하므로
+      class MyAdapter extends BaseAdapter{
+          @Override
+          BaseAdapter의 추상(abstract)메서드 재정의
+      }
+   3. 커스텀 클래스 - 1건의 데이터정보
 
-#### 5. 기본위젯 사용법과 Event처리
+참고) 특정클래스의 메서드가 사용자에 의해 호출되는 것이 아니라, 내부적인 작동구조에 의해 시스템에 의해 호출되는 메서드를 callback(콜백) 메서드라고 부른다.
 
-#### 3. Event처리
 
-#### 4. 실습
-#### 5. Summary / Close
+
++ ListViewExamActivity.java
+```java
+package com.jica.adapterview;
+
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+public class ListViewExamActivity extends AppCompatActivity {
+    //UI 객체
+    ListView listView;
+    //원본데이터
+    ArrayList<String> data;
+    //ListView와 원본 데이터를 연동시키는 어댑터
+    ArrayAdapter<String> adapter;
+
+    Button btnAdd, btnRemove;
+    EditText itemName;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml 전개
+        setContentView(R.layout.activity_list_view_exam);
+
+        //UI 객체 참조값 얻기
+        listView = findViewById(R.id.listView);
+        btnAdd = findViewById(R.id.btnAdd);
+        btnRemove = findViewById(R.id.btnRemove);
+        itemName = findViewById(R.id.etItemName);
+
+        //원본 데이터 만들기
+        data = new ArrayList<String>();
+        data.add("고조선");
+        data.add("부여");
+        data.add("옥저");
+        data.add("동예");
+        data.add("고구려");
+
+        //어댑터 생성(1.항목뷰UI
+        adapter = new ArrayAdapter<String>(this,
+                                            android.R.layout.simple_list_item_1,
+                                            data);
+
+        //res/arrays/array_string사용할수도 있다.
+//        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+//                                                    R.array.country,
+//                                                    android.R.layout.simple_list_item_1);
+
+        //ListView에 어댑터 설정
+        listView.setAdapter(adapter);
+
+        //ListView의 메서드 사용
+        listView.setDivider(new ColorDrawable(Color.RED));
+        listView.setDividerHeight(2);
+
+        //ListView의 항목뷰를 클릭했을때의 이벤트 핸들러
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(),position+" 번째 항목을 클릭했습니다.",Toast.LENGTH_SHORT).show();
+                Log.d("TAG","클릭한 항목명 : "+data.get(position));
+                TextView textView = (TextView)view;
+                String item = textView.getText().toString();
+                Log.d("TAG","클릭한 항목명 : "+item);
+
+                ListView curListView = (ListView)adapterView;
+                int itemCount = curListView.getChildCount();
+                Log.d("TAG","현재 ListView의 항목 갯수 : "+itemCount);
+            }
+        });
+
+        //버튼 클릭시 항목 추가
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String item = itemName.getText().toString();
+
+                //원본 데이터에 항목추가
+                data.add(item);
+
+                //adapter에게 원본 항목에 변화가 생겼으므로 이를 ListView에 반영하도록 한다.
+                adapter.notifyDataSetChanged();
+
+                //text항목 리셋
+                itemName.setText("");
+
+                Toast.makeText(getApplicationContext(),item+" 항목이 추가되었습니다.",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //버튼 클릭시 항목 삭제
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String item = itemName.getText().toString();
+
+                //원복 데이터에 항목삭제
+                data.remove(item);
+
+                //adapter에게 원본 항목에 변화가 생겼으므로 이를 ListView에 반영하도록 한다.
+                adapter.notifyDataSetChanged();
+
+                //text항목 리셋
+                itemName.setText("");
+
+                Toast.makeText(getApplicationContext(),item+" 항목이 삭제되었습니다.",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
+```
+
++ ListViewExam2Activity.java
+```java
+package com.jica.adapterview;
+
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+public class ListViewExam2Activity extends AppCompatActivity {
+    //UI 객체
+    ListView listView;
+    //원본데이터
+    ArrayList<String> data;
+    //ListView와 원본 데이터를 연동시키는 어댑터
+    ArrayAdapter<String> adapter;
+
+    Button btnAdd, btnRemove;
+    EditText itemName;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml 전개
+        setContentView(R.layout.activity_list_view_exam2);
+
+        //UI 객체 참조값 얻기
+        listView = findViewById(R.id.listView);
+        btnAdd = findViewById(R.id.btnAdd);
+        btnRemove = findViewById(R.id.btnRemove);
+        itemName = findViewById(R.id.etItemName);
+
+        //원본 데이터 만들기
+        data = new ArrayList<String>();
+        data.add("First");
+        data.add("Second");
+        data.add("Third");
+
+
+        //어댑터 생성(1.항목뷰UI
+        adapter = new ArrayAdapter<String>(this,
+                                            android.R.layout.simple_list_item_single_choice,
+                                            data);
+
+        //ListView에 어댑터 설정
+        listView.setAdapter(adapter);
+
+        //ListView Choice mode 설정
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+
+        //버튼 클릭시 항목 추가
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String item = itemName.getText().toString();
+                if (item.length() != 0){
+                    //원본에 추가
+                    data.add(item);
+                    //선택항목 초기화(체크X)
+                    listView.clearChoices();
+                    //TextView 초기화
+                    itemName.setText("");
+                    //변화된 데이터로 싱크
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+
+        //버튼 클릭시 항목 삭제
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //선택한 항목삭제
+                int pos = listView.getCheckedItemPosition();
+
+                if (pos != ListView.INVALID_POSITION) {
+                    //원본에서 제거
+                    data.remove(pos);
+                    //선택항목 초기화(체크X)
+                    listView.clearChoices();
+                    //변화된 데이터로 싱크
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+}
+```
++ ListViewExam3Activity.java
+```java
+package com.jica.adapterview;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.SparseBooleanArray;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+
+public class ListViewExam3Activity extends AppCompatActivity {
+    //UI 객체
+    ListView listView;
+    //원본데이터
+    ArrayList<String> data;
+    //ListView와 원본 데이터를 연동시키는 어댑터
+    ArrayAdapter<String> adapter;
+
+    Button btnAdd, btnRemove;
+    EditText itemName;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml 전개
+        setContentView(R.layout.activity_list_view_exam3);
+
+        //UI 객체 참조값 얻기
+        listView = findViewById(R.id.listView);
+        btnAdd = findViewById(R.id.btnAdd);
+        btnRemove = findViewById(R.id.btnRemove);
+        itemName = findViewById(R.id.etItemName);
+
+        //원본 데이터 만들기
+        data = new ArrayList<String>();
+        data.add("First");
+        data.add("Second");
+        data.add("Third");
+
+
+        //어댑터 생성(1.항목뷰UI
+        adapter = new ArrayAdapter<String>(this,
+                                            android.R.layout.simple_list_item_multiple_choice,
+                                            data);
+
+        //ListView에 어댑터 설정
+        listView.setAdapter(adapter);
+
+        //ListView Choice mode 설정
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+
+        //버튼 클릭시 항목 추가
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String item = itemName.getText().toString();
+                if (item.length() != 0){
+                    //원본에 추가
+                    data.add(item);
+                    //선택항목 초기화(체크X)
+                    listView.clearChoices();
+                    //TextView 초기화
+                    itemName.setText("");
+                    //변화된 데이터로 싱크
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+
+        //버튼 클릭시 항목 삭제
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //선택한 항목삭제
+                SparseBooleanArray sb = listView.getCheckedItemPositions();
+
+                if (sb.size() != 0){
+                    for (int i=listView.getCount()-1; i>=0; i--){
+                        if (sb.get(i)){
+                            data.remove(i);
+                        }
+                    }
+                    listView.clearChoices();
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+}
+```
+  
++ WebToonActivity.java
+```java
+package com.jica.adapterview;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+public class WebToonActivity extends AppCompatActivity {
+    ListView lvWebToon;    //ListView
+    WebToonAdapter adapter;   //원본데이터
+    ArrayList<Item> data;   //Adapter
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml 전개
+        setContentView(R.layout.activity_web_toon);
+
+        //UI 참조값 얻기
+        lvWebToon = findViewById(R.id.lvWebToon);
+
+        //원본 data 만들기
+        makeData();
+
+        //Adapter -- 사용자정의 Adapter
+        adapter = new WebToonAdapter(getApplicationContext(),R.layout.webtoon,data);
+
+        //ListView에 Adpater연결
+        lvWebToon.setAdapter(adapter);
+
+        //항목클릭시 이밴트핸들러 설정
+        lvWebToon.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(),position+"번째 항목 클릭함",Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void makeData() {
+        if (data != null){
+            data.clear();
+        }else{
+            data = new ArrayList<Item>();
+        }
+        //.... 여러건의 data 추가
+        data.add(new Item(R.drawable.w253, "253화 승부1",8.99, "19.6.11") );
+        data.add(new Item(R.drawable.w252, "252화 세미나5",6.91, "19.6.10") );
+        data.add(new Item(R.drawable.w251, "251화 세미나4",8.12, "19.6.09") );
+        data.add(new Item(R.drawable.w250, "250화 세미나3",8.5, "19.6.08") );
+        data.add(new Item(R.drawable.w249, "249화 세미나2",4.6, "19.6.07") );
+        data.add(new Item(R.drawable.w248, "248화 세미나1",8.55, "19.6.06") );
+        data.add(new Item(R.drawable.w247, "247화 성장",8.99, "19.6.05") );
+        data.add(new Item(R.drawable.w246, "246화 장례식3",6.91, "19.6.04") );
+        data.add(new Item(R.drawable.w245, "245화 장례식2",8.12, "19.6.03") );
+        data.add(new Item(R.drawable.w244, "244화 장례식1",8.5, "19.6.02") );
+        data.add(new Item(R.drawable.w243, "243화 신년마무리",4.6, "19.6.01") );
+        data.add(new Item(R.drawable.w242, "242화 신년6",8.55, "19.5.30") );
+        data.add(new Item(R.drawable.w241, "241화 신년5",8.55, "19.5.29") );
+    }
+}
+```  
+
++ WebToonAdapter.java
+```java
+package com.jica.adapterview;
+
+import android.content.Context;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+
+public class WebToonAdapter extends BaseAdapter {
+    Context context;
+    int layoutId;
+    ArrayList<Item> data;
+
+    LayoutInflater layoutInflater;
+
+    public WebToonAdapter() {
+    }
+
+    public WebToonAdapter(Context context, int layoutId, ArrayList<Item> data) {
+        this.context = context;
+        this.layoutId = layoutId;
+        this.data = data;
+
+        //xml UI 전개할 객체
+        layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        Log.d("TAG", "WebToonAdapter::WebToonAdapter(Context,int,ArryList)");
+    }
+
+    @Override
+    public int getCount() {
+        //원본 데이터의 갯수를 알려주는 기능
+        Log.d("TAG","WebToonAdapter::getCount().....");
+        return data.size();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        //index(position)번째의 원본데이터를 리턴
+        Log.d("TAG","WebToonAdapter::getItem().....");
+        return data.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        //index(position)번째 원본 데이타의 id
+        Log.d("TAG","WebToonAdapter::getItemId().....");
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        //position : 순서
+        //convertView : 항목뷰
+        //parent : ListView-부모뷰
+
+        //index(position)번째의 항목뷰를 완성하여 리턴한다.
+        Log.d("TAG","WebToonAdapter::getView(int,View,ViewGroup).....");
+
+        LinearLayout linearLayout = (LinearLayout)convertView;
+
+        //내부적으로 위/아래 스크롤시 View를 재상요하도록 설계
+        if (linearLayout == null) {
+            //xml을 전개하여 만든다.
+            linearLayout = (LinearLayout) layoutInflater.inflate(layoutId,parent,false);
+            Log.d("TAG","항목뷰 객체를 신규생성함!");
+        } else {
+            Log.d("TAG","항목뷰 객체를 재사용함!");
+        }
+
+        //UI 객체에 원본데이터 값들을 설정한다.
+        Item curItem = data.get(position);
+
+        ImageView ivWebToon = linearLayout.findViewById(R.id.ivWebToon);
+        ivWebToon.setImageResource(curItem.getImgId());
+
+        TextView tvWebToonTitle = linearLayout.findViewById(R.id.tvWebToonTitle);
+        tvWebToonTitle.setText(curItem.getTitle());
+
+        TextView tvWebToonGrade = linearLayout.findViewById(R.id.tvWebToonGrade);
+        tvWebToonGrade.setText(curItem.getGrade()+"");
+
+        TextView tvWebToonDate = linearLayout.findViewById(R.id.tvWebToonDate);
+        tvWebToonDate.setText(curItem.getDate());
+
+        return linearLayout;
+    }
+}
+```  
+
+
++ SpinnerActivity.java
+```java
+package com.jica.adapterview;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+public class SpinnerActivity extends AppCompatActivity {
+    Spinner spYear;
+
+    //원본데이타
+    String strYear[];
+
+    //어탭터
+    ArrayAdapter<String> adapter;
+
+    //Spinner : 단순목록에서 선택(Java AWT에서 Choice와 유사)
+    boolean isFirst = true;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //UI xml 전개
+        setContentView(R.layout.activity_spinner);
+
+        //UI객체 참조값 얻기
+        spYear = findViewById(R.id.spYear);
+        spYear.setPrompt("년도를 선택하세요");
+
+        //원본데이타 만들기
+        strYear = new String[30];
+        for(int i=0; i<strYear.length; i++){
+            strYear[i] = (i+1990) + " 년";
+        }
+
+        //어댑터 생성
+        adapter = new ArrayAdapter<String>(getApplicationContext(),
+                android.R.layout.simple_spinner_item,
+                strYear);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //Spinner에 어댑터 연결
+        spYear.setAdapter(adapter);
+
+        //Spinner에서 항목클릭시 이벤트 핸들러 설정
+        spYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                //최초작동시 1번은 자동호출된다.
+                if (isFirst){
+                    isFirst = false;
+                    return;
+                }
+
+                Toast.makeText(getApplicationContext(),
+                        i + " 번째 항목 " + strYear[i] + "선택됨", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+}
+```
+
+
++ 
+
+
+#### 3. 쓰레드(Tread)
+1. 안드로이드에서 쓰레드도 자바(Java)에서의 쓰레드작업과 동일하다.
+```
+유일한 차이점은 쓰레드작업결과를 UI객체에 반영시키려고 하면 Error발생
+이때는 Main Thread ==> 지금 현재 화면에 보이는 액티비티와 연결되어 있다.
+
+방법1) 
+class MyThread extends Thread {
+    ...
+    public void run() {
+        여기에서 실행되는 코드가
+        OS가 인지하는 쓰레드이다.
+
+        //UI객체의 내용값 변경 불가
+        Handler에게 메세지를 보낸다.
+    }
+}
+MyThread mt = new MyThread();
+mt.start();
+
+
+
+방법2)
+class MyRunnable implemnts Runnable {
+    public void run() {
+        여기에서 실행되는 코드가 
+        OS가 인지하는 쓰레드이다.
+    }
+}
+MyRunnable mr = new MyRunnable();
+Thread thread = new Thread(mr);
+thread.start();
+```
+
+
+##### 안드로이드에서 쓰레드를 쓰려면!!! Handler 사용!!!
+
+
+
+
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
