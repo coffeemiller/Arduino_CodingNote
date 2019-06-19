@@ -2514,7 +2514,105 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.ViewHolder
 
 
 #### 4. Thread
+1. 안드로이드에서 쓰레드도 자바(Java)에서의 쓰레드작업과 동일하다.
+```
+유일한 차이점은 쓰레드작업결과를 UI객체에 반영시키려고 하면 Error발생
+이때는 Main Thread ==> 지금 현재 화면에 보이는 액티비티와 연결되어 있다.
+
+Activity에서 메서드를 생성해서 기능을 작동시키거나
+이벤트핸들러를 설정해서 수행되는 모든 기능은 main Thread에서 관여하는 기능
+====================================================================
+방법1) 
+class MyThread extends Thread {
+    ...
+    public void run() {
+        여기에서 실행되는 코드가
+        OS가 인지하는 쓰레드이다.
+
+        //UI객체의 내용값 변경 불가
+        Handler에게 메세지를 보낸다.
+    }
+}
+MyThread mt = new MyThread();
+mt.start();
+
+
+
+방법2)
+class MyRunnable implemnts Runnable {
+    public void run() {
+        여기에서 실행되는 코드가 
+        OS가 인지하는 쓰레드이다.
+    }
+}
+MyRunnable mr = new MyRunnable();
+Thread thread = new Thread(mr);
+thread.start();
+====================================================================
+```
+
++ 안드로이드에서의 쓰레드는 화면 UI도 정상적으로 작동하면서 재부적으로 다른 기능도 동시에 수행되도록 만드는 것 <=== 쓰레드 사용
+
++ 안드로이드 쓰레드의 제한 : 작업 쓰레드 내부에서 UI요소를 변경할수 X.
+
+
+
 ##### 4.1. Handler
+```
+                                      ----------------
+  Process ----------> main Thread ---- ||||||||||||||||--|   메세지큐
+                          |           ----------------   |
+                       Activity            루퍼(Looper)  |
+                          |                              v
+                      -----------                 이벤트처리메서드 호출
+                      |          |     Handler
+           사용자<===>|    UI     |       handleMessage(Message msg){
+                      |          |             ....msg에서 정보를 추출하여 UI에 반영
+                      |          |        }
+              Event   |          | ======> 작업쓰레드
+                      |          |         run(){
+                      -----------             실행코드
+                                              1) 메세지 생성후 정보저장
+                                              2) - Handler를 사용하여 메세지 전달
+                                                   mainHandler.sendMessage(message객체);
+                                                 - Handler를 사용하여 직접수행할 코드를 전달하여 실행시킬수 있다.
+                                                   mainHandler.post(Runnable객체) ;
+                                           }
+
+
+```
++ 쓰레드 관련 클래스
+  + 1) Handler : 작업쓰레드에서 전송한 Message객체를 사용하여 UI갱신
+```
+class MyHandler extends Handler {
+    public void handleMessage(Message msg){
+
+    }
+}
+```
+  
+  + 2) Message : 작업쓰레드의 결과값을 Handler를 이용하여 전달
+    + Message()
+    + 주요내부 멤버변수
+      + int what ==> 어느 쓰레드에서 보낸 메세지인지 식별.
+      + int arg1 --> 작업쓰레드의 결과값이 단순한 정수값일때 손쉽게 전달
+      + int arg2 ---|
+      + Object obj ==> 사용자정의 객체를 만들어서 여기에 값을 담아 전달
+```
+<Message 객체 생성방법>
+1) Message msg = new Message();
+2) Message msg = Message.obtain();
+   Message msg = Message.obtain(핸들러 객체, int);
+                ...
+3) Message msg = 핸들러객체.obtainMessage();
+                ...
+
+
+2)와 3)의 방법은 내부적으로 Message를 재사용 -- 메모리를 효율적으로 사용.
+```
+
+
+
 ##### 4.2. Nascape
 ##### 4.3. ASyncTalk
 
