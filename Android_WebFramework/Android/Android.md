@@ -2314,7 +2314,7 @@ thread.start();
 ```
 
 
-##### 안드로이드에서 쓰레드를 쓰려면!!! Handler 사용!!!
+##### 안드로이드에서 쓰레드를 쓰려면!!! Handler 사용!!
 
 
 
@@ -2332,6 +2332,214 @@ thread.start();
 
 #### 1. Review
 
+#### 2. RecyclerView
++ RecyclerView는 ListView, GridView의 기능을 새롭게 제공한다.
+```
+<기존의 Adapter와는 다른 상속계층구조를 가졌다.>
+java.lang.Object
+   ↳	android.view.View
+ 	   ↳	android.view.ViewGroup
+ 	 	   ↳	android.widget.AdapterView<android.widget.ListAdapter>
+ 	 	 	   ↳	android.widget.AbsListView
+ 	 	 	 	   ↳	android.widget.ListView
+
+
+ListView          BaseAdapter
+GridView  <---->   ↳ ArrayAdapter   <==>   원본데이터(배열, ArrayList, SQLite, NetDown)
+Spinner               ↳ UserAdapter
+                        ||
+                    1건의 항목뷰(신규생성,재사용) getView
+
+---------------------------------------------------------------------------
+
+<RecyclerView 상속계층구조>
+java.lang.Object
+   ↳	android.view.View
+ 	   ↳	android.view.ViewGroup
+ 	 	   ↳	androidx.recyclerview.widget.RecyclerView
+
+
+RecyclerView   <--->    RecyclerView.Adapter  <===>  원본데이터
+                               ||
+              ViewHolder,  1건의 항목뷰
+                            신규생성 - onCreateHolderView()
+                            재사용 - onBindViewHolder()     ......따로제공
+``` 
+
+
++ RecyclerViewActivity.java
+```java
+package com.jica.adapterview;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+
+public class RecyclerViewActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml 전개
+        setContentView(R.layout.activity_recycler_view);
+
+        //UI 객체 참조값 얻기
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+
+        //RecyclerView의 항목뷰를 위/아래, 좌/우... 배치 결정
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+
+        //할일
+        /*
+        1) 1건의 데이터 ==> Person.java
+        2) 원본데이터는 Adapter에서 관리
+        3) 1건의 항목뷰 ==> xml파일로 작성(Person_item.xml)
+        4) Adapter 만들기
+         */
+        PersonAdapter adapter = new PersonAdapter();
+
+        adapter.addItem(new Person("김민수", "010-1000-1000"));
+        adapter.addItem(new Person("김하늘", "010-2000-2000"));
+        adapter.addItem(new Person("홍길동", "010-3000-3000"));
+        adapter.addItem(new Person("김민수2", "010-1000-1000"));
+        adapter.addItem(new Person("김하늘2", "010-2000-2000"));
+        adapter.addItem(new Person("홍길동2", "010-3000-3000"));
+        adapter.addItem(new Person("김민수3", "010-1000-1000"));
+        adapter.addItem(new Person("김하늘3", "010-2000-2000"));
+        adapter.addItem(new Person("홍길동3", "010-3000-3000"));
+        adapter.addItem(new Person("김민수4", "010-1000-1000"));
+        adapter.addItem(new Person("김하늘4", "010-2000-2000"));
+        adapter.addItem(new Person("홍길동4", "010-3000-3000"));
+
+        //어댑터를 RecyclerView에 연결
+        recyclerView.setAdapter(adapter);
+
+        //항목선택시의 이밴트핸들러 설정에 사용자가 직접개입해야 한다.
+        //의외로 코드가 복잡하다. ==> RecyclerViewActivity2.java
+
+        //교재를 통해 클릭될 수 있도록 변형해보자!!
+    }
+}
+```
+
++ PersonAdapter.java
+```java
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+
+public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.ViewHolder> {
+    ArrayList<Person> items = new ArrayList<Person>();
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+        View itemView = inflater.inflate(R.layout.person_item, viewGroup, false);
+        Log.d("TAG","PersonAdapter::onCreateViewHolder(ViewGroup, int");
+        return new ViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+        Person item = items.get(position);
+        viewHolder.setItem(item);
+        Log.d("TAG","PersonAdapter::onBindViewHolder(ViewHolder, int)...."+position);
+    }
+
+    @Override
+    public int getItemCount() {
+        Log.d("TAG","PersonAdapter::getItemCount()");
+        return items.size();
+    }
+
+    public void addItem(Person item) {
+        items.add(item);
+    }
+
+    public void setItems(ArrayList<Person> items) {
+        this.items = items;
+    }
+
+    public Person getItem(int position) {
+        return items.get(position);
+    }
+
+    public void setItem(int position, Person item) {
+        items.set(position, item);
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView textView;
+        TextView textView2;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            textView = itemView.findViewById(R.id.textView);
+            textView2 = itemView.findViewById(R.id.textView2);
+        }
+
+        public void setItem(Person item) {
+            textView.setText(item.getName());
+            textView2.setText(item.getMobile());
+        }
+    }
+}
+```
+
+
+
+
+#### 3. ExpandableListView
++ 예제를 통한 각자 분석
+
+
+
+
+
+
+#### 4. Thread
+##### 4.1. Handler
+##### 4.2. Nascape
+##### 4.3. ASyncTalk
+
+
+
+
+
+
+##### [오늘의 할일]
++ 교재 431~435page의 소스를 반영시키자.
+
+
+#### 5. 실습
+#### 6. Summary / Close
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-20]
+
+#### 1. Review
+
 #### 2. 기본위젯과 배치관리자
 
 #### 5. 기본위젯 사용법과 Event처리
@@ -2343,11 +2551,28 @@ thread.start();
 
 
 
+-----------------------------------------------------------
+
+
+### [2019-06-21]
+
+#### 1. Review
+
+#### 2. 기본위젯과 배치관리자
+
+#### 5. 기본위젯 사용법과 Event처리
+
+#### 3. Event처리
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
 
 -----------------------------------------------------------
 
 
-### [2019-06-20]
+### [2019-06-24]
 
 #### 1. Review
 
