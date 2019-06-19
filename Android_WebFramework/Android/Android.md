@@ -2578,8 +2578,6 @@ thread.start();
                                                  - Handler를 사용하여 직접수행할 코드를 전달하여 실행시킬수 있다.
                                                    mainHandler.post(Runnable객체) ;
                                            }
-
-
 ```
 + 쓰레드 관련 클래스
   + 1) Handler : 작업쓰레드에서 전송한 Message객체를 사용하여 UI갱신
@@ -2589,8 +2587,20 @@ class MyHandler extends Handler {
 
     }
 }
+
+MyHandler handler = new MyHandler();
+...
+작업쓰레드의 run()메서드 내부에서 작업결과를 전송하는 방법
+1) handler.sendEmptyMessage(what);
+2) Message 객체를 생성한 후 정보를 저장.
+   handler.sendMessage(Message객체);
+3) 실행할 기능을 Runnable 객체에 작성한 후,
+   handler.post(Runnable객체);
+   handler.postDelayed(Runnable객체,지연시간);
+
 ```
   
+
   + 2) Message : 작업쓰레드의 결과값을 Handler를 이용하여 전달
     + Message()
     + 주요내부 멤버변수
@@ -2611,10 +2621,36 @@ class MyHandler extends Handler {
 2)와 3)의 방법은 내부적으로 Message를 재사용 -- 메모리를 효율적으로 사용.
 ```
 
++ 현재는 작업쓰레드에서 main Thread로 메세지를 전송하고 있다.
+  + 상황에 따라서는 main Thread가 작업쓰레드에게 메세지를 전송하는 특별한 경우도 있다.
+  + 이때는 작업쓰레드 전담 Looper를 만들어서 작업을 한다.
+  + (교재 485~488page 예제) - 생략
 
 
-##### 4.2. Nascape
-##### 4.3. ASyncTalk
+
+
+
+
+##### 4.2. AsyncTask
++ 쓰레드를 명시적으로 사용하지 않고 UI객체도 동시에 변형시키는 방법
+  + 내부적으로 작업쓰레드가 안드로이드 시스템에 의해 만들어지고 사용된다.
+  + 이때 사용되는 것이 AsyncTask클래스(실무적으로 많이 사용됨)
+```
+1) 쓰레드 작동 전 작업
+2) 쓰레드 작업내용
+3) UI 갱신 전담
+4) 쓰레드 작업 후 마무리
+5) 쓰레드 중간 취소시 작업
+```
+
+
+
+
+
+
+
+
+##### 4.3. Nascape
 
 
 
