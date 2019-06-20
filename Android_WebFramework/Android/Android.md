@@ -2647,16 +2647,6 @@ MyHandler handler = new MyHandler();
 
 
 
-
-
-
-##### 4.3. Nascape
-
-
-
-
-
-
 ##### [오늘의 할일]
 + 교재 431~435page의 소스를 반영시키자.
 
@@ -2673,15 +2663,325 @@ MyHandler handler = new MyHandler();
 ### [2019-06-20]
 
 #### 1. Review
++ Thread
+  + Thread extends  -> UI변경 X
+    + Handler 객체를 만들어, 이 객체를 통해 UI변경가능
+    + Message 객체(or what전달)를 만들어 내용을 전달(sendMessage(msg)/sendEmptyMessage(what))
+    + Looper를 통해 전달된 Message를 사용.
+  + Runnable implements
+  + 
 
-#### 2. 기본위젯과 배치관리자
 
-#### 5. 기본위젯 사용법과 Event처리
 
-#### 3. Event처리
 
-#### 4. 실습
-#### 5. Summary / Close
+#### 2. AsyncTask 사용법
++ 쓰레드를 명시적으로 사용하지 않고 UI객체도 동시에 변형시키는 방법
+  + 내부적으로 작업쓰레드가 안드로이드 시스템에 의해 만들어지고 사용된다.
+  + 이때 사용되는 것이 AsyncTask클래스(실무적으로 많이 사용됨)
+```
+1) 쓰레드 작동 전 작업 -- 준비작업 onPreExcute() == UI갱신가능
+2) 쓰레드 작업내용              doInBackground() == UI갱신 불가능
+                                        ||
+                                    publishProgress
+                                        | 호출(OS)
+3) UI 갱신 전담          --         onProgressUpdate() == UI갱신가능
+4) 쓰레드 작업 후 마무리 -- 마무리작업 onPostExecute() == UI갱신가능
+5) 쓰레드 중간 취소시 작업
+
+
+java.lang.Object
+   ↳	android.os.AsyncTask<Params, Progress, Result>
+
+    Params : 최초로 AsyncTask객체를 execute()메서드로 실행시킬때 전달한는 값의 자료형
+             doInbackground()의 인자값 자료형이 된다.
+
+    Progress : doInbackground()내부에서 작업결과를 UI에 반영시키기 위해
+               publishProgress(값) 사용시 인자값의 자료형
+               onProgressUpdate(인자)메서의 인자값의 자료형
+
+    Result : doInbackground()가 작업을 마치고 최종적으로 리턴해주는 값의 자료형
+             이값은 onPostExecute(인자값)의 인자값으로 전달된다.
+    ===================================================================
+
+
+    task = new BackgroundTask();
+    task.execute(인자들);
+                 -----
+                   |
+                   |----------------------|               |------> doInbackground()메서드의 리턴값 자료형
+                                          v             -------
+ class BackgroundTask extends AsyncTask<Integer,Integer,Integer>  {
+                                        ------- ------------------v
+                                           |     publishProgress(인자)
+        @Override                          v
+        protected Integer doInBackground(Integer... integers) {
+            ...실행코드
+            publishProgress(value); //UI갱신
+            ...실행코드
+
+            return value;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+        }
+
+ }
+```
+
++ AsyncTask의 가변인자 예제
+```java
+import android.os.AsyncTask;
+
+public class MyAsyncTask extends AsyncTask<String, Integer, Double> {
+    @Override
+    protected Double doInBackground(String... strings) {
+        //....
+        publishProgress(100);
+        //....
+        return new Double(3.14);
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+    }
+
+    @Override
+    protected void onPostExecute(Double aDouble) {
+        super.onPostExecute(aDouble);
+    }
+}
+```
+
+
+
++ AsyncTaskActivity.java
+```java
+```
+
+
+
+
+#### 3. Menu와 ActionBar
++ 메뉴(Menu)
+  + 초창기 안드로이드 : 스마트폰 하단의 메뉴버튼(현재 시스템메뉴)
+  + 현재 안드로이드 : 스마트폰의 하단 => 시스템메뉴(내부에 활성화되어있는 액티비티)
+    + 액티비티 화면 상단의 오른쪽(:) <----------- 클릭(액티비티의 메뉴)
+    + 자주사용되는 메뉴항목을 (타이틀바) 액션바로 사용하면 아이콘으로 메뉴항목을 표시한다.
+    + 액티비티 화면의 위젯을 롱클릭시 팝업상태의 메뉴 <---컨텍스트 메뉴
+      1. 옵션메뉴
+      2. 액션바영역의 아이콘
+      3. Context메뉴
+
+
+
++ Activity는 메뉴를 위한 메서드를 가지고 있다.
+
+```
+@Override
+    public boolean onCreateOptionsMenu(Menu menu) 
+    인자로 전달된 menu객체에 메뉴내용설정
+        1) JavaCode
+        2) res\menu\ xxx_menu.xml --> 메뉴를 전개
+
+@Override
+    public boolean onOptionsItemSelected(MenuItem item) 
+    옵션메뉴의 메뉴항목을 클릭하면 호출된다.
+    여기에서 수행할 기능 작성
+```
+
++ OptionMenu2Activity.java
+```java
+package com.jica.dialogactionbar;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SubMenu;
+import android.widget.Toast;
+
+public class OptionMenu2Activity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_option_menu2);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        //java code로 메뉴생성
+        //add(int groupId, int itemId, int order, CharSequence charSequence);
+        MenuItem item = menu.add(0,1,0,"짜장");
+        item.setIcon(R.drawable.menu_refresh);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        menu.add(0,2,0,"짬뽕").setIcon(R.drawable.menu_search);
+
+        SubMenu etc = menu.addSubMenu("기타");
+        etc.add(0,3,0,"우동");
+        etc.add(0,4,0,"만두");
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case 1 :
+                Toast.makeText(this,"짜장은 달콤해",Toast.LENGTH_SHORT).show();
+                return true;
+            case 2 :
+                Toast.makeText(this,"짬뽕은 매워요",Toast.LENGTH_SHORT).show();
+                return true;
+            case 3 :
+                Toast.makeText(this,"우동은 시원해",Toast.LENGTH_SHORT).show();
+                return true;
+            case 4 :
+                Toast.makeText(this,"만두는 공짜일때가 좋아",Toast.LENGTH_SHORT).show();
+                return true;
+        }
+        return true;
+    }
+}
+``` 
+
+
+##### ContextMenu
+```
+개별위젯.registForContext메뉴(개별위젯);
+        |             //롱클릭~
+    public void onCreateContextMenu(ContextMenu menu, View view,
+                                             ContextMenu.ContextMenuInfo menuInfo){
+        위젯(View)에 따라 ContextMenu를 설정
+    }
+
+    public boolean onContextItemSelected(MenuItem item){
+        컨텍스트메뉴클릭시의 구현 코드
+    }
+```
+
++ ContextMenuActivity.java
+```java
+package com.jica.dialogactionbar;
+
+import android.graphics.Color;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+public class ContextMenuActivity extends AppCompatActivity {
+    Button btnConfirm;
+    EditText etWord;
+    ImageView ivLogo;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //UI xml
+        setContentView(R.layout.activity_context_menu);
+
+        //UI 참조값
+        btnConfirm = findViewById(R.id.btnConfirm);
+        etWord = findViewById(R.id.stWord);
+        ivLogo = findViewById(R.id.ivLogo);
+
+        //개별 위젯에 context메뉴를 등록한다.
+        registerForContextMenu(btnConfirm);
+        registerForContextMenu(etWord);
+        registerForContextMenu(ivLogo);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+
+        if (view == btnConfirm) {
+            menu.setHeaderTitle("버튼 컨텍스트메뉴");
+            menu.add(0,1,0,"Red");
+            menu.add(0,2,0,"Green");
+            menu.add(0,3,0,"Blue");
+        }
+
+        if (view == etWord){
+            menu.add(0,4,0,"번역하기");
+            menu.add(0,5,0,"필기체로 인식");
+        }
+
+        if (view == ivLogo){
+            menu.add(0,6,0,"흑백으로 변환");
+            menu.add(0,7,0,"이미지 우로 90도회전");
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case 1 :
+                btnConfirm.setTextColor(Color.RED); break;
+            case 2 :
+                btnConfirm.setTextColor(Color.GREEN); break;
+            case 3 :
+                btnConfirm.setTextColor(Color.BLUE); break;
+            case 4 :
+                //원래는 여기서 입력한 단어를 읽어서
+                //Naver공용 번역 API를 사용하여 네트웍으로 전송하여 번역된 단어를 받아온다.
+                Toast.makeText(this,"번역했습니다.",Toast.LENGTH_SHORT).show(); break;
+            case 5 :
+                Toast.makeText(this,"필기체로 인식했습니다.",Toast.LENGTH_SHORT).show(); break;
+            case 6 :
+                //여기 이미지 조작기능을 이용하여 흑백이미지를 만드는 로직
+                Toast.makeText(this,"흑백 이미지로 변환했습니다.",Toast.LENGTH_SHORT).show(); break;
+            case 7 :
+                //여기 이미지 조작기능을 이용하여 이미지를 회전하는 로직
+                Toast.makeText(this,"이미지를 회전했습니다.",Toast.LENGTH_SHORT).show(); break;
+        }
+        return true;
+    }
+}
+```
+
++ 교재 323page 이후의 응용 예제는 Fragment 학습후 살펴보자.
+
+
+
+
+#### 4. SQLite 사용법
++ SQLite : 경량화된 모바일 기기에서의 데이터 베이스
+    + 표준 SQL명령을 그대로 사용
+      + DDL, Query, DML, DTL
+    + 데이터베이스 파일(*.DB)
+    + 테이블(dictionary)
+      + 순번 _id       NUMBER    ----------->  Integer PK
+      + 영어단어 eng  VARCHAR2(10)  -------->  TEXT
+      + 한글단어 kor  VARCHAR2(20)  -------->  TEXT
+    + =========> 기기 data/data/com.jica.sqlite/datavases/이름.DB
+
+
++ 안드로이드에서는 SQLite를 관리하기 위해, SQLiteDatabase 클래스를 제공한다.
+    + SQLiteOpenHelper클래스도 제공(데이터베이스파일 및 테이블생성, 오픈작업 쉽게)
+
+
++ 교재 537page 확인
+
+
+#### 5. 실습
+#### 6. Summary / Close
 
 
 
