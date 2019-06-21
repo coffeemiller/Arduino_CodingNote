@@ -2962,7 +2962,7 @@ public class ContextMenuActivity extends AppCompatActivity {
 
 
 #### 4. SQLite 사용법
-+ SQLite : 경량화된 모바일 기기에서의 데이터 베이스
++ SQLite : ah모바일기기(아이폰, 안드로이드)긱에 기본으로 제공되는 경량화된 데이타베이스(내부-파일시스템)
     + 표준 SQL명령을 그대로 사용
       + DDL, Query, DML, DTL
     + 데이터베이스 파일(*.DB)
@@ -2992,7 +2992,74 @@ public class ContextMenuActivity extends AppCompatActivity {
 
 #### 1. Review
 
-#### 2. 기본위젯과 배치관리자
+#### 2. SQLite 사용법
++ 안드로이드에서는 SQLite관리하기 위해 SQLiteDatabase 클래스를 제공해준다.
+
+```
+   java.lang.Object
+      ↳	android.database.sqlite.SQLiteClosable
+    	   ↳	android.database.sqlite.SQLiteDatabase
+```
+
+
+
+   + 1) SQLite에 대한 모든 관리는 SQLiteDatabase클래스로 제공된다.
+```
+        관리하는 기능을 다양한 메서드로 제공
+        create()
+        openDataBase()
+        execSQL(sql)     ---  SELECT문을 제외한 SQL명령
+        rawQuery(sql)    ---  SELECT문
+        
+        ===> Query,DML명령을 별도의 메서드로 제공해준다.
+        insert(),update(),delete()
+        ....
+```
+
+
+
+
+   + 2) 데이타베이스화일 및 테이블생성 그리고 OPEN을 손쉽게 하도록 지원하기 위해
+```
+      SQLiteOpenHelper클래스도 제공
+        //다양한 생성자 =====> 데이타베이스화일을 생성
+        SQLiteOpenHelper()
+        ....
+        //Open 메서드
+        SQLiteDatabase	getReadableDatabase() ------|필요할때 내부적으로 호출
+        SQLiteDatabase	getWritableDatabase()       |
+                                                    |
+        //추상메서드 =====>테이블생성,구조변경,삭제 <--|
+        abstract void	onCreate(SQLiteDatabase db)
+        abstract void	onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+
+
+
+      class MyDBHelper extends SQListOpenHelper{
+          public MyDBHelper(Context ){
+             super( context , 데이타베이스화일명  , null  , 버전번호  ); //상위클래스 생성자 호출
+          }
+
+          @Override
+          void	onCreate(SQLiteDatabase db){
+             테이블생성,테이블삭제, 연습용데이타 추가
+          }
+
+          @Override
+          void	onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
+             테이블의 구조 변경
+          }
+
+      }
+```
+
++ JDBC program에서는 SELECT문의 결과값을 ResultSet에 담아왔다.
+  + SQLite에서는 Cursor에 담아야 한다.
+
+
++ 참고) SQLite 데이터베이스 관리tool  ==>  sqlitestudio
+
+
 
 #### 5. 기본위젯 사용법과 Event처리
 
