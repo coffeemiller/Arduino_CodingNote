@@ -3010,7 +3010,7 @@ public class ContextMenuActivity extends AppCompatActivity {
         openDataBase()
         execSQL(sql)     ---  SELECT문을 제외한 SQL명령
         rawQuery(sql)    ---  SELECT문
-        
+
         ===> Query,DML명령을 별도의 메서드로 제공해준다.
         insert(),update(),delete()
         ....
@@ -3026,9 +3026,9 @@ public class ContextMenuActivity extends AppCompatActivity {
         SQLiteOpenHelper()
         ....
         //Open 메서드
-        SQLiteDatabase	getReadableDatabase() ------|필요할때 내부적으로 호출
-        SQLiteDatabase	getWritableDatabase()       |
-                                                    |
+        SQLiteDatabase	getReadableDatabase() ---------|필요할때 내부적으로 호출
+        SQLiteDatabase	getWritableDatabase()          |
+                                                       |
         //추상메서드 =====>테이블생성,구조변경,삭제 <--|
         abstract void	onCreate(SQLiteDatabase db)
         abstract void	onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
@@ -3060,13 +3060,20 @@ public class ContextMenuActivity extends AppCompatActivity {
 + 참고) SQLite 데이터베이스 관리tool  ==>  sqlitestudio
 
 
+##### 교재 예제
+1) 데이타베이스/테이블 만들기 /삭제하기
+   Activity상위 클래스인 ContextWrapper클래스의 아래메서드를 사용
+   SQLiteDatabase openOrCreateDatabase(String name,
+                                       int mode,
+                                       SQLiteDatabase.CursorFacotry);
+   boolean deleteDatabase(String name)
+2) 교재예제 BookSQLiteActivty 처럼 Context의 openORCreateDatabse() 하거나
+   OpenHelper를 사용하 방법 둘중에 하나를 선택해서 사용하세요.
 
-#### 5. 기본위젯 사용법과 Event처리
 
-#### 3. Event처리
 
-#### 4. 실습
-#### 5. Summary / Close
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
