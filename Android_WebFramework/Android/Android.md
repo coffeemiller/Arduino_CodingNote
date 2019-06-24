@@ -3084,11 +3084,115 @@ public class ContextMenuActivity extends AppCompatActivity {
 
 #### 1. Review
 
-#### 2. 기본위젯과 배치관리자
+#### 2. View에 직접 그리기
++ 커스텀뷰(CustomView) : View클래스를 상속받아 사용자가 만든 View 클래스
+  + 1) 그리기 : onDraw(Canvas)
+  + 2) 배치
+  + 3) 이벤트 처리
+  + =================> 커스텀 위젯
 
-#### 5. 기본위젯 사용법과 Event처리
 
-#### 3. Event처리
++ onDraw()
+```java
+void onDraw(Canvas canvas){
+    //그리는데 필요한 정보 ==> Paint객체
+    canvas.그리기메서드(... , paint객체);
+}
+```
+
+```
++ canvas.다양한 그리기 메서드(.. , Paint객체)
+                                    정보를 설정해서 변화를 준다.
+```
+
++ CustomView3Activity.java
+  + MyView클래스를 xml 레이아웃을 디자인할때 사용할수 있도록 작성
+  + 1) View를 상속받아 Attribute attrs을 인자로 가지는 생성자도 함께 작성
+  + 2) xml파일에서 
+```
+<view
+    class = "com.jica.customview.MyView"
+    ...나머지는 동일
+``` 
+  + MyView를 다시 그리기 위해서는 onDraw(Canvas) 작동해야 한다.
+    + 그런데 onDraw()는 직접호출할수 없고 invalidate()메서드를 호출하면 간적접으로 호출되어 진다.
+
+
++ 커스텀뷰에 이미지 그리기 기능
+  + 1) res/drawable/*.jpg --> 읽어서 Bitmap객체 생성후 View의 canvas에 그린다.
+    - 원본그대로
+    - 원본을 확대/축소
+    - 원본의 일부를 그대로, 확대/축소
+  + 2) 사용자가 비트맵객체를 생성후 --> Canvas를 얻어서 여기에 그리기 메서드
+    - 최종적으로 비트맵객체를 View의 Canvas에 그리기
+
+
++ 여기까지를 이해한 후 이것을 응용하는 방법이 교재 579page(chapter 12).
++ 터치이벤트 처리  ----  이미지 확대/축소(Zoom-in, Zoon-out)
+
+
+
+
+
+
+#### 3. 실습
+#### 4. Summary / Close
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-25]
+
+#### 1. Review
+
+#### 2. Broadcast Receiver
+##### 2.1. 개요
+##### 2.2. 사용자 BR
+##### 2.3. 시스템 BR
+##### 2.4. 문자메시지 수신 BR
+
+#### 3. Fragment
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-26]
+
+#### 1. Review
+
+#### 2. Broadcast Receiver
+##### 2.1. 개요
+##### 2.2. 사용자 BR
+##### 2.3. 시스템 BR
+##### 2.4. 문자메시지 수신 BR
+
+#### 3. Fragment
+
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-27]
+
+#### 1. Review
+
+#### 2. Broadcast Receiver
+##### 2.1. 개요
+##### 2.2. 사용자 BR
+##### 2.3. 시스템 BR
+##### 2.4. 문자메시지 수신 BR
+
+#### 3. Fragment
 
 #### 4. 실습
 #### 5. Summary / Close
