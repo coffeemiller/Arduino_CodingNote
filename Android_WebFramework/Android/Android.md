@@ -3144,10 +3144,109 @@ void onDraw(Canvas canvas){
 
 ### [2019-06-25]
 
-#### 1. Review
+#### 0. Review
+
+
++ 참고) androidx 사용하기
+  + androidx는 기존의 다양한 종류의 support라이브러리를 통합배포한 라이브러리.(2018)
+  + 이전 프로젝트 --> androidx 프로젝트변환 (Jactpat 프로젝트)
+  + 1) gradle.properties 파일
+    + androidx.useAdroidX = true
+    + androidx.enableJetifier = true
+  + 2) App에서 Refactor/Migrate to AndroidX 선택하여 작업진행
+    + 최종적으로 bundle.gradle(app) 하단의 dependencies내부내용이 androidx로 변환
+
+
+#### 1. View에 직접 그리기
++ View 클래스의 대표적인 메서드
+  1. onDraw() - 내용그리기
+  2. onTouchEvent(MotionEvent event) - 화면터치 이벤트 처리
+```
+[터치 이벤트를 사용하는 방법]
+1)  onTouchEvent(MotionEvent event) 재정의
+    MotionEvent.ACTION_DOWN, MOVE, UP
+
+2) View.OnTouchListener라는 터치이벤트처리 Listener가 있다.
+    class MyTouchListener implement View.OnTouchListerner{
+        @Override
+        boolean onTouch(View v, MotionEvent event){
+            동일하게 사용
+        }
+    }
+    View객체.setOnTouchListener(new MyTouchListener());
+```
+
 
 #### 2. Broadcast Receiver
++ 통지 : 자신의 App에서 안드로이드 시스템에게 알려주는 것
++ 내 APP ------------->  안드로이드시스템
+                        1) 최상단 상태바에 통지 아이콘 표시(진동)
+                        2) 드래그를 해서 개략내용을 확인
+                        3) 사용자가 수행해야할 기능이 있다면 개략내용을 탭하면 Activity로 이동시킨다.
+
 ##### 2.1. 개요
++ BR : BroadcastReceiver(교재 362page)
+
++ 방송(Broadcast)는 안드로이드 시스템이나 특정 app에서 내부적 상태를 외부(폰에 설치되어 있는 App)에게 알려주는 것.
+
+
+
++ 방송(Broadcast)의 종류:
+  1) 안드로이드 시스템의 방송(Broadcast)
+  2) 사용자가 보내는 방송(Broadcast)
+
+```
+
+     안드로이드 시스템
+     ================                          내 APP
+     상태변화(약속된 값:Broadcast)              ===================
+                                                밧데리상태변화에 관심이 있다면
+                        1)<-------------------- 밧데리상태변화가 생기면 작동할 BR을 작성하여 등록
+                           AndoridManifest.xml
+        ....운용......                          class BatReceiver extends BroadcastReceiver{
+                                           |---->  public onReceive(){
+        2)                                 |          //간단한 기능수행후
+        밧데리 상태변화가 생기면           |          //Activity를 동작시키거나 Service작동시킨다
+        등록된 BR을 검색하여               |       }
+        해당 BR을 작동시킨다 --------------|   }
+
+
+
+
+     다른 App에서도 필요하다면                 내 App에서도 다른 App에서 발송한 방송을
+     사용자정의 Broadcast을 발송할수가 있다.           수신할 수도 있다.
+     sendBroadcast();
+```
+
+```
+     방송을 수신할수 있는 상태는 2가지이다.
+     1)BR을 AndroidManifest.xml에 등록하면 내App동작중이지 않은상태에서도 BR이 작동할수 있다.
+     2)BR을 등록시키지 않으면 내App가 동작중일때만 BR을 수신할 수 있다.
+                             ==============================
+                             Activity가 화면에 보여지는 중이다.
+                             onCreate(),onResum()에서 BR수신 시작을 설정
+                             onPause()에서 BR수신 끝을 설정
+
+
+1) BR을 AndroidManifest.xml 등록해 놓은 자신의 BR을 가진 APP이 동작중이거나
+   혹은 동작중이 아니어도 BR이 동작한다.
+
+2) BR을 등록시켜놓지 않고 특정 Activity가 동작할때만 수신하도록 하자.
+                         ==================
+                         onCrete(), onResume() ==> 일시적으로 BR수신 가능하도록 설정
+                         ...                       registerReceiver(BroadcastReceiver, IntentFilter);
+                         ...
+                         ...
+                         onPause()             ==> BR수신을 해제
+                                                   unregisterReceiver(BroadcastReceiver);
+```
+
++ BR은 UI를 가지고 있지 않다. 단순히 logic처리만 담당한다.
+  + 간단하다면, 직접작성.
+  + 오랜시간이 걸리는 작업이라면  ==> Service 혹은 Thread처리
+  + 사용자에게 보여줄 내용이 있다면 ==> Activity호출
+
+
 ##### 2.2. 사용자 BR
 ##### 2.3. 시스템 BR
 ##### 2.4. 문자메시지 수신 BR
