@@ -1809,7 +1809,7 @@ public class ListViewExamActivity extends AppCompatActivity {
                 //text항목 리셋
                 itemName.setText("");
 
-                Toast.makeText(getApplicationContext(),item+" 항목이 추가되었습니다.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),item+" 항목이 ��가되었습니다.",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -3247,14 +3247,9 @@ void onDraw(Canvas canvas){
   + 사용자에게 보여줄 내용이 있다면 ==> Activity호출
 
 
-##### 2.2. 사용자 BR
-##### 2.3. 시스템 BR
-##### 2.4. 문자메시지 수신 BR
 
-#### 3. Fragment
-
-#### 4. 실습
-#### 5. Summary / Close
+#### 3. 실습
+#### 4. Summary / Close
 
 
 
@@ -3266,12 +3261,286 @@ void onDraw(Canvas canvas){
 #### 1. Review
 
 #### 2. Broadcast Receiver
-##### 2.1. 개요
-##### 2.2. 사용자 BR
-##### 2.3. 시스템 BR
-##### 2.4. 문자메시지 수신 BR
+
++ AndroidManifest.xml
+  + App 설정정보
+  + 4대구성요소정보등록(추가적인 특성을 지정 --> intent-filter)
+```
+ <intent-filter>
+    <action android:name="android.intent.action.MAIN" />
+
+    <category android:name="android.intent.category.LAUNCHER" />
+</intent-filter>
+```
+    1. Activity
+    2. Receiver
+    3. Service
+    4. Content Provider
+   
+
++ Intent, IntentFilter class
+
+
+
+
+##### 2.1. 사용자 BR
+##### 2.2. 시스템 BR
+##### 2.3. 문자메시지 수신 BR
+
 
 #### 3. Fragment
++ 안드로이드의 화면구성
+  + 한화면 ---- 한개의 액티비티
+  + --- 여러위젯, Fragment(독자적인 화면구성)-- JavaCode
+```java
+class MyActivity extends XXXActivity {
+    onCreate(Bundle s) {
+        setContentView(R.layout.xxx);
+        ...
+    }
+}
+
+class MyFragment extends Fragment {
+    다양한 lifecyle메서드들
+        자신의 화면구성 -- 별도의 xml로 작성 or JavaCode
+    독자적인 이벤트 처리
+}
+```
+
+
+1. 프래그먼트(Fragment) : 액티비티의 화면을 분할하여 화면의 한 부분을 정의한다.
+```
+      FragmentBaseActvity                  CounterFrament
+          |										|
+      화면구성(activity_base.xml)		  화면구성( 1. counter_fragment.xml
+            일부분을 Fragment사용                   2. 코드로 작성 )
+            <fragement 
+	           android:id="@+id/CounterFragment"
+               android:name="com.jica.android.fragment.FragmentBaseActivity$CounterFragment"
+	        />
+    - 자신만의 레이아웃, 동작, 생명주기를 가진 독립적인 모듈이다.
+    - 재사용 가능( 하나의 Activity에서 --> 여러개(동일, 다른)의 Fragment사용가능
+                         여러 Activity에서 한개의 Fragment를 사용할 수도 있다.)
+                                                           
+    - 관리(추가, 변경, 삭제 <--- 백스택)
+```
+
+
+
+2. 프래그먼트의 생명주기
+```
+
+    Activity									    Fragment
+---------------------------------					--------------------------------
+    생성자()
+    onCreate(Bundle){
+        setContentView(R.layout.activity_main) --->  생성자
+										             void onAttach(Activity)
+		<-----------|						         void onCreate(Bundle)
+				    |  				                 View onCreateView(LayoutInflater, ViewGroup, Bundle){
+				    |                                       //독자적인  fragmenet 자체의 구성요소 즉, 화면구성과 이벤트 처리 코딩
+				    |                                       retrun view;
+				    |                                }
+    }				|-------------------------------
+     
+    ------------------------------------------------->void onActivityCreated(Bundle savedInstanceState)
+    onStart(), onRestart()                            void onStart()
+    onResume()                                        void onRsume()
+                        Actvity및 Fragment활성화 상태
+			                                          void onPause()
+    onPause()	  							          void onStop()
+    onStop()                                          void onDestroyView()
+                                                      void onDestroy()
+										              void onDetch()
+    onDestroy()										  
+```
+
+
+
+
+3. 프래그먼트 사용시 주의점
+```
+        Activity                                                                  Fragment
+
+	onCreate(){							     onAttach(),onCreate()	
+	   setContentView(xml layout id);			     onCreateView(){	   
+											화면구성(xml전개, 코드)	
+	   Fragment의 구성요소에 대한 처리(권장안함)               구성요소에 대한 처리(적극권장);
+	}									     }	
+										     
+										     onActivityCreated(){
+										        부득이하게 이곳에 구성요소에 대한
+											 처리를 하게 될경우(getView())
+										     }	
+```
+
+
+
+
+4. 상태값을 저장하거나 복구할때
+```
+       Activity								        Fragment
+
+       onCreate(Bundle savedInstance){
+            // Bundle를 이용하여 임시정보 복구가능
+	    // 영구정보 복구가능
+       }
+       onRestoreInstanceState(Bundle){
+            // Bundle를 이용하여 임시정보 복구가능
+       }
+       onResume(){
+            // 영구정보는 SharedPreference, SQLite에저장
+	    // 되어 있으므로 이곳에서 일반적으로 복구한다.
+       }
+       활성화 상태 ===> 이후부터는 시스템에 의해 강제로 액티비티가 종료될수도 있다.
+                       그러므로 현재의 작업내용을 저장할 필요성이 있다면
+                       1) onPause()메서드에서 저장하고
+                          다시 액티비티가 만들어져 보여질때
+                          onResume()메서드에서 복구하는것이 일반적인다. ==>영구적인 정보 저장(file, SQLite, SharedPreference)
+                       2) onSaveInstanceState(Bundle)메서드를 재정의하고 인자로 전달된
+                          Bundle객체에 값을 저장하고 다시 액티비티가 보여질때
+                          onCreate(Bundle), 혹은  onRestoreInstanceState(Bundle)에서
+                          값을 값을 복구할 수 있다. ==> 임시정보 저장
+
+
+       onPause()  {
+            // 영구정보는 SharedPreference, SQLite에저장        onCreate(Bundle)
+	                                                                                onCreateView( , , Bundle)
+											onActivityCreated(Bundle)
+	    // 되어 있으므로 이곳에서 일반적으로 복구한다.          onRestoreInstanceState(Bundle)
+       }										onPause()
+       onSaveInstanceState(Bundle){					onSaveInstanceState(Bundle)...
+             임시정보는 Bundle객체에 저장
+       }
+```
+
+
+
+
+5. Activity에서
+```
+      Fragment를 상황에 따라 추가,변경(교체),삭제하는 기능 ==> 관리
+      FrgmentManger, FragmentTransaction 을 사용
+      
+      add, replace, remove, show/hide
+
+      1) FragmentManager fm = this.getFragmentManager();
+      2) Fragment fragment = fm.findFragmentById(R.id.frame);  // 현재 Fragment 구하기
+      3) 추가/수정/삭제 제일먼저
+         - FragmentTransaction ft = fm.beginTransaction();
+         - 추가
+           CounterFragment countFragment = new CounterFragment();
+           // add(int containerViewId, Fragment fragment [,String tag])
+           ft.add(R.id.frame, countFragment, "counter");
+
+         - 교체
+           TextFragment textFragment = new TextFragment();
+           //replace(int containerViewId, Fragment fragment [,String tag])
+           replace(R.id.frame, textFragment, "text");
+
+         - 제거
+           //ft.remove(Fragment)
+           ft.replace(fragment)
+
+         - 보이기/숨기기
+           ft.show(fragment);
+           ft.hide(fragment);
+
+         ft.commit();
+```
+
+
+
+
+6. Fragment를 생성하면서 어떤 값들을 전달해줄 필요성이 생긴다.
+```
+      1)인자가 없는 생성자를 대신하는 Fragment newInstance(전달할인자값)를 이용한 인자 전달
+      2)인자가 없는 생성자로 Fragment객체 생성
+        Bundle arg = new Bundle();
+        arg.putXXX(키,값);
+        ...
+        fragment.setArgument(arg);
+
+        //onCreate(), onCreateView(), onCreatedActivity()메서드 내부에서
+        Bundle arg = getArgument();
+        arg.getXXX(키) ===> 전달된 인자값을 얻어 사용
+```
+
+
+
+
+7. Fragment를 백스택을 이용하여 누적시켜 관리할 수 잇다.
+```
+     Activity
+
+     A Fragmenet객체
+     B Fragement객체
+     C Fragement객체  <-- 백버튼
+     ================
+     Fragment의 백스택
+```
+
+
+
+
++ Custom fragment 작성방법 및 순서
+```
+1. Fragment를 사용할 Activity를 정의한다.
+2. Activity의 UI xml을 작성한다. : <fragment tag를 이용하여 Fragement를 설정한다.
+3. Fragment를 상속받은 Custom Fragment 클래스를 만든다.
+4. Fragment의 화면내용을 위한 별도의 UI xml을 작성한다.
+5. Custom Fragment의 callback 메서드중에서
+   View createView(,,) 메서드 내부에서
+   1) UI xml를 전개하여 리턴
+   2) 직접 코드로 UI 객체 생성하여 리턴
+   3) null을 리턴
+   방법중 하나를 선택하여 화면 UI를 구성한다.
+
+-------------------------------------------------------
+
+사용자가 만든 Fragment는 자신을 위한 화면구성을
+1) xml 레이아웃화일을 만들었다면
+    View createView(LayoutInflater, ViewGroup ,Bundle){
+         xml 레이아웃화일을 전개하여
+         이벤트 핸들러를 설정하고
+         최종적으로 return한다
+    }
+2) 안만들었다면 createView()에서 Java코드로 화면구성을 위한 View를 구성하고
+         해당 View를 return한다.
+```
+
+
+
+#### 3. Project 실습
+#### 4. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-06-28]
+
+#### 1. Review
+
+#### 2. Fragment
++ Custom fragment 작성방법 및 순서
+```
+1. Fragment를 사용할 Activity를 정의한다.
+2. Activity의 UI xml을 작성한다. : <fragment tag를 이용하여 Fragement를 설정한다.
+3. Fragment를 상속받은 Custom Fragment 클래스를 만든다.
+4. Fragment의 화면내용을 위한 별도의 UI xml을 작성한다.
+5. Custom Fragment의 callback 메서드중에서
+   View createView(,,) 메서드 내부에서
+   1) UI xml를 전개하여 리턴
+   2) 직접 코드로 UI 객체 생성하여 리턴
+   3) null을 리턴
+   방법중 하나를 선택하여 화면 UI를 구성한다.
+```
+
+
+
+
 
 #### 4. 실습
 #### 5. Summary / Close
@@ -3281,7 +3550,7 @@ void onDraw(Canvas canvas){
 -----------------------------------------------------------
 
 
-### [2019-06-27]
+### [2019-07-01]
 
 #### 1. Review
 
