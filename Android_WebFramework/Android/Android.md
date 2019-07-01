@@ -3454,7 +3454,12 @@ class MyFragment extends Fragment {
 
 6. Fragment를 생성하면서 어떤 값들을 전달해줄 필요성이 생긴다.
 ```
+Fragment는 JavaCode와 xml layout에서 동시에 사용할수 있어야 한다.
+JavaCode로만 생성한다면 인자가 있는 생성자를 이요하여 인자값을 전달할수 있지만,
+xml layout에서는 이방법을 사용할 수 없다.(이유:자동으로 작동하는 메서드가 인자X생성자)
+
       1)인자가 없는 생성자를 대신하는 Fragment newInstance(전달할인자값)를 이용한 인자 전달
+
       2)인자가 없는 생성자로 Fragment객체 생성
         Bundle arg = new Bundle();
         arg.putXXX(키,값);
@@ -3554,13 +3559,72 @@ class MyFragment extends Fragment {
 
 #### 1. Review
 
-#### 2. Broadcast Receiver
-##### 2.1. 개요
-##### 2.2. 사용자 BR
-##### 2.3. 시스템 BR
-##### 2.4. 문자메시지 수신 BR
+#### 2. Fragment 관리
+6. Fragment를 생성하면서 어떤 값들을 전달해줄 필요성이 생긴다.
+```
+Fragment는 JavaCode와 xml layout에서 동시에 사용할수 있어야 한다.
+JavaCode로만 생성한다면 인자가 있는 생성자를 이요하여 인자값을 전달할수 있지만,
+xml layout에서는 이방법을 사용할 수 없다.(이유:자동으로 작동하는 메서드가 인자X생성자)
 
-#### 3. Fragment
+      1)인자가 없는 생성자를 대신하는 Fragment newInstance(전달할인자값)를 이용한 인자 전달
 
-#### 4. 실습
-#### 5. Summary / Close
+      2)인자가 없는 생성자로 Fragment객체 생성
+        Bundle arg = new Bundle();
+        arg.putXXX(키,값);
+        ...
+        fragment.setArgument(arg);
+
+        //onCreate(), onCreateView(), onCreatedActivity()메서드 내부에서
+        Bundle arg = getArgument();
+        arg.getXXX(키) ===> 전달된 인자값을 얻어 사용
+```
+
+
+7. Fragment를 백스택을 이용하여 누적시켜 관리할 수 잇다.
+```
+     Activity
+
+     A Fragmenet객체
+     B Fragement객체
+     C Fragement객체  <-- 백버튼
+     ================
+     Fragment의 백스택
+```
+
+
++ Custom fragment 작성방법 및 순서
+```
+1. Fragment를 사용할 Activity를 정의한다.
+2. Activity의 UI xml을 작성한다. : <fragment tag를 이용하여 Fragement를 설정한다.
+3. Fragment를 상속받은 Custom Fragment 클래스를 만든다.
+4. Fragment의 화면내용을 위한 별도의 UI xml을 작성한다.
+5. Custom Fragment의 callback 메서드중에서
+   View createView(,,) 메서드 내부에서
+   1) UI xml를 전개하여 리턴
+   2) 직접 코드로 UI 객체 생성하여 리턴
+   3) null을 리턴
+   방법중 하나를 선택하여 화면 UI를 구성한다.
+
+-------------------------------------------------------
+
+사용자가 만든 Fragment는 자신을 위한 화면구성을
+1) xml 레이아웃화일을 만들었다면
+    View createView(LayoutInflater, ViewGroup ,Bundle){
+         xml 레이아웃화일을 전개하여
+         이벤트 핸들러를 설정하고
+         최종적으로 return한다
+    }
+2) 안만들었다면 createView()에서 Java코드로 화면구성을 위한 View를 구성하고
+         해당 View를 return한다.
+```
+
++ 교재에서의 Fragment설명 : page.287
+
+
+
+#### 3. Fragment 예제
+
+#### 4. Service 사용법
+
+#### 5. 실습
+#### 6. Summary / Close
