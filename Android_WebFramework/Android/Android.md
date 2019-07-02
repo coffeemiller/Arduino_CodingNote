@@ -3624,7 +3624,189 @@ xml layout에서는 이방법을 사용할 수 없다.(이유:자동으로 작�
 
 #### 3. Fragment 예제
 
-#### 4. Service 사용법
 
-#### 5. 실습
-#### 6. Summary / Close
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-07-02]
+
+#### 1. Review
+
+#### 2. Service 사용법
++ Service (교재:353~361page)
+  1. Android Application의 4대구성요소중 1개이다. 반드시 AndroidManifest.xml 등록
+  2. UI 상관없는 백그라운드 작업을 지원해 준다.
+  3. 사용자는 Service를 상속받아 UserService를 작성한후 AndroidManifest에 등록
+```
+java.lang.Object
+   ↳	android.content.Context
+ 	   ↳	android.content.ContextWrapper
+ 	 	   ↳	android.app.Service
+
+             onCreate()
+             onStartCommand()/onBind()
+             onDestroy()
+            
+```
+  4. startService(인텐트)로 실행 / stopService() 종료 / stopSelf 자체종료
+
+
+
++ 참고) Thread -- 프로그램의 구성요소(액티비티가 동작중일때 백그라운드작업-결과UI반영)
+  + Service -- 안드로이드 앱(app)의 구성요소로서 다른 구성요소와 상호작용 가능.
+    + Activity, BR등록, CP.... 현재APP이 실중이 아니어도 작동 가능하다.
+    + 핵심용도
+      1) 백그라운드 작업(onStartCommand())
+      2) 원격호출기능(onBind())
+
+
+
+#### 3. Network
++ 안드로이드에서의 Network Program
+
+0. App의 권한 설정(AndroidManifest.xml)
+```xml
+    <!-- 현재의 APP에서 네트웍기능 사용한다는 권한 설정 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- 네트워크 연결정보(일반네트워크, WIPI사용)를 사용할수 있는 권한 설정 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
+
+
+1. 웹브라우저 사용
+   1) 특정App에서 Intent를 사용하여 외부 웹브라우저 호출
+           Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://m.naver.com"));
+           startActivity(intent);
+   2) 현재 App의 화면구성 내부에서 웹브라우저와 동일한 효과를 연출
+           WebView사용
+
+```
+1) 소켓 프로그램       client                          server
+   TCP/IP   ------- Socket 생성  -----연결요청-------> ServerSocket
+                    Socket      ======연결확보========  Socket
+           write()-->OutputStream                       InputStream --> read()
+           read()<-- InputStream                        OutputStream <-- write()
+
+   ----------------------------------------------------------------------------
+   UDP              DatagramSocket                      DatagramSocket
+                    DatagramPacket --send()/receive()-->DatagramPacket
+                                   <-receive()/send()--
+
+   소켓 프로그램도 안드로이드에서 동일하게 사용할 수 있다.
+```
+
+
+
+2. 웹(Web) 프로그램( Http )
+```
+        client --스마트폰                                  웹서버
+    ======================                           =======================
+    URL   -----------------|<----request/response---->  1) 자체(회사) 웹서버
+    URLConnection ---------|                            2) 공용 API 서버
+    외부라이브러리---------|  (xml,json)                3) 임의의 서버
+                            파싱하여 그 결과값을 사용  
+    
+    1. 내장된 웹브라우저 사용                       
+    2. 사용자만든 app에서 웹브라우저를 호출         
+       (Intent를 사용하여 호출)                     
+    -----------------------------------------
+    3. 사용자만든 app에서 화면구성의 일부분을
+       웹브라우저 영역으로 사용 <== WebView 위젯
+    -----------------------------------------
+    4. 소켓프로그램
+       - TCP/IP
+           스마트폰(client)                           pc(server)
+                                                     ServerSocket객체생성
+              1)소켓생성 -----접속요청------------->  accept() 접속대기
+                Socket  <----연결확보--------------  Socket
+              1)       io stream을 이용한 데이타전송
+              2)             접속해제
+
+
+       - UDP
+
+    2. 스마트폰에서 웹서버 접근(http 프로토콜)
+        사용자만든 app의 모든 화면구성을 자체구성                      웹서버(Tomcat)--pc(자체서버,공용 API서버, 포털사이트)
+                    URL
+                    URLConnection/HttpURLConnection --request--->  웹컴퍼넌트(정적/동적 웹퍼넌트 )
+                                                    <-response---
+                                                                 1) html
+                                                                 2) 이미지화일과 같은 resource
+                                                    <============3) xml/json표기
+                                            응답된 문서내용에서
+                                            원하는 정보를 추출
+          자체화면구성에 반영  <-----------   (파싱(parsing))
+
+                                            ===========================
+                                            반드시 쓰레드를 사용해야 한다.
+                                            ===========================
+
+------------------------------------------------------------------------
+스마트폰 즉, 안드로이드 폰에서 네트웍기능을 사용하려면
+1) 인터넷기능 사용을 위한 권한을 지정해야 하고(AndroidManifest.xml)
+2) 하드웨어 기기에서 사용하는 접속방법(무선네트웍(WIPI/모바일))
+   네트웍연결관리자
+-------------------------------------------------------------------------
+   웹뷰 사용법
+```
+
++ 일반참고사항
+    안드로이드 app내부에서
+    res폴더의 내용은 aapt에 의해 컴파일되어(resource들을 식별하기 위한 id값이 자동 저장된 파일 -- R.java) 실행화일에 포함되어 진다.
+    assets폴더(사용자가 생성)의 내용은 그대로 실행화일에 포함되어 진다.
+
+##### 3.1. 개요
+##### 3.2. 개요
+##### 3.3. 파싱
+
+#### 4. 프로젝트 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-07-03]
+
+#### 1. Review
+
+#### 2. Service 사용법
+
+#### 3. Network
+##### 3.1. 개요
+##### 3.2. 개요
+##### 3.3. 파싱
+
+#### 4. 프로젝트 실습
+#### 5. Summary / Close
+
+
+
+-----------------------------------------------------------
+
+
+### [2019-07-04]
+
+#### 1. Review
+
+#### 2. Service 사용법
+
+#### 3. Network
+##### 3.1. 개요
+##### 3.2. 개요
+##### 3.3. 파싱
+
+#### 4. 프로젝트 실습
+#### 5. Summary / Close
+
