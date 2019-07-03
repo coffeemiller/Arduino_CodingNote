@@ -3799,6 +3799,60 @@ java.lang.Object
 ```
 
 ##### 파싱 Parsing
++ XML 파싱(Parser)
+```
+일반적인 문자열은 자료 정보를 표시하기에 부족함
+자료에 대한 구조를 일반화 하기 위해서 XML 표현 형식을 활용
+현재 서비스 되는 방법에 xml 데이터가 일반적
+XML 기본적인 학습 필요
+안드로이드 플랫폼은 DOM, SAX 를 지원함
+      - DOM : 트리형식으로 문서를 읽어서 전체 구조를 파악한 후
+                  정보를 구하는 방식(많은 메모리, 성능 좋음)
+      - SAX  : 순차적으로 문서를 읽으면서 정보를 차례로 읽는방식
+                  (적은 메모리, 성능 저하)
+단순 표기 방식인 JSON 표기 형식을 지원
+모바일환경에서는 SAX Parser를 선호함
+XMLPullParser 객체를 지원
+자바의 기본적인 API 활용
+```
+
++ DOM 파싱 객체
+```
+객체 생성 메소드 - javax.xml.parsers.DocumentBuilderFactory
+                       - javax.xml.parsers.DocumentBuilder 
+
+
+DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+DocumentBuilder builder = factory.newDocumentBuilder();
+
+
+Documentbuiler 클래스의 파싱 메서드
+    Document parse(InputStream stream)
+    Document parse(String url)
+    Document parse(File file)
+
+
+
+Root Element 객체 얻기 - org.w3c.dom.Element 
+    Element order = doc.getDocumentElement();
+
+Element 객체 검색(NodeList) - org.w3c.dom.NodeList
+    NodeList items = order.getElementsByTagName("item");
+
+Node 객체 - org.w3c.dom.Node
+    Node  item = items.item(1);
+
+    getNodeName() : 현재 Node 객체명 얻기
+    getNodeValue() : 현재 Node 객체의 값 얻기   
+    Node 객체의 이동
+    getFirstChild() : 첫번째 자식 엘리먼트 Node 얻기
+    getLastChild()  : 마지막 자식 엘리먼트 Node 얻기
+    getNextSibling() : 다음 형제 엘리먼트 Node 얻기
+    getPriviousSibling() : 이전 형제 엘리먼트 Node 얻기
+    getParentNode() : 상위 엘리먼트 Node 얻기
+    getChildNodes() : 자식 엘리먼트 NodeList 얻기
+
+```
 
 
 
