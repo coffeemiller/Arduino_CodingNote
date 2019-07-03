@@ -3781,12 +3781,26 @@ java.lang.Object
 
 #### 1. Review
 
-#### 2. Service 사용법
 
 #### 3. Network
-##### 3.1. 개요
-##### 3.2. 개요
-##### 3.3. 파싱
+```
+1) 소켓 프로그램       client                          server
+   TCP/IP   ------- Socket 생성  -----연결요청-------> ServerSocket
+                    Socket      ======연결확보========  Socket
+           write()-->OutputStream                       InputStream --> read()
+           read()<-- InputStream                        OutputStream <-- write()
+
+   ----------------------------------------------------------------------------
+   UDP              DatagramSocket                      DatagramSocket
+                    DatagramPacket --send()/receive()-->DatagramPacket
+                                   <-receive()/send()--
+
+   소켓 프로그램도 안드로이드에서 동일하게 사용할 수 있다.
+```
+
+##### 파싱 Parsing
+
+
 
 #### 4. 프로젝트 실습
 #### 5. Summary / Close
