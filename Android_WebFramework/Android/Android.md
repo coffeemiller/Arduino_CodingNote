@@ -3868,6 +3868,302 @@ Node 객체 - org.w3c.dom.Node
 
 #### 1. Review
 
+#### 2. 파싱(Parsing)
+##### SAX Parsing
+```java
+public class NetworkSAXParserActivity extends Activity {
+	TextView tvXml;
+	TextView resultTextView;
+	String xml;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.activity_sax_parser);
+
+		// 파싱대상이 되는 xml문서의 내용
+		tvXml = (TextView)findViewById(R.id.tvXml);
+
+		xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		xml += "<order>\n";
+		xml += "<item>Mouse</item>\n";
+		xml += "</order>";
+
+		tvXml.setText(xml);
+
+		// 파싱결과
+		resultTextView = (TextView)findViewById(R.id.resultTextView);
+	}
+	
+	public void onClick(View view){
+		// 원래는 네트워크를 이용하여 xml문서를 다운로드 받아서 파싱을 해야한다.
+		// 여기서는 이미 다운로드 받았다고 가정하고 파싱에만 집중한다.
+
+		// 아래의 문서가 파싱의 대상이 되는 문서 내용이다.
+		//<?xml version="1.0" encoding="utf-8"?>
+		//<order>
+		//   <item>Mouse</item>
+		//</order>
+
+		//DOM 파서 : 문서의 처음부터 끝까지를 다 읽어서 메모리에 트리구조 정보를 표현해 놓은 상태에서
+		//           검색하여 정보를 추출
+		//-----------------------------------------------------------------
+		//                      <item>Mouse</item>
+		//SAX 파서 : 문서를 읽으면서 구성요소 (태그의 시작, 내용, 끝)가 읽혀질때마다 특정 이벤트를 발생시켜
+		//           사용자가 만든 Logic이 개입하여 정보를 추출<==ContentHanler
+
+
+    	// 위의 문서내용은 Network를 이용하여 이미 다운받았다고 가정
+     	try {
+     	   	SAXParserFactory factory = SAXParserFactory.newInstance();     		
+			SAXParser parser = factory.newSAXParser();
+			XMLReader reader = parser.getXMLReader();
+			
+			//파싱중(xml문서를 reader가 읽을 때마다-새로운 태그구성을 만날때마다.)
+			//새로운 Element를 만날때마다 이벤트를 발생시켜
+			//사용자가 지정하는 핸들러를 호출해주므로 이때 사용할 핸들러를 만들자.
+			SaxHandler handler = new SaxHandler();
+			
+			reader.setContentHandler(handler); // ****
+
+			// 파싱할 원본 xml문서를 읽을 inputStream
+			InputStream istream = new ByteArrayInputStream(xml.getBytes("utf-8"));
+			
+			// 아래의 메서드에 의해 xml문서의 내용을 읽어들이면서
+			// 새로운 내용을 만날때마다 위에서 지정한 SaxHandler에 특정 메서드들을 
+			// 콜백한다.
+			Log.e("TAG", xml);
+			Log.e("TAG", "SAX 파싱 시작...");
+			reader.parse(new InputSource(istream));
+			//위의 코드에서 xml문서의 처음부터 끝까지 차례로 읽으면서 이벤트를 발생시켜
+			//Handler의 적정 메서드를 호출해 준다.
+			Log.e("TAG", "SAX 파싱 끝...");
+
+			// 결과를 UI에 반영
+			resultTextView.setText(handler.itemValue.toString());
+			
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+	}
+
+
+	// xml 문서의 구조를 반영하여 사용자가 로직으로 개입하여 정보 추출
+	class SaxHandler extends DefaultHandler{
+
+		// 최종 파싱 결과 저장
+		StringBuilder itemValue = new StringBuilder();
+
+		// 파싱 로직구현을 위해 설정 - Element를 읽기 시작하면 true, 해당 Element가 끝나면 false
+		boolean initOrder = false;
+		boolean initItem = false;
+		//<?xml version="1.0" encoding="utf-8"?>
+		//<order>
+		//   <item>Mouse</item>
+		//</order>
+		@Override
+		public void startDocument() throws SAXException {
+			super.startDocument();
+			//문서의 시작시 호출
+			Log.w("TAG", "startDocument()....");
+		}
+
+		@Override
+		public void endDocument() throws SAXException {
+			super.endDocument();
+			//문서의 끝에서 호출
+			Log.w("TAG", "endDocument()....");			
+		}
+
+		@Override
+		public void startElement(String uri, String localName, String qName,
+				Attributes attributes) throws SAXException {
+			super.startElement(uri, localName, qName, attributes);
+
+			// 새로운 태그를 읽기 시작할때 호출됨
+			Log.w("TAG", "startElement().... : " + localName);
+			if( localName.equals("order")){
+				initOrder = true;
+			}else if( localName.equals("item")){
+				initItem = true;	// <item 태그가 시작되었다.
+			}else{
+
+			}
+			
+		}
+
+		@Override
+		public void endElement(String uri, String localName, String qName)
+				throws SAXException {
+			super.endElement(uri, localName, qName);
+			// 종료태그를 만났을때 호출
+			Log.w("TAG", "endElement().... : " + localName);
+			if( localName.equals("order")){
+				initOrder = false;
+			}else if( localName.equals("item")){
+				initItem = false;	// <item 태그 읽기가 끝났다.
+			}else{
+
+			}
+		}
+
+		@Override
+		public void characters(char[] ch, int start, int length)
+				throws SAXException {
+			super.characters(ch, start, length);
+			// 태그의 내용값을 읽었을때 호출됨
+			Log.w("TAG", "characters()....");
+			if(initOrder && initItem){
+				itemValue.append(ch, start, length);
+			}
+		}
+		
+	}
+}
+```
+
+
+
+##### JSON Parsing
+```
+JSON표기법 : xml 표현을 경량화시켜 정보만을 표현함으로 파싱의 속도 향상
+나타낼수 있는 값
+배열 :  [값1,값2,....]                      ===> JSONArray
+객체 :  {이름1:값1, 이름2:값2,...}		   ===> JSONObject
+단순값 : 수치, 문자열, 논리형, null
+       수치   --> 10진수만 표현가능, 정수, 실수 가능
+       문자열 --> "문자열"
+       논리형 --> true, false
+       null --> 빈객체 표현
+```
+
++ XML형태의 표현
+```
+<?xml version="1.0" encoding="utf-8"?>
+<order>
+	<item maker="전주" price="13000">비빕밥</item>
+	<item maker="군산" price="5000">제과점빵</item>
+	<item maker="임실" price="10000">치즈</item>
+	<item maker="정읍" price="35000">산외한우</item>
+</order>
+-----------------------------------------------------------------------------
+JSON
+[{"title":"비빔밥", "maker":"전주", "price":13000},
+ {"title":"제과점빵", "maker":"군산", "price":5000},
+ {"title":"치즈", "maker":"임실", "price":10000},
+ {"title":"산외한우", "maker":"정읍", "price":35000}]
+
+ JSONObject myJSONObject = new JSONObjet("{"bindings": [
+    {"ircEvent": "PRIVMSG", "method": "newURI", "regex": "^http://.*"},
+    {"ircEvent": "PRIVMSG", "method": "deleteURI", "regex": "^delete.*"},
+    {"ircEvent": "PRIVMSG", "method": "randomURI", "regex": "^random.*"}
+  ]
+}");
+
+JSONArray myArr =  myJSONObjet.getJSONArray("bindings");
+JSONObject item = myArr.getJSONObject(1);
+String title1 = item.getString("ircEvent");
+String uri = item.getString("method");
+```
+
+
++ json문자열의 내용
+```json
+[{"Product":"Mouse", "Maker":"Samsung", "Price":23000},
+{"Product":"KeyBoard", "Maker":"LG", "Price":112000},
+{"Product":"HDD", "Maker":"Western Digital", "Price":156000}
+]
+```
+```java
+class Item{
+    String Product;
+    Strin Maker;
+    String Price;
+}
+```
+
+
++ json의 또다른 형태
+```json
+[{"Product":{"name":"홍길동", "age":25}, "Maker":"Samsung", "Price":23000},
+{"Product":{"name":"장길산", "age":70}, "Maker":"LG", "Price":112000},
+{"Product":{"name":"이순신", "age":36}, "Maker":"Western Digital", "Price":156000}
+]
+```
+```java
+    Item[] = {new Item(), new Item(), new Item()};
+    class Item{
+    Product product;
+    String Maker;
+    String Price;
+    }
+
+    class Product{
+    Stirng name;
+    int age;
+    }
+```
+
+
+
++ json 파싱파기 예제
+```java
+try {
+    String result = "주문내역\n";
+    // String str = "[10,20,30]";  //이값이 Json형식의 문서내용이라고 하면
+
+    // JSONArray jsonArray = new JSONArray(str)
+    // jsonArray.getInt(1)
+
+    //String json =
+        //[{"Product":"Mouse", "Maker":"Samsung", "Price":23000},
+        //{"Product":"KeyBoard", "Maker":"LG", "Price":112000},
+        //{"Product":"HDD", "Maker":"Western Digital", "Price":156000}
+        //]
+    JSONArray jsonArray = new JSONArray(json);
+    //[JSONObject,JSONObject ,JSONObject]
+
+    for(int i=0; i<jsonArray.length(); i++){
+        JSONObject item = jsonArray.getJSONObject(i);
+        //item ==> JSONObject
+        String product = item.getString("Product");
+        //JSONObject person = item.getJSONObject("Product");
+        //String name = person.getString("name");
+        //int age = person.getInt("age");
+
+        String maker = item.getString("Maker");
+        int price = item.getInt("Price");
+        
+        result += product + ":" + maker + "," + price + "\n";
+    }
+    resultTextView.setText(result);
+} catch (JSONException e) {			
+    e.printStackTrace();
+}		
+```
+
+
+
+#### 3. 프로젝트 실습
+#### 4. Summary / Close
+
+
+-----------------------------------------------------------
+
+
+### [2019-07-05]
+
+#### 1. Review
+
 #### 2. Service 사용법
 
 #### 3. Network
@@ -3877,4 +4173,3 @@ Node 객체 - org.w3c.dom.Node
 
 #### 4. 프로젝트 실습
 #### 5. Summary / Close
-
