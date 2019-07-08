@@ -4160,16 +4160,253 @@ try {
 -----------------------------------------------------------
 
 
-### [2019-07-05]
+### [2019-07-08]
 
 #### 1. Review
 
-#### 2. Service 사용법
+#### 2. 맵 서비스
+##### 개요
+1. 위치로부터 정보를 얻어 편의를 제공하는 기능을 위치 기반 서비스(LBS:Location based service) 또는 맵 서비스라 한다.
+2. 스마트폰은 위치 인식 장치를 내장하고 있어 별도의 장비가 없어도 정확한 현재 위치를 알 수 있음
+3. 위치 정보라고 하면 흔히 자동차의 길을 안내해 주는 네비게이션을 떠올리며 실제로 가장 보편적이고 실용적인 위치 정보 서비스라 함(LBS)
 
-#### 3. Network
-##### 3.1. 개요
-##### 3.2. 개요
-##### 3.3. 파싱
 
-#### 4. 프로젝트 실습
-#### 5. Summary / Close
+
+##### 위치정보 개요
+1. 지도는 2차원의 평면이며 평면상의 한 지점은 x, y 좌표로 표현
+2. 수직 위치는 적도에서 극점까지 90등분하여 지구 중심과의 각도인 위도(Latitude)로 표현하며 위쪽을 북위, 아래쪽을 남위라 함
+   - 1 위도는 적도에서 북극점까지의 거리인 10000을 90으로 나눈 값이므로 대략 111Km
+   - 1위도를 60등분하여 분을 나누고 분을 다시 60등분하여 초로 나누어 1분은 대략 1.85Km가 되고 1초는 대략 30m
+   - 초도 실수까지 표시해야 정확한 위치값 구현 가능
+3. 수평 위치를 나타내는 경도(Longitude)는 영국의 그리니치 천문대를 기준으로 하여 360도 나누어 동쪽을 동경, 서쪽을 서경 이라함
+4. 북극, 남극은 너무 좁아 위치 표시가 좋지 않음
+5. 위도와 경도  두 가지 값을 함께 표시하여 지도 위의 좌표값 활용
+6. 수면 위에서의 거리표시인 고도값도 기본적으로 제공 됨
+7. 위도는 90진법, 경도는 180진법, 분 초는 60진법, 초 아래는 10진법 활용
+
+
+
+##### 구글맵 사용하기 절차
+1. sdk manager를 이용하여
+    - Google API 버전을 다운로드
+    - Extras의 google play service 다운로드
+
+2.  AndroidManifest.xml
+```xml     
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    
+    <application
+        ....
+        <activity android:name=".MainActivity">
+            ...
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+                                   ---------------------------------------> 정보설정화일은 res/values/google_maps_api.xml화일 이다.
+				       구글 console 개발자 사이트에서 API Key를 발급받아 저장한다.
+```
+3. File/Project-Structure/에서 컴파일 버전은 API23 Google API선택
+                                             Dependencies  에서     compile 'com.google.android.gms:play-services:9.2.0' 추가
+```
+    결과적으로 Gradle Scripts의 build.gradle(app)내용에 다음을 추가했다.
+    android {
+    compileSdkVersion 'Google Inc.:Google APIs:23'
+    .....
+    }
+
+    dependencies {
+    ....
+    compile 'com.google.android.gms:play-services:9.2.0'
+    }
+```
+
+##### 사용하기
+1. 지도 표시하기 -- New/Google/Google Maps Activity선택하여 액티비티 생성
+2. 위치정보 제공자
+```
+    LocationProvider gpsProvider = 
+			locationManager.getProvider(LocationManager.GPS_PROVIDER); 
+								     LocationManager.NETWORK_PROVIDER
+    현재 폰상태에 따라 최적의 위치정보 제공자 구하기
+    String strProvider = locationManager.getBestProvider(criteria, true);
+									     // 조건
+```
+3.  위치정보 관리자
+```
+    LocationManager : 위치정보제공자가 위치정보에 대한 변화생겼을때 이를 감지하는 기능수행
+    
+    위치정보 관리자 객체 얻기
+    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+    만일 위치정보를 수신하고 싶다면 다음 설정한다.    
+    locationListener = new LocationListener(){
+       // 메서드 재정의  ---> 위치정보를 수신하여 원하는 기능 수행
+    }
+
+    // 위치정보 수신 설정
+    locationManager.requestLocationUpdates(strProvider, 1000, 10, locationListener);
+										       시간 및 움직인거리에 따라 locationListener객체에게 알린다.
+
+    // 위치정보 수신 해제
+    locationManager.removeUpdates(locationListener);
+										       
+  
+    // 특정위치 근접/벗어남을 알려주는 기능
+    locationManager.addProximityAlert(35.823882, 127.153725, 100, -1, pIntent);
+													     ------------
+													     BroadcastReceiver를 설정하여 사용자가 개입
+```
+4. 위치정보 변환: 
+```
+      위치정보 ==> Location객체
+      상황에 따라 위치정보를 도.분.초 <---> 도.십진수
+      Location.convert()
+```
+
+5. 기준위치 범위를 벗어나거나 진했을때 알림기능
+```
+	locationManager.addProximityAlert(35.823882, 127.153725, 100, -1, pIntent);
+```
+
+
+
+##### 지도표시
+1. 자신의 현재 위치 표시
+```
+  --> 표준 Marker를 이용하여 자동으로 표시
+   map.setMyLocationEnabled(true); // 설정
+   map.setMyLocationEnabled(false); // 해제
+
+  --> 사용자가 Marker표시
+        locationManage를 이용하여 위치를 수신할 때마자 표식을 남기자
+```
+
+2. 다양한 표식 표시 방법(Overlay)
+```
+	MarkerOptions marker = new MarkerOptions();
+        marker.position(new LatLng(35.825452, 127.151758));
+        marker.title("전주고등학교");
+        marker.snippet("주소:전라북도 전주시 완산구 권삼득로 2");
+        marker.draggable(true);
+        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.arrow_n));
+        map.addMarker(marker);	
+
+		map.addPolygon (options);
+
+map.addMarker(new MarkerOptions().position(new LatLng(35.847068, 127.129331))
+   .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+   // Specifies the anchor to be at a particular point in the marker image.
+   .anchor(0.5f, 1));
+```
+
+3. GeoCoding
+```
+        위치정보 <--> 장소정보
+```
+
+4. 검색
+
+
+
+
++ MapsActivity.java
+```java
+package com.jica.android.map;
+
+import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+//googleMap사용시
+// 1. sdk manager          --> tools : google play service -- installed
+// 아래의 2번 설정내용은 Google Maps Activity를 최초로 생성하면 자동 추가되는 설정내용이다.
+// 2. AndroidManifest.xml  --> <meta-data
+//                                  android:name="com.google.android.geo.API_KEY"
+//                                  android:value="@string/google_maps_key" />
+//    res/values/google_maps_api.xml --> 인증키값 ==> http://console.developers.google.com
+//                                                  사이트에서 인증키를 발급받아서 기록
+//    build.gradle(app)    --> dependencies {
+//                               ...
+//                             implementation 'com.google.android.gms:play-services-maps:11.6.2'
+//                            }
+
+
+//googleMap의 도움말 문서
+//https://developers.google.com/android/reference/com/google/android/gms/maps/package-summary
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+    private GoogleMap mMap;
+   /*
+    //실제지도를 보여주기위해 준비해야할 내용
+    // 1. UI에 MapFragment
+    // 2. 인증키(API key)을 AndoridManifest.xml에 등록
+    //    ---------------->http://console.developer.google.com사이트 방문
+    //     최초방문 : 회원가입 ===> 프로젝트생성후 선택
+    //                             API사용설정
+    //                             GoogleMaps Android API선택/사용설정
+    //                             우측의 사용자인증정보만들기
+    //                             어떤인증정보가필요한가요 선택
+    //                             1) 모든 어플리케이션(모바일,웹,기타...)에 사용가능한 인증키 발급
+    //                             2) 제한된 인증키만들기
+    //                                ==================>
+    //                                인증키생성후 키제한을 선택하거나
+    //                                키생성완료후 사용자인증정보만들기를 진행한여 키제한 선택/Andorid앱선택
+    //                                == 현재컴퓨터정보(지문), 프로젝트 패키지명을 입력하기위해
+    //                                    패키지이름 및 지문추가 선택 클릭
+    //                                                 ===현재컴퓨터에서 지문얻는 방법(jdk설치폴더/bin/keytool.exe 사용
+    //                                                    참조화일위치 c:\사용자명\.android>debug.keystore화일이 필요
+    //                                    c:\>cd 사용자명\.android엔터
+    //                                    C:\Users\jica\.android>keytool -list -v -keystore debug.keystore -storepass android -keypass android
+    //                                        결과화면의 sha1 93:13:2F:4E:9D:D8:B7:69:6E:4F:84:D9:EE:F8:87:26:AF:D1:60:88
+    //                                                       93:13:2F:4E:9D:D8:B7:69:6E:4F:84:D9:EE:F8:87:26:AF:D1:60:88
+    //
+    //
+
+    // 3. 컴파일시 Google Play Service를 사용할수 있도록 설정 ==>(build.gradle)
+    //     좌측상단의 File 메뉴/Project Structure.../
+*/
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);  // 지도를 표시할 준비를 내부적으로 수행
+    }
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // 실생활에서 사용하는 위치정보(경도,위도,고도)            ==> 도.분.초 로 이루어진 문자열
+        //                                                                -----
+        //                                                                  |
+        //                                                                  |
+        //                                                                  v
+        // 프로그램(Android)에서 사용하는 위치정보(위도,경도,고도_ ==> Location 객체 ( 도. 10진수로 변환 )
+        // 지도상에서의 위치정보(위도,경도 ========>LatLng(내부에서 * 100만을 사용한 값)
+        // Add a marker in Sydney and move the camera
+        LatLng curPoint = new LatLng(35.823906, 127.153623); //35.824534, 127.153761
+        mMap.addMarker(new MarkerOptions().position(curPoint).title("전주정보문화산업진흥원"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(curPoint, 15));  // 지도의 zoom level조정
+
+        //원래 소스
+        //LatLng sydney = new LatLng(-34, 151);
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+}
+```
+
+
+#### 3. 프로젝트 실습
+#### 4. Summary / Close
