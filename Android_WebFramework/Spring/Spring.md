@@ -8,6 +8,17 @@
 + 손쉽고 적은 비용으로 유지보수가 가능하게 한다.
 
 
+##### 웹프로그램 기술
++ client
+  + html / css / javaScript
++ Server
+  + Servlet / JSP
+
+
+1. 게시판 예제(복습)
+2. MVC패턴적용 -> 게시판
+
+
 
 #### 2. MVC (Model View Controller) 패턴 적용
 #### 3. spring tool 설치
