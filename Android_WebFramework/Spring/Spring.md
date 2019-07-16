@@ -167,6 +167,339 @@ client   ---------------------> ControllerAction(서블릿)
 
 #### 1. Review
 
+#### 2. 들어가기...
++ 개발자가 코딩으로 의존주입을 직접 구현하지않고, 스프링에서 제공하는 방법으로 처리!!
+  + 다양한 클래스 라이브러리사용, Anotation사용
+
++ AOP(Aspect-Oriented Programing)
+  + 특정기능수행을 하는 객체들의 공통기능들을 묶어서 편리하게 사용하자!
+
++ MVC패턴을 적용하여 프로젝트를 개발 ---> 작동구조, 작동순서, 작동기능
+
++ JDBC 지원기능 --> 드라이버로드, Connection(커넥션풀), Statement, ResultSet
+  + 간편하게 사용할수 있는 라이브러리나 방법들을 제공.
+
+
+
+##### 프레임워크(framework) ?
++ 소프트웨어 제작을 편리하게 할 수 있도록, 미리 뼈대를 이루는 클래스와 인터페이스를 제작하여 이것들은 모아둔 것.
+
+```
+   ========================================================================
+   GoF의 디자인 패턴으로 유명한 랄프 존슨(Ralph Johnson) 교수의 정의 : 
+     "소프트웨어의 구체적인 부분에 해당하는 설계와 구현을 
+         재사용이 가능하게끔 일련의 협업화된 형태로 클래스들을 제공하는 것"
+   
+   - 프레임워크는 라이브러리와 달리 애플리케이션의 틀과 구조를 결정할 뿐 아니라
+       그 위에 개발된 개발자의 코드를 제어한다.
+   - 프레임워크는 구체적이며 확장 가능한 기반 코드를 가지고 있으며,
+       설계자가 의도하는 여러 디자인 패턴의 집합으로 구성되어 있다.
+   ========================================================================
+```
+
+
+##### 라이브러리 ?
+```
+라이브러리 : 자주 쓰일 만한 기능들을 모아 놓은 유틸리티(클래스)들의 모음집.
+           필요할때 가져다 쓰는 기능이지 그 기능을 쓰기 위해 필요한(혹은 효율적인) 구조에 대해 말해주지는 않는다. 
+           즉, 설계를 대신해 주지 않는다. (동일한 라이브러리를 쓰는 동일한 기능의 프로그램일지라도
+           클래스 관계 구조나, 데이터를 처리하는 절차,프로그램이 화면에 그려지는 방식 같은 등등의 요소들은 
+           프로그램을 짜는 프로그래머마다 천차만별 일수 밖에 없으며 프로그램을 완성하는 데에 걸리는 시간도,
+           완성된 코드의 품질도 프로그래머의 역량에 따라 제각각일 수밖에 없다)
+```
+
+
+
+##### 프레임워크와 라이브러리의 가장 큰 차이점 ?
+```
+    - 프레임워크는 라이브러리에 추가적으로  뼈대가 되는 클래스들과 그 클래스들의 관계로 만들어진 일종의 '설계의 기본 틀'이 추가된다.
+                                                                       ============ 
+                                                           '확장 가능한 기반코드', '재사용 가능한 형태의 협업화된 클래스들'
+    - 프레임워크에는 프레임워크의 제작자가 '이걸 기초로 해서 만드세요'라고  만들어 놓은(제공되는) '기반 코드'가 있다.
+      (이 코드, 혹은 클래스들은 차후 사용자들에 의해 확장될 것을 충분히 고려해서 만들어졌기 때문에 사용자 입장에서는 그저 이 것을 가지고,
+          여기 저기를 자기 입맛대로 바꾸고 살을 덧붙여 자기만의 프로그램을 완성해 나가면 된다.)
+    
+    - '확장 가능한 기반 코드'에는 프레임워크 제작자 나름대로의 설계 철학이 담겨 있으며, 차후 이 프레임워크의 사용자가
+          제작자가 설계한 구조를 유지하면서 확장할 수 있도록, 제작자에 의해 의도된 제약 사항이 존재한다.
+                                                        =====
+                               보통 디자인 패턴을 구현한 코드의 형태로 표현된다(예 - MVC 패턴)
+    - 기반 코드는 프레임웍 제작자가 사용자들로 하여금 세세하게 신경 쓰지 않아도 쉽고 빠르게 기능을 확장하거나 유지보수할 수 있게 해주는 
+      구조에 대한 가이드라인(제약을 가하고 싶은 사항) 을 여러 디자인 패턴을 조합해 표현해 놓은 결과물이다.
+         
+          
+  결론 ) 프레임워크란 ?
+          설계의 기반이 되는 부분을 기술한  확장 가능한 기반 코드와 사용자가 이 코드를 자기 입맛대로 확장하는 데 필요한 라이브러리
+          이 두 가지 요소가 통합되어 제공되는 형태를 말하며, 사용자가 이를 이용해 일정 수준 이상의 품질을 보장받는 코드를, 
+          비교적 빠른 시간에 완성 및 유지 보수할 수 있는환경을 제공해주는 솔루션으로
+          "기본적인 설계나 필요한 라이브러리는 알아서 제공해 줄꺼니깐 프로그래머는 구현 하고 싶은 기능 구현에만 전념하도록 만들어진 도구"
+          이다.
+```
+
+
+
+##### 스프링 프레임워크
+```
+스프링 프레임워크 : 자바 플랫폼을 위한 오픈소스 애플리케이션 프레임워크로서,
+                        자바 엔터프라이즈 즉 서버 개발을 편하게 해주는 오픈 소스 경량급 애플리케이션 프레임워크이다
+```
+
+
+
+##### 개발환경 설치 : eclipse , jdk, tomcat, maven
+```
+     maven : 프로젝트 관리도구(원래는 cmd Mode에서 사용 --> 윈도우즈용으로 eclipse,sts에서 사용)
+             1) 라이브러리 관리 기능 :
+                개발 시 스프링,  jdbc, junit, mybatis 등 필요한 라이브러리들을 zip 형태로 다운로드해 추가해도 되지만
+                maven을 사용하면 필요한 라이브러리를 pom.xml 파일에 적어놓으면 자동으로 다운 및 설치를 가능하게 해준다.
+             2) 빌드 기능 :
+                        컴파일, 테스트, 실행기능을 편리하게 사용할 수 있다.
+             -------------------------------------------------------
+                   내가 사용할 라이브러리 뿐만 아니라 해당 라이브러리가 작동하는데에 필요한 다른 라이브러리들까지 관리하여 네트워크를 통해서 자동으로 다운받아준다.
+             Spring 라이브러리를 효율적으로 관리해주기위해 사용       
+                               
+             maven 다운로드 ==> http://maven.apache.org/download.cgi
+	           1) 압축해제후 하위폴더를 원하는 위치로 이동
+		   2) 시스템환경변수 설정
+		      M2_HOME   : 
+		      Path : 
+	     spring 다운로드 ==> https://spring.io/tools(See all version에서 64비트용 다운)
+                   1) 압축해제후 C:\sts-bundle폴더를 c드라이브로 옮기기
+		   2) C:\sts-bundle\sts-3.9.5.RELEASE\STS.exe실행
+
+  스프링 개발환경
+    1) jdk, eclipse, spring plug-in, maven plug-in, tomcat
+    2) jdk, sts(스프링 전용 tool), maven, tomcat
+            =====================
+  스프링 도움말 : https://spring.io/docs/reference
+```
+
+
+
+##### 스프링의 특징
+```
+   ## 특징
+    > 스프링은 경량의 프레임워크
+      . 자바의 객체를 담고 있는 컨테이너
+      . 객체의 생성, 소멸과 같은 생명주기를 관리한다.
+  
+    > DI(Dependency Injection):의존성 주입 패턴을 지원한다.    
+      . 설정파일을 통해서 의존관계를 설정해 주는 패턴
+      
+    > AOP(Aspect Oriented Programming)을 지원
+      . 트랜잭션이나, 로깅, 보안과 같은 엔터프라이즈 어플리케이션에서 공통으로 필요로 하는 기능을 분리해서 
+        각 모듈에 적용할 수 있도록 하는 기능
+    
+    > 스프링은 POJO(Plain Old Java Object)를 지원한다.
+      .특정 인터페이스나 클래스를 상속받지 않는 순수한 자바 객체를 스프링 컨테이너가 저장하고 있다.
+      
+    > 트랜잭션 처리를 위한 일관된 방식을 제공한다.
+    
+    > 영속성과 관련된 다양한 API를 제공한다.
+     . JDBC, IBatis, MyBatis, JPA, Hibernate 등과 같은 프레임워크와 연동을 지원한다.
+```
+
+
+
+##### 자주 사용하는 용어정리
+```
+CRUD / DAO / DTO
+ CRUD : Create, Retrieve, Update, Delete의 약어이다.
+     즉, 데이터베이스에 데이터를 입력(insert) 하고, 읽어(select) 오고, 수정(update) 하고, 삭제(delete) 하는
+   DML(Data Manipulation Language) 작업을 의미한다.(DML 기본 사용방법) 
+
+ 
+ DAO(data Access Object) : 실질적으로 데이터베이스에 접근하여 작업을 수행하는 객체이다. 
+     즉, 데이터베이스에 CRUD 작업을 수행하기 위한 로직(데이터베이스 연결, SQL 문, 해제 등)들이 정의되어 있는 객체를 의미한다.
+     참고로 DAO는 주로 싱글톤 패턴으로 생성하게 된다.
+
+ DTO(Data Transfer Object) 또는 VO(Value Object) :
+     뷰 페이지(jsp, html)로부터 입력된 데이터를 DTO에서 일시적으로 저장하여 DAO로 넘겨주거나, 
+     데이터베이스로부터 읽어온 데이터를 DAO로부터 넘겨받아 DTO에서 일시적으로 저장하여 뷰 페이지로 이동시켜 주는 역할을 한다.
+     즉, 데이터 임시 저장 및 교환을 위한 객체(자바빈/Java Bean) 이다. 
+   DTO는 대부분 필드(프로퍼티)와 getter, setter 메서드로만 이루어진다.
+```
+
+
+##### 설치과정 모습 : mvn archetype:genarate
+```
+C:\SCWork\SpringWork> mvn archetype:genarate
+...
+...
+...
+...
+...
+1387:
+Choose org.apache.maven.archetypes:maven-archetype-quickstart version:
+1: 1.0-alpha-1
+2: 1.0-alpha-2
+3: 1.0-alpha-3
+4: 1.0-alpha-4
+5: 1.0
+6: 1.1
+7: 1.3
+8: 1.4
+Choose a number: 8:
+.....
+.....
+.....
+.....
+Define value for property 'groupId': com.jica
+Define value for property 'artifactId': intro
+Define value for property 'version' 1.0-SNAPSHOT: :
+Define value for property 'package' com.jica: : com.jica.intro
+Confirm properties configuration:
+groupId: com.jica
+artifactId: intro
+version: 1.0-SNAPSHOT
+package: com.jica.intro
+ Y: :
+[INFO] ----------------------------------------------------------------------------
+[INFO] Using following parameters for creating project from Archetype: maven-archetype-quickstart:1.4
+[INFO] ----------------------------------------------------------------------------
+[INFO] Parameter: groupId, Value: com.jica
+[INFO] Parameter: artifactId, Value: intro
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: package, Value: com.jica.intro
+[INFO] Parameter: packageInPathFormat, Value: com/jica/intro
+[INFO] Parameter: package, Value: com.jica.intro
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] Parameter: groupId, Value: com.jica
+[INFO] Parameter: artifactId, Value: intro
+[INFO] Project created from Archetype in dir: C:\SCWork\SpringWork\intro
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  06:52 min
+[INFO] Finished at: 2019-07-16T14:40:52+09:00
+[INFO] ------------------------------------------------------------------------
+C:\SCWork\SpringWork>
+```
+
+
+##### maven 프로젝트 구조
+```
+intro\src\main\java\패키지\App.java
+              \resources\여러설정파일(xml파일)  ---  필요한경우 생성
+              \webapp\웹프로그램소스(html,jsp...)
+          \test\java\패키지\AppTest.java
+      \pom.xml  <===== (Project Object Model)의 약자를 사용한 설정파일
+                      컴파일 테스트 배포폰 설치등의 여러 옵션을 작성.
+```
+
+##### maven 컴파일 : mvn compile
+```
+C:\SCWork\SpringWork\intro> mvn compile
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------------< com.jica:intro >---------------------------
+[INFO] Building intro 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.0.2/maven-resources-plugin-3.0.2.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.0.2/maven-resources-plugin-3.0.2.pom (7.1 kB at 6.7 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/30/maven-plugins-30.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/30/maven-plugins-30.pom (10 kB at 32 kB/s)
+...
+...
+...
+...
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-compiler-javac/2.8.4/plexus-compiler-javac-2.8.4.jar (21 kB at 27 kB/s)
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to C:\SCWork\SpringWork\intro\target\classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  32.936 s
+[INFO] Finished at: 2019-07-16T14:55:28+09:00
+[INFO] ------------------------------------------------------------------------
+C:\SCWork\SpringWork\intro>
+```
+
+
+##### mven 배포본 만들기 : mvn package
+```
+C:\SCWork\SpringWork\intro> mvn package
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------------< com.jica:intro >---------------------------
+[INFO] Building intro 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/2.22.1/maven-surefire-plugin-2.22.1.pom
+...
+...
+...
+[INFO]
+[INFO] --- maven-resources-plugin:3.0.2:resources (default-resources) @ intro ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 0 resource
+[INFO]
+[INFO] --- maven-compiler-plugin:3.8.0:compile (default-compile) @ intro ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO]
+[INFO] --- maven-resources-plugin:3.0.2:testResources (default-testResources) @ intro ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory C:\SCWork\SpringWork\intro\src\test\resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.8.0:testCompile (default-testCompile) @ intro ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to C:\SCWork\SpringWork\intro\target\test-classes
+[INFO]
+[INFO] --- maven-surefire-plugin:2.22.1:test (default-test) @ intro ---
+...
+...
+...
+[INFO]
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.jica.intro.AppTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s - in com.jica.intro.AppTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO]
+[INFO] --- maven-jar-plugin:3.0.2:jar (default-jar) @ intro ---
+...
+...
+...
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/3.4/plexus-archiver-3.4.jar (187 kB at 97 kB/s)
+[INFO] Building jar: C:\SCWork\SpringWork\intro\target\intro-1.0-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  24.556 s
+[INFO] Finished at: 2019-07-16T14:58:52+09:00
+[INFO] ------------------------------------------------------------------------
+C:\SCWork\SpringWork\intro>
+```
+
+
+
+##### mven 실행하기 : java -cp [압축파일명] [파일명]
+```
+C:~~\intro\target> java -cp intro-1.0-SNAPSHOT.jar com.jica.intro.App
+Hello World!
+```
+
+
+
+
+
+#### 2. MVC (Model View Controller) 패턴 적용
+
+#### 3. spring tool 설치
+#### 4. project 실습
+#### 5. Summary / Close
+
+
+
+-------------------------------------------------------------------------
+
+### [2019-07-17]
+
+#### 1. Review
+
 #### 2. MVC (Model View Controller) 패턴 적용
 
 #### 3. spring tool 설치
