@@ -483,16 +483,8 @@ Hello World!
 ```
 
 
-
-
-
-#### 2. MVC (Model View Controller) 패턴 적용
-
-#### 3. spring tool 설치
-#### 4. project 실습
-#### 5. Summary / Close
-
-
+#### 3. project 실습
+#### 4. Summary / Clos
 
 -------------------------------------------------------------------------
 
@@ -500,8 +492,255 @@ Hello World!
 
 #### 1. Review
 
-#### 2. MVC (Model View Controller) 패턴 적용
+#### 2. Spring 사용하기
 
-#### 3. spring tool 설치
++ AppContext.java
+```java
+package com.jica.chap02;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+
+//AppContext클래스는 스프링 설정 클래스라고 지정한다.
+@Configuration
+public class AppContext {
+	
+	//Bean객체생성메서드 지정(ApplicationContext 즉 스프링프레임워크에서 생성하는 객체==> Bean객체)
+	@Bean
+	@Scope("prototype")  // <---- 새로운 객체가 각각 생성.
+  // @Scope("singleton")  // <---- 하나의 객체를 이용하여 실행(없던상태와 같음)
+	public Greeter greeter() {
+		System.out.println("AppContext::greeter() 작동함");
+		
+		Greeter g = new Greeter();
+		g.setFormat("%s 안녕하세요");
+		return g;
+	}
+}
+```
+
++ Main.java
+```java
+package com.jica.chap02;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class Main {
+
+	public static void main(String[] args) {
+		// 자유롭게 사용자가 직접 코딩하여 Greeter객체를 생성하고 작성한다.
+//		Greeter g = new Greeter();
+//		g.setFormat("%s 님! 반갑습니다.");
+//		
+//		String message = g.greet("스프링");
+//		System.out.println(message);
+//		
+//		message = g.greet("JICA");
+//		System.out.println(message);
+		
+		
+		//spring framwork를 사용할때는 필요할때 자바객체를 사용자가 위처럼
+		//직접 코드로 생성하지 않고, 객체생성설정파일을 사용하거나...
+		//resource설정파일을 이용하여 객체를 생성하고, 생성된 객체를 spring framework이 관리.
+		//(생성, 검색, 삭게...)
+		//그래서 spring을 spring container라고도 부른다.
+		
+		
+		//우리는 AppContext클래스를 사용하여 간접적으로 Greeter객체를 얻어서 사용한다.
+		AnnotationConfigApplicationContext ctx 
+				= new AnnotationConfigApplicationContext(AppContext.class);
+		System.out.println("Main::Context객체 생성 직후 ------------------");
+		
+		//Context가 관리하는 객체중에서 검색하여 Bean객체를 리턴해달라.
+		Greeter g = ctx.getBean("greeter",Greeter.class);
+		String message = g.greet("스프링(spring)");
+		System.out.println(message);
+		
+		Greeter g2 = ctx.getBean("greeter",Greeter.class);
+		String message2 = g.greet("프레임워크");
+		System.out.println(message2);
+		
+		//위의 g,g2객체는 동일한 객체일까? 다른 객체일까?
+		System.out.println(g == g2);
+
+    //컨텍스트 사용후 종료
+    ctx.close();
+	}
+}
+```
+
++ 위 코드의 핵심은 AnnotationConfigApplicationContext 클래스이다. 스프링의 핵심 기능은 객체를 생성하고 초기화하는 것. 관련 기능은 AppicationContext라는 인터페이스에 정의되어 있다.
+
+
+
++ applicationContext.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 객체 생성 설정 -->
+	<!-- chap02.Greeter클래스의 객체를 생성하고 해당 객체를 식별하기 위한 식별자로
+	     greeter라고 지정해서 관리하겠다.
+	     setFormat("%s, spring이 관리하는 빈객체입니다.")을 작동시킨다. 
+	     
+	     scope="prototype|singleton" -->
+	     
+	<bean id="greeter" class="com.jica.chap02.Greeter" >
+		<property name="format" value="%s, spring이 관리하는 빈객체입니다." />
+	</bean>
+	
+	<bean id="greeterX" class="com.jica.chap02.Greeter">
+		<property name="format" value="%s, 빈객체는 기본적으로 동일하다. 기본 scope가 singleton이기때문" />
+	</bean>
+</beans>
+```
+
+
++ Main2.java
+```java
+package com.jica.chap02;
+
+import org.springframework.context.support.GenericXmlApplicationContext;
+
+public class Main2 {
+
+	public static void main(String[] args) {
+		// GenericXmlApplicationContext를 이용한 Bean객체 생성
+		GenericXmlApplicationContext ctx
+			= new GenericXmlApplicationContext("classpath:applicationContext.xml");
+		
+		System.out.println("main()에서 Context객체 생성 직후---------------------------");
+		
+		Greeter g = ctx.getBean("greeter", Greeter.class);
+		String message = g.greet("JICA");
+		System.out.println(message);
+		System.out.println();
+		
+		Greeter g2 = ctx.getBean("greeter", Greeter.class);
+		message = g2.greet("JICA2");
+		System.out.println(message);
+		System.out.println();
+		
+		System.out.println(g == g2);
+		System.out.println();
+		//-------------------------------------------
+		
+		Greeter gx = ctx.getBean("greeterX", Greeter.class);
+		message = gx.greet("JICA-X");
+		System.out.println(message);
+		System.out.println();
+				
+		//아래의 코드는 예외가 발생한다.(greeterX2를 id로 가지는 Bean태그가 없다.)
+		Greeter gx2 = ctx.getBean("greeterX2", Greeter.class);
+	}
+}
+```
+
+
+
+
+
+#### 2. 의존주입(DI : Dependency Injection)
++ 클래스의 관계성
+1. 상속관계(extends)
+```
+   A클래스 <----- 부모클래스
+   
+   B클래스  <---- 자식클래스
+   
+   class A{
+   }
+   
+   class B extends A{
+   }  
+```
+
+
+2. 포함관계
+```
+   A클래스 <---- 전체
+   B클래스, C클래스, D클래스 <--- 부분
+   
+   class B{
+   }
+   class C{
+   }
+   class D{
+   }
+   
+   class A{
+   	 B b = new B();  // 자체적으로 부분에 속하는 클래스를 항상 가지고 있다.
+   	 C c = new C();
+   	 D d = new D();
+   	 .....
+   }   
+   
+   A obj = new A();
+
+   포함관계는 전체와 부분이 생사를 같이한다.
+   즉, 전체 객체가 생성되면 내부의 부분객체도 모두 생성되어 사용되고
+   전체객체가 소거되면 내부의 부분 객체도 동일하게 소멸된다.
+   
+```
+
+
+
+
+3. 의존 관계
+```
+   class B{
+      ....
+      
+      methodB(){
+           다른 클래스형 객체를 사용하여 기능이 작성된다.
+         ------------->1)생성자의 인자로 전달받거나
+                     2)set메서드로 전달받는다.    
+         .....
+      }
+   }
+
+   =================================================
+   class A{
+     B b;  //멤버변수로 B형객체 b가 있지만
+           //A객체가 생성될때 b멤버가 생성되지 않았다.
+     
+     A(){
+       
+     }
+     
+     //생성자에 의한 의존성 주입(DI)
+     A(B b){
+       this.b = b;
+     }
+     
+     //set메서드에 의한 의존성 주입(DI)
+     setB(B b){
+     	this.b = b;
+     }
+   
+     ...
+     methodA(){
+        ...
+        b객체의 메서드를 호출하여 사용
+        ....
+     }
+   }
+      
+   B b = new B();   
+   // 생성자에 의한 의존객체 연결
+   A obj = new A(b); 
+   obj.methodA();    // A객체의 기능은 B객체에 의존되어 있다.
+   					 // 즉, B객체의 내용이 바뀌면 A객체의 기능도 변경된다 즉, 의존관계이다.
+   					
+   // set 메서드에의한 의존객체 연결   					 
+   A obj = new A(); 
+   obj.setB(b);		  	
+```
+
+
 #### 4. project 실습
 #### 5. Summary / Close
