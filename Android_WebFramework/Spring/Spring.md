@@ -749,7 +749,7 @@ public class Main2 {
 
 -------------------------------------------------------------------------
 
-### [2019-07-17]
+### [2019-07-18]
 
 #### 1. Review
 
@@ -1696,9 +1696,591 @@ VersionPrinter::setMinorVersion(int)...
 ```
 + 즉, 프로그램이 실행이 되기도 전에... Spring이 관리하는 모든 객체들이 생성된다.
 
++ RegisterRequest, Member 는 사용자가 필요한 시점에서 생성해서 사용
+  + 단독으로 사용하는 기능이기 때문.
+
++ 주로 여러클래스에서 공유되어질 객체와 핵심서비스를 수행하는 객체를 ApplicationContext에서 관리
+  + MemberDao, MemberInfoPrint.... MemberRegisterService, ChangePasswordService, MemberPrinter
+
+
+
 
 
 ##### Spring을 이제 Annotaion xml으로 만들어보자.
++ appCtx.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+		
+	<!-- spring.MemberDao형 객체를 생성할때 인자가없는 생성자를 호출하고 생성된 객체의 식별자를
+	     memberDao로 한다.  이후 이 객체를 spring framework이 관리한다. -->	
+	<bean id="memberDao" class="spring.MemberDao">
+	</bean>
+	
+	<!-- spring.MemberRegisterService형 객체를 생성할때 인자값으로 이미 만들어진 객체 즉,
+	      memberDao를 식별자로 가지는 객체를 전달하여 객체를 생성하고 생성된 객체의 식별자를 
+	      memberRegSvc로 한다. 이후 이 객체를 spring framework이 관리한다. -->	
+	<bean id="memberRegSvc" class="spring.MemberRegisterService">
+		<constructor-arg ref="memberDao"/>
+	</bean>
+	
+	<bean id="changePwdSvc" class="spring.ChangePasswordService">
+		<constructor-arg ref="memberDao"/>
+	</bean>
+</beans>
+```
+
++ 생성자에 의한 의존성주입부분
+```xml
+<constructor-arg ref="memberDao"/>
+```
+
+
+
++ MainForSpring.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import assembler.Assembler;
+import spring.AlreadyExistingMemberException;
+import spring.ChangePasswordService;
+import spring.IdPasswordNotMatchingException;
+import spring.MemberDao;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+
+public class MainForSpring {
+	//spring에서의 DI기능 - 설정정보화일(xml) 사용
+	private static ApplicationContext ctx = null;
+	
+	public static void main(String[] args) {
+		
+		ctx = new GenericXmlApplicationContext("classpath:appCtx.xml");
+		System.out.println("위의코드에 의해 설정정보화일(appCtx.xml)의 내용대로 객체가 생성되어 진다.--------");
+		
+		printHelp();   // 메뉴 보여주기
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		while(true) {
+			System.out.println("명령어를 입력하세요");
+			try {
+				String command = reader.readLine();
+				if( command.equalsIgnoreCase("exit")) {
+					System.out.println("종료합니다.");
+					break;
+				}
+				
+				// "new jica@daum.net 홍길동 1234 1234"
+				if( command.startsWith("new")) {
+					processNewCommand(command.split(" "));
+					continue;
+				// "change jica@daum.net 1234 5678"	
+				}else if( command.startsWith("change")) {
+					processChangeCommand(command.split(" "));
+					continue;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	//           0           1           2    3  
+	// arg ==> [change, jica@daum.net, 1234, 5678]
+	private static void processChangeCommand(String arg[]) {
+		if( arg.length != 4 ) {
+			printHelp();
+			return;
+		}
+		
+		try {
+			ChangePasswordService pwdSvc = ctx.getBean("changePwdSvc",ChangePasswordService.class);
+			pwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.");
+		}catch( MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.");
+		}catch( IdPasswordNotMatchingException e1) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.");
+		}
+		
+	}
+	
+	
+	//           0      1           2    3    4 
+	// arg ==> [new,jica@daum.net,홍길동,1234,1234]
+	private static void processNewCommand(String arg[]) {
+		if( arg.length != 5 ) {
+			printHelp();
+			return;
+		}
+		
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPssword(arg[4]);
+		
+		// 암호와 확인암호가 같은지 알아본다.
+		if( !req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.");
+			return;
+		}
+		try {
+			/*
+			<bean id="memberRegSvc" class="spring.MemberRegisterService">
+				<constructor-arg ref="memberDao"/>
+			</bean>
+			 */
+			MemberRegisterService regSvc = ctx.getBean("memberRegSvc", MemberRegisterService.class);			
+			regSvc.regist(req);
+			System.out.println("신규회원을 등록했습니다.");
+		}catch( AlreadyExistingMemberException e) {
+			System.out.println("이미 존재하는 이메일 입니다.");
+		}
+		
+	}
+	private static void printHelp() {
+		System.out.println("--------------------");
+		System.out.println("명령어 사용법");
+		System.out.println("신규회원 등록 : new 이메일 이름 암호 암호확인");
+		System.out.println("암호 변경     : change 이메일 현재비번 변경비번");
+		System.out.println("====================");
+		
+	}
+}
+```
+
++ 실행화면
+```
+MemberDao::MemberDao()...
+MemberRegisterService::MemberRegisterService(MemberDao)...
+ChangePasswordService::ChangePasswordService(MemberDao)...
+위의코드에 의해 설정정보화일(appCtx.xml)의 내용대로 객체가 생성되어 진다.--------
+--------------------
+명령어 사용법
+신규회원 등록 : new 이메일 이름 암호 암호확인
+암호 변경     : change 이메일 현재비번 변경비번
+====================
+명령어를 입력하세요
+
+```
+
+##### 인자가 2개인 생성자 사용
++ appCtx2.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+		
+	<!-- spring.MemberDao형 객체를 생성할때 인자가없는 생성자를 호출하고 생성된 객체의 식별자를
+	     memberDao로 한다.  이후 이 객체를 spring framework이 관리한다. -->	
+	<bean id="memberDao" class="spring.MemberDao">
+	</bean>
+	
+	
+	<!-- spring.MemberRegisterService형 객체를 생성할때 인자값으로 이미 만들어진 객체 즉,
+	      memberDao를 식별자로 가지는 객체를 전달하여 객체를 생성하고 생성된 객체의 식별자를 
+	      memberRegSvc로 한다. 이후 이 객체를 spring framework이 관리한다. -->	
+	<bean id="memberRegSvc" class="spring.MemberRegisterService">
+		<constructor-arg ref="memberDao"/>
+	</bean>
+	
+	<bean id="changePwdSvc" class="spring.ChangePasswordService">
+		<constructor-arg ref="memberDao"/>
+	</bean>
+	
+	<bean id="memberPrinter" class="spring.MemberPrinter">
+	</bean>
+	
+	<!-- 아래의 설정에 의해서 MemberListPrinter객체가 생성되어질때 인자가 2개인 생성자가 호출되어진다. -->
+	<bean id="listPrinter" class="spring.MemberListPrinter">
+		<constructor-arg ref="memberDao"/>
+		<constructor-arg ref="memberPrinter"/>
+	</bean>
+	
+	<!-- 아래의 설정에 의핸 객체가 생성되어지고 set메서드가 동작한다 -->
+	<bean id="infoPrinter" class="spring.MemberInfoPrinter">
+		<property name="memberDao" ref="memberDao"/>
+		<property name="printer" ref="memberPrinter" />
+	</bean>
+	
+	<!-- 생성자, set메서드에 기본 데이타를 전달할 수 도 있다. -->
+	<bean id="versionPrinter" class="spring.VersionPrinter">
+		<property name="majorVersion" value="4"/>
+		<property name="minorVersion" value="1"/>
+	</bean>
+			<!-- 
+			  <property name="minorVersion">
+			      <value>1</value>
+		    </property>
+		    -->
+</beans>
+```
+
++ MemberInfoPrinter obj가 있다면... obj.setMemberDao(memberDao객체)
+  + set메서드에 의한 의존성주입!!
+```xml
+<!-- ref : 객체 -->
+		<property name="memberDao" ref="memberDao"/>
+		<property name="printer" ref="memberPrinter" />
+<!-- value : 기본자료형 -->
+		<property name="majorVersion" value="4"/>
+		<property name="minorVersion" value="1"/>
+```
+
+
+
+
++ MainForSpring2.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import assembler.Assembler;
+import spring.AlreadyExistingMemberException;
+import spring.ChangePasswordService;
+import spring.IdPasswordNotMatchingException;
+import spring.MemberDao;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.VersionPrinter;
+
+public class MainForSpring2 {
+	//spring에서의 DI기능 - 설정정보화일 사용
+	private static ApplicationContext ctx = null;
+	
+	public static void main(String[] args) {
+		
+		ctx = new GenericXmlApplicationContext("classpath:appCtx2.xml");
+		System.out.println("위의코드에 의해 설정정보화일(appCtx2.xml)의 내용대로 객체가 생성되어 진다.--------");
+		
+		printHelp();   // 메뉴 보여주기
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		while(true) {
+			System.out.println("명령어를 입력하세요");
+			try {
+				String command = reader.readLine();
+				if( command.equalsIgnoreCase("exit")) {
+					System.out.println("종료합니다.");
+					break;
+				}
+				
+				// "new jica@daum.net 홍길동 1234 1234"
+				if( command.startsWith("new")) {
+					processNewCommand(command.split(" "));
+					continue;
+				// "change jica@daum.net 1234 5678"	
+				}else if( command.startsWith("change")) {
+					processChangeCommand(command.split(" "));
+					continue;
+				}else if( command.equals("list")) {
+					processListCommand();
+					continue;
+				// "info jica@daum.net"	
+				}else if( command.startsWith("info")) {
+					processInfoCommand(command.split(" "));
+					continue;
+				}else if(command.equals("version")) {
+					processVersionCommand();
+					continue;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+
+	}
+	
+	
+	private static void processVersionCommand() {
+		VersionPrinter versionPrinter = ctx.getBean("versionPrinter", VersionPrinter.class);
+		versionPrinter.print();
+	}
+	//           0           1      
+	// arg ==> [info, jica@daum.net]
+	private static void processInfoCommand(String arg[]) {
+		if( arg.length != 2) {
+			printHelp();
+			return;
+		}
+		
+		MemberInfoPrinter infoPrinter = ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+	
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+	
+	//           0           1           2    3  
+	// arg ==> [change, jica@daum.net, 1234, 5678]
+	private static void processChangeCommand(String arg[]) {
+		if( arg.length != 4 ) {
+			printHelp();
+			return;
+		}
+		
+		try {
+			ChangePasswordService pwdSvc = ctx.getBean("changePwdSvc",ChangePasswordService.class);
+			pwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.");
+		}catch( MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.");
+		}catch( IdPasswordNotMatchingException e1) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.");
+		}
+	}
+	
+	
+	//           0      1           2    3    4 
+	// arg ==> [new,jica@daum.net,홍길동,1234,1234]
+	private static void processNewCommand(String arg[]) {
+		if( arg.length != 5 ) {
+			printHelp();
+			return;
+		}
+		
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPssword(arg[4]);
+		
+		// 암호와 확인암호가 같은지 알아본다.
+		if( !req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.");
+			return;
+		}
+		try {
+			/*
+			<bean id="memberRegSvc" class="spring.MemberRegisterService">
+				<constructor-arg ref="memberDao"/>
+			</bean>
+			 */
+			MemberRegisterService regSvc = ctx.getBean("memberRegSvc", MemberRegisterService.class);			
+			regSvc.regist(req);
+			System.out.println("신규회원을 등록했습니다.");
+		}catch( AlreadyExistingMemberException e) {
+			System.out.println("이미 존재하는 이메일 입니다.");
+		}
+		
+	}
+	private static void printHelp() {
+		System.out.println("--------------------");
+		System.out.println("명령어 사용법");
+		System.out.println("신규회원 등록 : new 이메일 이름 암호 암호확인");
+		System.out.println("암호 변경     : change 이메일 현재비번 변경비번");
+		System.out.println("전체 회원정보 출력 : list");
+		System.out.println("회원정보 출력 : info 이메일");
+		System.out.println("버전정보 : version");
+		System.out.println("====================");	
+	}
+}
+```
+
+
+
+#### 3. project 실습
+#### 4. Summary / Close
+
+
+
+-------------------------------------------------------------------------
+
+### [2019-07-19]
+
+#### 1. Review
+
+#### 2. SpringFramework
+
+
+##### Spring을 활용한 의존주입 4번째 방법
+
++ MainForSpring3.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import assembler.Assembler;
+import spring.AlreadyExistingMemberException;
+import spring.ChangePasswordService;
+import spring.IdPasswordNotMatchingException;
+import spring.MemberDao;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.VersionPrinter;
+
+public class MainForSpring3 {
+	//spring에서의 DI기능 - 설정정보화일 사용
+	private static ApplicationContext ctx = null;
+	
+	public static void main(String[] args) {
+		
+		//설정화일을 여러개 사용할때
+		String conf[] = {"classpath:conf1.xml","classpath:conf2.xml"};		
+		ctx = new GenericXmlApplicationContext(conf);
+		System.out.println("위의코드에 의해 설정정보화일 2개를 이용하여 빈객체를 생성하면서 의존성 주입을 한다.--------");
+		
+		printHelp();   // 메뉴 보여주기
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		while(true) {
+			System.out.println("명령어를 입력하세요");
+			try {
+				String command = reader.readLine();
+				if( command.equalsIgnoreCase("exit")) {
+					System.out.println("종료합니다.");
+					break;
+				}
+				
+				// "new jica@daum.net 홍길동 1234 1234"
+				if( command.startsWith("new")) {
+					processNewCommand(command.split(" "));
+					continue;
+				// "change jica@daum.net 1234 5678"	
+				}else if( command.startsWith("change")) {
+					processChangeCommand(command.split(" "));
+					continue;
+				}else if( command.equals("list")) {
+					processListCommand();
+					continue;
+				// "info jica@daum.net"	
+				}else if( command.startsWith("info")) {
+					processInfoCommand(command.split(" "));
+					continue;
+				}else if(command.equals("version")) {
+					processVersionCommand();
+					continue;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	private static void processVersionCommand() {
+		VersionPrinter versionPrinter = ctx.getBean("versionPrinter", VersionPrinter.class);
+		versionPrinter.print();
+	}
+	//           0           1      
+	// arg ==> [info, jica@daum.net]
+	private static void processInfoCommand(String arg[]) {
+		if( arg.length != 2) {
+			printHelp();
+			return;
+		}
+		
+		MemberInfoPrinter infoPrinter = ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+	
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+	
+	//           0           1           2    3  
+	// arg ==> [change, jica@daum.net, 1234, 5678]
+	private static void processChangeCommand(String arg[]) {
+		if( arg.length != 4 ) {
+			printHelp();
+			return;
+		}
+		
+		try {
+			ChangePasswordService pwdSvc = ctx.getBean("changePwdSvc",ChangePasswordService.class);
+			pwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.");
+		}catch( MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.");
+		}catch( IdPasswordNotMatchingException e1) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.");
+		}
+		
+	}
+	
+	
+	//           0      1           2    3    4 
+	// arg ==> [new,jica@daum.net,홍길동,1234,1234]
+	private static void processNewCommand(String arg[]) {
+		if( arg.length != 5 ) {
+			printHelp();
+			return;
+		}
+		
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPssword(arg[4]);
+		
+		// 암호와 확인암호가 같은지 알아본다.
+		if( !req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.");
+			return;
+		}
+		try {
+			/*
+			<bean id="memberRegSvc" class="spring.MemberRegisterService">
+				<constructor-arg ref="memberDao"/>
+			</bean>
+			 */
+			MemberRegisterService regSvc = ctx.getBean("memberRegSvc", MemberRegisterService.class);			
+			regSvc.regist(req);
+			System.out.println("신규회원을 등록했습니다.");
+		}catch( AlreadyExistingMemberException e) {
+			System.out.println("이미 존재하는 이메일 입니다.");
+		}
+		
+	}
+	private static void printHelp() {
+		System.out.println("--------------------");
+		System.out.println("명령어 사용법");
+		System.out.println("신규회원 등록 : new 이메일 이름 암호 암호확인");
+		System.out.println("암호 변경     : change 이메일 현재비번 변경비번");
+		System.out.println("전체 회원정보 출력 : list");
+		System.out.println("회원정보 출력 : info 이메일");
+		System.out.println("버전정보 : version");
+		System.out.println("====================");	
+	}
+}
+```
+
+
+
++ MainForSpring4.java
+```java
+```
 
 
 
@@ -1712,3 +2294,17 @@ VersionPrinter::setMinorVersion(int)...
 
 #### 4. project 실습
 #### 5. Summary / Close
+
+
+
+
+-------------------------------------------------------------------------
+
+### [2019-07-22]
+
+#### 1. Review
+
+#### 2. SpringFramework
+#### 4. project 실습
+#### 5. Summary / Close
+
