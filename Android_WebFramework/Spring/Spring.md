@@ -1171,6 +1171,47 @@ static {
 ##### Sptring을 이용한 '의존주입'
 + 위의 사용자 강제 주입코드를.... sptring으로 편하게 관리해보자.
 
+
++ Assembler.java
+```java
+package assembler;
+
+import spring.ChangePasswordService;
+import spring.MemberDao;
+import spring.MemberRegisterService;
+
+
+//아래의 코드는 프로그램에서 필요한 객체를 관리하는 클래스를 별도로 작성하여 객체를 관리했다.
+//아래클래스와 동일한 역활을 spring framework가 담당한다.
+public class Assembler {
+	private MemberDao memberDao;
+	private MemberRegisterService memberRegisterService;
+	private ChangePasswordService changePasswordService;
+	
+	public Assembler() {
+		super();
+		
+		memberDao = new MemberDao();
+		memberRegisterService = new MemberRegisterService(memberDao);
+		changePasswordService = new ChangePasswordService(memberDao);
+	}
+
+	public MemberDao getMemberDao() {
+		return memberDao;
+	}
+
+	public MemberRegisterService getMemberRegisterService() {
+		return memberRegisterService;
+	}
+
+	public ChangePasswordService getChangePasswordService() {
+		return changePasswordService;
+	}
+}
+```
+
+
+
 + MainForAssembler2.java
 ```java
 package main;
@@ -1289,6 +1330,376 @@ public class MainForAssembler2 {
 	}
 }
 ```
+
+
+```java
+private static Assembler assembler;
+assembler = new Assembler();
+
+ChangePasswordService pwdSvc = assembler.getChangePasswordService();
+MemberRegisterService regSvc = assembler.getMemberRegisterService();
+```
++ 위에 코드를 통해 Spring에 의한 의존주입을 만들었다.
+
+
+
+##### 교재의 예제를 살펴보자.
++ AppCtx.java
+```java
+package config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import spring.ChangePasswordService;
+import spring.MemberDao;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberPrinter;
+import spring.MemberRegisterService;
+import spring.VersionPrinter;
+
+@Configuration
+public class AppCtx {
+
+	@Bean
+	public MemberDao memberDao() {
+		return new MemberDao();
+	}
+	
+	@Bean
+	public MemberRegisterService memberRegSvc() {
+		return new MemberRegisterService(memberDao());
+	}
+	
+	@Bean
+	public ChangePasswordService changePwdSvc() {
+		ChangePasswordService pwdSvc = new ChangePasswordService();
+		pwdSvc.setMemberDao(memberDao());
+		return pwdSvc;
+	}
+	
+	@Bean
+	public MemberPrinter memberPrinter() {
+		return new MemberPrinter();
+	}
+	
+	@Bean
+	public MemberListPrinter listPrinter() {
+		return new MemberListPrinter(memberDao(), memberPrinter());
+	}
+	
+	@Bean
+	public MemberInfoPrinter infoPrinter() {
+		MemberInfoPrinter infoPrinter = new MemberInfoPrinter();
+		infoPrinter.setMemberDao(memberDao());
+		infoPrinter.setPrinter(memberPrinter());
+		return infoPrinter;
+	}
+	
+	@Bean
+	public VersionPrinter versionPrinter() {
+		VersionPrinter versionPrinter = new VersionPrinter();
+		versionPrinter.setMajorVersion(5);
+		versionPrinter.setMinorVersion(0);
+		return versionPrinter;
+	}
+}
+```
+
+
++ MemberInfoPrinter.java
+```java
+package spring;
+
+public class MemberInfoPrinter {
+	private MemberDao memberDao;
+	private MemberPrinter printer;
+	
+	public MemberInfoPrinter() {
+		super();
+		System.out.println("MemberInfoPrinter::MemberInfoPrinter()...");
+	}
+
+	//set 메서드에의한 의존성 주입
+	//<bean id="infoPrinter" class="spring.MemberInfoPrinter">
+	//   <property name="memberDao"></property>
+    //</bean>
+	
+	public void setMemberDao(MemberDao memberDao) {
+		System.out.println("MemberInfoPrinter::setMemberDao(MemberDao)...");
+		this.memberDao = memberDao;
+	}
+
+	public void setPrinter(MemberPrinter printer) {
+		System.out.println("MemberInfoPrinter::setPrinter(MemberPrinter)...");		
+		this.printer = printer;
+	}
+	
+	public void printMemberInfo(String email) {
+		Member member = memberDao.selectByEmai(email);
+		if( member == null) {
+			System.out.println("데이타 없음");
+			//throw new MemberNotFoundException();
+			return;
+		}
+		
+		printer.print(member);
+	}
+}
+```
+
+
+
++ MemberListPrinter.java
+```java
+package spring;
+
+import java.util.Collection;
+
+public class MemberListPrinter {
+	private MemberDao memberDao;
+	private MemberPrinter printer;
+		
+	public MemberListPrinter() {
+		super();
+		System.out.println("MemberListPrinter::MemberListPrinter()...");
+	}
+
+
+	public MemberListPrinter(MemberDao memberDao, MemberPrinter printer) {
+		super();
+		System.out.println("MemberListPrinter::MemberListPrinter(MemberDao,MemberPrinter)...");
+		this.memberDao = memberDao;
+		this.printer = printer;
+	}
+	
+	public void printAll() {
+		Collection<Member> members = memberDao.selectAll();
+		
+		for(Member member : members) {
+			printer.print(member);
+		}
+	}
+}
+```
+
+
+
++ MemberPrinter.java
+```java
+package spring;
+
+public class MemberPrinter {
+	
+	
+	public MemberPrinter() {
+		super();
+		System.out.println("MemberPrinter::MemberPrinter()...");
+	}
+
+	public void print(Member member) {
+		System.out.printf("회원정보 : 아이디=%d, 이메일=%s, 이름:%s, 등록일=%tF\n",
+				member.getId(), member.getEmail(), member.getName(), member.getRegisterDate());
+	}
+}
+```
+
+
++ VersionPrinter.java
+```java
+package spring;
+
+public class VersionPrinter {
+	private int majorVersion;
+	private int minorVersion;
+	
+	public VersionPrinter() {
+		super();
+		System.out.println("VersionPrinter::VersionPrinter()...");
+	}
+
+	public void setMajorVersion(int majorVersion) {
+		System.out.println("VersionPrinter::setMajorVersion(int)...");
+		this.majorVersion = majorVersion;
+	}
+
+	public void setMinorVersion(int minorVersion) {
+		System.out.println("VersionPrinter::setMinorVersion(int)...");		
+		this.minorVersion = minorVersion;
+	}
+	
+	public void print() {
+		System.out.printf("이 프로그램의 버전은 %d.%d 입니다\n\n", majorVersion, minorVersion);
+	}
+}
+```
+
+
+
++ MainForSpringBook.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import config.AppCtx;
+import spring.AlreadyExistingMemberException;
+import spring.ChangePasswordService;
+import spring.DuplicateMemberException;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.VersionPrinter;
+import spring.WrongIdPasswordException;
+
+public class MainForSpringBook {
+
+	private static ApplicationContext ctx = null;
+	
+	public static void main(String[] args) throws IOException {
+		ctx = new AnnotationConfigApplicationContext(AppCtx.class);
+		
+		BufferedReader reader = 
+				new BufferedReader(new InputStreamReader(System.in));
+		while (true) {
+			System.out.println("명령어를 입력하세요:");
+			String command = reader.readLine();
+			if (command.equalsIgnoreCase("exit")) {
+				System.out.println("종료합니다.");
+				break;
+			}
+			if (command.startsWith("new ")) {
+				processNewCommand(command.split(" "));
+				continue;
+			} else if (command.startsWith("change ")) {
+				processChangeCommand(command.split(" "));
+				continue;
+			} else if (command.equals("list")) {
+				processListCommand();
+				continue;
+			} else if (command.startsWith("info ")) {
+				processInfoCommand(command.split(" "));
+				continue;
+			} else if (command.equals("version")) {
+				processVersionCommand();
+				continue;
+			}
+			printHelp();
+		}
+	}
+
+	private static void processNewCommand(String[] arg) {
+		if (arg.length != 5) {
+			printHelp();
+			return;
+		}
+		MemberRegisterService regSvc = 
+				ctx.getBean("memberRegSvc", MemberRegisterService.class);
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPssword(arg[4]);
+		
+		if (!req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.\n");
+			return;
+		}
+		try {
+			regSvc.regist(req);
+			System.out.println("등록했습니다.\n");
+		} catch (DuplicateMemberException e) {
+			System.out.println("이미 존재하는 이메일입니다1.\n");
+		} catch (AlreadyExistingMemberException e) {
+			System.out.println("이미 존재하는 이메일입니다2.\n");
+		}
+	}
+
+	private static void processChangeCommand(String[] arg) {
+		if (arg.length != 4) {
+			printHelp();
+			return;
+		}
+		ChangePasswordService changePwdSvc = 
+				ctx.getBean("changePwdSvc", ChangePasswordService.class);
+		try {
+			changePwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.\n");
+		} catch (MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.\n");
+		} catch (WrongIdPasswordException e) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.\n");
+		}
+	}
+
+	private static void printHelp() {
+		System.out.println();
+		System.out.println("잘못된 명령입니다. 아래 명령어 사용법을 확인하세요.");
+		System.out.println("명령어 사용법:");
+		System.out.println("new 이메일 이름 암호 암호확인");
+		System.out.println("change 이메일 현재비번 변경비번");
+		System.out.println("전체 회원정보 출력 : list");
+		System.out.println("회원정보 출력 : info 이메일");
+		System.out.println("버전정보 : version");		
+		System.out.println();
+	}
+
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = 
+				ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+
+	private static void processInfoCommand(String[] arg) {
+		if (arg.length != 2) {
+			printHelp();
+			return;
+		}
+		MemberInfoPrinter infoPrinter = 
+				ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+	
+	private static void processVersionCommand() {
+		VersionPrinter versionPrinter = 
+				ctx.getBean("versionPrinter", VersionPrinter.class);
+		versionPrinter.print();
+	}
+}
+```
+
++ 스프링 내부에서 사용자가 만든 설정파일 클래스를 상속받아새로운 클래스를 만들어서 이것을 사용한다.
+
++ 위 프로그램을 실행하면 다음과 같이 출력된다.
+```
+MemberDao::MemberDao()...
+MemberRegisterService::MemberRegisterService(MemberDao)...
+ChangePasswordService::ChangePasswordService()...
+MemberPrinter::MemberPrinter()...
+MemberListPrinter::MemberListPrinter(MemberDao,MemberPrinter)...
+MemberInfoPrinter::MemberInfoPrinter()...
+MemberInfoPrinter::setMemberDao(MemberDao)...
+MemberInfoPrinter::setPrinter(MemberPrinter)...
+VersionPrinter::VersionPrinter()...
+VersionPrinter::setMajorVersion(int)...
+VersionPrinter::setMinorVersion(int)...
+명령어를 입력하세요:
+
+```
++ 즉, 프로그램이 실행이 되기도 전에... Spring이 관리하는 모든 객체들이 생성된다.
+
+
+
+##### Spring을 이제 Annotaion xml으로 만들어보자.
+
 
 
 
