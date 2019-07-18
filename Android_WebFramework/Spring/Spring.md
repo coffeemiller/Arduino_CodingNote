@@ -744,3 +744,560 @@ public class Main2 {
 
 #### 4. project 실습
 #### 5. Summary / Close
+
+
+
+-------------------------------------------------------------------------
+
+### [2019-07-17]
+
+#### 1. Review
+
+#### 2. SpringFramework
++ ApplicationContext의 설정파일 사용법 2가지
+  1. JavaCode 설정파일(*.java)
+  ```
+  @Configuration
+  @Bean
+  ...
+  Annotation으로 정보를 설정
+  ```
+
+  2. xml 설정파일(*.xml --> resources폴더 내부)
+  ```
+  <bean>
+  </bean>
+  ....
+  다양한 태그를 사용하여 정보를 설정
+  ```
+
+
++ 실습하려는 기능부터 익혀보자
+```
+회원등록, 회원목록보기, 회원정보조회, 패스워드변경....
+
+회원등록
+  키보드로 회원정보 입력 ---> RegisterRequest 객체에 저장
+  이메일/성명/PW/PW확인       MemberRegisterService.regist(RegisterRequest)
+                                //데이터의 유효성검증 -- 동일 email가진 회원존재여부.
+                                //       예외처리(예외클래스)
+
+                                //RegisterRequest 객체 ---> Member 객체로 변환
+                                //DB작업전용 객체....  MemberDao 객체생성(얻기)
+                                //memberDao.insert 회원등록(DB관련기능 - HashMap,JDBC)
+
+  에메일, 기존PW, 새PW  --->  ChangePasswordService(email,oldPW,newPW)
+                                //휴효성 검증
+
+                                //Member객체 -- 패스워드변경
+                                //memberDao.update(member객체)
+                              
+```
+
+
+
+##### spring없이, 사용자가 직접 '의존주입' - 로직이해
+
++ RegisterRequest.java
+```java
+package spring;
+
+// 사용자의 요청정보를 저장하는 클래스
+public class RegisterRequest {
+	private String email;
+	private String password;
+	private String confirmPssword;
+	private String name;
+	
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getConfirmPssword() {
+		return confirmPssword;
+	}
+	public void setConfirmPssword(String confirmPssword) {
+		this.confirmPssword = confirmPssword;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public boolean isPasswordEqualToConfirmPassword() {
+		return password.equals(confirmPssword);
+	}	
+}
+```
+
++ MemberDao.java
+```java
+package spring;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+//db처리 전담하는 클래스
+public class MemberDao {
+	private static long nextId = 0;
+	
+	//db대신 HashMap으로 데이타를 저장하자
+	private Map<String,Member> map = new HashMap<String,Member>();
+	// map ---->[{"jica@daum.net", 멤버객체},
+	//           {"jica2@naver.com", 멤버객체},
+	//           {"jica3@gmail.com", 멤버객체}]
+
+	public MemberDao() {
+		super();
+		System.out.println("MemberDao::MemberDao()...");
+	}
+	
+	public Member selectByEmai(String email) {
+		return map.get(email);
+	}
+	
+	public void insert(Member member) {
+		member.setId(++nextId);
+		
+		//아래코드에 실제db에 저장될때 JDBC기능이 사용될 것이다.
+		//현재예제에서는 HashMap으로 대용하고 있다.
+		map.put(member.getEmail(), member);
+	}
+	
+	public void update(Member member) {
+		map.put(member.getEmail(), member);
+	}
+	
+	public Collection<Member> selectAll(){
+		return map.values();
+	}	
+}
+```
+
+
+
++ Member.java
+```java
+package spring;
+
+import java.util.Date;
+
+//db에 저장되는 1건의 데이타를 표현한 클래스
+public class Member {
+	private Long id;
+	private String email;
+	private String password;
+	private String name;
+	private Date registerDate;
+	
+	public Member(String email, String password, String name, Date registerDate) {
+		super();
+		this.email = email;
+		this.password = password;
+		this.name = name;
+		this.registerDate = registerDate;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Date getRegisterDate() {
+		return registerDate;
+	}
+	
+	public void changePassword(String oldPassword, String newPassword) {
+		if( !password.equals(oldPassword)) {
+			throw new IdPasswordNotMatchingException();
+		}
+		this.password = newPassword;
+	}
+}
+```
+
+
+
++ ChangePasswordService.java
+```java
+package spring;
+
+//실제요청을 처리하는 클래스 - 암호변경
+public class ChangePasswordService {
+	private MemberDao memberDao;
+
+	public ChangePasswordService() {
+		super();
+		System.out.println("ChangePasswordService::ChangePasswordService()...");
+	}
+	
+	public ChangePasswordService(MemberDao memberDao) {
+		super();
+		this.memberDao = memberDao;
+		System.out.println("ChangePasswordService::ChangePasswordService(MemberDao)...");		
+	}	
+	
+	//                           jica@daum.net    1234           5678
+	public void changePassword(String email, String oldPwd, String newPwd) throws MemberNotFoundException, IdPasswordNotMatchingException {
+		Member member = memberDao.selectByEmai(email);
+		
+		// 존재하지 않는 객체의 패스워드 변경시도이므로 예외발생
+		if( member == null) {
+			throw new MemberNotFoundException();
+		}
+		
+		member.changePassword(oldPwd, newPwd);
+		
+		memberDao.update(member);
+	}
+	
+	public void setMemberDao(MemberDao memberDao) {
+		this.memberDao = memberDao;
+	}
+}
+```
+
+
++ MemberRegisterService.java
+```java
+package spring;
+
+import java.util.Date;
+
+//실제요청을 처리하는 클래스 - 등록처리
+public class MemberRegisterService {
+	// 의존관계에 있는 클래스
+	private MemberDao memberDao;
+
+	public MemberRegisterService() {
+		super();
+		System.out.println("MemberRegisterService::MemberRegisterService()...");
+	}
+
+	// 생성자에 의한 의존성 주입
+	public MemberRegisterService(MemberDao memberDao) {
+		super();
+		this.memberDao = memberDao;
+		System.out.println("MemberRegisterService::MemberRegisterService(MemberDao)...");		
+	}  
+	
+	// 요청정보를 db에 저장하는 기능(등록)
+	public void regist(RegisterRequest req) throws AlreadyExistingMemberException {
+		// 동일한 email을 가진 회원이 있는지 검색
+		Member member = memberDao.selectByEmai(req.getEmail());
+		
+		if( member != null) {
+			throw new AlreadyExistingMemberException("dup email : " + req.getEmail());
+		}
+		
+		// RegisterRequest정보를 Member객체로 변환
+		Member newMember = new Member(req.getEmail(), req.getPassword(), req.getName(), new Date());
+		memberDao.insert(newMember);
+	}	
+}
+```
+
+
++ MainForAssembler.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import spring.AlreadyExistingMemberException;
+import spring.ChangePasswordService;
+import spring.IdPasswordNotMatchingException;
+import spring.MemberDao;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+
+public class MainForAssembler {
+	//spring에서의 DI기능을 처리하기 전에
+	//기존의 프로그램코드에서 직접 DI를 지정하는 방법을 살펴보자 
+	
+	//방법1)
+	static private MemberDao memberDao;
+	// 회원 등록 서비스
+	static private MemberRegisterService regSvc;
+	// 회원 정보 변경 서비스
+	static private ChangePasswordService pwdSvc;
+	
+	static {
+		//직접 코드로 의존성 주입
+		memberDao = new MemberDao();
+		regSvc = new MemberRegisterService(memberDao);
+		pwdSvc = new ChangePasswordService(memberDao);
+	}
+	
+	public static void main(String[] args) {
+		printHelp();   // 메뉴 보여주기
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		while(true) {
+			System.out.println("명령어를 입력하세요");
+			try {
+				String command = reader.readLine();
+				//command --> "new jica@daum.net JICA 1234 1234"
+				//            "change jica@daum.net 1234 5678"
+				if( command.equalsIgnoreCase("exit")) {
+					System.out.println("종료합니다.");
+					break;
+				}
+				
+				// "new jica@daum.net JICA 1234 1234"
+				if( command.startsWith("new")) {
+					processNewCommand(command.split(" "));
+					continue;
+				// "change jica@daum.net 1234 5678"	
+				}else if( command.startsWith("change")) {
+					processChangeCommand(command.split(" "));
+					continue;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+
+	}
+	
+	//         "change jica@daum.net 1234 5678"
+	//           0           1           2    3  
+	// arg ==> [change, jica@daum.net, 1234, 5678]
+	private static void processChangeCommand(String arg[]) {
+		if( arg.length != 4 ) {
+			printHelp();
+			return;
+		}
+		
+		try {
+			pwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.");
+		}catch( MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.");
+		}catch( IdPasswordNotMatchingException e1) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.");
+		}
+		
+	}
+	
+	
+	//         "new jica@daum.net JICA 1234 1234"
+	//           0      1           2    3    4 
+	// arg ==> [new,jica@daum.net,JICA,1234,1234]
+	private static void processNewCommand(String arg[]) {
+		if( arg.length != 5 ) {
+			printHelp();
+			return;
+		}
+		
+		//사용자가 입력한 내용을 객체로 만든다.
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPssword(arg[4]);
+		
+		// 암호와 확인암호가 같은지 알아본다.
+		if( !req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.");
+			return;
+		}
+		
+		// 위의 코드는 유효성 검사기능이라고 할수 있다.
+		// 실제 기능을 작동
+		try {
+			regSvc.regist(req);
+			System.out.println("신규회원을 등록했습니다.");
+		}catch( AlreadyExistingMemberException e) {
+			System.out.println("이미 존재하는 이메일 입니다.");
+		}
+		
+	}
+	private static void printHelp() {
+		System.out.println("--------------------");
+		System.out.println("명령어 사용법");
+		System.out.println("신규회원 등록 : new 이메일 이름 암호 암호확인");
+		System.out.println("암호 변경     : change 이메일 현재비번 변경비번");
+		System.out.println("====================");
+		
+	}
+}
+```
+
+```java
+static {
+		//직접 코드로 의존성 주입
+		memberDao = new MemberDao();
+		regSvc = new MemberRegisterService(memberDao);
+		pwdSvc = new ChangePasswordService(memberDao);
+	}
+```
++ 사용자가 위 코드부분을 직접 입력하여, 강제로 의존성을 주입한 경우이다.
++ 사용자가 직접 개입해서, 모든 컨트롤을 해야하는 부담감이 주어진다.
+
+
+
+
+##### Sptring을 이용한 '의존주입'
++ 위의 사용자 강제 주입코드를.... sptring으로 편하게 관리해보자.
+
++ MainForAssembler2.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import assembler.Assembler;
+
+import spring.AlreadyExistingMemberException;
+import spring.ChangePasswordService;
+import spring.IdPasswordNotMatchingException;
+import spring.MemberDao;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+
+public class MainForAssembler2 {
+	//spring에서의 DI기능을 처리하기 전에
+	//기존의 프로그램코드에서 직접 DI를 지정하는 방법을 살펴보자 
+	
+	//방법2)
+	private static Assembler assembler;
+	
+	public static void main(String[] args) {
+		
+		assembler = new Assembler();
+		System.out.println("---위의코드에 의해 생성/관리되는 객체 ==> spring framework가 대신하게 할것이다--------");
+		
+		printHelp();   // 메뉴 보여주기
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		while(true) {
+			System.out.println("명령어를 입력하세요");
+			try {
+				String command = reader.readLine();
+				if( command.equalsIgnoreCase("exit")) {
+					System.out.println("종료합니다.");
+					break;
+				}
+				
+				// "new jica@daum.net 홍길동 1234 1234"
+				if( command.startsWith("new")) {
+					processNewCommand(command.split(" "));
+					continue;
+				// "change jica@daum.net 1234 5678"	
+				}else if( command.startsWith("change")) {
+					processChangeCommand(command.split(" "));
+					continue;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+
+	}
+	
+	//           0           1           2    3  
+	// arg ==> [change, jica@daum.net, 1234, 5678]
+	private static void processChangeCommand(String arg[]) {
+		if( arg.length != 4 ) {
+			printHelp();
+			return;
+		}
+		
+		try {
+			ChangePasswordService pwdSvc = assembler.getChangePasswordService();
+			pwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.");
+		}catch( MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.");
+		}catch( IdPasswordNotMatchingException e1) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.");
+		}
+		
+	}
+	
+	
+	//           0      1           2    3    4 
+	// arg ==> [new,jica@daum.net,홍길동,1234,1234]
+	private static void processNewCommand(String arg[]) {
+		if( arg.length != 5 ) {
+			printHelp();
+			return;
+		}
+		
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPssword(arg[4]);
+		
+		// 암호와 확인암호가 같은지 알아본다.
+		if( !req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.");
+			return;
+		}
+		try {
+			MemberRegisterService regSvc = assembler.getMemberRegisterService();
+			regSvc.regist(req);
+			System.out.println("신규회원을 등록했습니다.");
+		}catch( AlreadyExistingMemberException e) {
+			System.out.println("이미 존재하는 이메일 입니다.");
+		}
+		
+	}
+	private static void printHelp() {
+		System.out.println("--------------------");
+		System.out.println("명령어 사용법");
+		System.out.println("신규회원 등록 : new 이메일 이름 암호 암호확인");
+		System.out.println("암호 변경     : change 이메일 현재비번 변경비번");
+		System.out.println("====================");
+		
+	}
+}
+```
+
+
+
+#### 3. 의존주입(DI : Dependency Injection)
+##### 3.1. DI개념
+##### 3.2. 생성자 의존주입
+##### 3.3. 메서드 의존주입
+##### 3.4. 관련 Annotation
+
+
+#### 4. project 실습
+#### 5. Summary / Close
