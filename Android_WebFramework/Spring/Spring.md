@@ -2285,15 +2285,8 @@ public class MainForSpring3 {
 
 
 
-#### 3. 의존주입(DI : Dependency Injection)
-##### 3.1. DI개념
-##### 3.2. 생성자 의존주입
-##### 3.3. 메서드 의존주입
-##### 3.4. 관련 Annotation
-
-
-#### 4. project 실습
-#### 5. Summary / Close
+#### 3. project 실습
+#### 4. Summary / Close
 
 
 
@@ -2305,6 +2298,476 @@ public class MainForSpring3 {
 #### 1. Review
 
 #### 2. SpringFramework
++ MainForSpringBook2.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import config.AppConf1;
+import config.AppConf2;
+import spring.ChangePasswordService;
+import spring.DuplicateMemberException;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.VersionPrinter;
+import spring.WrongIdPasswordException;
+
+public class MainForSpringBook2 {
+
+	private static ApplicationContext ctx = null;
+	
+	public static void main(String[] args) throws IOException {
+		ctx = new AnnotationConfigApplicationContext(AppConf1.class, AppConf2.class);
+		
+		BufferedReader reader = 
+				new BufferedReader(new InputStreamReader(System.in));
+		while (true) {
+			System.out.println("명령어를 입력하세요:");
+			String command = reader.readLine();
+			if (command.equalsIgnoreCase("exit")) {
+				System.out.println("종료합니다.");
+				break;
+			}
+			if (command.startsWith("new ")) {
+				processNewCommand(command.split(" "));
+				continue;
+			} else if (command.startsWith("change ")) {
+				processChangeCommand(command.split(" "));
+				continue;
+			} else if (command.equals("list")) {
+				processListCommand();
+				continue;
+			} else if (command.startsWith("info ")) {
+				processInfoCommand(command.split(" "));
+				continue;
+			} else if (command.equals("version")) {
+				processVersionCommand();
+				continue;
+			}
+			printHelp();
+		}
+	}
+
+	private static void processNewCommand(String[] arg) {
+		if (arg.length != 5) {
+			printHelp();
+			return;
+		}
+		MemberRegisterService regSvc =
+				ctx.getBean("memberRegSvc", MemberRegisterService.class);
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPssword(arg[4]);
+		
+		if (!req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.\n");
+			return;
+		}
+		try {
+			regSvc.regist(req);
+			System.out.println("등록했습니다.\n");
+		} catch (DuplicateMemberException e) {
+			System.out.println("이미 존재하는 이메일입니다.\n");
+		}
+	}
+
+	private static void processChangeCommand(String[] arg) {
+		if (arg.length != 4) {
+			printHelp();
+			return;
+		}
+		ChangePasswordService changePwdSvc = 
+				ctx.getBean("changePwdSvc", ChangePasswordService.class);
+		try {
+			changePwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.\n");
+		} catch (MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.\n");
+		} catch (WrongIdPasswordException e) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.\n");
+		}
+	}
+
+	private static void printHelp() {
+		System.out.println();
+		System.out.println("잘못된 명령입니다. 아래 명령어 사용법을 확인하세요.");
+		System.out.println("명령어 사용법:");
+		System.out.println("new 이메일 이름 암호 암호확인");
+		System.out.println("change 이메일 현재비번 변경비번");
+		System.out.println();
+	}
+
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = 
+				ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+
+	private static void processInfoCommand(String[] arg) {
+		if (arg.length != 2) {
+			printHelp();
+			return;
+		}
+		MemberInfoPrinter infoPrinter = 
+				ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+	
+	private static void processVersionCommand() {
+		VersionPrinter versionPrinter = 
+				ctx.getBean("versionPrinter", VersionPrinter.class);
+		versionPrinter.print();
+	}
+}
+```
+
+
+
++ AppConfi1.java
+```java
+package config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import spring.MemberDao;
+import spring.MemberPrinter;
+
+@Configuration
+public class AppConf1 {
+	public AppConf1() {
+		System.out.println("AppConfi1 생성자 작동");
+	}
+
+	@Bean
+	public MemberDao memberDao() {
+		return new MemberDao();
+	}
+	
+	@Bean
+	public MemberPrinter memberPrinter() {
+		return new MemberPrinter();
+	}
+}
+```
+
+
+
++ AppConfi2.java
+```java
+package config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import spring.ChangePasswordService;
+import spring.MemberDao;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberPrinter;
+import spring.MemberRegisterService;
+import spring.VersionPrinter;
+
+@Configuration
+public class AppConf2 {
+		
+	@Autowired
+	//현재 ApplicationContext가 관리하는 객체를 자동으로 연결...(같은자료형)의존자동주입
+	private MemberDao memberDao;
+	
+	@Autowired  //의존자동주입
+	private MemberPrinter memberPrinter;
+		
+	
+	
+	public AppConf2() {
+		System.out.println("AppConf2 생성자 작동");
+	}
+
+	@Bean
+	public MemberRegisterService memberRegSvc() {
+		return new MemberRegisterService(memberDao);
+	}
+	
+	@Bean
+	public ChangePasswordService changePwdSvc() {
+		ChangePasswordService pwdSvc = new ChangePasswordService();
+		pwdSvc.setMemberDao(memberDao);
+		return pwdSvc;
+	}
+	
+	@Bean
+	public MemberListPrinter listPrinter() {
+		return new MemberListPrinter(memberDao, memberPrinter);
+	}
+	
+	@Bean
+	public MemberInfoPrinter infoPrinter() {
+		MemberInfoPrinter infoPrinter = new MemberInfoPrinter();
+		infoPrinter.setMemberDao(memberDao);
+		infoPrinter.setPrinter(memberPrinter);
+		return infoPrinter;
+	}
+	
+	@Bean
+	public VersionPrinter versionPrinter() {
+		VersionPrinter versionPrinter = new VersionPrinter();
+		versionPrinter.setMajorVersion(5);
+		versionPrinter.setMinorVersion(0);
+		return versionPrinter;
+	}
+}
+
+```
+
+
+
++ 의존자동주입
+```java
+	@Autowired  //의존자동주입
+	private MemberDao memberDao;
+	
+	@Autowired  //의존자동주입
+	private MemberPrinter memberPrinter;
+
+	//다른 클래스에서 만들어진 memverDao의 객체를 함께 사용하기 위한 자동주입.
+```
+
+
+
+
+
++ AppConfImport.java
+```java
+package config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+import spring.MemberDao;
+import spring.MemberPrinter;
+
+@Configuration
+@Import({AppConf2.class})  // AppConf2.class를 그대로 가져와 사용함.
+public class AppConfImport {
+
+	@Bean
+	public MemberDao memberDao() {
+		return new MemberDao();
+	}
+	
+	@Bean
+	public MemberPrinter memberPrinter() {
+		return new MemberPrinter();
+	}
+}
+```
+
+
+
++ MainForImport.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import config.AppConfImport;
+import spring.ChangePasswordService;
+import spring.DuplicateMemberException;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.VersionPrinter;
+import spring.WrongIdPasswordException;
+
+public class MainForImport {
+
+	private static ApplicationContext ctx = null;
+	
+	public static void main(String[] args) throws IOException {
+		ctx = new AnnotationConfigApplicationContext(AppConfImport.class);
+		// AppConfImport.class 하나만 참조하지만.... 결극 그 안에 다른 클래스를 Import!
+		// 두개의 클래스를 쓰는것과 같은 효과
+		
+		BufferedReader reader = 
+				new BufferedReader(new InputStreamReader(System.in));
+		while (true) {
+			System.out.println("명령어를 입력하세요:");
+			String command = reader.readLine();
+			if (command.equalsIgnoreCase("exit")) {
+				System.out.println("종료합니다.");
+				break;
+			}
+			if (command.startsWith("new ")) {
+				processNewCommand(command.split(" "));
+				continue;
+			} else if (command.startsWith("change ")) {
+				processChangeCommand(command.split(" "));
+				continue;
+			} else if (command.equals("list")) {
+				processListCommand();
+				continue;
+			} else if (command.startsWith("info ")) {
+				processInfoCommand(command.split(" "));
+				continue;
+			} else if (command.equals("version")) {
+				processVersionCommand();
+				continue;
+			}
+			printHelp();
+		}
+	}
+
+	private static void processNewCommand(String[] arg) {
+		if (arg.length != 5) {
+			printHelp();
+			return;
+		}
+        MemberRegisterService regSvc = 
+                ctx.getBean("memberRegSvc", MemberRegisterService.class);
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPssword(arg[4]);
+		
+		if (!req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.\n");
+			return;
+		}
+		try {
+			regSvc.regist(req);
+			System.out.println("등록했습니다.\n");
+		} catch (DuplicateMemberException e) {
+			System.out.println("이미 존재하는 이메일입니다.\n");
+		}
+	}
+
+	private static void processChangeCommand(String[] arg) {
+		if (arg.length != 4) {
+			printHelp();
+			return;
+		}
+        ChangePasswordService changePwdSvc = 
+                ctx.getBean("changePwdSvc", ChangePasswordService.class);
+		try {
+			changePwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.\n");
+		} catch (MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.\n");
+		} catch (WrongIdPasswordException e) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.\n");
+		}
+	}
+
+	private static void printHelp() {
+		System.out.println();
+		System.out.println("잘못된 명령입니다. 아래 명령어 사용법을 확인하세요.");
+		System.out.println("명령어 사용법:");
+		System.out.println("new 이메일 이름 암호 암호확인");
+		System.out.println("change 이메일 현재비번 변경비번");
+		System.out.println();
+	}
+
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = 
+				ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+
+	private static void processInfoCommand(String[] arg) {
+		if (arg.length != 2) {
+			printHelp();
+			return;
+		}
+		MemberInfoPrinter infoPrinter = 
+				ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+	
+	private static void processVersionCommand() {
+		VersionPrinter versionPrinter = 
+				ctx.getBean("versionPrinter", VersionPrinter.class);
+		versionPrinter.print();
+	}
+}
+```
+
+
+
+
++ getBean()의 사용
+```java
+MemberListPrinter listPrinter = 
+				ctx.getBean("listPrinter", MemberListPrinter.class);
+				//ctx.getBean("listPrinter2", MemberListPrinter.class);
+				// 식발자 listPrinter2가 없으므로 NoSuchBeanDefinitionException 발생
+
+VersionPrinter versionPrinter = 
+				ctx.getBean("versionPrinter", VersionPrinter.class);
+
+////////////////////////////////////////////////////////////////
+//아래의 이름이 다음과 같기때문에 위와 같이 맞춰서 작성해야한다.
+@Bean
+	public MemberListPrinter listPrinter() {
+		return new MemberListPrinter(memberDao(), memberPrinter());
+	}
+
+@Bean
+	public VersionPrinter versionPrinter() {
+		VersionPrinter versionPrinter = new VersionPrinter();
+		versionPrinter.setMajorVersion(5);
+		versionPrinter.setMinorVersion(0);
+		return versionPrinter;
+	}
+```
+
++ 만약 빈 이름을 지정하지 않고 타입으로 빈을 구할 수 있다.
+```java
+VersionPrinter versionPrinter = ctx.getBean(MemberPrinter.class);
+```
+
+
++ 만약 클래스에 "@Bean"이 없는 메서드가 있다면 그것은 빈이 아니라 불러올 수 없다.
+  + 기능은 정상으로 작동하나....ApplicationContext가 찾아내주 못해서 쓸수 없다.
+
+
+
+
 #### 4. project 실습
 #### 5. Summary / Close
 
+
+
+
+
+
+
+-------------------------------------------------------------------------
+
+### [2019-07-23]
+
+#### 1. Review
+
+#### 2. SpringFramework
+#### 4. project 실습
+#### 5. Summary / Close
