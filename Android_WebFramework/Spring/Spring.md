@@ -2753,6 +2753,483 @@ VersionPrinter versionPrinter = ctx.getBean(MemberPrinter.class);
 
 
 
+
+##### 의존자동주입
++ 지금까지 우리는 생성자를 이용한 주입, set메서드를 이용한 주입을 해왔으나... 자동으로 가능.
+
++ DI(의존 주입방법 -- 1) 명시적 의존주입-chap03  2) 자동의존주입-chap04
+
+1. 설정화일의 '<bean>' 태그를 이용한 명시적인 의존 주입
+```xml
+   	<bean id="memberDao" class="spring.MemberDao">
+	</bean>
+	
+	<!-- 생성자에 의한 의존성 주입 -->
+	<bean id="memberRegSvc" class="spring.MemberRegisterService">
+		<constructor-arg ref="memberDao" />
+	</bean>
+	
+	<bean id="memberPrinter" class="spring.MemberPrinter">
+	</bean>
+	
+	<!-- 멤버변수 즉 set Method에 의한 의존성 주입 -->
+	<bean id="infoPrinter" class="spring.MemberInfoPrinter">
+		<property name="memberDao" ref="memberDao" />
+		<property name="printer" ref="memberPrinter" />
+	</bean>	
+```
+
+
+
+2. 자동 의존 주입
+```
+    1) 설정화일에 <construct-arg, <property 태그를 사용하지 않는다.==> 자동주입
+
+		<교재>
+    2) 빈객체를 생성하려는 설정파일이 있고(인자가 없는생성자) 이때 작동하는 자바클래스에 
+      @Autowired, @Resource를 사용하여 의존을 자동주입한다.
+                                      ======
+      springframework에서의 spring container 즉, ApplicationContext객체가
+        내부적으로 생성하여 관리하고 있는 객체에서 검색하여 의존성을 주입해 준다.
+                                                  ------
+                                 (byName(식별자) , byType(클래스형))     
+      
+    ****  설정화일에 아래의 태그를 반드시 추가해야 한다. ****  
+	<context:annotation-config />
+	     springframework가 관리하는 빈객체들을 검색하여 자동의존을 설정하는 기능을 수행하는
+	      내부적인 빈을 생성하는 코드다
+   	
+   	<bean id="memberDao" class="spring.MemberDao">
+	</bean>
+	
+	<bean id="memberRegSvc" class="spring.MemberRegisterService">
+	</bean>
+	
+	*** 자바 코드에서 자동의존주입과 관련된 Annotation을 사용한다.
+	MemberRegistService.java화일의 
+	       필드나 생성자, setMethod에 @Autowired , @Resources Annotation 을 사용-->
+
+
+
+
+	1) 생성자에 Autowired       
+	<bean id="memberRegSvc" class="spring.MemberRegisterService">
+	</bean>
+	
+
+
+
+	2) 필드에 Autowired
+	<bean id="infoPrinter" class="spring.MemberInfoPrinter">
+	</bean>
+	
+	@Autowired   ----> 해당객체 생성직후에 ApplicationContext가 관리하는 객체중
+	                            자료형이 MemberDao객체의 참조값을 직접 연결한다.  
+	MemberDao memDao; 
+	
+
+
+
+	3) set Method 에 Autowired
+	<bean id="infoPrinter" class="spring.MemberInfoPrinter">
+	</bean>
+
+	@Autowired  ---> 해당객체 생성직후에 아래의 메서드를 실행시키되
+				인자로 전달되는 값은 	ApplicationContext가 관리하는 객체중
+				MemberPrinter형 객체의 참조값을 전달하여 실행시킨다.				
+	public void setPrinter(MemberPrinter printer) {
+		System.out.println("MemberInfoPrinter::setPrinter(MemberPrinter)..." + printer);
+		this.printer = printer;
+	}
+	===========================================================
+	@Autowired  ---> 해당객체 생성직후에 아래의 메서드를 실행시키되
+				인자로 전달되는 값은 	ApplicationContext가 관리하는 객체중
+				MemberPrinter형 객체의 참조값을 전달하여 실행시킨다.
+				 
+				만일 동일한 자료형의 객체가 여러개일때는 qualifier의 value가 sysout 객체로 연결시켜 실행하시오
+	<bean id="printer1" class="spring.MemberPrinter">
+ 		<qualifier value="sysout" />
+	</bean>
+	
+	@Autowired	
+	@Qualifier("sysout")						
+	public void setPrinter(MemberPrinter printer) {
+		System.out.println("MemberInfoPrinter::setPrinter(MemberPrinter)..." + printer);
+		this.printer = printer;
+	}	
+	==============================================
+	여기까지의 내용으로 주의할점은 @Autowired는 자료형을 기준으로 연결된다. ****
+		@Autowird가 적용되는 순서
+		1. 타입이 같은 빈객체를 검색한다.  없으면 예외발생
+				1개면 해당 빈객체를 사용
+				@Qualifier가 명시되어 있으면 해당 빈객체를 사용--> 없으면 예외발생
+		2. 타입이 같은 빈객체가 여러개이면 @Qualifier가 명시되어 있으면 해당 빈객체를 적용
+		3. @Qualifier가 없다면 이름이 같은 객체를 찾는다. 존재하면 적용하고 없으면 예외 발생   
+
+
+
+
+	4) @Resource --> 객체명 즉, 식별자로 연결시킨다.
+	 빈객체의 id를 기준으로 연결시킬수 있다.	
+	    
+	  사용법 1)
+	   필드에 사용
+	   @Resource(name="memberDao")
+	   private MemberDao memDao;
+	   
+	   @Resource(name="memberPrinter")
+	   public void setPrinter(MemberPrinter printer) {
+		  System.out.println("MemberInfoPrinter::setPrinter(MemberPrinter)..." + printer);
+		  this.printer = printer;
+	   }
+	   ==> 어플리케이션 컨텍스트 에서 id가 memberDao , id가 memberPrinter인 객체를 찾아
+	   연결시킨다.  만일 동일 id를 가지는 객체가 존재하지 않으면 예외를 발생시킨다.
+
+
+	  ** 생성자에 적용할 수 없고 필드나 메서드에만 적용할 수 있다. 
+	  
+	 사용법 2)
+	   @Resource
+	   private MemberDao memberDao;
+	   
+	   @Resource
+	   public void setPrinter(MemberPrinter printer) {
+		  System.out.println("MemberInfoPrinter::setPrinter(MemberPrinter)..." + printer);
+		  this.printer = printer;
+	   }
+	   ==> @Resource(name="식별자명")에서 name속성이 생략될때는 자료형을 기준으로 연결한다.
+	          즉, MemberDao형 spring빈객체, MemberPrinter형 spring빈객체를 연결한다.
+	          
+      @Resource의 적용순선
+      1. name속성에 지정된 빈객체를 찾는다. 존재하면 해당 객체 주입
+      2. name속성이 생략되었다면 동일한 자료형의 빈객체를 찾아서 주입한다.
+      3. name속성이 없고 동일한 자료형의 빈객체가 두개 이상일 경우 같은 이름을 가지 빈개를 주입한다.
+      4.  //            //                  //    같은 이름을 가진 객체가 없다면 @Qualifier를 이용하여 빈객체를 찾는다.
+           없다면 예외발생	          
+-------------------------------
+만일 의존주입이
+명시적주입과(<constructor-arg
+          <property)
+자동주입이(@Autowired,@Qulifier
+        @Resource)   
+ 동시에 사용되었다면 명시적주입을 우선한다.
+```
+
++ chap04/AppCtx.java
+```java
+package config;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import spring.ChangePasswordService;
+import spring.MemberDao;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberPrinter;
+import spring.MemberRegisterService;
+import spring.MemberSummaryPrinter;
+import spring.VersionPrinter;
+
+@Configuration
+public class AppCtx {
+	
+	
+
+	public AppCtx() {
+		System.out.println("AppCtx::AppCtx().... 인자없는 생성자 작동!! ");
+	}
+
+	@Bean
+	public MemberDao memberDao() {
+		return new MemberDao();
+	}
+	
+	@Bean
+	public MemberRegisterService memberRegSvc() {
+		return new MemberRegisterService();
+	}
+	
+	@Bean
+	public ChangePasswordService changePwdSvc() {
+		return new ChangePasswordService();
+	}
+	
+	//식별자를 별도로 지정하지 않으면 메서드명이 식별자가 된다. -- memberPrinter
+	//@Bean
+	//public MemberPrinter memberPrinter() {
+	//	return new MemberPrinter();
+	//}
+	
+	@Bean
+	@Qualifier("printer")
+	public MemberPrinter memberPrinter1() {
+		return new MemberPrinter();
+	}
+	
+	//@Bean
+	//public MemberPrinter memberPrinter2() {
+	//	return new MemberPrinter();
+	//}
+	
+
+	@Bean
+	@Qualifier("summaryPrinter")
+	public MemberSummaryPrinter memberPrinter2() {
+		return new MemberSummaryPrinter();
+	}
+
+	@Bean
+	public MemberListPrinter listPrinter() {
+		return new MemberListPrinter();
+	}
+	
+	@Bean
+	public MemberInfoPrinter infoPrinter() {
+		MemberInfoPrinter infoPrinter = new MemberInfoPrinter();
+		//위의 코드가 실행될때
+		//1) MemberInfoPrinter클래스의 인스턴스가 만들어지고
+		//2) Autowired 어토테이션이 set메서드에 적용되어있으면, 자동으로 set메서드 동작.
+		//infoPrinter.setPrinter(memberPrinter2());
+		return infoPrinter;
+	}
+	
+	@Bean
+	public VersionPrinter versionPrinter() {
+		VersionPrinter versionPrinter = new VersionPrinter();
+		versionPrinter.setMajorVersion(5);
+		versionPrinter.setMinorVersion(0);
+		return versionPrinter;
+	}
+}
+```
+
+
++ chap04/MemberRegisterService.java
+```java
+package spring;
+
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class MemberRegisterService {
+	
+	//필드에 적용한 의존자동주입 -- 식별자가 아니라 자료형이 같은 객체를 검색하여 자동연결.
+	@Autowired
+	private MemberDao memberDao;
+
+	public MemberRegisterService() {
+		System.out.println("MemberRegisterService::MemberRegisterService()...");
+	}
+	
+	//아래의 메서드는 작동되지 않는다. -- 필드에 의한 자동주입.
+	public MemberRegisterService(MemberDao memberDao) {
+		System.out.println("MemberRegisterService::MemberRegisterService(MemberDao)...");
+		this.memberDao = memberDao;
+	}
+
+	public Long regist(RegisterRequest req) {
+		Member member = memberDao.selectByEmail(req.getEmail());
+		if (member != null) {
+			throw new DuplicateMemberException("dup email " + req.getEmail());
+		}
+		Member newMember = new Member(
+				req.getEmail(), req.getPassword(), req.getName(), 
+				LocalDateTime.now());
+		memberDao.insert(newMember);
+		return newMember.getId();
+	}
+}
+```
+
++ chap04/MainForSpring.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import config.AppCtx;
+import spring.ChangePasswordService;
+import spring.DuplicateMemberException;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.VersionPrinter;
+import spring.WrongIdPasswordException;
+
+public class MainForSpring {
+
+	private static ApplicationContext ctx = null;
+	
+	public static void main(String[] args) throws IOException {
+		ctx = new AnnotationConfigApplicationContext(AppCtx.class);
+		
+		BufferedReader reader = 
+				new BufferedReader(new InputStreamReader(System.in));
+		while (true) {
+			System.out.println("명령어를 입력하세요:");
+			String command = reader.readLine();
+			if (command.equalsIgnoreCase("exit")) {
+				System.out.println("종료합니다.");
+				break;
+			}
+			if (command.startsWith("new ")) {
+				processNewCommand(command.split(" "));
+				continue;
+			} else if (command.startsWith("change ")) {
+				processChangeCommand(command.split(" "));
+				continue;
+			} else if (command.equals("list")) {
+				processListCommand();
+				continue;
+			} else if (command.startsWith("info ")) {
+				processInfoCommand(command.split(" "));
+				continue;
+			} else if (command.equals("version")) {
+				processVersionCommand();
+				continue;
+			}
+			printHelp();
+		}
+	}
+
+	private static void processNewCommand(String[] arg) {
+		if (arg.length != 5) {
+			printHelp();
+			return;
+		}
+		MemberRegisterService regSvc = 
+				ctx.getBean("memberRegSvc", MemberRegisterService.class);
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPassword(arg[4]);
+		
+		if (!req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.\n");
+			return;
+		}
+		try {
+			regSvc.regist(req);
+			System.out.println("등록했습니다.\n");
+		} catch (DuplicateMemberException e) {
+			System.out.println("이미 존재하는 이메일입니다.\n");
+		}
+	}
+
+	private static void processChangeCommand(String[] arg) {
+		if (arg.length != 4) {
+			printHelp();
+			return;
+		}
+		ChangePasswordService changePwdSvc =
+				ctx.getBean("changePwdSvc", ChangePasswordService.class);
+		try {
+			changePwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.\n");
+		} catch (MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.\n");
+		} catch (WrongIdPasswordException e) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.\n");
+		}
+	}
+
+	private static void printHelp() {
+		System.out.println();
+		System.out.println("잘못된 명령입니다. 아래 명령어 사용법을 확인하세요.");
+		System.out.println("명령어 사용법:");
+		System.out.println("new 이메일 이름 암호 암호확인");
+		System.out.println("change 이메일 현재비번 변경비번");
+		System.out.println();
+	}
+
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = 
+				ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+
+	private static void processInfoCommand(String[] arg) {
+		if (arg.length != 2) {
+			printHelp();
+			return;
+		}
+		MemberInfoPrinter infoPrinter = 
+				ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+	
+	private static void processVersionCommand() {
+		VersionPrinter versionPrinter = 
+				ctx.getBean("versionPrinter", VersionPrinter.class);
+		versionPrinter.print();
+	}
+}
+```
+
++ chap04/MemberListPrinter.java
+```java
+package spring;
+
+import java.util.Collection;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+public class MemberListPrinter {
+
+	private MemberDao memberDao;
+	private MemberPrinter printer;
+
+	public MemberListPrinter() {
+	}
+	
+	public MemberListPrinter(MemberDao memberDao, MemberPrinter printer) {
+		this.memberDao = memberDao;
+		this.printer = printer;
+	}
+
+	public void printAll() {
+		Collection<Member> members = memberDao.selectAll();
+		members.forEach(m -> printer.print(m));
+	}
+
+	@Autowired
+	public void setMemberDao(MemberDao memberDao) {
+		System.out.println("@Autowired MemberListPrinter::setMemberDao(MemberDao)..........................................");
+
+		this.memberDao = memberDao;
+	}
+	
+	@Autowired
+	@Qualifier("printer")
+	public void setMemberPrinter(MemberPrinter printer) {
+		System.out.println("@Autowired MemberListPrinter::setMemberDao(MemberSummaryPrinter)..........................................");
+
+		this.printer = printer;
+	}
+	
+	@Autowired
+	public void setMemberPrinter(MemberSummaryPrinter printer) {
+		System.out.println("@Autowired MemberListPrinter::setMemberDao(MemberSummaryPrinter)..........................................");
+
+		this.printer = printer;
+	}	
+}
+```
+
+
+
 #### 4. project 실습
 #### 5. Summary / Close
 
