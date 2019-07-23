@@ -3245,6 +3245,415 @@ public class MemberListPrinter {
 
 #### 1. Review
 
+#### 2. 컴퍼넌트스캔(ComponentScan)
+1. 설정파일을 사용하면, 설정파일의 @Bean 어노테이션을 가진 메서드를 실행시켜 빈객체를 생성하고 의존주입(명시적의존주입, 자동의존주입)을 수행하여 빈객체를 ApplicationContext가 관리한다. ------> 기존방법.
+
+2. 설정파일을 사용할때 @ComponentScan을 사용하여 명시되지 않은 빈객체도 생성하고(@Component), 설정파일에 @Bean으로 명시된 빈객체도 생성하여 관리한다.  ------> 오늘 배울 내용.
+
+
+
++ AppCtx.java
+```java
+package config;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+import spring.MemberPrinter;
+import spring.MemberSummaryPrinter;
+import spring.VersionPrinter;
+
+@Configuration
+@ComponentScan(basePackages = {"spring"}) //basePackages는  스캔대상 패키지목록을 지정한다. spring패키지와 그하위패지지에서 스캔
+public class AppCtx {
+
+	@Bean
+	@Qualifier("printer")
+	public MemberPrinter memberPrinter1() {
+		return new MemberPrinter();
+	}
+	
+	@Bean
+	@Qualifier("summaryPrinter")
+	public MemberSummaryPrinter memberPrinter2() {
+		return new MemberSummaryPrinter();
+	}
+	
+	@Bean
+	public VersionPrinter versionPrinter() {
+		VersionPrinter versionPrinter = new VersionPrinter();
+		versionPrinter.setMajorVersion(5);
+		versionPrinter.setMinorVersion(0);
+		return versionPrinter;
+	}
+}
+```
+
+
+
+
++ MainForSpring.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import config.AppCtx;
+import spring.ChangePasswordService;
+import spring.DuplicateMemberException;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.VersionPrinter;
+import spring.WrongIdPasswordException;
+
+public class MainForSpring {
+
+	private static ApplicationContext ctx = null;
+	
+	public static void main(String[] args) throws IOException {
+		ctx = new AnnotationConfigApplicationContext(AppCtx.class);
+		System.out.println("------------------------------------------------------------------------");
+		//확인
+		String[] names = ctx.getBeanDefinitionNames();
+		for(String name : names) {
+			System.out.println(name);
+		}
+		System.out.println("------------------------------------------------------------------------");
+		
+		BufferedReader reader = 
+				new BufferedReader(new InputStreamReader(System.in));
+		while (true) {
+			System.out.println("명령어를 입력하세요:");
+			String command = reader.readLine();
+			if (command.equalsIgnoreCase("exit")) {
+				System.out.println("종료합니다.");
+				break;
+			}
+			if (command.startsWith("new ")) {
+				processNewCommand(command.split(" "));
+				continue;
+			} else if (command.startsWith("change ")) {
+				processChangeCommand(command.split(" "));
+				continue;
+			} else if (command.equals("list")) {
+				processListCommand();
+				continue;
+			} else if (command.startsWith("info ")) {
+				processInfoCommand(command.split(" "));
+				continue;
+			} else if (command.equals("version")) {
+				processVersionCommand();
+				continue;
+			}
+			printHelp();
+		}
+	}
+
+	private static void processNewCommand(String[] arg) {
+		if (arg.length != 5) {
+			printHelp();
+			return;
+		}
+		MemberRegisterService regSvc = 
+				ctx.getBean(MemberRegisterService.class);
+		//MemberRegisterService regSvc = 
+		//		ctx.getBean(memberRegisterService,MemberRegisterService.class);
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPassword(arg[4]);
+		
+		if (!req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.\n");
+			return;
+		}
+		try {
+			regSvc.regist(req);
+			System.out.println("등록했습니다.\n");
+		} catch (DuplicateMemberException e) {
+			System.out.println("이미 존재하는 이메일입니다.\n");
+		}
+	}
+
+	private static void processChangeCommand(String[] arg) {
+		if (arg.length != 4) {
+			printHelp();
+			return;
+		}
+		ChangePasswordService changePwdSvc =
+				ctx.getBean(ChangePasswordService.class);
+		//ChangePasswordService changePwdSvc =
+		//		ctx.getBean(changePasswordService,ChangePasswordService.class);		
+		try {
+			changePwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.\n");
+		} catch (MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.\n");
+		} catch (WrongIdPasswordException e) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.\n");
+		}
+	}
+
+	private static void printHelp() {
+		System.out.println();
+		System.out.println("잘못된 명령입니다. 아래 명령어 사용법을 확인하세요.");
+		System.out.println("명령어 사용법:");
+		System.out.println("new 이메일 이름 암호 암호확인");
+		System.out.println("change 이메일 현재비번 변경비번");
+		System.out.println();
+	}
+
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = 
+				ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+
+	private static void processInfoCommand(String[] arg) {
+		if (arg.length != 2) {
+			printHelp();
+			return;
+		}
+		MemberInfoPrinter infoPrinter = 
+				ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+	
+	private static void processVersionCommand() {
+		VersionPrinter versionPrinter = 
+				ctx.getBean("versionPrinter", VersionPrinter.class);
+		versionPrinter.print();
+	}
+}
+```
+
+
+
+
+
++ MemberListPrinter.java
+```java
+package spring;
+
+import java.util.Collection;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component("listPrinter")
+public class MemberListPrinter {
+
+	private MemberDao memberDao;
+	private MemberPrinter printer;
+
+	public MemberListPrinter() {
+		System.out.println("@Component--MemberListPrinter:MemberListPrinter()...");
+	}
+	
+	public MemberListPrinter(MemberDao memberDao, MemberPrinter printer) {
+		System.out.println("@Component--MemberListPrinter:MemberListPrinter(MemberDao,MemberPrinter)...");		
+		this.memberDao = memberDao;
+		this.printer = printer;
+	}
+
+	public void printAll() {
+		Collection<Member> members = memberDao.selectAll();
+		members.forEach(m -> printer.print(m));
+	}
+
+	@Autowired
+	public void setMemberDao(MemberDao memberDao) {
+		this.memberDao = memberDao;
+	}
+	
+	@Autowired
+	public void setMemberPrinter(MemberSummaryPrinter printer) {
+		this.printer = printer;
+	}
+}
+```
+
+
+
+
+```
+설정파일에 @ComponentScan을 넣으면...
+@Component를 기입한 모든 클래스를 자동주입하고 객체를 생성하여 관리를 시작한다.
+
+@ComponentSca("이름")  -> 생성자명이 '이름'으로 관리된다.
+```
+
+
+
+
+##### 실습
+```
+0-1. ApplicationContext에 등록되는 빈객체 확인
+   MainForList.java 실습
+   
+0-2. Bean객체를 직접 등록했을때 동일 id와 동일 클래스일때 1개만 동작한다.
+   MainforManual.java 실습
+       
+----------------------------------------------   
+1. Java설정화일에 Bean을 등록하지 않고
+   Java화일 자체에 @Component를 사용하여 스프링컨테이너가 검색하여 생성할수 있도록 설정할수 있다.
+      단,Java설정화일에 반드시 @ComponentScan(basePackages = {"spring"})을 지정해야 한다.
+   
+   MainForSpring.java실습
+   
+
+
+2. 스캔할때 특정 대상을 자동 등록 대상에서 제외할수 있다.
+   MainForExclude.jva실습
+   
+  방법 1) 정규표현식을 사용해서 제외 대상을 지정
+         "spring"로 시작하고 Dao로 끝나는 클래스 제외 -- spring.MemberDao제외
+          
+		@Configuration
+		@ComponentScan(basePackages = {"spring"}, 
+			excludeFilters = @Filter(type = FilterType.REGEX, pattern = "spring\\..*Dao")
+		)	
+   
+  방법 2) ASPECTJ를 이용하여 제외(pom.xml의 dependency와 aaspectjweaver 모듈 추가) 
+		@Configuration
+		@ComponentScan(basePackages = {"spring"}, 
+			excludeFilters = @Filter(type = FilterType.ASPECTJ, pattern = "spring.*Dao")			
+		)
+   
+  방법 3) 특정 Annotaion을 붙인 타입을 컴퍼넌트 대상에서 제외
+      @NoProduct @ManualBean어노테이션을 붙인 클래스는 컴퍼넌트 스캔 대상에서 제외
+      ----------------------사용자가 만든 어노테이션
+
+    @Configuration
+    @ComponentScan(basePackages = {"spring","spring2"}, 
+       excludeFilters = @Filter(type = FilterType.ANNOTATION, classes = {NoProduct.class, ManualBean.class})			
+    )
+    
+ 	방법4) 특정 타입이나 그하위 타입을 컴퍼넌트 대상에서 제외 - ASSIGNABLE_TPPE    
+    @Configuration
+    @ComponentScan(basePackages = {"spring"}, 
+      excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = MemberDao.class)
+    )
+     
+ 	방법5) 설정필터가 2개 이상이면 다음과 같이 사용할 수 있다.
+    @Configuration
+    @ComponentScan(basePackages = {"spring"}, 
+    excludeFilters = {
+		 @Filter(type = FilterType.ANNOTATION, classes = ManualBean.class),
+		 @Filter(type = FilterType.REGEX,pattern = "spring2\\..*")}
+    )      
+      
+
+
+3. @Component 어노테이션 뿐만아니라 다음의 어노테이션도 컴퍼넌트 스캔 대상에 포함된다.
+   @Controller
+   @Service
+   @Repository
+   @Aspect
+   @Configuration
+   
+
+
+4. 컴퍼넌트 스캔기능을 사용해서 자동으로 빈을 등록할대 충돌에 주의 한다.
+   - 빈 이름 충돌
+   - 수동 등록에 따른 충돌
+             
+   MainForExplicait.java 실습
+```
+
+
+
++ AppCtxWithExclude.java
+```java
+//정규표현식으로 제외
+@Configuration
+@ComponentScan(basePackages = {"spring"}, 
+  excludeFilters = @Filter(type = FilterType.REGEX, pattern = "spring\\..*Dao")
+																														//"클래스이름\\..*문자"
+)			
+
+//ASPECTJ를 이용한 제외
+@Configuration
+@ComponentScan(basePackages = {"spring"}, 
+excludeFilters = @Filter(type = FilterType.ASPECTJ, pattern = "spring.*Dao")			
+																														//"클래스이름.*문자"
+)
+
+//Annotaion(사용자가 만든 어노테이션)을 붙인 대상에 관한 제외 -- NoProduct, ManualBean
+@Configuration
+@ComponentScan(basePackages = {"spring","spring2"}, 
+excludeFilters = @Filter(type = FilterType.ANNOTATION, classes = {NoProduct.class, ManualBean.class})		              
+																														// 어노테이션이름.class
+)
+
+//특정타입 or 그 하위에서 제외 -- ASSIGNABLE_TYPE
+@Configuration
+@ComponentScan(basePackages = {"spring"}, 
+excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = MemberDao.class)			
+)
+
+//설정필터가 2개 이상일때...
+@Configuration
+@ComponentScan(basePackages = {"spring"}, 
+ excludeFilters = {
+		 @Filter(type = FilterType.ANNOTATION, classes = ManualBean.class),
+		 @Filter(type = FilterType.REGEX,pattern = "spring2\\..*")}
+)
+
+public class AppCtxWithExclude {
+	//아래 코드는 @ComponentScan에 의해서 자동등록되는 빈이아니라 사용자가 직접등록한 빈.
+	@Bean
+	public MemberDao memberDao() {
+		return new MemberDao();
+	}
+	
+	@Bean
+	@Qualifier("printer")
+	public MemberPrinter memberPrinter1() {
+		return new MemberPrinter();
+	}
+
+	@Bean
+	@Qualifier("summaryPrinter")
+	public MemberSummaryPrinter memberPrinter2() {
+		return new MemberSummaryPrinter();
+	}
+
+	@Bean
+	public VersionPrinter versionPrinter() {
+		VersionPrinter versionPrinter = new VersionPrinter();
+		versionPrinter.setMajorVersion(5);
+		versionPrinter.setMinorVersion(0);
+		return versionPrinter;
+	}
+}
+```
+
+
+
+#### 4. project 실습
+#### 5. Summary / Close
+
+
+
+-------------------------------------------------------------------------
+
+### [2019-07-24]
+
+#### 1. Review
+
 #### 2. SpringFramework
 #### 4. project 실습
 #### 5. Summary / Close
+
