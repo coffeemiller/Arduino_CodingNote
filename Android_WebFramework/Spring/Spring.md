@@ -3504,19 +3504,17 @@ public class MemberListPrinter {
    
 0-2. Bean객체를 직접 등록했을때 동일 id와 동일 클래스일때 1개만 동작한다.
    MainforManual.java 실습
-       
-----------------------------------------------   
-1. Java설정화일에 Bean을 등록하지 않고
-   Java화일 자체에 @Component를 사용하여 스프링컨테이너가 검색하여 생성할수 있도록 설정할수 있다.
-      단,Java설정화일에 반드시 @ComponentScan(basePackages = {"spring"})을 지정해야 한다.
-   
-   MainForSpring.java실습
+```
+
+1. Java설정화일에 Bean을 등록하지 않고 Java화일 자체에 @Component를 사용하여 스프링컨테이너가 검색하여 생성할수 있도록 설정할수 있다.
+   + 단,Java설정화일에 반드시 @ComponentScan(basePackages = {"spring"})을 지정해야 한다.
+   + MainForSpring.java실습
    
 
 
 2. 스캔할때 특정 대상을 자동 등록 대상에서 제외할수 있다.
-   MainForExclude.jva실습
-   
+   + MainForExclude.jva실습
+```   
   방법 1) 정규표현식을 사용해서 제외 대상을 지정
          "spring"로 시작하고 Dao로 끝나는 클래스 제외 -- spring.MemberDao제외
           
@@ -3553,24 +3551,8 @@ public class MemberListPrinter {
 		 @Filter(type = FilterType.ANNOTATION, classes = ManualBean.class),
 		 @Filter(type = FilterType.REGEX,pattern = "spring2\\..*")}
     )      
-      
+```      
 
-
-3. @Component 어노테이션 뿐만아니라 다음의 어노테이션도 컴퍼넌트 스캔 대상에 포함된다.
-   @Controller
-   @Service
-   @Repository
-   @Aspect
-   @Configuration
-   
-
-
-4. 컴퍼넌트 스캔기능을 사용해서 자동으로 빈을 등록할대 충돌에 주의 한다.
-   - 빈 이름 충돌
-   - 수동 등록에 따른 충돌
-             
-   MainForExplicait.java 실습
-```
 
 
 
@@ -3642,6 +3624,114 @@ public class AppCtxWithExclude {
 
 
 
+3. @ComponentScan은 @Component 어노테이션 뿐만아니라 다음의 어노테이션도 컴퍼넌트 스캔 대상에 포함된다.
+```
+   @Controller
+   @Service
+   @Repository
+   @Aspect
+   @Configuration
+```
+
+
+
+
+##### <주의할 점>
+4. 컴퍼넌트 스캔기능을 사용해서 자동으로 빈을 등록할대 충돌에 주의 한다.
+   - 빈 이름 충돌
+     - @Component에서 자동등록된 빈객체의 식별자명과 설정파일에서 등록한 빈객체의 명칭충돌.
+     - 패키지가 여러개일때 주로 발생.
+   
+	 - 수동 등록에 따른 충돌
+  	 - 자동등록된 빈객체와 설정파일에서 등록한 빈객체가 함께 존재할때.
+   
+	 - MainForExplicait.java 실습
+
+
++ AppCtxWithExplicit.java
+```java
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+import spring.MemberDao;
+import spring.MemberPrinter;
+import spring.MemberSummaryPrinter;
+import spring.VersionPrinter;
+
+@Configuration
+@ComponentScan(basePackages = {"spring"})
+//@ComponentScan(basePackages = {"spring","spring2"})   //--> 빈충돌
+//exception is org.springframework.context.annotation.ConflictingBeanDefinitionException
+
+public class AppCtxWithExplicit {
+	
+	//자동등록과 수동등록이 함께 지정되었을때는.... 수동등록이 우선(적용)
+	@Bean
+	public MemberDao memberDao() {
+		MemberDao memberDao = new MemberDao();
+		System.out.println("explicit : " + memberDao);
+		return memberDao;
+	}
+	
+	//수동으로 같은 객체 2개를 지정하면.... 수동으로 2개의 객체가 생성
+	// memberDao, memberDao2
+	/*
+	@Bean
+	public MemberDao memberDao2() {
+		MemberDao memberDao = new MemberDao();
+		System.out.println("explicit : " + memberDao);
+		return memberDao;
+	}
+	*/
+	
+	@Bean
+	@Qualifier("printer")
+	public MemberPrinter memberPrinter1() {
+		return new MemberPrinter();
+	}
+	
+	@Bean
+	@Qualifier("summaryPrinter")
+	public MemberSummaryPrinter memberPrinter2() {
+		return new MemberSummaryPrinter();
+	}
+	
+	@Bean
+	public VersionPrinter versionPrinter() {
+		VersionPrinter versionPrinter = new VersionPrinter();
+		versionPrinter.setMajorVersion(5);
+		versionPrinter.setMinorVersion(0);
+		return versionPrinter;
+	}
+}
+
+```
+
+
+
++ MainForExplicit.java
+```java
+import java.io.IOException;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import config.AppCtxWithExplicit;
+
+public class MainForExplicit {
+
+	private static AbstractApplicationContext ctx = null;
+	
+	public static void main(String[] args) throws IOException {
+		ctx = new AnnotationConfigApplicationContext(
+				AppCtxWithExplicit.class);
+		ctx.close();
+	}
+}
+```
+
+
+
 #### 4. project 실습
 #### 5. Summary / Close
 
@@ -3657,3 +3747,15 @@ public class AppCtxWithExclude {
 #### 4. project 실습
 #### 5. Summary / Close
 
+
+
+
+-------------------------------------------------------------------------
+
+### [2019-07-25]
+
+#### 1. Review
+
+#### 2. SpringFramework
+#### 4. project 실습
+#### 5. Summary / Close
