@@ -3491,7 +3491,7 @@ public class MemberListPrinter {
 설정파일에 @ComponentScan을 넣으면...
 @Component를 기입한 모든 클래스를 자동주입하고 객체를 생성하여 관리를 시작한다.
 
-@ComponentSca("이름")  -> 생성자명이 '이름'으로 관리된다.
+@ComponentScan("이름")  -> 생성자명이 '이름'으로 관리된다.
 ```
 
 
@@ -3739,23 +3739,80 @@ public class MainForExplicit {
 
 -------------------------------------------------------------------------
 
-### [2019-07-24]
+### [2019-07-29]
 
 #### 1. Review
++ Spring
+	1. Library
+	2. framework
+   	1. 표준화된 설계기법 - 공통의 사용법(표준) / 유지보수용이
+   	2. 어느 단계에서 생성 -> 사용 -> 소멸
+      	- 동작구조 / 작동순서  ---> (template-틀)
 
-#### 2. SpringFramework
-#### 4. project 실습
-#### 5. Summary / Close
+
++ 의존주입
+  1. 명시적 의존주입
+     - 생성자에 의한 의존주입
+     - set 메서드에 의한 의존주입
+  
+	```java
+	@Bean
+	public MemberRegisterService memberRegSvc() {
+		//명시적 의존주입
+		return new MemberRegisterService(memberDao());
+	}
+	
+	@Bean
+	public ChangePasswordService changePwdSvc() {
+		ChangePasswordService pwdSvc = new ChangePasswordService();
+		//set메서드에 의한 의존주입
+		pwdSvc.setMemberDao(memberDao());
+		return pwdSvc;
+	}
+	```
+	
+
+
+	2. 자동 의존주입
+     - @Autowired =====> [@ComponentScan /  @Configuration]
+
+
+
+
+#### 2. Bean's Lifecycle
+
+
+#### 3. AoP (Aspect Oriented Programming)
++ A, B, C가 가지는 공통기능 = Aspect
+
+##### 3.1. 개념
+##### 3.2. 사용법
+##### 3.3. 실습
+#### 4. Summary / Close
 
 
 
 
 -------------------------------------------------------------------------
 
-### [2019-07-25]
+### [2019-07-30]
 
 #### 1. Review
 
 #### 2. SpringFramework
-#### 4. project 실습
+#### 4. 실습
+#### 5. Summary / Close
+
+
+
+
+
+-------------------------------------------------------------------------
+
+### [2019-07-31]
+
+#### 1. Review
+
+#### 2. SpringFramework
+#### 4. 실습
 #### 5. Summary / Close
