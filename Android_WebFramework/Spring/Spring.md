@@ -3780,14 +3780,783 @@ public class MainForExplicit {
 
 
 #### 2. Bean's Lifecycle
++ 일반 빈 객체의 생명주기
+```
+1. 생성-->생성자-->의존주입(자바설정파일)
+AnnotationConfigApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtx.class);
+
+@Configuration
+@Bean     -------| 빈객체생성-식별자(@Qualifier)
+@ComponentScan --| 명시적의존주입, 자동의존주입(@Autowired)
+==============================================================
+
+2. 사용
+클래스명 객체명 = ctx.getBean("식별자명", Client.class);
+								= ctx.getBean(Client.class);
+객체명.메서드();
+==============================================================
+
+3. 메모리에서 소멸
+ctx.close();
+
+
+
+InitializingBean, DisposableBean 인터페이스를 implements한 빈클래스 객체의 생명주기
+1. 생성 --> 생성자 -->의존주의 ==> afterPropertiesSet():초기화 기능
+   메모리를 할당
+           초기화작업==>생성자의 역활이 미비하다.  그래서 기능보완을 위해서 별도의 메서드를 만들었다.
+                  의존주입관련 기능(필드,인자가있는생성자,set메서드)
+2. 사용
+
+3. 메모리에서 소멸되기 직전에 ==> destroy() : 마무리 기능
+4. 메모리에서 소멸
+
+
+빈객체의 scope가 ==> singleton일때
+
+
+==================================================================
+위의 방법을 사용하면 초기화메서드와 종료메서드의 명칭이 모두 같다.
+상황에 따라 초기화메서드, 종료메서드를 지정해서 사용할 수 도 있다.
+1) xml설정화일 ==> GenericXmlApplicationContext
+   <bean ...  init-method="초기화메서드명" destroy-method="마무리메서드명">
+   </bean> 
+2) Java설정화일 ==> AnnotationConfigApplicationContext
+   @Bean(initMethod="connect", destroyMethod="close")   
+
+   
+   -----------------------------------------------
+   //빈객체의 scope ==> 객체가 메모리에 존재하는 기간
+                      1) singleton : Context초기화시 생성되고 close()시 소멸 ==> 1개만 객체가 만들어 진다.
+```
+
++ chap06/AppCtx.java
+```java
+package config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import spring.Client;
+import spring.Client2;
+
+@Configuration
+public class AppCtx {
+
+	@Bean	
+	public Client client() {
+		//한번만 객체가 생성된다 --- getBean(Client.class);
+		Client client = new Client();
+		client.setHost("host");
+		return client;
+	}
+	
+	//빈객체는 주로 인자가 없는 생성자에 의해 만들어진다.
+	//그러다보니 생성자에서 수행할 준비기능을 작동시키기가 불편하다.
+	//그래서 초기화 기능을 전담하는 메서드를 별도로 지정할 수 있다.
+	
+	@Bean(initMethod = "connect", destroyMethod = "close")
+	public Client2 client2() {
+		//한번만 객체가 생성된다 --- getBean(Client2.class);
+		Client2 client = new Client2();
+		client.setHost("host");
+		return client;
+	}
+}
+```
+
+
++ chap06/Main.java
+```java
+package main;
+
+import java.io.IOException;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+
+import config.AppCtx;
+import spring.Client;
+
+public class Main {
+
+	public static void main(String[] args) throws IOException {
+		AbstractApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtx.class);
+		System.out.println("ApplicationContext초기화------------------------------");
+		
+		Client client = ctx.getBean(Client.class);
+		client.send();
+		
+		System.out.println("ApplicationContext소멸------------------------------");
+		ctx.close();
+	}
+}
+```
+
+
++ chap06/Client.java
+```java
+package spring;
+
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+
+public class Client implements InitializingBean, DisposableBean {
+
+	private String host;
+	
+	public Client() {
+		System.out.println("Client::Client()....");
+	}
+	
+	//생성된 직후에 자동으로 작동하는 메서드
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		System.out.println("생성된 직후에 작동하는 메서드 Client::afterPropertiesSet() 실행");
+	}
+	//-------------------------------------
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+
+
+	public void send() {
+		System.out.println("Client.send() to " + host);
+	}
+	//-------------------------------------
+	
+	//소멸되기 직전에 작동하는 메서드
+	@Override
+	public void destroy() throws Exception {
+		System.out.println("소멸 직전에 작동하는 메서드 Client::destroy() 실행");
+	}
+}
+```
+
+
+
++ chap06/Client2.java
+```java
+package spring;
+
+public class Client2 {
+
+	private String host;
+
+	public Client2() {
+		System.out.println("Client2:Client2()....");
+	}
+	
+	//설정화일지정 생성직후 작동하는 메서드
+	public void connect() {
+		System.out.println("생성된 직후에 작동하는 메서드 지정 Client2::connect() 실행");
+	}
+	
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+
+	public void send() {
+		System.out.println("Client2.send() to " + host);
+	}
+
+	//설정화일지정 소멸직전 작동하는 메서드
+	public void close() {
+		System.out.println("소멸 직전에 작동하는 메서드 지정 Client2::close() 실행");
+	}
+}
+```
+
+
+
+
++ chap06/MainWithPrototype.java
+```java
+package main;
+
+import java.io.IOException;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+
+import config.AppCtxWithPrototype;
+import spring.Client;
+import spring.Client2;
+
+public class MainWithPrototype {
+
+	public static void main(String[] args) throws IOException {
+		AbstractApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtxWithPrototype.class);
+		System.out.println("ApplicationContext초기화------------------------------");
+
+		Client client1 = ctx.getBean(Client.class);
+		Client client2 = ctx.getBean(Client.class);
+		System.out.println("client1 == client2 : " + (client1 == client2));
+		
+		Client2 client21 = ctx.getBean(Client2.class);
+		Client2 client22 = ctx.getBean(Client2.class);
+		System.out.println("client21 == client22 : " + (client21 == client22));
+		System.out.println("ApplicationContext소멸------------------------------");
+		ctx.close();
+	}
+}
+```
+
++ chap06/AppCtxWithPrototype.java
+```java
+package config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+
+import spring.Client;
+import spring.Client2;
+
+@Configuration
+public class AppCtxWithPrototype {
+
+	@Bean
+	@Scope("prototype")
+	public Client client() {
+		//ApplicationContext가 작동할 아래의 코드는 동작하지 않는다.
+		//사용자가 getBean()을 사용할때마다 작동한다.
+		//그리고 매번 새로운 객체를 생성하여 리턴한다.
+		Client client = new Client();
+		client.setHost("host");
+		return client;
+	}
+	
+	@Bean(initMethod = "connect", destroyMethod = "close")
+	@Scope("singleton")
+	public Client2 client2() {
+		//ApplicationContext가 작동할 아래의 코드는 단 1번만 작동한다.
+		//이후 사용자가 getBean()을 사용할때마다 작동하지 않는다.
+		//그리고 기존의 객체를 검색해서 리턴한다.		
+		Client2 client = new Client2();
+		client.setHost("host");
+		return client;
+	}
+}
+```
+
+
++ MainWithPrototype.java
+```java
+package main;
+
+import java.io.IOException;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+
+import config.AppCtxWithPrototype;
+import spring.Client;
+import spring.Client2;
+
+public class MainWithPrototype {
+
+	public static void main(String[] args) throws IOException {
+		AbstractApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtxWithPrototype.class);
+		System.out.println("ApplicationContext초기화------------------------------");
+
+		Client client1 = ctx.getBean(Client.class);
+		Client client2 = ctx.getBean(Client.class);
+		System.out.println("client1 == client2 : " + (client1 == client2));
+		
+		Client2 client21 = ctx.getBean(Client2.class);
+		Client2 client22 = ctx.getBean(Client2.class);
+		System.out.println("client21 == client22 : " + (client21 == client22));
+		System.out.println("ApplicationContext소멸------------------------------");
+		ctx.close();
+	}
+}
+```
+
+
+
++ 결과
+```Client2:Client2()....
+생성된 직후에 작동하는 메서드 지정 Client2::connect() 실행
+ApplicationContext초기화------------------------------
+Client::Client()....
+생성된 직후에 작동하는 메서드 Client::afterPropertiesSet() 실행
+Client::Client()....
+생성된 직후에 작동하는 메서드 Client::afterPropertiesSet() 실행
+client1 == client2 : false
+client21 == client22 : true
+ApplicationContext소멸------------------------------
+.....
+소멸 직전에 작동하는 메서드 지정 Client2::close() 실행
+```
+
+
 
 
 #### 3. AoP (Aspect Oriented Programming)
 + A, B, C가 가지는 공통기능 = Aspect
 
++ Calculator.java
+```java
+package chap07;
+
+public interface Calculator {
+
+	public long factorial(long num);
+
+}
+```
+
+
++ ImpeCalculator.java
+```java
+package chap07;
+
+public class ImpeCalculator implements Calculator {
+
+	public ImpeCalculator() {
+		System.out.println("ImpeCalculator::ImpeCalculator()...");
+	}
+
+	@Override
+	public long factorial(long num) {
+		//반복문으로 팩토리얼 계산
+		//System.out.println("ImpeCalculator::factorial(long)..." + num);
+		//long start = System.currentTimeMillis();
+		
+		long result = 1;
+		for (long i = 1; i <= num; i++) {
+			result *= i;
+		}
+		
+		//long end = System.currentTimeMillis();
+		//System.out.printf("ImpeCalculator.factorial(%d) 실행시간 = %d\n", num,(end-start));
+		
+		return result;
+	}
+}
+```
+
++ RecCalculator.java
+```java
+package chap07;
+
+public class RecCalculator implements Calculator {
+	
+	public RecCalculator() {
+		System.out.println("RecCalculator::RecCalculator()...");
+	}
+
+	@Override
+	public long factorial(long num) {
+		//재귀호출에 의한 팩토리얼 계산
+		System.out.println("RecCalculator::factorial(long)..." + num);
+		//long start = System.currentTimeMillis();
+		
+		try {
+	        if (num == 0)
+	            return 1;
+	        else
+	            return num * factorial(num - 1);
+		}finally{
+			//long end = System.currentTimeMillis();
+			//System.out.printf("RecCalculator.factorial(%d) 실행시간 = %d\n", num,(end-start));			
+		}
+	}
+}
+```
+
++ MainJava.java
+```java
+package main;
+
+import chap07.ImpeCalculator;
+import chap07.RecCalculator;
+import chap07.ExeTimeCalculator;
+
+public class MainJava {
+
+	public static void main(String[] args) {
+		ImpeCalculator impeCalculator = new ImpeCalculator();		
+		System.out.println(impeCalculator.factorial(20));
+		System.out.println("----------------------------------------------");
+		
+		RecCalculator recCalculator =new RecCalculator();
+		System.out.println(recCalculator.factorial(20));
+	}
+}
+```
+
+
+
 ##### 3.1. 개념
 ##### 3.2. 사용법
 ##### 3.3. 실습
+
++ AOP의 개념을 이해하기위해 다음의 순서로 실습해보자
+
+1. MainJava.java
+```
+   ImpeCalculator -- 반복문
+   RecCalculator  -- 재귀호출 사용
+     두가지 factorial을 구하는 클래스 사용 -- 시간측정(클래스 내부에 표현)
+```
+
+2. MainJava2.java 
+```
+   ImpeCalculator -- 반복문
+   RecCalculator  -- 재귀호출 사용
+     두가지 factorial을 구하는 클래스 사용 -- 시간측정(외부에 별도 표현)
+     
+==> 좀더 자세한 시간측정이 필요하다면 소스코드가 중복되어 변경이 번거롭다. 
+    이를 해결하는 일반적인 방법이 프록시(Proxy) 객체를 사용하는 것이다.
+
+		시간측정기능을 별도의 클래스로 작성하는 것이다.
+		그리고 기존의 프로그램에서는 시간측정은 자신이 수행하지 않고,
+		다른 클래스에 위임시키는 delegate패턴을 일반적으로 많이 사용한다.
+    
+    프록시(Proxy) 객체 : 핵심기능의 실행은 다른 객체에 위임하고 부가적인 기능을 제공하는 객체
+                    --------------------------  --------------------(공통기능구현객체)
+                                     대상객체  
+```
+
+
+
++ MainJava2.java
+```java
+package main;
+
+import chap07.ImpeCalculator;
+import chap07.RecCalculator;
+import chap07.ExeTimeCalculator;
+
+public class MainJava2 {
+
+	public static void main(String[] args) {
+		ImpeCalculator impeCalculator = new ImpeCalculator();	
+		long start1 = System.currentTimeMillis();
+		System.out.println(impeCalculator.factorial(20));
+		long end1 = System.currentTimeMillis();
+		System.out.printf("ImpeCalculator.factorial(20) 실행시간 = %d\n", (end1-start1));
+		
+		System.out.println("----------------------------------------------");
+		
+		RecCalculator recCalculator =new RecCalculator();
+		long start2 = System.currentTimeMillis();
+		System.out.println(recCalculator.factorial(20));
+		long end2 = System.currentTimeMillis();
+		System.out.printf("RecCalculator.factorial(20) 실행시간 = %d\n", (end2-start2));	
+	}
+}
+```
+
+
+
+
+
+
+
+
+
+
+3. MainProxy.java             
+```
+   ExeTimeCalculator클래스 -- delegate패턴 적용
+     실제 factorial을 계산하는 클래스를 인자로 전달받아 사용
+   
+   ExeTimeCalculator객체 ==> Proxy 객체  
+   ImpeCalculator객체 --| 대상객체
+   RecCalculator 객체 --| 
+   
+================================================================
+```
+
++ MainProxy.java
+```java
+package main;
+
+import chap07.ImpeCalculator;
+import chap07.RecCalculator;
+import chap07.ExeTimeCalculator;
+
+public class MainProxy {
+
+	public static void main(String[] args) {
+		ExeTimeCalculator ttCal1 = new ExeTimeCalculator(new ImpeCalculator());
+		System.out.println(ttCal1.factorial(20));
+		System.out.println("----------------------------------------------");
+		
+		ExeTimeCalculator ttCal2 = new ExeTimeCalculator(new RecCalculator());
+		System.out.println(ttCal2.factorial(20));
+
+		//------------ExeTimeCalculator 객체
+		//					시간계산시작
+		//                 delegate ------------> ImpeCalculator객체
+		//                                             factorial() 계산 메서드
+		// 					시간계산끝
+		//
+		//            ExeTimeCalculator 객체
+		//      			delegate ------------> RecCalculator객체
+		//                                             factorial() 계산 메서드
+	}
+}
+```
+
+
+
++ ExeTimeCaluator.java
+```java
+package chap07;
+
+public class ExeTimeCalculator implements Calculator {
+
+	private Calculator delegate;
+
+	public ExeTimeCalculator(Calculator delegate) {
+		System.out.println("ExeTimeCalculator::ExeTimeCalculator(Calculator)...");
+        this.delegate = delegate;
+    }
+
+	@Override
+	public long factorial(long num) {
+		//공통기능 - 시간 측정
+		long start = System.nanoTime();
+		long result = delegate.factorial(num);  // 핵심기능
+		long end = System.nanoTime();
+		System.out.printf("%s.factorial(%d) 실행 시간 = %d\n",
+				delegate.getClass().getSimpleName(),
+				num, (end - start));
+		return result;
+	}
+}
+```
+
+
+
+
+
+
+
+
+
+1. AOP(Aspect Oriented Programming) : 관점 지향 프로그래밍
+```
+    여러 객체에 공통으로 적용할 수 있는 기능을 분리해서 재사용성을 높여주는 프로그래밍 기법
+    핵심기능과 공통기능의 구현을 분리함으로써 핵심 기능을 구현한 코드의 수정없이 공통기능을 적용할수 있게 만들어 준다.   
+  
+ *** 스프링에서의 AOP적용 ***
+  공통기능을 제공하는 Aspect 구현 클래스를 만들고 자바설정화일을 이용해서 Aspect를
+  어디에 적용할지를 설정한다. 프록시는 springframework가 알아서 해준다.
+  
+ 1) 공통기능 (Aspect)만들기 : 시간측정
+ 2) Java설정화일에서
+       
+       어떤 핵심기능에 어떤 공통기능을 언제 적용할것인지 설정 : Advice를 설정
+    ======================> 자바 POJO클래스  	                                    	
+	       				    @Aspect 어노테이션 사용 
+    - @EnableAspectJAutoProxy을 사용하여 @Aspect 어노테이션을 붙인 클래스를 공통기능으로 적용하도록 설정
+    - 공통기능 빈객체 생성설정
+ 3) 공통기능 클래스에서
+    - @Aspect적용
+    - 공통기능을 적용할 대상을 설정한다==>chap07패키지와 그 하위 패키지에 위치한 타입의 public메서드를 pointcut으로 설정.
+	@Pointcut("execution(public * chap07..*(..))")
+	private void publicTarget() {
+		System.out.println("@Pointcut -- ExeTimeAspect::publicTarget()...");
+	}
+
+	- Around Advice 즉, publicTarget()에 적용된 대상의 메서드가 호출전/후에 아래의 공통기능이 적용된다. 
+	 @Around("publicTarget()")  
+	 public Object measure(ProceedingJoinPoint joinPoint) throws Throwable {
+		...
+		Object result = joinPoint.proceed(); //핵심기능 호출
+		...
+     }
+     
+     - Pointcut지정 방식
+     @Pointcut("execution(public * chap07..*(..))")
+     @Pointcut("execution(수식어패턴? 리턴타입패턴 클래스이름패턴?메서드이름패턴(파라미터패턴)")
+                          -------- --------- ---------- ----------(---------)
+                          public       *     chap07..        *        ..  
+                          
+       ● 수식어 패턴
+          - 생략가능한 부분.
+          - public, protected 등이 옴.
+        ● 리턴타입패턴
+          - 리턴 타입을 명시
+        ● 클래스이름 패턴, 이름패턴
+          - 클래스 이름 및 메서드 이름을 패턴으로 명시.
+        ● 파라미터패턴
+          - 매칭될 파라미터에 대해서 명시.
+      
+      ○ 특징
+        - 각 패턴은 '*'를 이용하여 모든 값을 표현.
+        - '..'을 이용하여 0개 이상이라는 의미를 표현.
+      
+      ○ 설정 예
+        ● execution(public void set*(..))
+          - 리턴 타입이 void이고 메서드 이름이 set으로 시작하고, 파라미터가 0개 이상인 메서드 호출.
+        ● execution(* com.jica.chap07.*.*())
+          - com.jica.chap07 패키지의 모든 클래스의 파라미터가 없는 모든 메서드 호출.
+        ● execution(* com.jica.chap07..*.*(..))
+          - com.jica.chap07 패키지 및 하위 패키지에 있는 모든 클래스의 파라미터가 0개 이상인 메서드 호출.
+        ● execution(Integer com.jica.chap07.WriteArticleService.write(..))
+          - 리턴 타입이 Integer인 com.jica.chap07패키지의 WriteArticleService 인터페이스의 write() 메서드 호출.
+        ● execution(* get*(*))
+          - 이름이 get으로 시작하고 1개의 파라미터를 갖는 메서드 호출.
+        ● execution(* get*(*, *))
+          - 이름이 get으로 시작하고 2개의 파라미터를 갖는 메서드 호출.
+        ● execution(* read*(Integer, ..))
+          - 메서드 이름이 read로 시작하고, 첫 번째 파라미터 타입이 Integer이며, 1개 이상의 파라미터를 갖는 메서드 호출.
+
+   실습 : MainAspect.java
+       MainAspectWithClassProxy.java
+       
+```
+
+
++ MainAspect.java
+```java
+package main;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import chap07.Calculator;
+import chap07.RecCalculator;
+import config.AppCtx;
+
+public class MainAspect {
+	
+	public static void main(String[] args) {
+		AnnotationConfigApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtx.class);
+		System.out.println("ApplicationContext초기화 끝-------------------------------------------------------------------");
+		
+		String[] names = ctx.getBeanDefinitionNames();
+		for(String name : names) {
+			System.out.println(name);
+		}
+		
+		System.out.println("ApplicationContext사용----------------------------------------------------------------------");
+		
+		Calculator cal = ctx.getBean("calculator", Calculator.class);
+		//RecCalculator cal = ctx.getBean("calculator", RecCalculator.class);
+		//오류발생 : 이유) 내부으로 Calculator를 구현한 Proxy17클래스형 객체가 만들어 지므로 형변환을 할 수 없다.
+		//이를 해결한 코드 MainAspectWithClassproxy.java
+		
+		long fiveFact = cal.factorial(5);
+		
+		System.out.println("cal.factorial(5) = " + fiveFact);
+		System.out.println(cal.getClass().getName());
+		
+		System.out.println("ApplicationContext사용끝----------------------------------------------------------------------");
+				
+		ctx.close();
+	}
+}
+```
+
+
++ AppCtx.java
+```java
+package config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+
+import aspect.ExeTimeAspect;
+import chap07.Calculator;
+import chap07.RecCalculator;
+
+@Configuration
+@EnableAspectJAutoProxy  //@Aspect 어노테이션을 붙인 클래스를 공통기능으로 적용하시오
+public class AppCtx {
+	//공통기능 객체를 빈으로 생성
+	@Bean
+	public ExeTimeAspect exeTimeAspect() {
+		return new ExeTimeAspect();
+	}
+
+	@Bean
+	public Calculator calculator() {
+		return new RecCalculator();
+	}
+}
+```
+
+
+
+
+
++ ExeTimeAspect.java
+```java
+package aspect;
+
+import java.util.Arrays;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.annotation.Order;
+
+@Aspect
+//@Order(1)
+public class ExeTimeAspect {
+	public ExeTimeAspect() {
+		System.out.println("@Aspect -- ExeTimeAspect::ExeTimeAspect()....");
+	}
+	
+	//공통기능을 적용할 대상을 설정한다==>chap07패키지와 그 하위 패키지에 위치한 타입의 public메서드를 pointcut으로 설정.
+	@Pointcut("execution(public * chap07..*(..))")
+	private void publicTarget() {
+		System.out.println("@Pointcut -- ExeTimeAspect::publicTarget()...");
+	}
+
+	//Around Advice 즉, publicTarget()에 적용된 대상의 메서드가 호출전/후에 아래의 공통기능이 적용된다. 
+	@Around("publicTarget()")
+	public Object measure(ProceedingJoinPoint joinPoint) throws Throwable {
+		System.out.println("@Pointcut -- ExeTimeAspect::measure(ProceedingJointPoint)...");
+		long start = System.nanoTime();
+		try {
+			Object result = joinPoint.proceed(); //핵심기능 호출
+			return result;
+		} finally {
+			long finish = System.nanoTime();
+			Signature sig = joinPoint.getSignature();
+			System.out.printf("%s.%s(%s) 실행 시간 : %d ns\n",
+					joinPoint.getTarget().getClass().getSimpleName(),
+					sig.getName(), Arrays.toString(joinPoint.getArgs()),
+					(finish - start));
+		}
+	}
+}
+```
+
+
+
+
+
+
+
+5. 한 Pointcut에 여러 Advice 적용
+```
+     실습 : MainAspectWithCache.java
+        MainAspectWithCache.java -- @Order()적용하여 실습
+```
+
+6. @Pointcut 어노테이션이 아닌 @Around 어노테이션에 execution명시자 직접 지정
+```
+     실습 : MainAspectCommonPointcut.java
+```
+
 #### 4. Summary / Close
 
 
