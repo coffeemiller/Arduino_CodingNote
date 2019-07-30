@@ -4567,8 +4567,876 @@ public class ExeTimeAspect {
 ### [2019-07-30]
 
 #### 1. Review
++ interface를 만드는 것은 해당 인터페이스를 구현한 모든 클래스들은 인터페이스의 추상메서드를 반드시 재정의 해야한다.
+	- 즉, 사용법을 표준화시키는 효과가 있다.
+	- 상위클래스로 하위형 객체를 가리킬수 있다.
 
-#### 2. SpringFramework
+#### 2. AOP(Aspect Oriented Programming) : 관점 지향 프로그래밍
+
++ AOP:Aspect Oriented Programming(관점지향프로그래밍)
+```
+   코딩의 효율을 중시 -- 코드의 중복발생(원인:여러곳에서 동일한 기능이 사용)
+                                     ----------------------
+                                                        공통기능
+            핵심기능 : 자신의 기능만 집중하고 필요하다면 공통기능을 호출하여 사용
+         =======================================================
+         spring framework에서는 설정화일을 이용하여 핵심기능이 필요한 공통기능을 설정해주면
+            공통기능이 동작하는 과정중에 핵심이 동작하도록하는 방식을 취한다.
+         =======================================================                        
+```
+
+ - 개선방법:기존)
+```
+    공통기능(Aspect)과 핵심기능을 분리해서 작성하여 sw의 생산성과 유지보수성을 증대
+   ---------------------------------> 공통기능을 작성하고 핵심기능은 다른곳으로 위임시키는 방법으로
+    코드를 개선하여 사용하고 있다.
+```    
+ - spring에서의 방법  
+```
+     이것을 spring framework에서는 Proxy를 사용한 AOP로 지원하고 있다. 
+ 
+    factorial계산 ---> 핵심기능
+       시간측정          ---> 공통기능(Aspect)
+ 
+   1) 공통기능과 핵심기능을 한꺼번에 작성했을때의 예
+   public class ImpeCalculator implements Calculator {
+
+	@Override
+	public long factorial(long num) {
+
+		long start = System.currentTimeMillis();
+
+		long result = 1;
+		for (long i = 1; i <= num; i++) {
+			result *= i;
+		}
+
+		long end = System.currentTimeMillis();
+		System.out.printf("ImpeCalculator.factorial(%d) 실행시간 = %d\n", num, (end-start)); 
+		
+		return result;
+	}
+  }   
+  
+  2) 공통기능과 핵심기능을 분리의 예 
+  //핵심기능
+  public class ImpeCalculator implements Calculator {
+
+	@Override
+	public long factorial(long num) {
+
+		long result = 1;
+		for (long i = 1; i <= num; i++) {
+			result *= i;
+		}
+		return result;
+	}
+  }
+  
+  //공통기능
+	ImpeCalculator impeCalculator = new ImpeCalculator();
+	long start1 = System.nanoTime();
+	//핵심기능
+	long result1 = impeCalculator.factorial(20);
+	
+	long end1 = System.nanoTime();
+	System.out.printf("ImpeCalculator.factorial(%d) 실행시간 = %d\n", 20, (end1-start1)); 
+
+	System.out.println("결과1 : " + result1); 
+	
+	============>문제점은 다른 핵심기능에서도 공통기능이 필요하다면
+	공통기능은 중복해서 작성할 수밖에 없다. 
+	
+	이를 개선시키기 위해서 Proxy개념을 도입했다.
+	Proxy는 핵심기능을 delegate로 별도로 가지고 있고
+	공통기능 만을 구현해서 가진다.
+	
+	핵심기능의 실행은 다른 객체에 위임하고 부가적인 기능을 제공하는 객체를 프록시(Proxy)라고 부르고,
+	실제 핵심 기능을 실행하는 객체를 대상객체라고 부른다.
+	여기에서는 ExeTimeCalculator객체가 프록시 객체이고 ==> 공통기능
+	ImpeCalculator,RecCalculator이 대상객체이다    ==>  핵심기능
+	 
+	3) Proxy클래스의 예
+	public class ExeTimeCalculator implements Calculator {
+		//핵심기능을 멤버변수로 가지고 있어서 생성자에서 전달받는다.
+		private Calculator delegate;
+
+		public ExeTimeCalculator(Calculator delegate) {
+			this.delegate = delegate;
+		}
+		
+		//공통기능
+		@Override
+		public long factorial(long num) {
+
+			long start = System.nanoTime();
+			
+			//핵심기능을 수행할때 다른 클래스에 기능을 위임시킨다.
+			long result = delegate.factorial(num);
+			
+			//공통기능
+			long end = System.nanoTime();
+			System.out.printf("%s.factorial(%d) 실행 시간 = %d\n",
+					delegate.getClass().getSimpleName(),
+					num, (end - start));
+			return result;
+		}
+	}
+	
+	위의 기능이 동작할때는
+	기능요청  프록시객체
+	----->       ----->공통기능호출1 
+	             ------------------->핵심기능호출
+	             ----->공통기능호출2   
+	<-----
+	      =======================
+	      springframework에서는 프록시객체를 내부적으로 자동생성하여 지원해주므로
+	      우리들은 공통기능(Aspect 객체)과 핵심기능(factorial계산 : 대상(Target)객체)만을 작성해서
+	      어떤핵심기능이 동작할때 공통기능도 동작해야 한다는것을 설정해 주기만 하면 된다.(xml설정화일, Annotation)
+	                                   -----------이때 사용되어지는 전문 용어가 있다.
+	      interface TestAspect    공통기능 interface        핵심기능
+	                
+	      class TimeAspect implements TestAspect         class MyImportent                                  
+	                  공통기능메서드(){                                 핵심기능메서드(){
+	                     ....                                 ...
+	          }                                             }
+	                   
+	                     공통기능과 핵심기능을 설정(연결) <=== Annotain : @Aspect 
+	      
+	      springframework에서 핵심기능이 동작할때 공통기능을 작동시켜주기위해
+	          실행시간에 프록시 객체를 생성한다. 이때 프록시 객체는 핵심기능의 interface를 구현한 클래스에 의해서 만들어진다.
+	          	      
+	         
+        1) 공통기능 : Aspect
+        2) 공통기능이 핵심기능에 언제 적용될지 정의 : Advice(메서드호출,필드값변경 등)                     
+        3) Advide의 적용시점 : JoinPoint(메서드 호출- 스프링에서는 이것만 가능)
+             -Before Advice			  : 핵심 메서드 호출전에 공통기능 적용
+             -After  Advice			  : 핵심 메서드 호출후 예외발생혹은 정상종료시 공통기능 모두 적용 
+             -After Returning Advice  : 핵심 메서드 호출호 정상종료시만 공통기능 적용
+             -Atfer Throwing Advice	  : 핵심 메서드 호출후 예외발생시만 공통기능 적용 
+             -Around Advice 		  : 핵심 메서드 호출전/후나 공통기능 모두 적용	
+             
+	                                         
+ ---------------------------------------------------------------------
+ 스프링에서의 AOP적용
+ 1) 공통기능 (Aspect)만들기 : 시간측정
+ 2) 어떤 핵심기능에 어떤 공통기능을 언제 적용할것인지 설정 : Advice를 설정
+    ======================> 자바 POJO클래스  	                                    
+	       					@Aspect 어노테이션 사용
+
+  0. □ XML 스키마를 이용한 AOP 설정
+    - Spring 2 버전부터 AOP 설정과 관련된 "aop" 네임스페이스 및 "aop" 네임스페이스와 관련된 XML 스키마가 추가되었다.
+    ■ <beans> 태그에 "aop" 네임스페이스와 관련된 XML 스키마 지정
+	 <beans xmlns="http://www.springframework.org/schema/beans"
+	     ...
+	     xmlns:aop="http://www.springframework.org/schema/aop"
+	     ...
+	       http://www.springframework.org/schema/aop
+	       http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+	    ...
+	 </beans>
+```	 
+    					
+ 1. Aspect를 만들때 - POJO클래스 사용
+```
+   1) POJO클래스 만들기
+      - ProceedingJoinPoint를 인자로 가지는 메서드 작성 	
+        ------------------->핵심기능을 가진 객체의 정보를 가진 객체 즉, 대상객체 정보를 가지고 있다.
+               					 
+	  public class ExeTimeAspect {
+	
+		public Object measure(ProceedingJoinPoint joinPoint) throws Throwable {
+			long start = System.nanoTime();
+			try {
+				System.out.println("ExeTimeAspect::measure() -->핵심기능 수행전" );
+				Object result = joinPoint.proceed(); //핵심기능 수행
+				System.out.println("ExeTimeAspect::measure() -->핵심기능 수행후1" );
+				return result;
+			} finally {
+				System.out.println("ExeTimeAspect::measure() -->핵심기능 수행후2" );
+				long finish = System.nanoTime();
+				Signature sig = joinPoint.getSignature();
+				System.out.printf("%s.%s(%s) 실행 시간 : %d ns\n",
+						joinPoint.getTarget().getClass().getSimpleName(),
+						sig.getName(), Arrays.toString(joinPoint.getArgs()),
+						(finish - start));
+			}
+		}
+	}
+
+
+  2) xml 설정화일 작성
+     ■ <aop:config> 태그를 사용하여 AOP 관련 정보 설정
+  
+  	<!-- 공통 기능을 제공할 클래스를 빈으로 등록 -->
+	<bean id="exeTimeAspect" class="aspect.ExeTimeAspect" />
+
+	<!-- Aspect 설정: Advice를 어떤 Pointcut에 적용할 지 설정 -->
+	<aop:config >
+	    <!-- 공통 기능으로 사용할 Aspect 지정 -->
+		<aop:aspect id="measureAspect" ref="exeTimeAspect">
+			<!-- 어떤 핵심기능이 동작할때 적용하느냐 설정 즉, cahp07패키지 및 그 하위패키지의 모든 public 메서드가 동작할때-->
+			<aop:pointcut id="publicMethod"
+				expression="execution(public * chap07..*(..))" />
+			<aop:around pointcut-ref="publicMethod" method="measure" />
+		</aop:aspect>
+	</aop:config>
+
+ 	<!-- 핵심기능을 가진 클래스도 빈으로 등록 -->
+	<bean id="impeCal" class="chap07.ImpeCalculator">
+	</bean>
+
+	<bean id="recCal" class="chap07.RecCalculator">
+	</bean>
+    ===============================================================
+```	
+
++ spring에서 AOP적용 코드 작성시 수행해 주어야 할 작업
+```
+1) 공통기능을 작성
+   - 공통기능 수행 메서드는 인자값으로 반드시 ProceedingJoinPoint를 전달받도록 해야 한다.
+                                   ====================>핵심기능을 수행하는 객체의 메서드정보가 들어가 있다. 
+2) 핵심기능을 작성한다.
+
+3) 설정화일(xml)에 공통기능과 핵심기능을 연결시키는 <aop:config>를 작성한다.
+	<aop:config proxy-target-class="true">
+	            =========================> 생성된 핵심기능객체 즉 bean얻은때 상위인터페이스명으로 검색하는게 기본이다.
+	                                    이때 생성한 하위클래스정보로 객체를 얻고 싶다면 설정한다. 	              
+		<aop:aspect id="measureAspect" ref="exeTimeAspect"> ==>공통기능객체가 어떤 bean이라고 설정
+			<aop:pointcut id="publicMethod"
+				expression="execution(public * chap07..*(..))" />				
+			<aop:around pointcut-ref="publicMethod" method="measure" /> ==> 공통기능객체의 어떤 메서드가 공통기능을 수행하는 메서드라는 것을 설정함과 동시에
+			                          언제 작동할지 즉, 어떤 핵심기능이 작동할때 호출될지 설정한다.
+			
+		</aop:aspect>
+	</aop:config>
+
+    ***우리가 직접 코딩할때는 일반적으로
+       핵심기능에서 공통기능을 호출하는 형태를 가진다.
+       그런데 AOP에서는 공통기능에서 핵심기능을 호출하는 형태로 프로그램실행이 역제어 되어 있는 형태다. ***
+```       
+
++ 공통기능이 여러개이다.
+```
+ 1. 공통기능
+     시간 측정기능
+     한번이라도 factorial을 계산했으면 그값을 저장했다가 얻어서 사용하는 기능
+
+ 2. 핵심기능
+
+    factorial 계산
+```         
+ 
+```    
+     ○ <aop:*>에 해당하는 태그 정보
+          - <aop:config> : AOP 설정 정보를 나타냄.
+          - <aop:aspect> : Aspect를 설정.
+          - <aop:pointcut> : Pointcut을 설정.
+          - <aop:around> : Around Advice를 설정. 이 외에도 다양한 Advice를 설정.
+     
+     ○ <aop:aspect> 태그
+          ● ref 속성
+          - Aspect로서 기능을 제공할 빈을 설정할  때 사용.
+     ■ 특징
+      - Advice를 대상 객체에 적용하기 위해 더 이상 프록시 객체를 사용할 필요가 없음.
+      - <aop:pointcut>의 expression 속성에 Advice를 적용할 Pointcut에 대한 정보를 지정하기만 하면 
+            자동으로 Advice가 해당 Pointcut 에 적용.
+      - 설정 파일만 보더라도 어렵지 않게 어떤 코드에 어떤 Aspect가 어떤 타입의 Advice로 적용되는지를 파악할 수 있음.
+     
+     ■ Aspect 설정
+      ○ <aop:aspect> 태그
+        - 한 개의 Aspect를 설정.
+        - ref 속성에는 공통 기능을 구현하고 있는 빈을 전달.
+	  ○ 설정
+		<aop:config>
+			<aop:aspect id="measureAspect" ref="exeTimeAspect">
+				<aop:pointcut id="publicMethod"
+					expression="execution(public * chap07..*(..))" />				
+				<aop:around pointcut-ref="publicMethod" method="measure" />
+			</aop:aspect>
+		</aop:config>
+      ○ Advice를 적용한 Pointcut
+        - <aop:pointcut> 태그를 이용하여 설정.
+      ○ <aop:pointcut> 태그
+        - id 속성 : Pointcut을 구분하는데 사용되는 식별 값을 입력 받음.
+        - expression 속성 : Pointcut을 정의하는 AspectJ의 표현식을 입력 받음.
+      ○ Advice 정의 관련 태그
+        - <aop:before> 메서드 실행 전에 적용되는 advice를 정의
+        - <aop:after-returning> 메서드가 정상적으로 실행된 후에 적용되는 advice를 정의
+        - <aop:after-throwing> 메서드가 예외를 발생시킬 때 적용되는 advice를 정의, try-catch블럭의 catch블럭과 비슷
+        - <aop:after> 메서드가 정상적으로 실행되는지 또는 예외를 발생시키는지 여부에 상관없이 적용되는 advice를 정의. try-catch-finally에서 finally블럭과 비슷
+        - <aop:around> MethodInterceptor와 마찬가지로 메서드 호출 이전, 이후, 예외발생등 모든 시점에 적용 가능한 advice를 정의
+        --------------------------------------------------------------------------------------------
+        - 각 태그는 pointcut 속성 또는 pointcut-ref 속성을 사용하여 Advice가 적용될 Pointcut을 지정.
+        - 각 태그는 Pointcut에 포함되는 대상 객체의 메서드가 호출될 때 <aop:aspect> 태그의 ref 속성으로 지정한 빈 객체에서 어떤
+               메서드를 실행할지를 지정
+      ○ pointcut-ref 속성
+        - <aop:pointcut> 태그를 이용하여 설정한 Pointcut을 참조할 때 사용.
+      ○ pointcut 속성
+        - 직접 AspectJ 표현식을 이용하여 Pointcut을 지정할 때에 사용.
+        
+
+    ===============================================================	
+```
+
+
+
+2. @Aspect 애노테이션 사용
+```
+   1) POJO클래스로 Aspect 클래스를 만든다. 단 xml Aspect를 설정하지 않고
+         아래의 애노테이션을 적용하여 만든다.
+      @Aspect, 	
+      @Pointcut("execution(public * chap07..*(..))")
+      @Around("publicTarget()")
+        애노테이션을 사용한 Aspect 클래스 만들기
+   2) xml 설정화일 작성
+      <!-- @Aspect 애노테이션을 인지하여 프록시객체를 생성하도록 설정해야함 -->
+      <aop:aspectj-autoproxy />
+	
+	  <!-- Aspect를 빈으로 등록 -->
+	  <bean id="exeTimeAspect" class="aspect.ExeTimeAspect2" />       
+```
+
+
+3. 자바설정화일을 이용하여 빈객체를 생성한다면 @EnableAspectJAutoProxy을 사용한다.
+```
+    --------------------------------------------
+    
+*** 프록시 객체가 인터페이스를 구현하여 자동으로 생성될때와 
+             클래스를 이용하여 자동으로 생성될때의 차이점
+             
+***	<aop:pointcut id="publicMethod"
+				expression="execution(public * chap07..*(..))" />
+				execution(수식어? 리턴타입 클래스이름?메서드이름(파라미터))
+						* ==> 모든값 의미
+						..==>0개이상 이라는 의미 
+	<aop:around pointcut-ref="publicMethod" method="measure" />
+```
+	
+
+
+
+4. Advice의 적용 순서
+```
+   <aop:aspect id="calculatorCache" ref="cacheAspect" order="1">
+   order속성값이 작은 Aspect부터 적용된다.   
+   
+   @Order(1)  
+   -----------------------------------
+   	Calculator impeCal = ctx.getBean("impeCal", Calculator.class);
+	impeCal.factorial(5);  
+      위 메서드의 내부적인 작동순서
+     
+    ExeTimeAspet ---> CacheAspect ---> ImpeCalculator.factorial(5)
+     										120계산
+     				  map에 [5,120] 저장
+      경과시간 계산하여 출력
+     		
+    impeCal.factorial(5);  	
+    ExeTimeAspet ---> CacheAspect             
+					  캐쉬에서 검색하여 값구한다	
+      경과시간 계산하여 출력					  
+```
+
+
+
++ chap07/MainAspect.java
+```java
+package main;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import chap07.Calculator;
+import chap07.RecCalculator;
+import config.AppCtx;
+
+public class MainAspect {
+	
+	public static void main(String[] args) {
+		AnnotationConfigApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtx.class);
+		System.out.println("ApplicationContext초기화 끝-------------------------------------------------------------------");
+		
+		String[] names = ctx.getBeanDefinitionNames();
+		for(String name : names) {
+			System.out.println(name);
+		}
+		
+		System.out.println("ApplicationContext사용----------------------------------------------------------------------");
+		
+		Calculator cal = ctx.getBean("calculator", Calculator.class);
+		//RecCalculator cal = ctx.getBean("calculator", RecCalculator.class);
+		//오류발생 : 이유) 내부으로 Calculator를 구현한 Proxy17클래스형 객체가 만들어 지므로 형변환을 할 수 없다.
+		//이를 해결한 코드 MainAspectWithClassproxy.java
+		
+		//아래의 코드에서 어느 핵심기능을 작동시킬때 공통기능이 동작해야 하는지에 대한 설정을 
+		//Aspect객체 즉, 공통기능객체에 설정하면 아래의 코드에서 factorial()을 호출하면,
+		//직접 factorial()이 호출되는 것이 아니라, 공통기능의 메서드가 동작하고 
+		//그 메서드 내부에서 핵심기능을 호출하는 간접호출방식이 사용된다.
+		long fiveFact = cal.factorial(5);
+		
+		System.out.println("cal.factorial(5) = " + fiveFact);
+		System.out.println(cal.getClass().getName());
+		
+		System.out.println("ApplicationContext사용끝----------------------------------------------------------------------");
+				
+		ctx.close();
+	}
+}
+```
+
+
++ chap07/AppCtx.java
+```java
+package config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+
+import aspect.ExeTimeAspect;
+import chap07.Calculator;
+import chap07.RecCalculator;
+
+@Configuration
+@EnableAspectJAutoProxy  //@Aspect 어노테이션을 붙인 클래스를 공통기능으로 적용하시오
+public class AppCtx {
+	//공통기능 객체를 빈으로 생성
+	@Bean
+	public ExeTimeAspect exeTimeAspect() {
+		return new ExeTimeAspect();
+	}
+
+	@Bean
+	public Calculator calculator() {
+		return new RecCalculator();
+	}
+}
+```
+
+
++ chap07/ExeTimeAspect.java
+```java
+package aspect;
+
+import java.util.Arrays;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.annotation.Order;
+
+
+//AOP에서는 공통기능을 수행하는 클래스를 아무런 제약이 없는 일반 자바클래스로 만든다.
+
+@Aspect
+//@Order(1)
+public class ExeTimeAspect {
+	public ExeTimeAspect() {
+		System.out.println("@Aspect -- ExeTimeAspect::ExeTimeAspect()....");
+	}
+	
+	//공통기능을 적용할 대상을 설정한다==>chap07패키지와 그 하위 패키지에 위치한 타입의 public메서드를 pointcut으로 설정.
+	@Pointcut("execution(public * chap07..*(..))")
+	private void publicTarget() {
+		System.out.println("@Pointcut -- ExeTimeAspect::publicTarget()...");
+	}
+
+	//Around Advice 즉, publicTarget()에 적용된 대상의 메서드가 호출전/후에 아래의 공통기능이 적용된다.
+	//아래의 measure()메서드의 인자로 전달된 객체안에 사용자가 실제호출할 핵심기능객체및 메서드의 모든정보가 저장되어 있다.
+	@Around("publicTarget()")
+	public Object measure(ProceedingJoinPoint joinPoint) throws Throwable {
+		System.out.println("@Pointcut -- ExeTimeAspect::measure(ProceedingJointPoint)...");
+		//핵심기능 작동이전의 공통기능 -- 웹프로그램이라면, 로그인체크기능
+		long start = System.nanoTime();
+		//핵심기능 수행
+		try {
+			Object result = joinPoint.proceed(); //핵심기능 호출
+			return result;
+		} finally {
+			//로그파일에 접속정보 저장 -- 로그파일에 접속정보 저장
+			long finish = System.nanoTime();
+			System.out.println("걸린시간은 "+(finish - start)+" 나노초입니다.");
+			
+			Signature sig = joinPoint.getSignature();
+			System.out.printf("%s.%s(%s) 실행 시간 : %d ns\n",
+					joinPoint.getTarget().getClass().getSimpleName(), //클래스명 : RecCalculator
+					sig.getName(),                                    //메서드명 : factorial
+					Arrays.toString(joinPoint.getArgs()),             //인자정보 : [5]
+					(finish - start));                                //실행시간 : 끝-시작
+		}
+	}
+}
+```
+
+
+
+##### PointCut
+```
+ AspectJ의 Pointcut 표현식
+    - AspectJ는 Pointcut을 명시할 수 있는 다양한 명시자를 제공.
+    - 스프링은 메서드 호출과 관련된 명시자만을 지원.
+    ■ execution 명시자
+      - Advice를 적용할 메서드를 명시할 때 사용.
+      ○ 기본 형식
+        execution(수식어패턴? 리턴타입패턴 패키지패턴?이름패턴(파라미터패턴)
+        ● 수식어 패턴
+          - 생략가능한 부분.
+          - public, protected 등이 옴.
+        ● 리턴타입패턴
+          - 리턴 타입을 명시
+        ● 클래스이름 패턴, 이름패턴
+          - 클래스 이름 및 메서드 이름을 패턴으로 명시.
+        ● 파라미터패턴
+          - 매칭될 파라미터에 대해서 명시.
+      ○ 특징
+        - 각 패턴은 '*'를 이용하여 모든 값을 표현.
+        - '..'을 이용하여 0개 이상이라는 의미를 표현.
+      ○ 설정 예
+        ● execution(public void set*(..))
+          - 리턴 타입이 void이고 메서드 이름이 set으로 시작하고, 파라미터가 0개 이상인 메서드 호출.
+        ● execution(* com.jica.chap07.*.*())
+          - com.jica.chap07 패키지의 모든 클래스의 파라미터가 없는 모든 메서드 호출.
+        ● execution(* com.jica.chap07..*.*(..))
+          - com.jica.chap07 패키지 및 하위 패키지에 있는 모든 클래스의 파라미터가 0개 이상인 메서드 호출.
+        ● execution(Integer com.jica.chap07.WriteArticleService.write(..))
+          - 리턴 타입이 Integer인 com.jica.chap07패키지의 WriteArticleService 인터페이스의 write() 메서드 호출.
+        ● execution(* get*(*))
+          - 이름이 get으로 시작하고 1개의 파라미터를 갖는 메서드 호출.
+        ● execution(* get*(*, *))
+          - 이름이 get으로 시작하고 2개의 파라미터를 갖는 메서드 호출.
+        ● execution(* read*(Integer, ..))
+          - 메서드 이름이 read로 시작하고, 첫 번째 파라미터 타입이 Integer이며, 1개 이상의 파라미터를 갖는 메서드 호출.
+    ■ within 명시자
+      - 메서드가 아닌 특정 타입에 속하는 메서드를 Pointcut으로 설정할 때 사용.
+      ○ 설정 예
+        ● within(com.jica.chap07.WriteArticleService)
+          - WriteArticleService 인터페이스의 모든 메서드 호출.
+        ● within(com.jica.chap07.*)
+          - com.jica.chap07 패키지에 있는 모든 클래스의 모든 메서드 호출.
+        ● within(com.jica.chap07..*)
+          - com.jica.chap07 패키지 및 그 하위 패키지에 있는 모든 메서드 호출.
+    ■ bean 명시자
+      - 스프링 2.5 버전부터 스프링에서 추가적으로 제공하는 명시자.
+      - 스프링 빈 이름을 이용하여 Pointcut을 정의.
+      - 빈 이름의 패턴을 갖는다.
+      ○ 설정 예
+        ● bean(writeArticleService)
+          - 이름이 writeArticleService인 빈의 메서드 호출.
+        ● bean(*ArticleService)
+          - 이름이 ArticleServie로 끝나는 빈의 메서드 호출.
+    ■ 표현식 연결
+      - 각각의 표현식은 '&&' 나 '||' 연산자를 이용하여 연결 가능.
+      ○ @Aspect 어노테이션을 이용하는 경우
+        - '&&' 연산자를 사용하여 두 표현식을 모두 만족하는 Joinpoint에만 Advice가 적용.
+          @AfterThrowing(
+          pointcut = "execution(public * get*()) && execution(public void set*(..))")
+          public void throwingLogging() {
+            ...
+          }
+      ○ XML 스키마를 이용하여 Aspect를 설정하는 경우
+        - '&&'나 '||' 연산자를 사용.
+        <aop:pointcut id="propertyMethod"
+            expression="execution(public * get*()) &amp;&amp; execution(public void set*(..))" />
+         - XML 문서이기 때문에 값에 들어가는 '&&' '||'를 '&amp;&amp;'로 표현.
+         - 설정파일에서 '&&'나 '||' 대신 'and'와 'or'를 사용할 수 있도록 하고 있음.
+        <aop:pointcut id="propertyMethod"
+           expression="execution(public * get*()) and execution(public void set*(..))" />
+
+    □ 프록시 구현 방식에 따른 execution 적용 차이
+    - Pointcut은 실제로 프록시가 구현하고 있는 인터페이스를 기준으로 Pointcut을 적용.
+    - 인터페이스를 구현하고 있는 대상 객체에 대해서 Pointcut을 정의하려면 인터페이스를 기준으로 Pointcut을 작성.
+      <aop:aspect id="cacheAspect" ref="cache">
+         <aop:around method="read"
+             pointcut="execution(public * com..core.ReadArticleServiceImpl.get*(..))" />
+         </aop:aspect>
+
+        <bean id="readArticleService" class="com.jica.chap07.core.ReadArticleServiceImpl" />
+        
+    - ReadArticleServiceImpl 클래스가 ReadArticleService 인터페이스를 구현하고 있다면, 
+        <aop:around>는 ReadArticleServiceImpl 클래스의 get으로 시작하는 메서드에 적용.
+        (<aop:around> 태그에서 명시한 Pointcut은 readArticleService 빈에는 적용되지 않음.)
+    - ReadArticleServiceImpl 클래스가 인터페이스를 구현하고 있지 않다면,
+           생성된 프록시는 ReadArticleServiceImpl 클래스를 상속받아 생성됨. (Pointcut은 readArticleService 빈에만 적용.) AspectJ의 Pointcut 표현식
+    - AspectJ는 Pointcut을 명시할 수 있는 다양한 명시자를 제공.
+    - 스프링은 메서드 호출과 관련된 명시자만을 지원.
+    ■ execution 명시자
+      - Advice를 적용할 메서드를 명시할 때 사용.
+      ○ 기본 형식
+        execution(수식어패턴? 리턴타입패턴 패키지패턴?이름패턴(파라미터패턴)
+        ● 수식어 패턴
+          - 생략가능한 부분.
+          - public, protected 등이 옴.
+        ● 리턴타입패턴
+          - 리턴 타입을 명시
+        ● 클래스이름 패턴, 이름패턴
+          - 클래스 이름 및 메서드 이름을 패턴으로 명시.
+        ● 파라미터패턴
+          - 매칭될 파라미터에 대해서 명시.
+      ○ 특징
+        - 각 패턴은 '*'를 이용하여 모든 값을 표현.
+        - '..'을 이용하여 0개 이상이라는 의미를 표현.
+      ○ 설정 예
+        ● execution(public void set*(..))
+          - 리턴 타입이 void이고 메서드 이름이 set으로 시작하고, 파라미터가 0개 이상인 메서드 호출.
+        ● execution(* com.jica.chap07.*.*())
+          - com.jica.chap07 패키지의 모든 클래스의 파라미터가 없는 모든 메서드 호출.
+        ● execution(* com.jica.chap07..*.*(..))
+          - com.jica.chap07 패키지 및 하위 패키지에 있는 모든 클래스의 파라미터가 0개 이상인 메서드 호출.
+        ● execution(Integer com.jica.chap07.WriteArticleService.write(..))
+          - 리턴 타입이 Integer인 com.jica.chap07패키지의 WriteArticleService 인터페이스의 write() 메서드 호출.
+        ● execution(* get*(*))
+          - 이름이 get으로 시작하고 1개의 파라미터를 갖는 메서드 호출.
+        ● execution(* get*(*, *))
+          - 이름이 get으로 시작하고 2개의 파라미터를 갖는 메서드 호출.
+        ● execution(* read*(Integer, ..))
+          - 메서드 이름이 read로 시작하고, 첫 번째 파라미터 타입이 Integer이며, 1개 이상의 파라미터를 갖는 메서드 호출.
+    ■ within 명시자
+      - 메서드가 아닌 특정 타입에 속하는 메서드를 Pointcut으로 설정할 때 사용.
+      ○ 설정 예
+        ● within(com.jica.chap07.WriteArticleService)
+          - WriteArticleService 인터페이스의 모든 메서드 호출.
+        ● within(com.jica.chap07.*)
+          - com.jica.chap07 패키지에 있는 모든 클래스의 모든 메서드 호출.
+        ● within(com.jica.chap07..*)
+          - com.jica.chap07 패키지 및 그 하위 패키지에 있는 모든 메서드 호출.
+    ■ bean 명시자
+      - 스프링 2.5 버전부터 스프링에서 추가적으로 제공하는 명시자.
+      - 스프링 빈 이름을 이용하여 Pointcut을 정의.
+      - 빈 이름의 패턴을 갖는다.
+      ○ 설정 예
+        ● bean(writeArticleService)
+          - 이름이 writeArticleService인 빈의 메서드 호출.
+        ● bean(*ArticleService)
+          - 이름이 ArticleServie로 끝나는 빈의 메서드 호출.
+    ■ 표현식 연결
+      - 각각의 표현식은 '&&' 나 '||' 연산자를 이용하여 연결 가능.
+      ○ @Aspect 어노테이션을 이용하는 경우
+        - '&&' 연산자를 사용하여 두 표현식을 모두 만족하는 Joinpoint에만 Advice가 적용.
+          @AfterThrowing(
+          pointcut = "execution(public * get*()) && execution(public void set*(..))")
+          public void throwingLogging() {
+            ...
+          }
+      ○ XML 스키마를 이용하여 Aspect를 설정하는 경우
+        - '&&'나 '||' 연산자를 사용.
+        <aop:pointcut id="propertyMethod"
+            expression="execution(public * get*()) &amp;&amp; execution(public void set*(..))" />
+         - XML 문서이기 때문에 값에 들어가는 '&&' '||'를 '&amp;&amp;'로 표현.
+         - 설정파일에서 '&&'나 '||' 대신 'and'와 'or'를 사용할 수 있도록 하고 있음.
+        <aop:pointcut id="propertyMethod"
+           expression="execution(public * get*()) and execution(public void set*(..))" />
+
+    □ 프록시 구현 방식에 따른 execution 적용 차이
+    - Pointcut은 실제로 프록시가 구현하고 있는 인터페이스를 기준으로 Pointcut을 적용.
+    - 인터페이스를 구현하고 있는 대상 객체에 대해서 Pointcut을 정의하려면 인터페이스를 기준으로 Pointcut을 작성.
+      <aop:aspect id="cacheAspect" ref="cache">
+         <aop:around method="read"
+             pointcut="execution(public * com..core.ReadArticleServiceImpl.get*(..))" />
+         </aop:aspect>
+
+        <bean id="readArticleService" class="com.jica.chap07.core.ReadArticleServiceImpl" />
+        
+    - ReadArticleServiceImpl 클래스가 ReadArticleService 인터페이스를 구현하고 있다면, 
+        <aop:around>는 ReadArticleServiceImpl 클래스의 get으로 시작하는 메서드에 적용.
+        (<aop:around> 태그에서 명시한 Pointcut은 readArticleService 빈에는 적용되지 않음.)
+    - ReadArticleServiceImpl 클래스가 인터페이스를 구현하고 있지 않다면,
+           생성된 프록시는 ReadArticleServiceImpl 클래스를 상속받아 생성됨. (Pointcut은 readArticleService 빈에만 적용.)
+```
+
+
+
++ AOP관련 api 도움말
+	- https://www.eclipse.org/aspectj/doc/next/runtime-api/index.htm
+
+
+
+
+
++ AppCtxWithCache.java
+```java
+package config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+
+import aspect.CacheAspect;
+import aspect.ExeTimeAspect;
+import chap07.Calculator;
+import chap07.RecCalculator;
+
+@Configuration
+@EnableAspectJAutoProxy
+public class AppCtxWithCache {
+
+	//공통기능1
+	@Bean
+	public CacheAspect cacheAspect() {
+		return new CacheAspect();
+	}
+
+	//공통기능2
+	@Bean
+	public ExeTimeAspect exeTimeAspect() {
+		return new ExeTimeAspect();
+	}
+
+	@Bean
+	public Calculator calculator() {
+		return new RecCalculator();
+	}
+}
+```
+
++ ExeTimeAspect.java
+```java
+package aspect;
+
+import java.util.Arrays;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.annotation.Order;
+
+
+//AOP에서는 공통기능을 수행하는 클래스를 아무런 제약이 없는 일반 자바클래스로 만든다.
+
+@Aspect
+@Order(1)
+public class ExeTimeAspect {
+	public ExeTimeAspect() {
+		System.out.println("@Aspect -- ExeTimeAspect::ExeTimeAspect()....");
+	}
+	
+	//공통기능을 적용할 대상을 설정한다==>chap07패키지와 그 하위 패키지에 위치한 타입의 public메서드를 pointcut으로 설정.
+	@Pointcut("execution(public * chap07..*(..))")
+	private void publicTarget() {
+		System.out.println("@Pointcut -- ExeTimeAspect::publicTarget()...");
+	}
+
+	//Around Advice 즉, publicTarget()에 적용된 대상의 메서드가 호출전/후에 아래의 공통기능이 적용된다.
+	//아래의 measure()메서드의 인자로 전달된 객체안에 사용자가 실제호출할 핵심기능객체및 메서드의 모든정보가 저장되어 있다.
+	@Around("publicTarget()")
+	public Object measure(ProceedingJoinPoint joinPoint) throws Throwable {
+		System.out.println("@Pointcut -- ExeTimeAspect::measure(ProceedingJointPoint)...");
+		//핵심기능 작동이전의 공통기능 -- 웹프로그램이라면, 로그인체크기능
+		long start = System.nanoTime();
+		//핵심기능 수행
+		try {
+			Object result = joinPoint.proceed(); //핵심기능 호출
+//			System.out.println("결과값은 "+result);
+			return result;
+		} finally {
+			//로그파일에 접속정보 저장 -- 로그파일에 접속정보 저장
+			long finish = System.nanoTime();
+			System.out.println("걸린시간은 "+(finish - start)+" 나노초입니다.");
+			
+			Signature sig = joinPoint.getSignature();
+			System.out.printf("%s.%s(%s) 실행 시간 : %d ns\n",
+					joinPoint.getTarget().getClass().getSimpleName(), //클래스명 : RecCalculator
+					sig.getName(),                                    //메서드명 : factorial
+					Arrays.toString(joinPoint.getArgs()),             //인자정보 : [5]
+					(finish - start));                                //실행시간 : 끝-시작
+		}
+	}
+}
+```
+
++ CacheAspect.java
+```java
+package aspect;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.annotation.Order;
+
+@Aspect
+@Order(2)
+public class CacheAspect {
+
+	private Map<Long, Object> cache = new HashMap<>();
+
+	public CacheAspect() {
+		System.out.println("@Aspect --CacheAspect::CacheAspect()...");
+	}
+	
+	@Pointcut("execution(public * chap07..*(long))")
+	public void cacheTarget() {
+		System.out.println("@Pointcut -- CacheAspect::cacheTarget()...");		
+	}
+	
+	@Around("cacheTarget()")
+	public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
+		System.out.println("@Around -- CacheAspect::execute(ProceedingJoinPoint)...");
+		Long num = (Long) joinPoint.getArgs()[0];
+		if (cache.containsKey(num)) {
+			System.out.printf("CacheAspect: Cache에서 구함[%d]\n", num);
+			return cache.get(num);
+		}
+
+		Object result = joinPoint.proceed();
+		cache.put(num, result);
+		System.out.printf("CacheAspect: Cache에 추가[%d]\n", num);
+		return result;
+	}
+}
+```
+
++ MainAspectWithCache.java
+```java
+package main;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import chap07.Calculator;
+import config.AppCtxWithCache;
+
+public class MainAspectWithCache {
+	
+	public static void main(String[] args) {
+		AnnotationConfigApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtxWithCache.class);
+		System.out.println("ApplicationContext초기화 끝-------------------------------------------------------------------");
+		
+		String[] names = ctx.getBeanDefinitionNames();
+		for(String name : names) {
+			System.out.println(name);
+		}
+		
+		System.out.println("ApplicationContext사용----------------------------------------------------------------------");
+	
+		Calculator cal = ctx.getBean("calculator", Calculator.class);
+		long v1 = cal.factorial(7);
+		System.out.println("v1결과값 : "+v1);
+		//작동순서 Order(1)....ExeTimeAspect.measure() <-| 결과값과 시간 출력
+		//		Order(2)....CacheAspect.execute()     | <--| 내부 HashMap 7! 계산값
+		//		RecCalculator.factorial(7) 게산 ----------> |
+		long v2 = cal.factorial(7);
+		System.out.println("v1결과값 : "+v2);
+		long v3 = cal.factorial(5);
+		System.out.println("v1결과값 : "+v3);
+		long v4 = cal.factorial(5);
+		System.out.println("v1결과값 : "+v4);
+		
+		System.out.println("ApplicationContext끝----------------------------------------------------------------------");
+		
+		ctx.close();
+	}
+}
+```
+
+
 #### 4. 실습
 #### 5. Summary / Close
 
