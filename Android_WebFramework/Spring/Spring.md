@@ -5449,7 +5449,1038 @@ public class MainAspectWithCache {
 ### [2019-07-31]
 
 #### 1. Review
++ 반복적인 커넥션... 반복적인 예외처리 같은 작업을 ApplicationContext가 관리하도록 해야한다.
 
 #### 2. JDBC 사용하기
-#### 3. JDBC 소개
-#### 4. Summary / Close
+##### 스프링에서 JDBC사용하기
+0. 실습 순서
+   1) main.MainForMemberDao.java  ----> JdbcTemplate클래스 사용법 설명
+   2) main.MainForCPS.java        ----> 트랜잭션 처리(xml설정)
+   3) main.MainForJS.java         ----> 트랜잭션 처리(어노테이션 설정화일)
+   
+1. 스프링에서의 jdbc
+   1) JdbcTemplate클래스를 이용하여 JDBC프로그램에서의 코드 중복을 극복하고 있다.
+   2) 트랜잭션(transaction)처리를 위한 
+      connection 객체의 setAutoCommit(false), commit(), rollback()사용을
+      @Transaction 애노테이션을 이용하여 간소화 한다.
+   3) 컨넥션풀을 사용
+   
+2. 준비
+   - pom.xml화일 설정 -- 다음의 의존성을 추가한다.
+```xml   
+   		<!-- JdbcTemplate등 JDBC 연동에 필요한 기능 제공 --> 
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>	
+
+		
+		<!-- Oracle 연결에 필요한 jdbc 드라이버 제공 -->
+    	<dependency>
+		    <groupId>oracle</groupId>
+		    <artifactId>ojdbc6</artifactId>
+		    <version>11.2.0</version>
+            <systemPath>C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar</systemPath>
+            <scope>system</scope>
+        </dependency> 
+```        
+
+3. 테이블 생성(member.sql)
+```sql
+    DROP TRIGGER member_id_trigger;
+	DROP SEQUENCE member_id_seq;
+	DROP TABLE member;
+
+	CREATE TABLE member(
+		id 			NUMBER PRIMARY KEY,
+		email 		VARCHAR2(255) UNIQUE,
+		password 	VARCHAR2(255),
+		name 		VARCHAR2(100),
+		regdate 	DATE
+	);
+
+	CREATE SEQUENCE member_id_seq
+	START WITH 1;
+	        
+	-- member 테이블에 insert 할 때마다 id column에 이 sequence 를 적용시킬 수 있도록 trigger를 걸어보도록 하자.
+	CREATE OR REPLACE TRIGGER member_id_trigger
+	BEFORE INSERT	ON member
+	REFERENCING NEW AS NEW
+	FOR EACH ROW
+	BEGIN
+		SELECT member_id_seq.NEXTVAL INTO :NEW.ID FROM dual;
+	END;
+	/
+	
+	--INSERT INTO member(id, email, password, name, regdate)
+	--VALUES(member_id_seq.NEXTVAL, 'madvirus@madvirus.net', '1234', 'JICA', SYSDATE);
+	
+	INSERT INTO member(email, password, name, regdate)
+	VALUES('madvirus@madvirus.net', '1234', 'JICA', SYSDATE);
+	
+	COMMIT;
+```
+
+4. 어플리케이션 컨텍스트 설정화일
+```java
+  	@Bean(destroyMethod = "close")
+	public DataSource dataSource() {
+		DataSource ds = new DataSource();
+		ds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+		ds.setUrl("jdbc:oracle:thin:@127.0.0.1:1521:XE");
+		ds.setUsername("SCOTT");
+		ds.setPassword("TIGER");
+		ds.setInitialSize(2);
+		ds.setMaxActive(10);
+		ds.setTestWhileIdle(true); //유휴 컨텍션 검사
+		ds.setMinEvictableIdleTimeMillis(1000* 60 * 3); //최소 유휴시간 3qns
+		ds.setTimeBetweenEvictionRunsMillis(10 * 1000);	//10초 주기	
+
+		return ds;
+	}
+```
+
+5. JdbcTemplate 사용하기
+```java   
+   import javax.sql.DataSource;
+   import org.springframework.jdbc.core.JdbcTemplate;
+   
+   public class MemberDao {
+		private JdbcTemplate jdbcTemplate;
+	
+		public MemberDao(DataSource dataSource) {
+			1)JdbcTemplate객체 생성
+			this.jdbcTemplate = new JdbcTemplate(dataSource);
+		}
+		...
+   }
+```   
+
+1)JdbcTemplate객체 사용( 드라이버 로드, 컨넥션 얻기,   close()등은 생략해도
+                          우리가 사용하는 메서드 내부에서 처리해 준다. sql명령 자체에만 집중하면 된다.)
+    
+    - DDL, DML(select, insert, update, delete), DTL(rollback, commit)
+                          
+   	- SELECT구문의 사용법
+   	1) 결과값이 단일 row, 단일 column :  
+   	      SELECT COUNT(*) FROM member;
+   	      SELECT COUNT(*) FROM emp;
+   	   queryForObject(String sql, Integer.class)
+   	      SELECT COUNT(*) FROM emp WHERE deptno = 20 AND sal > 2000;
+   	   queryForObject(Sting sql, Integer.class, Object args...);
+   	   queryForObject("SELECT COUNT(*) FROM emp WHERE deptno=? AND sal > ?",
+   	                  Integer.class, 20,2000}); 
+   	                  
+   	2) 결과값이 여러 row이고, 여러 column으로 구성되어 있을때
+   	   SELECT * FROM emp WHERE deptno = 20;                  
+     - 조회 1
+     Statement 사용시
+     public List<T> query(String sql, RowMapper<T> rowMapper) throws DataAccessException
+    
+     PreparedStatement 사용시 
+	 public List<T> query(String sql, RowMapper<T> rowMapper, Object... args) throws DataAccessException
+     public List<T> query(String sql, Object[] args, RowMapper<T> rowMapper) throws DataAccessException
+     -------------------------------------------------------------
+     RowMapper 인터페이스(클래스)를 이용하여 ResultSet의 결과를 자바 객체로 변환한다.
+     sql파라미터가 PreparedStatement의 ?형태일때는 args 파라메터값을 사용한다.
+     -------------------------------------------------------------
+     
+     RowMapper 인터페이스     
+     public interface RowMapper<T>{
+     	T mapRow(ResultSet rs, int rowNum) throws SQLException;
+     } 
+     
+       사용예 1)
+     public Member selectByEmail(String email) {
+		List<Member> results = jdbcTemplate.query(
+				"select * from MEMBER where EMAIL = ?",
+				new RowMapper<Member>() {
+
+					public Member mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						Member member = new Member(rs.getString("EMAIL"),
+								rs.getString("PASSWORD"),
+								rs.getString("NAME"),
+								rs.getTimestamp("REGDATE"));
+						member.setId(rs.getLong("ID"));
+						return member;
+					}
+				},
+				email);
+
+		return results.isEmpty() ? null : results.get(0);
+	}
+	
+	사용예2)
+	public List<Member> selectAll() {
+		List<Member> results = jdbcTemplate.query("select * from MEMBER",
+				new RowMapper<Member>() {
+					//@Override
+					public Member mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						Member member = new Member(rs.getString("EMAIL"),
+								rs.getString("PASSWORD"),
+								rs.getString("NAME"),
+								rs.getTimestamp("REGDATE"));
+						member.setId(rs.getLong("ID"));
+						return member;
+					}
+				});
+		return results;
+	}
+	
+	- 조회 2
+	단일값을 리턴받는 쿼리문일때는  다음의 메서드를 사용하자
+	public T queryForObject(String sql, Class<T> requiredType) throws DataAccessException
+     
+      사용예) 
+    public int count() {
+		Integer count = jdbcTemplate.queryForObject(
+					"select count(*) from MEMBER", 
+					Integer.class);
+		return count;
+	}   
+	
+	인자가 있는 경우는 다음 메서드를 사용한다.
+	public <T> T queryForObject(String sql,Class<T> requiredType,Object... args) throws DataAccessException
+        double avg = jdbcTemplate.queryForObject(
+        			"select avg(height) from 테이블 where type=? and status=?",
+        			Double.class,
+        			100, "S");
+        						
+      실행결과가 두개 이상의 칼럼을 갖고 있는경우는 RowMapper를 사용    
+	public <T> T queryForObject(String sql, RowMapper<T> rowMapper) throws DataAccessException      
+    public <T> T queryForObject(String sql, RowMapper<T> rowMapper, Object... args) throws DataAccessException
+        
+    
+    - INSERT, UPDATE, DELETE : update()메서드 사용
+    public int update(String sql) throws DataAccessException
+    public int update(String sql, Object... args) throws DataAccessException
+    
+    =======================================================
+    PreparedStatementCreator 인터페이스 사용
+    =======================================================
+    INSERT시 KeyHolder를 이용한 자동키 생성
+    
+    	public void insert(final Member member) {
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		jdbcTemplate.update(new PreparedStatementCreator() {
+			//@Override
+			public PreparedStatement createPreparedStatement(Connection con) 
+					throws SQLException {
+				PreparedStatement pstmt = con.prepareStatement(
+						"insert into MEMBER (EMAIL, PASSWORD, NAME, REGDATE) "+
+						"values (?, ?, ?, ?)",
+						new String[] {"ID"});
+				pstmt.setString(1,  member.getEmail());
+				pstmt.setString(2,  member.getPassword());
+				pstmt.setString(3,  member.getName());
+				pstmt.setTimestamp(4,  
+						new Timestamp(member.getRegisterDate().getTime()));
+				return pstmt;
+			}
+		}, keyHolder);
+		Number keyValue = keyHolder.getKey();
+		member.setId(keyValue.longValue());
+	}
+      
+1) 예외처리 :jdbc 프로그램에서는 명령어를 사용하면서 SQLException철리를 했다.
+    JdbcTemplate에서는 SQLException이 발생하면 내부적으로  DataAccessException으로 변환시켜 발생해준다.
+    
+     예외가 발생하면 BadSqlGrammarException이 발생한다.
+     
+     다양한 종류의 예외에 대해서 모두 혹은 반드시 예외처리구분을 사용하는 것이 아니라
+     사용자가 개입할 필요성이 있든 부분에만 선택적으로 예최처리 구문을 작성하면 된다. 
+     
+     jdbc에서는 반드시 try catch로 처리해야만 했다면
+     JdbcTemplate에서는 안해도 된다. 내가 개입할 필요가 있을때만 선택적으로 SQLException을 사용하지 말고
+```	 
+                                 try{
+                                   sql명령실행코드...
+                                 } catch(DataAccessException){
+                                 }          						
+```
+
+
+##### 실습
++ chap08/AppCtx.java
+```java
+package config;
+
+import org.apache.tomcat.jdbc.pool.DataSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import spring.ChangePasswordService;
+import spring.MemberDao;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberPrinter;
+import spring.MemberRegisterService;
+
+@Configuration
+@EnableTransactionManagement //<---- 트렌젝션 메니저가 활성화하도록 함.
+public class AppCtx {
+
+	@Bean(destroyMethod = "close")
+	public DataSource dataSource() {
+		DataSource ds = new DataSource();
+		//mysql --> "com.mysql.jdbc.Driver"
+		ds.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+		//mysql --> "jdbc:mysql:thin://localhost/db명?charsetEncoding=utf8"
+		ds.setUrl("jdbc:oracle:thin:@127.0.0.1:1521:XE");
+		ds.setUsername("SCOTT");
+		ds.setPassword("TIGER");
+		ds.setInitialSize(2);
+		ds.setMaxActive(10);
+		ds.setMaxIdle(10);
+		ds.setTestWhileIdle(true); //유휴 컨텍션 검사
+		ds.setMinEvictableIdleTimeMillis(1000* 60 * 3); //최소 유휴시간 3qns
+		ds.setTimeBetweenEvictionRunsMillis(10 * 1000);	//10초 주기	
+
+		return ds;
+	}
+
+	//트렌젝션 예외처리 자동을 위한 구문
+	@Bean
+	public PlatformTransactionManager transactionManager() {
+		DataSourceTransactionManager tm = new DataSourceTransactionManager();
+		tm.setDataSource(dataSource());
+		return tm;
+	}
+
+	@Bean
+	public MemberDao memberDao() {
+		return new MemberDao(dataSource());
+	}
+
+	@Bean
+	public MemberRegisterService memberRegSvc() {
+		return new MemberRegisterService(memberDao());
+	}
+
+	@Bean
+	public ChangePasswordService changePwdSvc() {
+		ChangePasswordService pwdSvc = new ChangePasswordService();
+		pwdSvc.setMemberDao(memberDao());
+		return pwdSvc;
+	}
+
+	@Bean
+	public MemberPrinter memberPrinter() {
+		return new MemberPrinter();
+	}
+
+	@Bean
+	public MemberListPrinter listPrinter() {
+		return new MemberListPrinter(memberDao(), memberPrinter());
+	}
+
+	@Bean
+	public MemberInfoPrinter infoPrinter() {
+		MemberInfoPrinter infoPrinter = new MemberInfoPrinter();
+		infoPrinter.setMemberDao(memberDao());
+		infoPrinter.setPrinter(memberPrinter());
+		return infoPrinter;
+	}
+}
+```
+
+
+
++ chap08/pom.xml
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.jica</groupId>
+  <artifactId>chap08</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>chap08</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+ 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>5.0.2.RELEASE</version>
+		</dependency>
+		
+		<!-- JDBC Template을 사용하기위한 설정 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>5.0.2.RELEASE</version>
+		</dependency>
+		
+		<!-- 여러 Connection Pool을 사용하는 방법중에서
+		Tomcat의 JDBC기능의 커텍션풀을 사용하기위한 설정 -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>8.5.27</version>
+		</dependency>
+		<!-- 
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.45</version>
+		</dependency>
+		-->
+				
+		<!-- Oracle 연결에 필요한 jdbc 드라이버 제공 -->
+    	<dependency>
+		    <groupId>oracle</groupId>
+		    <artifactId>ojdbc6</artifactId>
+		    <version>11.2.0</version>
+            <systemPath>C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+  </dependencies>
+</project>
+```
+
++ chap08/MemberDao.java
+```java
+package spring;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+
+public class MemberDao {
+
+	private JdbcTemplate jdbcTemplate;
+
+	public MemberDao(DataSource dataSource) {
+		// JdbcTemplate객체가 만들어지면 
+		// 내부적으로 오라클드라이버도 로드하고
+		// 컨넥션풀도 만들어서 컨넥션을 유지하고 있다.
+		// 우리는 JdbcTemplate객체를 이용하여 다음의 기능을 사용할 것이다.
+		// 1. SELECT 
+		//    결과값이 단일값  (SQL> SELECT COUNT(*) FROM member;)
+		//    결과값이 여러 컬럼 (SQL> SELECT * FROM member WHERE id=1;)
+		//    결과값이 여러 row이고 여러 컬럼 (SQL> SELECT * FROM member;)
+		//    조건등 여러곳에 값을 사용한 표현(파라메터)
+		// 2. UPDATE(INSERT, UPDATE, DELETE)
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		
+		// 이제부터는 JdbcTemplate객체의 모든 메서드 내부에서
+		// connection을 얻거나 반납할 필요가 있을때 datasource를 이용한
+		// connection pool에서 동작하게 한다.
+	}
+
+	public Member selectByEmail(String email) {
+		List<Member> results = jdbcTemplate.query(
+				"select * from MEMBER where EMAIL = ?",
+				new RowMapper<Member>() {
+					@Override
+					public Member mapRow(ResultSet rs, int rowNum) throws SQLException {
+						Member member = new Member(
+								rs.getString("EMAIL"),
+								rs.getString("PASSWORD"),
+								rs.getString("NAME"),
+								rs.getTimestamp("REGDATE").toLocalDateTime());
+						member.setId(rs.getLong("ID"));
+						return member;
+					}
+				}, email);
+
+		return results.isEmpty() ? null : results.get(0);
+	}
+
+	public void insert(Member member) {
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		jdbcTemplate.update(new PreparedStatementCreator() {
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con)
+					throws SQLException {
+				// 파라미터로 전달받은 Connection을 이용해서 PreparedStatement 생성
+				PreparedStatement pstmt = con.prepareStatement(
+						"insert into MEMBER (EMAIL, PASSWORD, NAME, REGDATE) " +
+						"values (?, ?, ?, ?)",
+						new String[] { "ID" });
+				// 인덱스 파라미터 값 설정
+				pstmt.setString(1, member.getEmail());
+				pstmt.setString(2, member.getPassword());
+				pstmt.setString(3, member.getName());
+				pstmt.setTimestamp(4,
+						Timestamp.valueOf(member.getRegisterDateTime()));
+				// 생성한 PreparedStatement 객체 리턴
+				return pstmt;
+			}
+		}, keyHolder);
+		Number keyValue = keyHolder.getKey();
+		member.setId(keyValue.longValue());
+	}
+
+	public void update(Member member) {
+		//JdbcTemplate사용시
+		//우리는 Driver load, Connectiont얻기, Statement생성, ResultSet조작, 예외처리등의 작업을
+		//전혀 사용하지않고 단, sql명령과 결과를 처리하는데 집중하면 된다.
+		jdbcTemplate.update(
+				"update MEMBER set NAME = ?, PASSWORD = ? where EMAIL = ?",
+				member.getName(), member.getPassword(), member.getEmail());
+	}
+
+	public List<Member> selectAll() {
+		/*
+		List<Member> results = jdbcTemplate.query("select * from MEMBER",
+				(ResultSet rs, int rowNum) -> {
+					Member member = new Member(
+							rs.getString("EMAIL"),
+							rs.getString("PASSWORD"),
+							rs.getString("NAME"),
+							rs.getTimestamp("REGDATE").toLocalDateTime());
+					member.setId(rs.getLong("ID"));
+					return member;
+				});
+		return results;
+		*/
+		
+		//<T> List<T>	query(String sql, RowMapper<T> rowMapper)
+		//                                ======================
+		//                                select문으로 얻어진 ResultSet의 데이타가 여러건일때
+		//                                1건의 데이타를 사용자가 관리하는 객체로 변환시켜주는 클래스
+		
+		//별도로 RowMapper 클래스를 만들어 놓았을때
+		//MemberMapper memberMapper = new MemberMapper();		
+		//List<Member> results = jdbcTemplate.query("select * from MEMBER", memberMapper);
+				
+		//bof-------------------------
+		//   0번째 row
+		//   1번재 row
+		//   2번재 row
+		//   3번재 row		
+		//   4번재 row		
+		//eof-------------------------
+		
+		// RowMapper를 익명의 클래스로 사용할때
+		List<Member> results = jdbcTemplate.query("select * from MEMBER",
+				new RowMapper<Member>() {
+					//@Override
+					public Member mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						//디버깅
+						System.out.println("mapRow() : " + rowNum);
+
+						Member member = new Member(rs.getString("EMAIL"),
+								rs.getString("PASSWORD"),
+								rs.getString("NAME"),
+								rs.getTimestamp("REGDATE").toLocalDateTime());
+						member.setId(rs.getLong("ID"));
+						return member;  //리턴된 member객체는 List에 추가된다.
+					}
+				});
+		
+		return results;
+	}
+
+	public int count() {
+		
+		// public <T> T queryForObject(String sql,    Class<T> requiredType) throws DataAccessException
+		// select문의 결과 row가  1건이고 컬럼도 1일때 사용
+		Integer count = null;
+		try {
+			count = jdbcTemplate.queryForObject("select count(*) from MEMBER", Integer.class);
+		}catch(DataAccessException e) {
+			//예외처리 코드
+		}
+		return count;
+	}
+}
+```
+
+
+
++ chap08/MainForMemberDao.java
+```java
+package main;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import config.AppCtx;
+import spring.Member;
+import spring.MemberDao;
+
+public class MainForMemberDao {
+	private static MemberDao memberDao;
+
+	public static void main(String[] args) {
+		AnnotationConfigApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtx.class);
+		System.out.println("ApplicationContext초기화 끝-------------------------------------------------------------------");
+		
+		String[] names = ctx.getBeanDefinitionNames();
+		for(String name : names) {
+			System.out.println(name);
+		}
+		
+		System.out.println("ApplicationContext사용----------------------------------------------------------------------");
+
+		
+		memberDao = ctx.getBean(MemberDao.class);
+
+		selectAll();
+		
+		selectByEmail();
+		
+		updateMember();
+		
+		insertMember();
+		
+		System.out.println("ApplicationContext끝----------------------------------------------------------------------");
+
+		ctx.close();
+	}
+
+	private static void selectAll() {
+		System.out.println("----- selectAll");
+		int total = memberDao.count();		
+		System.out.println("전체 데이터: " + total);
+		
+		List<Member> members = memberDao.selectAll();
+		//                               ============
+		//                            x  1) connection 얻기
+		//                               2) Statement, preparedStatement 객체 얻기
+		//                               3) sql문장 작성
+		//                               4) 실행시켜 결과를 ResultSet으로 받는다.
+		//                            x  5) ArrayList<Member>()를 생성한후
+		//                            x  6) while( rs.next() ){
+		//                            x          rs.getXXX() 컬럼값얻기
+		//                            x         객체생성
+		//                            x         list.add(객체);
+		//                            x     }
+		//                            x  7) connection.close()
+		//                               8) list객체 리턴
+		for (Member m : members) {
+			System.out.println(m.getId() + ":" + m.getEmail() + ":" + m.getName() + " 패스워드 :" + m.getPassword());
+		}		
+		for (Member m : members) {
+			System.out.println(m.getId() + ":" + m.getEmail() + ":" + m.getName());
+		}
+	}
+
+	private static void selectByEmail() {
+		System.out.println("----- selectByEmail");
+		Member member = memberDao.selectByEmail("jica03@daum.net");
+			
+		System.out.println(member);
+	}
+	
+	private static void updateMember() {
+		System.out.println("----- updateMember");
+		Member member = memberDao.selectByEmail("jica02@daum.net");
+		String oldPw = member.getPassword();
+		String newPw = Double.toHexString(Math.random());
+		member.changePassword(oldPw, newPw);
+
+		memberDao.update(member);
+		System.out.println("암호 변경: " + oldPw + " > " + newPw);
+	}
+
+	private static DateTimeFormatter formatter = 
+			DateTimeFormatter.ofPattern("MMddHHmmss");
+
+	private static void insertMember() {
+		System.out.println("----- insertMember");
+
+		String prefix = formatter.format(LocalDateTime.now());
+		Member member = new Member(prefix + "@test.com", 
+				prefix, prefix, LocalDateTime.now());
+		memberDao.insert(member);
+		System.out.println(member.getId() + " 데이터 추가");
+	}
+}
+```
+
+
+
++ chap08/main/sql/ddl.sql
+```sql
+create user 'spring5'@'localhost' identified by 'spring5';
+
+create database spring5fs character set=utf8;
+
+grant all privileges on spring5fs.* to 'spring5'@'localhost';
+
+create table spring5fs.MEMBER (
+    ID int auto_increment primary key,
+    EMAIL varchar(255),
+    PASSWORD varchar(100),
+    NAME varchar(100),
+    REGDATE datetime,
+    unique key (EMAIL) 
+) engine=InnoDB character set = utf8;
+```
+
+
++ chap08/main/sql/member.sql
+```sql
+-- Oracle에서 예제 테이블을 생성
+
+DROP TRIGGER member_id_trigger;
+DROP SEQUENCE member_id_seq;
+DROP TABLE member;
+
+CREATE TABLE member(
+	id 			NUMBER PRIMARY KEY,
+	email 		VARCHAR2(255) UNIQUE,
+	password 	VARCHAR2(255),
+	name 		VARCHAR2(100),
+	regdate 	DATE
+);
+
+CREATE SEQUENCE member_id_seq
+START WITH 1;
+        
+-- member 테이블에 insert 할 때마다 id column에 이 sequence 를 적용시킬 수 있도록 trigger를 걸어보도록 하자.
+CREATE OR REPLACE TRIGGER member_id_trigger
+BEFORE INSERT	ON member
+REFERENCING NEW AS NEW
+FOR EACH ROW
+BEGIN
+SELECT member_id_seq.NEXTVAL INTO :NEW.ID FROM dual;
+END;
+/
+
+--INSERT INTO member(id, email, password, name, regdate)
+--VALUES(member_id_seq.NEXTVAL, 'madvirus@madvirus.net', '1234', 'JICA', SYSDATE);
+
+INSERT INTO member(email, password, name, regdate)
+VALUES('jica01@daum.net', '1234', 'JICA', SYSDATE);
+
+INSERT INTO member(email, password, name, regdate)
+VALUES('jica02@daum.net', '1234', 'JICA2', SYSDATE);
+
+INSERT INTO member(email, password, name, regdate)
+VALUES('jica03@daum.net', '1234', 'JICA3', SYSDATE);
+
+INSERT INTO member(email, password, name, regdate)
+VALUES('jica04@daum.net', '1234', 'JICA4', SYSDATE);
+
+INSERT INTO member(email, password, name, regdate)
+VALUES('jica05@daum.net', '1234', 'JICA5', SYSDATE);
+
+COMMIT;
+```
+
+
+
+
++ chap08/ChangePasswordService.java
+```java
+package spring;
+
+import org.springframework.transaction.annotation.Transactional;
+
+public class ChangePasswordService {
+
+	private MemberDao memberDao;
+
+	@Transactional    //<------ 아래 메서드가 작동할때, 트렌젝션 메니저 작동.
+	public void changePassword(String email, String oldPwd, String newPwd) {
+		Member member = memberDao.selectByEmail(email);
+		if (member == null)
+			throw new MemberNotFoundException();
+
+		member.changePassword(oldPwd, newPwd);
+
+		memberDao.update(member);
+	}
+
+	public void setMemberDao(MemberDao memberDao) {
+		this.memberDao = memberDao;
+	}
+}
+```
+
+
++ chap08/MainForCPS.java
+```java
+package main;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import config.AppCtx;
+import spring.ChangePasswordService;
+import spring.MemberNotFoundException;
+import spring.WrongIdPasswordException;
+
+public class MainForCPS {
+
+	public static void main(String[] args) {
+		AnnotationConfigApplicationContext ctx = 
+				new AnnotationConfigApplicationContext(AppCtx.class);
+
+        ChangePasswordService cps = 
+                ctx.getBean("changePwdSvc", ChangePasswordService.class);
+        try {
+            cps.changePassword("madvirus@madvirus.net", "1234", "1111");
+            System.out.println("암호를 변경했습니다.");
+        } catch (MemberNotFoundException e) {
+            System.out.println("회원 데이터가 존재하지 않습니다.");
+        } catch (WrongIdPasswordException e) {
+            System.out.println("암호가 올바르지 않습니다.");
+        }
+
+		ctx.close();
+	}
+}
+```
+
+
+
+
+
+##### log4j
+
++ 스프링의 기본 로그메세지를 표현하는 JCL(Java Commons Logging) API 대신에
++ Log4j 모듈(log4j.xml)이 존재할 경우 Log4j를 이용해서 로그를 기록할수 있다.
+
+
+1) 로깅 레벨 !
+① FATAL : 가장 크리티컬한 에러가 일어 났을 때 사용합니다.
+② ERROR : 일반 에러가 일어 났을 때 사용합니다.
+③ WARN : 에러는 아니지만 주의할 필요가 있을 때 사용합니다.
+④ INFO : 일반 정보를 나타낼 때 사용합니다.
+⑤ DEBUG : 일반 정보를 상세히 나타낼 때 사용합니다.
+
+
+2) 로그정보 형식 
+```
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" 
+				value="[%t] [%d{yyyy-MM-dd HH:mm:ss}] %-5p %c:%M - %m%n" />
+		</layout>
+	</appender>
+
+  appender 는 로그정보를 어디에다가 남길것인가를 정하는 부분이다 .
+   콘솔이나, log파일, xml파일 등으로 남길수 있다. 여기서는 콘솔에 남긴다.
+
+   내가 원하는 정보를 꾸미기를는 ConversionPattern 의 vaule에다가 해주면 된다 .
+   상세 정보는 아래 표와 같다. 
+
+   형식	설명
+  ------------------------------------------------------------- 
+  %p	debug, info, warn, error, fatal 등의 priority 가 출력된다.
+  %m	로그내용이 출력됩니다
+  %d	로깅 이벤트가 발생한 시간을 기록합니다.
+          포맷은 %d{HH:mm:ss, SSS}, %d{yyyy MMM dd HH:mm:ss, SSS}같은 형태로 사용하며 SimpleDateFormat에 따른 포맷팅을 하면 된다
+  %t	로그이벤트가 발생된 쓰레드의 이름을 출력합니다.
+  %%	% 표시를 출력하기 위해 사용한다.
+  %n	플랫폼 종속적인 개행문자가 출력된다. \r\n 또는 \n 일것이다.
+  %c	카테고리를 표시합니다 
+          예) 카테고리가 a.b.c 처럼 되어있다면 %c{2}는 b.c가 출력됩니다.
+  %C	클래스명을 포시합니다. 
+          예) 클래스구조가 org.apache.xyz.SomeClass 처럼 되어있다면 %C{2}는 xyz.SomeClass 가 출력됩니다
+  %F	로깅이 발생한 프로그램 파일명을 나타냅니다.
+  %l	로깅이 발생한 caller의 정보를 나타냅니다
+  %L	로깅이 발생한 caller의 라인수를 나타냅니다
+  %M	로깅이 발생한 method 이름을 나타냅니다.
+  %r	어플리케이션 시작 이후 부터 로깅이 발생한 시점의 시간(milliseconds)
+  %x	로깅이 발생한 thread와 관련된 NDC(nested diagnostic context)를 출력합니다.
+  %X	로깅이 발생한 thread와 관련된 MDC(mapped diagnostic context)를 출력합니다.
+  ------------------------------------------------------------
+```
+
+3. 어디서 나오는 로그를 볼 것인지도 정해줄수 있다 .
+```
+   디비쪽의 Connection 이라든가, preparedStatement 정보 든가, Bean 정보 등을
+    <logger name="java.sql.Connection">
+        <level value="DEBUG" />
+    </logger>
+
+    이런식으로 계속 추가해주면 그 부분에서의 로그를 볼 수 있다. 
+	
+	<root>
+		<priority value="INFO" />
+		<appender-ref ref="console" />
+	</root>
+```	
+
+4. 이문서에는 앨리먼트 작성 순서가 있다.
+``` 
+   순서가 틀리면 
+  log4j:WARN 요소 유형 "log4j:configuration"의 콘텐츠는 "(renderer*,appender*,plugin*,(category|logger)*,root?,(categoryFactory|loggerFactory)?)"과(와) 일치해야 합니다.
+   이런 메시지가 뜬다 . 괄호 안에 있는 저 앨리먼트 순서대로 나열해줘야 한다.
+
+```
+
+
+
+##### 종합실행
+
++ chap08/Main.java
+```java
+package main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import config.AppCtx;
+import spring.ChangePasswordService;
+import spring.DuplicateMemberException;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.WrongIdPasswordException;
+
+public class Main {
+
+	private static AnnotationConfigApplicationContext ctx = null;
+
+	public static void main(String[] args) throws IOException {
+		ctx = new AnnotationConfigApplicationContext(AppCtx.class);
+
+		BufferedReader reader =
+				new BufferedReader(new InputStreamReader(System.in));
+		while (true) {
+			System.out.println("명렁어를 입력하세요:");
+			String command = reader.readLine();
+			if (command.equalsIgnoreCase("exit")) {
+				System.out.println("종료합니다.");
+				break;
+			}
+			if (command.startsWith("new ")) {
+				processNewCommand(command.split(" "));
+			} else if (command.startsWith("change ")) {
+				processChangeCommand(command.split(" "));
+			} else if (command.equals("list")) {
+				processListCommand();
+			} else if (command.startsWith("info ")) {
+				processInfoCommand(command.split(" "));
+			} else {
+				printHelp();
+			}
+		}
+		ctx.close();
+	}
+
+	private static void processNewCommand(String[] arg) {
+		if (arg.length != 5) {
+			printHelp();
+			return;
+		}
+		MemberRegisterService regSvc =
+				ctx.getBean("memberRegSvc", MemberRegisterService.class);
+		RegisterRequest req = new RegisterRequest();
+		req.setEmail(arg[1]);
+		req.setName(arg[2]);
+		req.setPassword(arg[3]);
+		req.setConfirmPassword(arg[4]);
+
+		if (!req.isPasswordEqualToConfirmPassword()) {
+			System.out.println("암호와 확인이 일치하지 않습니다.\n");
+			return;
+		}
+		try {
+			regSvc.regist(req);
+			System.out.println("등록했습니다.\n");
+		} catch (DuplicateMemberException e) {
+			System.out.println("이미 존재하는 이메일입니다.\n");
+		}
+	}
+
+	private static void processChangeCommand(String[] arg) {
+		if (arg.length != 4) {
+			printHelp();
+			return;
+		}
+		ChangePasswordService changePwdSvc =
+				ctx.getBean("changePwdSvc", ChangePasswordService.class);
+		try {
+			changePwdSvc.changePassword(arg[1], arg[2], arg[3]);
+			System.out.println("암호를 변경했습니다.\n");
+		} catch (MemberNotFoundException e) {
+			System.out.println("존재하지 않는 이메일입니다.\n");
+		} catch (WrongIdPasswordException e) {
+			System.out.println("이메일과 암호가 일치하지 않습니다.\n");
+		}
+	}
+
+	private static void processListCommand() {
+		MemberListPrinter listPrinter =
+				ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
+
+	private static void processInfoCommand(String[] arg) {
+		if (arg.length != 2) {
+			printHelp();
+			return;
+		}
+		MemberInfoPrinter infoPrinter =
+				ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(arg[1]);
+	}
+
+	private static void printHelp() {
+		System.out.println();
+		System.out.println("잘못된 명령입니다. 아래 명령어 사용법을 확인하세요.");
+		System.out.println("명령어 사용법:");
+		System.out.println("new 이메일 이름 암호 암호확인");
+		System.out.println("change 이메일 현재비번 변경비번");
+		System.out.println("info 이메일");
+
+		System.out.println();
+	}
+}
+```
+
+
+
+#### 3. Summary / Close
