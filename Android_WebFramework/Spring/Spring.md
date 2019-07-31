@@ -5450,6 +5450,6 @@ public class MainAspectWithCache {
 
 #### 1. Review
 
-#### 2. SpringFramework
-#### 4. 실습
-#### 5. Summary / Close
+#### 2. JDBC 사용하기
+#### 3. JDBC 소개
+#### 4. Summary / Close
